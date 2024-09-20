@@ -255,7 +255,7 @@
         </div>
         <div class="user-actions">
             <div class="user-info">Bienvenido</div>
-            <a class="btn-logout nav-link text-white" href="{{ url_for('usuario') }}">
+            <a class="btn-logout nav-link text-white" href="">
                 <i class="bi bi-box-arrow-right"></i> Cerrar sesión
             </a>
         </div>
@@ -271,14 +271,8 @@
     <div class="container mt-3">
         <nav aria-label="breadcrumb">
             <ol class="breadcrumb bg-light p-2 rounded">
-                <li class="breadcrumb-item"><a href="{{ url_for('index') }}">Inicio</a></li>
-                {% for name, url in generate_breadcrumbs() %}
-                {% if loop.last %}
-                <li class="breadcrumb-item active" aria-current="page">{{ name }}</li>
-                {% else %}
-                <li class="breadcrumb-item"><a href="{{ url }}">{{ name }}</a></li>
-                {% endif %}
-                {% endfor %}
+                <li class="breadcrumb-item"><a href="">Inicio</a></li>
+
             </ol>
         </nav>
     </div>
@@ -287,20 +281,9 @@
     <!-- Sidenav -->
     <div id="mySidenav" class="sidenav">
         <a href="javascript:void(0)" class="closebtn" onclick="closeNav()">&times;</a>
-        <a href="{{ url_for('index') }}"><i class="bi bi-globe"></i> Inicio</a>
-        <a href="{{ url_for('dashboard') }}"><i class="bi bi-tags"></i> Dashboard</a>
-        <a href="{{ url_for('marca') }}"><i class="bi bi-tags"></i> Marca</a>
-        <a href="{{ url_for('tipo_producto') }}"><i class="bi bi-box-seam"></i> Tipo Producto</a>
-        <a href="{{ url_for('categoria') }}"><i class="bi bi-grid-3x3-gap"></i> Categoria</a>
-        <a href="{{ url_for('presentacion') }}"><i class="bi bi-journal"></i> Presentacion</a>
-        <a href="{{ url_for('grupo_edad') }}"><i class="bi bi-people"></i> Grupo edad</a>
-        <a href="{{ url_for('genero') }}"><i class="bi bi-gender-ambiguous"></i> Genero</a>
-        <a href="{{ url_for('producto') }}"><i class="bi bi-box"></i> Producto</a>
-        <a href="{{ url_for('detallepresentacion') }}"><i class="bi bi-card-list"></i> Detalle Presentacion</a>
-        <a href="{{ url_for('detallepresentacion') }}"><i class="bi bi-person"></i> Clientes</a>
-        <a href="{{ url_for('departamento') }}"><i class="bi bi-building"></i> Departamento</a>
-        <a href="{{ url_for('provincia') }}"><i class="bi bi-map"></i> Provincia</a>
-        <a href="{{ url_for('distrito') }}"><i class="bi bi-geo-alt"></i> Distrito</a>
+        <a href=""><i class="bi bi-globe"></i> Inicio</a>
+        <a href=""><i class="bi bi-tags"></i> Dashboard</a>
+
     </div>
 
     <div class="container main-content mt-3">

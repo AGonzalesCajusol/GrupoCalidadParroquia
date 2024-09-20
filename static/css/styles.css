@@ -1,0 +1,46 @@
+.btn-defecto {
+    background-color: #d0b571 !important; 
+    color: white !important; 
+    border: none;
+    border-radius: 5px;
+    padding: 10px 20px; 
+    cursor: pointer; 
+}
+
+.letters{
+    color: #02070c;
+}
+
+body{
+    font-family: sans-serif !important;
+}
+
+#moduloSeguridad button,
+#moduloActoLiturgico button,
+#moduloSecretaria button,
+#moduloCatequesis button,
+#moduloCaja button,
+#moduloDonaciones button,
+#moduloPersonalParroquial button,
+#moduloTomaDecisiones button {
+    border: none;
+    background: transparent;
+    margin-left: 15px;
+    margin-right: 15px;
+    height: 35px;
+    width: 90%;
+    border-radius: 5px;
+    color: black;
+}
+
+
+
+
+.indices{
+    border: none ;
+}
+
+.indices:hover{
+    background-color: #d0b571 ;
+    color: #fff ;
+}
