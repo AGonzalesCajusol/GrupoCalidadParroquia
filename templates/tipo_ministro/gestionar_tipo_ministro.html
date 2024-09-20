@@ -111,17 +111,7 @@
 
 <!-- Inicialización de DataTables -->
 <script>
-    $(document).ready(function() {
-        $('#tipoMinistroTable').DataTable({
-            "language": {
-                "url": "//cdn.datatables.net/plug-ins/1.13.1/i18n/es-ES.json"
-            },
-            "paging": true,
-            "searching": true,
-            "ordering": true,
-            "responsive": true
-        });
-    });
+    $('#tipoMinistroTable').DataTable()
 </script>
 
 {% endblock %}
