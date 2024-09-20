@@ -1,0 +1,66 @@
+{% extends "index.html" %}
+{% block title %}Gestión solicitudes{% endblock %}
+{% block cuerpo %}
+    <main class="ms-5">
+        <button class="btn btn-primary"><i class="bi bi-plus-circle-fill me-2"></i>Nueva Solicitud</button>
+        <hr>
+        <div class="row">
+            <form action="" class="col-10">
+                <label for="Actoliturgico">Acto liturgico: </label>
+                <input type="text" name="actoliturgico">
+                <hr>
+                <h5>Requisitos</h5>
+                <div>
+                    <table class="table">
+                       <thead>
+                            <tr>
+                                <th>Estado</th>
+                                <th>Id Requisito</th>
+                                <th>Descripcion</th>
+                                <th>Accion</th>
+                            </tr>
+                            <tr>
+                                <td>
+                                    <input type="checkbox" name="ch">
+                                </td>
+                                <td>
+                                    zxczczxczxczxc
+                                </td>
+                                <td>
+                                    Acta de nacimiento
+                                </td>
+                                <th>
+                                    <button class="btn btn-primary" onclick="mostrar('R1')">
+                                        <i class="bi bi-eye me-2"></i> Ver
+                                    </button>
+                                </th>
+                            </tr>
+                            <tr class="" >
+                                <td colspan="12" id="R1" >
+                                    <div class="mx-auto" >
+                                        <img class="" src="/static/img/6807aadf04c8e373aeee366f5b842cb7.jpg" alt="">
+                                    </div>
+                                </td>
+                            </tr>
+                       </thead> 
+                    </table>                
+                </div>
+            </form>
+        </div>
+        <table class="table">
+            <thead>
+
+            </thead>
+            <tbody>
+
+            </tbody>
+        </table>
+    </main>
+    <script>
+        function mostrar(id){
+            var div = document.getElementById(id);
+            div.style.visibility = "hidden";
+        }
+    </script>
+{% endblock %}
+
