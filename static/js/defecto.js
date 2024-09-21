@@ -1,10 +1,16 @@
 function openNav() {
     document.getElementById("mySidenav").classList.add('open');
+    document.getElementById('abrir').style.visibility = 'hidden';
+
 }
 
 function closeNav() {
     document.getElementById("mySidenav").classList.remove('open');
+    document.getElementById('abrir').style.visibility = 'visible';
+
 }
+
+
 //MODIFICAR >>>> onclick="return modificar()"
 function modificar(e) {
     e.preventDefault();
@@ -134,3 +140,5 @@ function volver(e) {
         }
     });
 }
+
+

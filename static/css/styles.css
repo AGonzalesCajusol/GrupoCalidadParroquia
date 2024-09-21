@@ -6,15 +6,44 @@
     padding: 10px 20px; 
     cursor: pointer; 
 }
+#R1 {
+    display: none; /* Oculto inicialmente */
+}
 
+.btn.btn-close:hover{
+    background-color: transparent;
+}
+.btn.btn-close{
+    background-color: transparent;
+    position: absolute;
+    top: 0;
+    left: 85%;
+}
+#uno{
+    margin: 0 !important;
+    font-size: 25px;
+    color: #02070c;
+}
 .letters{
     color: #02070c;
 }
 
-body{
-    font-family: sans-serif !important;
+.box1, .box2 {
+    padding: 2px 22px;
+    box-shadow: 4px 4px 8px rgba(2, 7, 12, 0.1); /* Sombra solo a la derecha y abajo */
 }
 
+
+body{
+    font-family: sans-serif !important;
+    font-size: 14px;
+}
+
+table{
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1); /* Sombra */
+    border-radius: 8px; /* Bordes redondeados (opcional) */
+    overflow: hidden; /* Evita que los bordes redondeados se vean mal */
+}
 #moduloSeguridad button,
 #moduloActoLiturgico button,
 #moduloSecretaria button,
