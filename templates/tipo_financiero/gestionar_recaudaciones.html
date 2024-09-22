@@ -1,0 +1,143 @@
+{% extends "index.html" %}
+{% block title %}Gestión de Recaudaciones{% endblock %}
+{% block cuerpo %}
+
+<div class="container mt-4">
+    <h1>Gestión de Recaudaciones</h1>
+
+    <!-- Botón para abrir el modal de "Agregar" -->
+    <button type="button" class="btn btn-primary mb-3" data-bs-toggle="modal" data-bs-target="#agregarModal">
+        Registrar Recaudación
+    </button>
+
+    <!-- Tabla de recaudaciones -->
+    <table class="table table-striped">
+        <thead>
+            <tr>
+                <th>ID</th>
+                <th>Sede</th>
+                <th>Monto</th>
+                <th>Descripción</th>
+                <th>Fecha</th>
+                <th>Hora</th>
+                <th>Acciones</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for rec in recaudaciones %}
+            <tr>
+                <td>{{ rec[0] }}</td>
+                <td>{{ rec[1] }}</td>
+                <td>{{ rec[2] }}</td>
+                <td>{{ rec[3] }}</td>
+                <td>{{ rec[4] }}</td>
+                <td>{{ rec[5] }}</td>
+                <td>
+                    <button class="btn btn-warning btn-sm" onclick="abrirModalEditar('{{ rec[0] }}', '{{ rec[1] }}', '{{ rec[2] }}', '{{ rec[3] }}', '{{ rec[4] }}', '{{ rec[5] }}')">Modificar</button>
+                    <form action="{{ url_for('eliminar_recaudacion') }}" method="POST" style="display:inline-block;">
+                        <input type="hidden" name="id_recaudacion" value="{{ rec[0] }}">
+                        <button type="submit" class="btn btn-danger btn-sm">Eliminar</button>
+                    </form>
+                </td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+</div>
+
+<!-- Modal para agregar -->
+<div class="modal fade" id="agregarModal" tabindex="-1" aria-labelledby="agregarModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <form action="{{ url_for('insertar_recaudacion') }}" method="POST">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="agregarModalLabel">Registrar Recaudación</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    <div class="mb-3">
+                        <label for="id_sede" class="form-label">ID Sede</label>
+                        <input type="number" class="form-control" name="id_sede" required>
+                    </div>
+                    <div class="mb-3">
+                        <label for="monto" class="form-label">Monto</label>
+                        <input type="number" step="0.01" class="form-control" name="monto" required>
+                    </div>
+                    <div class="mb-3">
+                        <label for="descripcion" class="form-label">Descripción</label>
+                        <input type="text" class="form-control" name="descripcion" required>
+                    </div>
+                    <div class="mb-3">
+                        <label for="fecha" class="form-label">Fecha</label>
+                        <input type="date" class="form-control" name="fecha" required>
+                    </div>
+                    <div class="mb-3">
+                        <label for="hora" class="form-label">Hora</label>
+                        <input type="time" class="form-control" name="hora" required>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
+                    <button type="submit" class="btn btn-primary">Guardar</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+<!-- Modal para editar -->
+<div class="modal fade" id="editarModal" tabindex="-1" aria-labelledby="editarModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <form action="{{ url_for('actualizar_recaudacion') }}" method="POST">
+                <input type="hidden" id="editarId" name="id_recaudacion">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="editarModalLabel">Modificar Recaudación</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    <div class="mb-3">
+                        <label for="id_sede" class="form-label">ID Sede</label>
+                        <input type="number" class="form-control" id="editarSede" name="id_sede" required>
+                    </div>
+                    <div class="mb-3">
+                        <label for="monto" class="form-label">Monto</label>
+                        <input type="number" step="0.01" class="form-control" id="editarMonto" name="monto" required>
+                    </div>
+                    <div class="mb-3">
+                        <label for="descripcion" class="form-label">Descripción</label> 
+                        <textarea type="text" class="form-control" id="editarDescripcion" name="descripcion" required> </textarea>
+                    </div>
+                    <div class="mb-3">
+                        <label for="fecha" class="form-label">Fecha</label>
+                        <input type="date" class="form-control" id="editarFecha" name="fecha" required>
+                    </div>
+                    <div class="mb-3">
+                        <label for="hora" class="form-label">Hora</label>
+                        <input type="time" class="form-control" id="editarHora" name="hora" required>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
+                    <button type="submit" class="btn btn-primary">Guardar cambios</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+<!-- Scripts para manejar el modal de Editar -->
+<script>
+    function abrirModalEditar(id, sede, monto, descripcion, fecha, hora) {
+        document.getElementById("editarId").value = id;
+        document.getElementById("editarSede").value = sede;
+        document.getElementById("editarMonto").value = monto;
+        document.getElementById("editarDescripcion").value = descripcion;
+        document.getElementById("editarFecha").value = fecha;
+        document.getElementById("editarHora").value = hora;
+        var editarModal = new bootstrap.Modal(document.getElementById('editarModal'));
+        editarModal.show();
+    }
+</script>
+
+{% endblock %}

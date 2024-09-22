@@ -1,6 +1,7 @@
 from flask import Flask, render_template
 import routers.router_main  # Importa las rutas generales
 import routers.router_secretaria
+import routers.router_recaudaciones
 import routers.router_tipo_ministro  # Importa las rutas relacionadas con tipos de ministro
 import routers.router_congregacion  # Importa las rutas relacionadas con
 
@@ -23,6 +24,9 @@ routers.router_congregacion.registrar_rutas(app)
 
 # Secretaria
 routers.router_secretaria.registrar_rutas(app)
+
+# Registrar las rutas definidas en router_recaudaciones.py
+routers.router_recaudaciones.registrar_rutas(app)
 
 if __name__ == '__main__':
     app.run(debug=True)
