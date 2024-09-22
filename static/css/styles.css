@@ -10,15 +10,25 @@
     display: none; /* Oculto inicialmente */
 }
 
+.btnfloatante{
+    position: fixed;
+    z-index: 100;
+    right: 20px;
+    bottom: 40px;
+    background-color: rgb(160, 160, 160);
+    width: 52px;
+    height: 52px;
+    border-radius: 50%;
+    font-size: 18px;
+}
+
+
 .btn.btn-close:hover{
     background-color: transparent;
 }
-.btn.btn-close{
-    background-color: transparent;
-    position: absolute;
-    top: 0;
-    left: 85%;
-}
+
+
+
 #uno{
     margin: 0 !important;
     font-size: 25px;
@@ -28,10 +38,18 @@
     color: #02070c;
 }
 
-.box1, .box2 {
-    padding: 2px 22px;
-    box-shadow: 4px 4px 8px rgba(2, 7, 12, 0.1); /* Sombra solo a la derecha y abajo */
+.tab-content{
+    padding-left: 35px;
+    padding-right: 50px;
 }
+.thea{
+    background-color: #443c27;
+}
+.tablasoli td{
+    height: 10px;
+} 
+.tablasoli button{
+} 
 
 
 body{
@@ -61,12 +79,24 @@ table{
     border-radius: 5px;
     color: black;
 }
-
-
-
-
 .indices{
     border: none ;
+}
+#hola{
+    background-color: #8f1010;
+}
+input[type="search"] {
+    border: 2px solid #d0b571;
+    border-radius: 5px; 
+    padding: 5px 10px;
+    width: 200px;
+    font-size: 14px;   
+    background-color: #8f1010; 
+}
+
+/* Añadir margen inferior al contenedor del campo de búsqueda */
+.dataTables_filter {
+    margin-bottom: 8px; /* Ajusta el valor según el espacio que desees */
 }
 
 .indices:hover{
