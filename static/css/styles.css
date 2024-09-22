@@ -15,13 +15,27 @@
     z-index: 100;
     right: 20px;
     bottom: 40px;
-    background-color: rgb(160, 160, 160);
+    background-color: rgb(184, 186, 189);
     width: 52px;
     height: 52px;
     border-radius: 50%;
     font-size: 18px;
 }
+a.btn.btn-close{
+    position: absolute;
+    top: 20px;
+    right: 0;
+}
+#mySidenav{
+    position: absolute;
+    
+}
 
+
+.btnfloatante:hover{
+    background-color: rgb(144, 146, 148);
+    color: white;
+}
 
 .btn.btn-close:hover{
     background-color: transparent;
@@ -37,6 +51,14 @@
 .letters{
     color: #02070c;
 }
+.chkestadoreque {
+    border: 2px solid red; /* Contorno rojo */
+    border-radius: 5px; /* Para un efecto redondeado opcional */
+}
+
+.chkestadoreque:checked {
+    border-color: transparent;/* Mantiene el contorno rojo cuando está marcado */
+}
 
 .tab-content{
     padding-left: 35px;
@@ -47,8 +69,6 @@
 }
 .tablasoli td{
     height: 10px;
-} 
-.tablasoli button{
 } 
 
 
@@ -82,6 +102,7 @@ table{
 .indices{
     border: none ;
 }
+
 #hola{
     background-color: #8f1010;
 }
