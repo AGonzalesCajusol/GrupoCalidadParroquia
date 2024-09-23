@@ -26,20 +26,10 @@ a.btn.btn-close{
     top: 20px;
     right: 0;
 }
-#mySidenav {
-    position: fixed; 
-    top: 80px; 
-    left: 0;
-    width: 0;
-    height: calc(100vh - 80px); 
-    overflow-y: auto;
-    transition: 0.3s;
+#mySidenav{
+    position: absolute;
+    
 }
-
-#mySidenav a:last-child {
-    margin-bottom: 10px; /* Espacio extra para evitar que se pegue al borde */
-}
-
 
 
 .btnfloatante:hover{

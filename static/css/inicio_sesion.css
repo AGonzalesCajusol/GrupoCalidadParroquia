@@ -19,7 +19,7 @@ html, body {
     display: flex;
     justify-content: center;
     align-items: center;
-    overflow: auto; /* Asegura que no haya scroll en este contenedor */
+    overflow: hidden; /* Asegura que no haya scroll en este contenedor */
 }
 
 
