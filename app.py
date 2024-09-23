@@ -1,4 +1,6 @@
 from flask import Flask, render_template
+import controladores.controlador_diocesis
+import routers.router_diocesis
 import routers.router_main  # Importa las rutas generales
 import routers.router_secretaria
 import routers.router_recaudaciones
@@ -27,6 +29,9 @@ routers.router_secretaria.registrar_rutas(app)
 
 # Registrar las rutas definidas en router_recaudaciones.py
 routers.router_recaudaciones.registrar_rutas(app)
+
+# Registrar las rutas definidas en router_diocesis.py
+routers.router_diocesis.registrar_rutas(app)
 
 if __name__ == '__main__':
     app.run(debug=True)

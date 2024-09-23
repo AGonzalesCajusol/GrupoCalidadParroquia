@@ -28,7 +28,11 @@ a.btn.btn-close{
 }
 #mySidenav{
     position: absolute;
-    
+    height: calc(100vh - 80px); 
+}
+
+#mySidenav a:last-child {
+    margin-bottom: 20px; 
 }
 
 
