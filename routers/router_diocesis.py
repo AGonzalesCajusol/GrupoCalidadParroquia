@@ -44,8 +44,8 @@ def registrar_rutas(app):
     def procesar_actualizar_diocesis():
         id = request.form["id"]
         nombre = request.form["nombre"]
-        id_departamento = request.form["id_departamento"]
-        id_provincia = request.form["id_provincia"]
+        id_departamento = request.form["id_departamentoEditar"]
+        id_provincia = request.form["id_provinciaEditar"]
         actualizar_diocesis(nombre, id_departamento, id_provincia, id)
         flash("La diócesis fue actualizada exitosamente")
         return redirect(url_for("gestionar_diocesis"))
