@@ -1,0 +1,99 @@
+{% extends "index.html" %}
+{% block title %}Gestión de Tipos de Recaudación{% endblock %}
+{% block cuerpo %}
+
+<div class="container mt-4">
+    <h1>Gestión de Tipos de Recaudación</h1>
+
+    <!-- Botón para abrir el modal de "Agregar" -->
+    <button type="button" class="btn btn-primary mb-3" data-bs-toggle="modal" data-bs-target="#agregarModal">
+        Registrar Tipo de Recaudación
+    </button>
+
+    <!-- Tabla de tipos de recaudación -->
+    <table class="table table-striped">
+        <thead>
+            <tr>
+                <th>ID Tipo</th>
+                <th>Nombre del Tipo</th>
+                <th>Acciones</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for tipo in tipos_recaudacion %}
+            <tr>
+                <td>{{ tipo[0] }}</td>
+                <td>{{ tipo[1] }}</td>
+                <td>
+                    <button class="btn btn-warning btn-sm" onclick="abrirModalEditar('{{ tipo[0] }}', '{{ tipo[1] }}')">Modificar</button>
+                    <form action="{{ url_for('eliminar_tipo_recaudacion') }}" method="POST" style="display:inline-block;">
+                        <input type="hidden" name="id_tipo_recaudacion" value="{{ tipo[0] }}">
+                        <button type="submit" class="btn btn-danger btn-sm">Eliminar</button>
+                    </form>
+                </td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+</div>
+
+<!-- Modal para agregar -->
+<div class="modal fade" id="agregarModal" tabindex="-1" aria-labelledby="agregarModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <form action="{{ url_for('insertar_tipo_recaudacion') }}" method="POST">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="agregarModalLabel">Registrar Tipo de Recaudación</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    <div class="mb-3">
+                        <label for="nombre_tipo" class="form-label">Nombre del Tipo</label>
+                        <input type="text" class="form-control" name="nombre_tipo" required>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
+                    <button type="submit" class="btn btn-primary">Guardar</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+<!-- Modal para editar -->
+<div class="modal fade" id="editarModal" tabindex="-1" aria-labelledby="editarModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <form action="{{ url_for('actualizar_tipo_recaudacion') }}" method="POST">
+                <input type="hidden" id="editarIdTipo" name="id_tipo_recaudacion">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="editarModalLabel">Modificar Tipo de Recaudación</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    <div class="mb-3">
+                        <label for="nombre_tipo" class="form-label">Nombre del Tipo</label>
+                        <input type="text" class="form-control" id="editarNombreTipo" name="nombre_tipo" required>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
+                    <button type="submit" class="btn btn-primary">Guardar cambios</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+<!-- Scripts para manejar el modal de Editar -->
+<script>
+    function abrirModalEditar(id_tipo, nombre_tipo) {
+        document.getElementById("editarIdTipo").value = id_tipo;
+        document.getElementById("editarNombreTipo").value = nombre_tipo;
+        var editarModal = new bootstrap.Modal(document.getElementById('editarModal'));
+        editarModal.show();
+    }
+</script>
+
+{% endblock %}
