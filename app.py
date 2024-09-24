@@ -1,9 +1,9 @@
 from flask import Flask, render_template
-import controladores.controlador_diocesis
 import routers.router_diocesis
 import routers.router_main  # Importa las rutas generales
 import routers.router_secretaria
 import routers.router_recaudaciones
+import routers.router_sede
 import routers.router_tipo_ministro  # Importa las rutas relacionadas con tipos de ministro
 import routers.router_congregacion  # Importa las rutas relacionadas con
 
@@ -23,6 +23,9 @@ routers.router_tipo_ministro.registrar_rutas(app)
 
 # Registrar las rutas definidas en router_congregacion.py
 routers.router_congregacion.registrar_rutas(app)
+
+# Registrar las rutas definidas en router_sede.py
+routers.router_sede.registrar_rutas(app)
 
 # Secretaria
 routers.router_secretaria.registrar_rutas(app)

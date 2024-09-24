@@ -1,0 +1,187 @@
+{% extends "index.html" %}
+{% block title %}Gestión de Sede{% endblock %}
+{% block cuerpo %}
+
+<div class="container mt-4">
+    <h1>Gestión de Sede</h1>
+
+    <!-- Botón para abrir el modal de "Agregar" -->
+    <button type="button" class="btn btn-primary mb-3" data-bs-toggle="modal" data-bs-target="#agregarModal">
+        Agregar Sede
+    </button>
+
+    <table class="table table-hover table-group-divider table align-middle">
+        <thead class="table-light">
+            <tr class="text-center">
+                <th scope="col" class="border">ID</th>
+                <th scope="col" class="border">Sede</th>
+                <th scope="col" class="border">Dirección</th>
+                <th scope="col" class="border">Creación</th>
+                <th scope="col" class="border">Telefono</th>
+                <th scope="col" class="border">Correo</th>
+                <th scope="col" class="border">ID congregacion</th>
+                <th scope="col" class="border">ID diosesis</th>
+                <th scope="col" class="border">Acciones</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for sed in sede %}
+            <tr>
+                <td class="border">{{ sed[0] }}</td>  <!-- ID del sede -->
+                <td class="border">{{ sed[1] }}</td>  <!-- Nombre de la sede -->
+                <td class="border">{{ sed[2] }}</td>  <!-- dirección -->
+                <td class="border">{{ sed[3] }}</td>  <!-- creación -->
+                <td class="border">{{ sed[4] }}</td>  <!-- telefono -->
+                <td class="border">{{ sed[5] }}</td>  <!-- correo -->
+                <td class="border">{{ sed[6] }}</td>  <!-- id congregación -->
+                <td class="border">{{ sed[7] }}</td>  <!-- id diosesis -->
+                <td class="text-center border">
+                    <button class="btn btn-warning btn-sm" onclick="abrirModalEditar('{{ sed[0] }}', '{{ sed[1] }}', '{{ sed[2] }}', '{{ sed[3] }}', '{{ sed[4] }}', '{{ sed[5] }}', '{{ sed[6] }}', '{{ sed[7] }}')">
+                        Editar
+                    </button>
+        
+                    <form action="{{ url_for('procesar_eliminar_sede') }}" method="POST" style="display:inline-block;">
+                        <input type="hidden" name="id" value="{{ sed[0] }}">
+                        <button type="submit" class="btn btn-danger btn-sm" onclick="return confirm('¿Estás seguro de que deseas eliminar esta sede?');">
+                            Eliminar
+                        </button>
+                    </form>
+                </td>
+            </tr>
+            {% endfor %}
+        </tbody>
+        
+        
+    </table>
+</div>
+
+<!-- Modal para Agregar -->
+<div class="modal fade" id="agregarModal" tabindex="-1" aria-labelledby="agregarModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <form action="{{ url_for('procesar_insertar_sede') }}" method="POST">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="agregarModalLabel">Agregar Sede</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    <div class="mb-3">
+                        <label for="sede" class="form-label">Nombre de la Sede</label>
+                        <input type="text" class="form-control" id="sede" name="sede" required>
+                    </div>
+                    <div class="mb-3">
+                        <label for="direccion" class="form-label">Dirección</label>
+                        <input type="text" class="form-control" id="direccion" name="direccion" required>
+                    </div>
+                    <div class="mb-3">
+                        <label for="creacion" class="form-label">Creación</label>
+                        <input type="date" class="form-control" id="creacion" name="creacion" required>
+                    </div>
+                    <div class="mb-3">
+                        <label for="telefono" class="form-label">Telefono</label>
+                        <input type="text" class="form-control" id="telefono" name="telefono" required>
+                    </div>
+                    <div class="mb-3">
+                        <label for="correo" class="form-label">Correo</label>
+                        <input type="text" class="form-control" id="correo" name="correo" required>
+                    </div>
+                    <div class="mb-3">
+                        <label for="id_congregacion">Congregación</label>
+                        <select class="form-select" id="id_congregacion" name="id_congregacion" required>
+                            {% for congre in congregacion %}
+                            <option value="{{ congre[0] }}">{{ congre[1] }}</option>
+                            {% endfor %}
+                        </select>
+                    </div>
+                    <div class="mb-3"></div>
+                        <label for="id_diosesis">Diosesis</label>
+                        <select class="form-select" id="id_diosesis" name="id_diosesis" required>
+                            {% for dioss in diosesis %}
+                            <option value="{{ dioss[0] }}">{{ dioss[1] }}</option>
+                            {% endfor %}
+                        </select>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
+                    <button type="submit" class="btn btn-primary">Guardar</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+<!-- Modal para Editar -->
+<div class="modal fade" id="editarModal" tabindex="-1" aria-labelledby="editarModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <form action="{{ url_for('procesar_actualizar_sede') }}" method="POST">
+                <input type="hidden" id="editarId" name="id">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="editarModalLabel">Editar Sede</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    <div class="mb-3">
+                        <label for="nombreEditar" class="form-label">Nombre de la Sede</label>
+                        <input type="text" class="form-control" id="nombreEditar" name="nombre" required>
+                    </div>
+                    <div class="mb-3">
+                        <label for="direccionEditar" class="form-label">Dirección</label>
+                        <input type="text" class="form-control" id="direccionEditar" name="direccionEditar" required>
+                    </div>
+                    <div class="mb-3">
+                        <label for="creacionEditar" class="form-label">Creación</label>
+                        <input type="date" class="form-control" id="creacionEditar" name="creacionEditar" required>
+                    </div>
+                    <div class="mb-3">
+                        <label for="telefonoEditar" class="form-label">Telefono</label>
+                        <input type="text" class="form-control" id="telefonoEditar" name="telefonoEditar" required>
+                    </div>
+                    <div class="mb-3">
+                        <label for="correoEditar" class="form-label">Correo</label>
+                        <input type="text" class="form-control" id="correoEditar" name="correoEditar" required>
+                    </div>
+                    <div class="mb-3">
+                        <label for="id_congregacionEditar">Congregación</label>
+                        <select class="form-select" id="id_congregacionEditar" name="id_congregacionEditar" required>
+                            {% for congre in congregacion %}
+                            <option value="{{ congre[0] }}">{{ congre[1] }}</option>
+                            {% endfor %}
+                        </select>
+                    </div>
+                    <div class="mb-3"></div>
+                        <label for="id_diosesisEditar">Diosesis</label>
+                        <select class="form-select" id="id_diosesisEditar" name="id_diosesisEditar" required>
+                            {% for dioss in diosesis %}
+                            <option value="{{ dioss[0] }}">{{ dioss[1] }}</option>
+                            {% endfor %}
+                        </select>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
+                    <button type="submit" class="btn btn-primary">Guardar cambios</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+<!-- Scripts para manejar el modal de Editar -->
+<script>
+    function abrirModalEditar(id, nombre,direccion,creacion,telefono,correo,id_congregacion,id_diosesis) {
+        document.getElementById("editarId").value = id;
+        document.getElementById("nombreEditar").value = nombre;
+        document.getElementById("direccionEditar").value = direccion;
+        document.getElementById("creacionEditar").value = creacion;
+        document.getElementById("telefonoEditar").value = telefono;
+        document.getElementById("correoEditar").value = correo;
+        document.getElementById("id_congregacionEditar").value = id_congregacion;
+        document.getElementById("id_diosesisEditar").value = id_diosesis;
+        var editarModal = new bootstrap.Modal(document.getElementById('editarModal'));
+        editarModal.show();
+    }
+</script>
+
+{% endblock %}

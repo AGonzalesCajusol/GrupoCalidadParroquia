@@ -37,3 +37,14 @@ def eliminar_congregacion(id):
         cursor.execute("DELETE FROM congregacion WHERE id_congregacion = %s", (id,))
     conexion.commit()
     conexion.close()
+
+def obtener_id_congregacion_por_nombre(nombre):
+        conexion = obtener_conexion()
+        id_congregacion = None
+        with conexion.cursor() as cursor:
+            cursor.execute("select id_congregacion from congregacion WHERE nombre_congregacion = %s", (nombre,))
+            resultado = cursor.fetchone()
+            if resultado:
+                id_congregacion = resultado[0]
+        conexion.close()
+        return id_congregacion
