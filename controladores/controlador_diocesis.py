@@ -20,6 +20,26 @@ def obtener_diocesis():
     conexion.close()
     return diosesis
 
+def obtener_departamento():
+    conexion = obtener_conexion()
+    with conexion.cursor() as cursor:
+        cursor.execute(
+            "SELECT id_departamento, nombre_departamento FROM departamento"
+        )
+        diosesis = cursor.fetchall()
+    conexion.close()
+    return diosesis
+
+def obtener_provincia():
+    conexion = obtener_conexion()
+    with conexion.cursor() as cursor:
+        cursor.execute(
+            "SELECT id_provincia, nombre_provincia, id_departamento FROM provincia"
+        )
+        diosesis = cursor.fetchall()
+    conexion.close()
+    return diosesis
+
 def obtener_diocesis_por_id(id):
     conexion = obtener_conexion()
     diosesis = None
