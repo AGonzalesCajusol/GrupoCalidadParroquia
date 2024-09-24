@@ -14,10 +14,11 @@ def listar_tipo_recaudacion():
 def agregar_tipo_recaudacion():
     if request.method == 'POST':
         nombre_tipo = request.form['nombre_tipo']
+        monetario = 1 if 'monetario' in request.form else 0
         
         conexion = obtener_conexion()
         with conexion.cursor() as cursor:
-            cursor.execute("INSERT INTO tipo_recaudacion (nombre_recaudacion) VALUES (%s)", (nombre_tipo,))
+            cursor.execute("INSERT INTO tipo_recaudacion (nombre_recaudacion, monetario) VALUES (%s, %s)", (nombre_tipo, monetario))
         conexion.commit()
         conexion.close()
 
@@ -29,14 +30,15 @@ def actualizar_tipo_recaudacion():
     if request.method == 'POST':
         id_tipo_recaudacion = request.form['id_tipo_recaudacion']
         nombre_tipo = request.form['nombre_tipo']
+        monetario = 1 if 'monetario' in request.form else 0
         
         conexion = obtener_conexion()
         with conexion.cursor() as cursor:
             cursor.execute("""
                 UPDATE tipo_recaudacion
-                SET nombre_recaudacion = %s
+                SET nombre_recaudacion = %s, monetario = %s
                 WHERE id_tipo_recaudacion = %s
-            """, (nombre_tipo, id_tipo_recaudacion))
+            """, (nombre_tipo, monetario, id_tipo_recaudacion))
         conexion.commit()
         conexion.close()
 
