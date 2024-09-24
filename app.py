@@ -3,6 +3,7 @@ import routers.router_diocesis
 import routers.router_main  # Importa las rutas generales
 import routers.router_secretaria
 import routers.router_recaudaciones
+import routers.router_tipo_recaudacion  # Importa las rutas relacionadas con
 import routers.router_sede
 import routers.router_tipo_ministro  # Importa las rutas relacionadas con tipos de ministro
 import routers.router_congregacion  # Importa las rutas relacionadas con
@@ -32,6 +33,9 @@ routers.router_secretaria.registrar_rutas(app)
 
 # Registrar las rutas definidas en router_recaudaciones.py
 routers.router_recaudaciones.registrar_rutas(app)
+# Registrar las rutas definidas en router_recaudaciones.py
+routers.router_tipo_recaudacion.registrar_rutas_tipo_recaudacion(app)
+
 
 # Registrar las rutas definidas en router_diocesis.py
 routers.router_diocesis.registrar_rutas(app)
