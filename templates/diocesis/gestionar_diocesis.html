@@ -60,12 +60,20 @@
                         <input type="text" class="form-control" id="nombreAgregar" name="nombre" required>
                     </div>
                     <div class="mb-3">
-                        <label for="departamentoAgregar" class="form-label">ID Departamento</label>
-                        <input type="number" class="form-control" id="departamentoAgregar" name="id_departamento" required>
+                        <label for="id_departamento">Departamento</label>
+                        <select class="form-select" id="id_departamento" name="id_departamento" required>
+                            {% for depar in departamento %}
+                            <option value="{{ depar[0] }}">{{ depar[1] }}</option>
+                            {% endfor %}
+                        </select>
                     </div>
                     <div class="mb-3">
-                        <label for="provinciaAgregar" class="form-label">ID Provincia</label>
-                        <input type="number" class="form-control" id="provinciaAgregar" name="id_provincia" required>
+                        <label for="id_provincia">Provincia</label>
+                        <select class="form-select" id="id_provincia" name="id_provincia" required>
+                            {% for provin in provincia %}
+                            <option value="{{ provin[0] }}">{{ provin[1] }}</option>
+                            {% endfor %}
+                        </select>
                     </div>
                 </div>
                 <div class="modal-footer">
@@ -93,12 +101,20 @@
                         <input type="text" class="form-control" id="nombreEditar" name="nombre" required>
                     </div>
                     <div class="mb-3">
-                        <label for="departamentoEditar" class="form-label">ID Departamento</label>
-                        <input type="number" class="form-control" id="departamentoEditar" name="id_departamento" required>
+                        <label for="id_departamentoEditar">Departamento</label>
+                        <select class="form-select" id="id_departamentoEditar" name="id_departamentoEditar" required>
+                            {% for depar in departamento %}
+                            <option value="{{ depar[0] }}">{{ depar[1] }}</option>
+                            {% endfor %}
+                        </select>
                     </div>
                     <div class="mb-3">
-                        <label for="provinciaEditar" class="form-label">ID Provincia</label>
-                        <input type="number" class="form-control" id="provinciaEditar" name="id_provincia" required>
+                        <label for="id_provinciaEditar">Provincia</label>
+                        <select class="form-select" id="id_provinciaEditar" name="id_provinciaEditar" required>
+                            {% for provin in provincia %}
+                            <option value="{{ provin[0] }}">{{ provin[1] }}</option>
+                            {% endfor %}
+                        </select>
                     </div>
                 </div>
                 <div class="modal-footer">
@@ -115,8 +131,8 @@
     function abrirModalEditar(id, nombre, id_departamento, id_provincia) {
         document.getElementById("editarId").value = id;
         document.getElementById("nombreEditar").value = nombre;
-        document.getElementById("departamentoEditar").value = id_departamento;
-        document.getElementById("provinciaEditar").value = id_provincia;
+        document.getElementById("id_departamentoEditar").value = id_departamento;
+        document.getElementById("id_provinciaEditar").value = id_provincia;
         var editarModal = new bootstrap.Modal(document.getElementById('editarModal'));
         editarModal.show();
     }

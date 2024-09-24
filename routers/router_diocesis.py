@@ -4,7 +4,9 @@ from controladores.controlador_diocesis import (
     obtener_diocesis,
     obtener_diocesis_por_id,
     actualizar_diocesis,
-    eliminar_diocesis  
+    eliminar_diocesis,
+    obtener_departamento,
+    obtener_provincia
 )
 
 def registrar_rutas(app):
@@ -12,8 +14,10 @@ def registrar_rutas(app):
     @app.route("/gestionar_diocesis", methods=["GET"])
     def gestionar_diocesis():
         diocesis = obtener_diocesis()
-        return render_template("diocesis/gestionar_diocesis.html", diocesis=diocesis)
-
+        departamento= obtener_departamento()
+        provincia = obtener_provincia()
+        return render_template("diocesis/gestionar_diocesis.html", diocesis=diocesis, departamento = departamento, provincia = provincia)
+    
     # Ruta para mostrar el formulario de registro de una nueva diócesis
     @app.route("/registrar_diocesis", methods=["GET"])
     def formulario_registrar_diocesis():
