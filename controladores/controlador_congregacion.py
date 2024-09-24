@@ -48,3 +48,14 @@ def obtener_id_congregacion_por_nombre(nombre):
                 id_congregacion = resultado[0]
         conexion.close()
         return id_congregacion
+
+def obtener_id_diosesis_por_nombre(nombre):
+        conexion = obtener_conexion()
+        id_diosesis = None
+        with conexion.cursor() as cursor:
+            cursor.execute("select id_diosesis from diosesis WHERE nombre_diosesis = %s", (nombre,))
+            resultado = cursor.fetchone()
+            if resultado:
+                id_diosesis = resultado[0]
+        conexion.close()
+        return id_diosesis
