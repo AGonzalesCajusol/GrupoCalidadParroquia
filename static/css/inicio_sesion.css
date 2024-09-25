@@ -3,8 +3,7 @@
 }
 
 html, body {
-    height: 100%;
-    margin: 0;
+    height: 100%;    
     overflow: hidden; /* Evita cualquier scroll en la página */
 }
 

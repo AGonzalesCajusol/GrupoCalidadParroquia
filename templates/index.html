@@ -32,10 +32,6 @@
 <body>
     <div class="header">
         <div class="d-flex align-items-center">
-
-            <span class="menu-btn" onclick="openNav()" id="abrir">
-                <i class="bi bi-list"></i>
-            </span>
             
             <a href="{{ url_for('inicio') }}" class="text-decoration-none">
                 <div class="logo">
@@ -57,12 +53,11 @@
     
 
     <!-- Sidenav -->
-
+    <div class="layout">  
     <div id="mySidenav" class="sidenav">
 
         <div>
-
-            <a class="btn btn-close" onclick="closeNav()"> </a>
+            
 
             <!------------------------- Modulo de Usuarios ------------------------->
             <a class="btn btn-primary  mb-2 mt-2" data-bs-toggle="collapse" href="#moduloUsuarios" role="button"
@@ -175,15 +170,8 @@
     <div class="main-content mt-3 me-5" style="max-height: 400px;">
         {% block cuerpo %}
         {% endblock %}
-        <a href="{{ url_for('solicitudes') }}">
-            <button class="btn btnfloatante me-2"><i class="bi bi-megaphone-fill"> <span
-                        class="position-absolute top-0 start-100 translate-middle badge rounded-pill bg-danger">
-                        99+
-                        <span class="visually-hidden">unread messages</span></i>
-            </button>
-        </a>
-
     </div>
+</div>
 
 </body>
 <script src="{{ url_for('static', filename = '/js/defecto.js')}}"></script>

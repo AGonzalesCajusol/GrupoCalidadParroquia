@@ -32,10 +32,6 @@ body {
 
 }
 
-
-
-
-
 .header .logo {
     display: flex;
     align-items: center;
@@ -52,8 +48,6 @@ body {
     border-radius: 50%;
 
 }
-
-
 
 .header .menu-btn {
     font-size: 2rem;
@@ -83,9 +77,6 @@ body {
 }
 
 
-
-
-
 .btn-logout {
     color: #033D8EBF;
     border: none;
@@ -102,8 +93,6 @@ body {
 .btn-logout i {
     color: #033D8EBF;
     font-size: 1.5rem;
-
-
 }
 
 
@@ -111,21 +100,21 @@ body {
     color: #e09844;
 }
 
-.sidenav {
-    height: calc(100% - 60px);
-    width: 250px;
-    position: fixed;
-    top: 80px;
-    left: 0;
-    background-color: #ffffff;
-    overflow-y: scroll; /* Fuerza la aparición del scrollbar vertical */
-    transition: transform 0.5s ease;
-    padding-top: 20px;
-    transform: translateX(-100%);
+.sidenav {    
+    width: 250px; /* Fija el ancho del menú lateral */
+    background-color: #ffffff;    
+    position: fixed; /* Esto mantiene el menú fijo mientras haces scroll */
+    top: 81px; /* Ajusta si tienes un header */
+    bottom: 0;
     z-index: 1051;
-    color: #033D8EBF; /* Texto gris claro */
+    color: #033D8EBF;
+    overflow-y: auto;
 }
 
+.layout{
+    display: flex;
+    height: 100vh;
+}
 .sidenav a {
     color: #033D8EBF; /* Fondo azul para la opción activa */
     font-weight: bold; /* Negrita para la opción activa */
@@ -138,9 +127,6 @@ body {
     color: #033D8EBF; /* Texto gris claro */
 }
 
-.sidenav.open {
-    transform: translateX(0); /* Muestra la barra lateral */
-}
 
 /* Personalización del scrollbar (opcional, para WebKit) */
 .sidenav::-webkit-scrollbar {
@@ -157,8 +143,7 @@ body {
     text-decoration: none;
     font-size: 18px;
     color: rgb(2, 2, 2);
-    display: block;
-    transition: 0.5s;
+    display: block;    
     font-size: 15px;
 }
 
@@ -188,12 +173,9 @@ a.btn{
     bottom: 5px;
 }
 .main-content {
-    transition: margin-left 0.5s;
-    padding: 20px;
-    margin-top: 20px;
-    margin-bottom: 50px;
-    /* Agregado margen inferior */
-    
+    flex-grow: 1; /* Esto hace que el contenido principal ocupe el resto del espacio */
+    margin-left: 250px; /* Deja el espacio suficiente para el menú fijo */
+    padding: 20px; 
 }
 
 /* Add padding to avoid content overlay */
@@ -285,15 +267,6 @@ th {
     width: 100%;
     height: 30px;
 }
-.main-content {
-    margin-left: 0;
-    transition: margin-left 0.5s; /* Transición suave */
-}
-
-.main-content.shifted {
-    margin-left: 250px; /* Debe coincidir con el ancho del sidenav */
-}
-
 
 
 .titulo-gestion {
