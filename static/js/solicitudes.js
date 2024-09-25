@@ -1,4 +1,4 @@
-$('#solicitudesactos , #programacion').DataTable({
+$('#solicitudesactos , #requisitos').DataTable({
     "language": {
         "lengthMenu": "Mostrar _MENU_ registros por página",
         "zeroRecords": "No se encontraron resultados",
