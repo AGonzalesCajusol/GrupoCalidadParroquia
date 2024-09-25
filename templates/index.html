@@ -31,18 +31,20 @@
 
 <body>
     <div class="header">
-        <!-- Botón para abrir el menú en pantallas pequeñas -->
-        <button class="menu-btn" onclick="toggleSidenav()">
-            <i class="bi bi-list"></i>
-        </button>
-
         <div class="d-flex align-items-center">
+
+            <span class="menu-btn" onclick="openNav()" id="abrir">
+                <i class="bi bi-list"></i>
+            </span>
+            
             <a href="{{ url_for('inicio') }}" class="text-decoration-none">
                 <div class="logo">
                     <img src="{{ url_for('static', filename='img/iconoiglesia.png') }}" alt="Point Roo" />
                     <h5>Parroquia Vianey</h5>
                 </div>
             </a>
+
+            
         </div>
         <div class="user-actions">
             <a class="btn-logout nav-link" href="">
@@ -51,17 +53,18 @@
             </a>
         </div>
     </div>
-    
 
     
 
     <!-- Sidenav -->
 
-    <div id="mySidenav" class="sidenav closed">
+    <div id="mySidenav" class="sidenav">
 
         <div>
 
-           <!------------------------- Modulo de Usuarios ------------------------->
+            <a class="btn btn-close" onclick="closeNav()"> </a>
+
+            <!------------------------- Modulo de Usuarios ------------------------->
             <a class="btn btn-primary  mb-2 mt-2" data-bs-toggle="collapse" href="#moduloUsuarios" role="button"
                 aria-expanded="false" aria-controls="moduloUsuarios">
                 <i class="bi bi-person-fill"></i> Gestión de Usuarios

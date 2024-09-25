@@ -1,8 +1,15 @@
-// Función para alternar el sidenav
-function toggleSidenav() {
-    var sidenav = document.getElementById("mySidenav");
-    sidenav.classList.toggle("open");
+function openNav() {
+    document.getElementById("mySidenav").classList.add('open');
+    document.querySelector('.main-content').classList.add('shifted');
+    document.getElementById('abrir').style.visibility = 'hidden'; // Ocultar el botón de abrir
 }
+
+function closeNav() {
+    document.getElementById("mySidenav").classList.remove('open');
+    document.querySelector('.main-content').classList.remove('shifted');
+    document.getElementById('abrir').style.visibility = 'visible'; // Mostrar el botón de abrir
+}
+
 
 
 //MODIFICAR >>>> onclick="return modificar()"
