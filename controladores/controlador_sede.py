@@ -39,7 +39,6 @@ def eliminar_sede(id):
     conexion.close()
 
 
-
 def obtener_id_sede_por_nombre(nombre):
         conexion = obtener_conexion()
         id_sede = None

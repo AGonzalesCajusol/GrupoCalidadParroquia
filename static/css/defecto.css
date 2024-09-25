@@ -183,20 +183,6 @@ a.btn{
     margin-right: 12px ;
 }
 
-.sidenav .closebtn {
-    position: absolute;
-    top: 0;
-    right: 0px;
-    font-size: 35px;
-    margin-left: 50px;
-    color: white;
-}
-
-.sidenav .closebtn:hover {
-    color: white;
-    background-color: transparent;
-}
-
 #selectacto{
     position: relative;
     bottom: 5px;
