@@ -1,0 +1,277 @@
+{% extends "index.html" %}
+{% block title %}Gestión de Ministro{% endblock %}
+{% block cuerpo %}
+
+<div class="container mt-4">
+    <h1 class="titulo-gestion">Gestión de Ministro</h1>
+
+    <!-- Botón para abrir el modal de "Agregar" con ícono -->
+    <button type="button" class="btn btn-success mb-3 fw-bold"  data-bs-toggle="modal" data-bs-target="#agregarModal">
+        <i class="bi bi-person-plus"></i> Agregar Ministro
+    </button>
+    
+
+
+    <!-- DataTable para la gestión de ministros -->
+    <table id="ministrosTable" class="table table-hover table-striped">
+        <thead>
+            <tr class="text-center">
+                <th>ID</th>
+                <th>Ministro</th>
+                <th>Sede</th>
+                <th>Cargo</th>
+                <th>Acciones</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for ministro in ministros %}
+            <tr>
+                <td>{{ ministro[0] }}</td>  <!-- ID del ministro -->
+                <td>{{ ministro[1] }}</td>  <!-- Nombre del ministro -->
+                <td>{{ ministro[7] }}</td>  <!-- id sede -->
+                <td>{{ ministro[8] }}</td>  <!-- id cargo -->
+                <td class="text-center">
+                    <!-- Botón para ver detalles -->
+                    <button class="btn btn-primary btn-sm" data-bs-toggle="tooltip" title="Ver" onclick="abrirModalVer('{{ ministro[0] }}', '{{ ministro[1] }}', '{{ ministro[2] }}', '{{ ministro[3] }}', '{{ ministro[4] }}', '{{ ministro[6] }}', '{{ ministro[7] }}', '{{ ministro[8] }}')">
+                        <i class="fas fa-eye"></i> 
+                    </button>
+
+                    <!-- Botón para editar -->
+                    <button class="btn btn-warning btn-sm" data-bs-toggle="tooltip" title="Editar" onclick="abrirModalEditar('{{ ministro[0] }}', '{{ ministro[1] }}', '{{ ministro[2] }}', '{{ ministro[3] }}', '{{ ministro[4] }}', '{{ ministro[6] }}', '{{ ministro[7] }}', '{{ ministro[8] }}')">
+                        <i class="fas fa-edit"></i> 
+                    </button>
+        
+                    <!-- Formulario para eliminar -->
+                    <form action="{{ url_for('procesar_eliminar_ministro') }}" method="POST" style="display:inline-block;">
+                        <input type="hidden" name="id" value="{{ ministro[0] }}">
+                        <button type="submit" class="btn btn-danger btn-sm" data-bs-toggle="tooltip" title="Eliminar" onclick="return confirm('¿Estás seguro de que deseas eliminar este ministro?');">
+                            <i class="fas fa-trash-alt"></i>  <!-- Icono de eliminar -->
+                        </button>
+                    </form>
+                </td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+</div>
+
+<!-- Modal para Ver detalles -->
+<div class="modal fade" id="verModal" tabindex="-1" aria-labelledby="verModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="verModalLabel">Detalles del Ministro</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <p><strong>Nombre del Ministro:</strong> <span id="verNombre"></span></p>
+                <p><strong>Fecha de nacimiento:</strong> <span id="verNacimiento"></span></p>
+                <p><strong>Fecha de ordenación:</strong> <span id="verOrdenacion"></span></p>
+                <p><strong>Fin de actividades:</strong> <span id="verActividades"></span></p>
+                <p><strong>Tipo de Ministro:</strong> <span id="verTipo"></span></p>
+                <p><strong>Sede:</strong> <span id="verSede"></span></p>
+                <p><strong>Cargo:</strong> <span id="verCargo"></span></p>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cerrar</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Modal para Agregar -->
+<div class="modal fade" id="agregarModal" tabindex="-1" aria-labelledby="agregarModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <form action="{{ url_for('procesar_insertar_ministro') }}" method="POST">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="agregarModalLabel">Agregar Ministro</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    <div class="mb-3">
+                        <label for="nombre" class="form-label">Nombre del Ministro</label>
+                        <input type="text" class="form-control" id="nombre" name="nombre" required>
+                    </div>
+                    <div class="mb-3">
+                        <label for="nacimiento" class="form-label">Fecha de nacimiento</label>
+                        <input type="date" class="form-control" id="nacimiento" name="nacimiento" required>
+                    </div>
+                    <div class="mb-3">
+                        <label for="ordenacion" class="form-label">Fecha de ordenación</label>
+                        <input type="date" class="form-control" id="ordenacion" name="ordenacion" required>
+                    </div>                   
+                    <div class="mb-3">
+                        <label for="actividades" class="form-label">Fin de actividades</label>
+                        <input type="date" class="form-control" id="actividades" name="actividades" required>
+                    </div>
+
+                    <div class="mb-3">
+                        <label for="id_tipoministro">Tipo de Ministro</label>
+                        <select class="form-select" id="id_tipoministro" name="id_tipoministro" required>
+                            {% for tipo in tipos %}
+                            <option value="{{ tipo[0] }}">{{ tipo[1] }}</option>
+                            {% endfor %}
+                        </select>
+                    </div>
+
+                    <div class="mb-3">
+                        <label for="id_sede">Sede</label>
+                        <select class="form-select" id="id_sede" name="id_sede" required>
+                            {% for sede in sedes %}
+                            <option value="{{ sede[0] }}">{{ sede[1] }}</option>
+                            {% endfor %}
+                        </select>
+                    </div>
+
+                    <div class="mb-3">
+                        <label for="id_cargo">Cargo</label>
+                        <select class="form-select" id="id_cargo" name="id_cargo" required>
+                            {% for cargo in cargos %}
+                            <option value="{{ cargo[0] }}">{{ cargo[1] }}</option>
+                            {% endfor %}
+                        </select>
+                    </div>  
+
+    
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
+                    <button type="submit" class="btn btn-primary">Guardar</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+<!-- Modal para Editar -->
+<div class="modal fade" id="editarModal" tabindex="-1" aria-labelledby="editarModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <form action="{{ url_for('procesar_actualizar_ministro') }}" method="POST">
+                <input type="hidden" id="editarId" name="id">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="editarModalLabel">Editar Ministro</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    <div class="mb-3">
+                        <label for="nombreEditar" class="form-label">Nombre del ministro</label>
+                        <input type="text" class="form-control" id="nombreEditar" name="nombre" required>
+                    </div>
+                    <div class="mb-3">
+                        <label for="nacimientoEditar" class="form-label">Fecha Nacimiento</label>
+                        <input type="date" class="form-control" id="nacimientoEditar" name="nacimiento" required>
+                    </div>
+
+                    <div class="mb-3">
+                        <label for="ordenacionEditar" class="form-label">Fecha Ordenación</label>
+                        <input type="date" class="form-control" id="ordenacionEditar" name="ordenacion" required>
+                    </div>
+
+                    <div class="mb-3">
+                        <label for="actividadesEditar" class="form-label">Fin Actividades</label>
+                        <input type="date" class="form-control" id="actividadesEditar" name="actividades" required>
+                    </div>
+
+                    <div class="mb-3">
+                        <label for="id_tipoministroEditar">Tipo Ministro</label>
+                        <select class="form-select" id="id_tipoministroEditar" name="id_tipoministro" required>
+                            {% for tipo in tipos %}
+                            <option value="{{ tipo[1] }}">{{ tipo[1] }}</option>
+                            {% endfor %}
+                        </select>
+                        
+                    </div>
+                    <div class="mb-3">
+                        <label for="id_sedeEditar">Sede</label>
+                        <select class="form-select" id="id_sedeEditar" name="id_sede" required>
+                            {% for sede in sedes %}
+                            <option value="{{ sede[1] }}">{{ sede[1] }}</option>
+                            {% endfor %}
+                        </select>
+                    </div>
+                    <div class="mb-3">
+                        <label for="id_cargoEditar">Cargo</label>
+                        <select class="form-select" id="id_cargoEditar" name="id_cargo" required>
+                            {% for cargo in cargos %}
+                            <option value="{{ cargo[1] }}">{{ cargo[1] }}</option>
+                            {% endfor %}
+                        </select>
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
+                        <button type="submit" class="btn btn-primary">Guardar cambios</button>
+                    </div>
+                </div>
+               
+            </form>
+        </div>
+    </div>
+</div>
+
+<!-- Modal para Agregar y Editar (sin cambios) -->
+
+<!-- jQuery -->
+<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+
+<!-- Bootstrap JS -->
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+
+<!-- DataTables JS -->
+<script src="https://cdn.datatables.net/1.13.1/js/jquery.dataTables.min.js"></script>
+
+<!-- Font Awesome para los iconos -->
+<script src="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/js/all.min.js"></script>
+
+<!-- Scripts para manejar los modales -->
+<script>
+    function abrirModalVer(id, nombre, nacimiento, ordenacion, actividades, tipo, sede, cargo) {
+        document.getElementById("verNombre").textContent = nombre;
+        document.getElementById("verNacimiento").textContent = nacimiento;
+        document.getElementById("verOrdenacion").textContent = ordenacion;
+        document.getElementById("verActividades").textContent = actividades;
+        document.getElementById("verTipo").textContent = tipo;
+        document.getElementById("verSede").textContent = sede;
+        document.getElementById("verCargo").textContent = cargo;
+        var verModal = new bootstrap.Modal(document.getElementById('verModal'));
+        verModal.show();
+    }
+
+    function abrirModalEditar(id, nombre, nacimiento, ordenacion, actividades, id_tipoministro, id_sede, id_cargo) {
+        document.getElementById("editarId").value = id;
+        document.getElementById("nombreEditar").value = nombre;
+        document.getElementById("nacimientoEditar").value = nacimiento;
+        document.getElementById("ordenacionEditar").value = ordenacion;
+        document.getElementById("actividadesEditar").value = actividades;
+        document.getElementById("id_tipoministroEditar").value = id_tipoministro;
+        document.getElementById("id_sedeEditar").value = id_sede;
+        document.getElementById("id_cargoEditar").value = id_cargo;
+        var editarModal = new bootstrap.Modal(document.getElementById('editarModal'));
+        editarModal.show();
+    }
+
+
+    var tooltipTriggerList = [].slice.call(document.querySelectorAll('[data-bs-toggle="tooltip"]'));
+    var tooltipList = tooltipTriggerList.map(function (tooltipTriggerEl) {
+        return new bootstrap.Tooltip(tooltipTriggerEl);
+    });
+
+
+
+
+
+</script>
+
+<!-- Inicialización de DataTables -->
+<script>
+    $(document).ready(function() {
+        $('#ministrosTable').DataTable({
+            "language": {
+                "url": "//cdn.datatables.net/plug-ins/1.13.1/i18n/es-ES.json"
+            }
+        });
+    });
+</script>
+
+{% endblock %}

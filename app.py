@@ -1,12 +1,15 @@
 from flask import Flask, render_template
 import routers.router_diocesis
 import routers.router_main  # Importa las rutas generales
+import routers.router_ministro
 import routers.router_secretaria
 import routers.router_recaudaciones
 import routers.router_tipo_recaudacion  # Importa las rutas relacionadas con
 import routers.router_sede
-import routers.router_tipo_ministro  # Importa las rutas relacionadas con tipos de ministro
+import routers.router_tipo_ministro # Importa las rutas relacionadas con tipos de ministro
 import routers.router_congregacion  # Importa las rutas relacionadas con
+import routers.router_cargo
+
 
 app = Flask(__name__)
 app.secret_key = 'super-secret'
@@ -39,6 +42,12 @@ routers.router_tipo_recaudacion.registrar_rutas_tipo_recaudacion(app)
 
 # Registrar las rutas definidas en router_diocesis.py
 routers.router_diocesis.registrar_rutas(app)
+
+routers.router_ministro.registrar_rutas(app)
+
+routers.router_cargo.registrar_rutas(app)
+
+
 
 if __name__ == '__main__':
     app.run(debug=True)
