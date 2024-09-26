@@ -32,6 +32,11 @@
 <body>
     <div class="header">
         <div class="d-flex align-items-center">
+
+            <span class="menu-btn" onclick="openNav()" id="abrir">
+                <i class="bi bi-list"></i>
+            </span>
+            
             <a href="{{ url_for('inicio') }}" class="text-decoration-none">
                 <div class="logo">
                     <img src="{{ url_for('static', filename='img/iconoiglesia.png') }}" alt="Point Roo" />
@@ -39,23 +44,17 @@
                 </div>
             </a>
 
-            <span class="menu-btn" onclick="openNav()" id="abrir">
-                <i class="bi bi-list"></i>
-            </span>
+            
         </div>
         <div class="user-actions">
-            <div class="user-info">Bienvenido</div>
-            <a class="btn-logout nav-link text-black" href="">
-                <i class="bi bi-box-arrow-right"></i> Cerrar sesión
+            <a class="btn-logout nav-link" href="">
+                <i class="bi bi-box-arrow-right"> </i> 
+                Cerrar sesión
             </a>
         </div>
     </div>
 
-    <div class="barra_separadora">
-
-        <!------------------------- Cabecera-fin ------------------------->
-
-    </div>
+    
 
     <!-- Sidenav -->
 
@@ -63,9 +62,6 @@
 
         <div>
 
-            <div class="ms-4 mt-2">
-                SISTEMA DE PARROQUIA 
-            </div>
             <a class="btn btn-close" onclick="closeNav()"> </a>
 
             <!------------------------- Modulo de Usuarios ------------------------->
@@ -84,15 +80,16 @@
                 </a>
 
             </div>
-            <!------------------------- Modulo de Usuarios ------------------------->
+            <!------------------------- Modulo de  Ministros ------------------------->
             <a class="btn btn-primary" data-bs-toggle="collapse" href="#moduloMinistros" role="button"
                 aria-expanded="false" aria-controls="moduloMinistros">
                 <i class="bi bi-bank"></i> Gestión de Ministros
             </a>
             <div class="collapse ms-4 mt-2" id="moduloMinistros">
-                <a class="btn btn-outline-primary">
-                    <i class="bi bi-globe"></i> Opcion 1
+                <a class="btn btn-outline-primary" href="{{ url_for('gestionar_ministro') }}">
+                    <i class="bi bi-person-badge-fill ms-1"></i> Ministro
                 </a>
+
 
                 <a class="btn btn-outline-primary mt-2">
                     <i class="bi bi-globe"></i> Opcion 2
@@ -174,6 +171,7 @@
         </div>
 
     </div>
+    
     <div class="main-content mt-3 me-5" style="max-height: 400px;">
         {% block cuerpo %}
         {% endblock %}

@@ -8,16 +8,12 @@
         <nav>
             <div class="nav nav-tabs" id="nav-tab" role="tablist">
                 <button class="nav-link active" id="nav-home-tab" data-bs-toggle="tab" data-bs-target="#nav-home"
-                    type="button" role="tab" aria-controls="nav-home" aria-selected="true">
+                    type="button" role="tab" aria-controls="nav-home" aria-selected="false">
                     <i class="bi bi-envelope-exclamation-fill me-2"></i>Solicitudes
                 </button>
-                <button class="nav-link" id="nav-profile-tab" data-bs-toggle="tab" data-bs-target="#nav-profile"
-                    type="button" role="tab" aria-controls="nav-profile" aria-selected="false">
-                    <i class="bi bi-ui-checks me-2"></i>Requisitos
-                </button>
                 <button class="nav-link" id="nav-contact-tab" data-bs-toggle="tab" data-bs-target="#nav-contact"
-                    type="button" role="tab" aria-controls="nav-contact" aria-selected="false">
-                    <i class="bi bi-clipboard2-check-fill me-2"></i>Celebraciones Registradas
+                    type="button" role="tab" aria-controls="nav-contact" aria-selected="true" >
+                    <i class="bi bi-clipboard2-check-fill me-2"></i>Requsitos
                 </button>
             </div>
         </nav>
@@ -29,6 +25,10 @@
                 tabindex="0">
                 <div class="col-12 mt-3">
                     <h6><strong>Solicitudes de Actos liturgicos:</strong></h6>
+                    <button class="btn btn-primary btn-sm"><i class="bi bi-plus-circle-fill me-2"></i>Nuevo</button>
+                    <hr>
+                        <input type="checkbox">Faltantes
+                        <input type="checkbox">Todos
                     <hr>
                     <table class="mt-5" id="solicitudesactos">
                         <thead >
@@ -108,7 +108,7 @@
             </div>
 
             <!---------Segundo menú-------------->
-            <div class="tab-pane fade" id="nav-profile" role="tabpanel" aria-labelledby="nav-profile-tab" tabindex="0">
+            <!-- <div class="tab-pane fade" id="nav-profile" role="tabpanel" aria-labelledby="nav-profile-tab" tabindex="0">
                 <div class="mt-3">
                     <h6 for="Actoliturgico" class="form-label">Seguimiento del registro:  00012</h6>
                     <h6>Acto liturgico:  Matrimonio</h5>
@@ -156,96 +156,62 @@
                     <textarea name="" id="" class="d-block form-control w-50"></textarea>
                     <button class="btn btn-secondary mt-3 my-3">Enviar</button>
                 </div>
-                <!-- Modal (sacado de la tabla) -->
+                Modal (sacado de la tabla) 
                 <div class="modal fade" id="imagenModal" tabindex="-1" aria-labelledby="modalLabel" aria-hidden="true">
                     <div class="modal-dialog modal-lg">
                         <img src="/static/img/6807aadf04c8e373aeee366f5b842cb7.jpg" alt="Imagen" class="img-fluid">
                     </div>
                 </div>
-            </div>
+            </div>----->
 
             <!---------Tercer menú-------------->
             <div class="tab-pane fade" id="nav-contact" role="tabpanel" aria-labelledby="nav-contact-tab" tabindex="0">
-                <div class="col-12 mt-3">
-                    <button class="btn btn-primary btn-sm"><i class="bi bi-plus-circle-fill me-2"></i>Nueva programacion</button>
+                <div class="col-12 mt-3 ">
+                    <div class="d-flex ">
+                        <h6 class="me-2"><strong>Acto liturgico:</strong></h6>
+                        <select class="form-select form-select-sm w-25" aria-label="Small select example" id="selectacto">
+                            <option selected>Todos</option>
+                            <option value="1">Bautizo</option>
+                            <option value="2">Matrimonio</option>
+                            <option value="3">Primera comunión</option>
+                        </select>
+                    </div>
                     <hr>
-                    <h6><strong>Actos Liturgicos programados:</strong></h6>
-                    <hr>
-                    <table class="mt-5" id="programacion">
-                        <thead >
-                            <tr >
-                                <th class="thea">Id Solicitud</th>
-                                <th class="thea">Acto liturgico</th>
-                                <th class="thea">Feligres</th>
-                                <th class="thea">Fecha</th>
-                                <th class="thea">Hora</th>
-                                <th class="thea">Opciones</th>
+                        
+                    <table class="table " id="requisitos">
+                        <thead>
+                            <tr>
+                                <th>
+                                    Acto liturgico
+                                </th>
+                                <th>
+                                    Requisitos
+                                </th>
+                                <th>
+                                    Tipo
+                                </th>
                             </tr>
                         </thead>
                         <tbody>
-                            <tr class="tablasoli">
-                                <td>1</td>
-                                <td>Matrimonio</td>
-                                <td>Rivera Elio</td>
-                                <td>01/10/2024</td>
-                                <td>12:45</td>
+                            <tr>
                                 <td>
-                                    <button type="button" class="btn btn-primary btn-sm text-start">
-                                        <i class="bi bi-check2 me-1"></i>Seleccionar
-                                    </button>
+                                    Bautizo 
                                 </td>
-                            </tr>
-                            <tr class="tablasoli">
-                                <td>2</td>
-                                <td>1ra comunion</td>
-                                <td>Julon Erick</td>
-                                <td>01/10/2024</td>
-                                <td>12:46</td>
                                 <td>
-                                    <button type="button" class="btn btn-primary btn-sm text-start">
-                                        <i class="bi bi-check2 me-1"></i>Seleccionar
-                                    </button>
+                                    Acto nacimiento
                                 </td>
-                            </tr>
-                            <tr class="tablasoli">
-                                <td>3</td>
-                                <td>1ra comunion</td>
-                                <td>Rodriguez roberta</td>
-                                <td>01/10/2024</td>
-                                <td>12:47</td>
                                 <td>
-                                    <button type="button" class="btn btn-primary btn-sm text-start">
-                                        <i class="bi bi-check2 me-1"></i>Seleccionar
-                                    </button>
-                                </td>
-                            </tr>
-                            <tr class="tablasoli">
-                                <td>4</td>
-                                <td>Matrimonio</td>
-                                <td>Sanches Maria</td>
-                                <td>01/10/2024</td>
-                                <td>12:48</td>
-                                <td class="">
-                                    <button type="button" class="btn btn-primary btn-sm text-start">
-                                        <i class="bi bi-check2 me-1"></i>Seleccionar
-                                    </button>
-                                </td>
-                            </tr>
-                            <tr class="tablasoli">
-                                <td>5</td>
-                                <td>Matrimonio</td>
-                                <td>Flores Ana</td>
-                                <td>01/10/2024</td>
-                                <td>12:49</td>
-                                <td>
-                                    <button type="button" class="btn btn-primary btn-sm text-start">
-                                        <i class="bi bi-check2 me-1"></i>Seleccionar
-                                    </button>
+                                    Obligado
                                 </td>
                             </tr>
                         </tbody>
                     </table>
                 </div>
+                <form action="" class="mt-2">
+                    <label for="">Enviar actividad:</label>
+                    <input type="email">
+                    <button class="btn btn-primary btn-sm"><i class="bi bi-send me-1"></i>Enviar</button>
+                </form>
             </div>
         </div> <!-- Cierre del contenedor de pestañas -->
     </div>

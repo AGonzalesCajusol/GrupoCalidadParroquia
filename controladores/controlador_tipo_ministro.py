@@ -44,3 +44,16 @@ def eliminar_tipo_ministro(id):
         cursor.execute("DELETE FROM tipo_ministro WHERE id_tipoministro = %s", (id,))
     conexion.commit()
     conexion.close()
+
+
+
+def obtener_id_tipoMinistro_por_nombre(nombre):
+        conexion = obtener_conexion()
+        id_tipoministro = None
+        with conexion.cursor() as cursor:
+            cursor.execute("select id_tipoministro from tipo_ministro WHERE tipo_ministro = %s", (nombre,))
+            resultado = cursor.fetchone()
+            if resultado:
+                id_tipoministro = resultado[0]
+        conexion.close()
+        return id_tipoministro

@@ -17,7 +17,7 @@ body {
     background-color: #2980b9; /* Cambiar color al hacer hover */
   }
 .header {
-    background-color: white;
+    background-color: #ECEADE;
     padding: 40px 50px;
     display: flex;
     justify-content: space-between;
@@ -28,37 +28,47 @@ body {
     width: 100%;
     z-index: 1050;
     height: 60px;
+    color: #033D8EBF;
+
 }
+
+
 
 
 
 .header .logo {
     display: flex;
     align-items: center;
-    color: #000000;
+}
+
+.header .logo h5 {
+    color: #033D8EBF;
+    font-weight: bold ;
 }
 
 .header .logo img {
     height: 55px;
     margin-right: 20px;
     border-radius: 50%;
+
 }
 
 
 
 .header .menu-btn {
-    font-size: 1.1rem;
+    font-size: 2rem;
     background: none;
     border: none;
     cursor: pointer;
-    color: #000000;
-}
+    color: #033D8EBF;
+    }
 
 .breadcrumb {
     margin: 70px 20px 10px 20px;
 }
 
 .user-info {
+    
     font-size: 1rem;
     font-weight: 500;
     color: #000000;
@@ -72,14 +82,30 @@ body {
     gap: 15px;
 }
 
+
+
+
+
 .btn-logout {
-    color: #000000;
+    color: #033D8EBF;
     border: none;
     background: none;
     cursor: pointer;
     display: flex;
     align-items: center;
+    font-weight: bold;
+    font-size: 1rem;
+
 }
+
+
+.btn-logout i {
+    color: #033D8EBF;
+    font-size: 1.5rem;
+
+
+}
+
 
 .btn-logout:hover {
     color: #e09844;
@@ -97,6 +123,19 @@ body {
     padding-top: 20px;
     transform: translateX(-100%);
     z-index: 1051;
+    color: #033D8EBF; /* Texto gris claro */
+}
+
+.sidenav a {
+    color: #033D8EBF; /* Fondo azul para la opción activa */
+    font-weight: bold; /* Negrita para la opción activa */
+}
+
+/* Ajustes para los botones dentro de las colapsables */
+.sidenav  .btn {
+    background-color: transparent;
+    border: none;
+    color: #033D8EBF; /* Texto gris claro */
 }
 
 .sidenav.open {
@@ -144,21 +183,10 @@ a.btn{
     margin-right: 12px ;
 }
 
-.sidenav .closebtn {
-    position: absolute;
-    top: 0;
-    right: 0px;
-    font-size: 35px;
-    margin-left: 50px;
-    color: white;
+#selectacto{
+    position: relative;
+    bottom: 5px;
 }
-
-.sidenav .closebtn:hover {
-    color: white;
-    background-color: transparent;
-}
-
-
 .main-content {
     transition: margin-left 0.5s;
     padding: 20px;
@@ -184,7 +212,7 @@ a.btn{
 }
 
 .menu-btn i {
-    margin-left: 25px;
+    margin-right: 25px;
 }
 
 /* Custom scrollbar */
@@ -252,7 +280,32 @@ th {
 }
 
 .barra_separadora {
-    background-color: #fff8d4;
+    background-color: rgb(224, 216, 157);
+
     width: 100%;
     height: 30px;
 }
+.main-content {
+    margin-left: 0;
+    transition: margin-left 0.5s; /* Transición suave */
+}
+
+.main-content.shifted {
+    margin-left: 250px; /* Debe coincidir con el ancho del sidenav */
+}
+
+
+
+.titulo-gestion {
+    font-size: 1.8rem;
+    font-weight: bold;
+    text-transform: uppercase;
+    text-align: left;
+    margin-bottom: 20px;
+}
+
+.btn-success {
+    background-color: #02BA26 !important ; /* Color verde más claro */
+    border-color: #02BA26 !important; /* Cambia también el borde */
+}
+

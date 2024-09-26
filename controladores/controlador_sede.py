@@ -37,3 +37,15 @@ def eliminar_sede(id):
         cursor.execute("DELETE FROM sede WHERE id_sede = %s", (id,))
     conexion.commit()
     conexion.close()
+
+
+def obtener_id_sede_por_nombre(nombre):
+        conexion = obtener_conexion()
+        id_sede = None
+        with conexion.cursor() as cursor:
+            cursor.execute("select id_sede from  sede WHERE nombre_sede = %s", (nombre,))
+            resultado = cursor.fetchone()
+            if resultado:
+                id_sede = resultado[0]
+        conexion.close()
+        return id_sede

@@ -1,14 +1,15 @@
 function openNav() {
     document.getElementById("mySidenav").classList.add('open');
-    document.getElementById('abrir').style.visibility = 'hidden';
-
+    document.querySelector('.main-content').classList.add('shifted');
+    document.getElementById('abrir').style.visibility = 'hidden'; // Ocultar el botón de abrir
 }
 
 function closeNav() {
     document.getElementById("mySidenav").classList.remove('open');
-    document.getElementById('abrir').style.visibility = 'visible';
-
+    document.querySelector('.main-content').classList.remove('shifted');
+    document.getElementById('abrir').style.visibility = 'visible'; // Mostrar el botón de abrir
 }
+
 
 
 //MODIFICAR >>>> onclick="return modificar()"

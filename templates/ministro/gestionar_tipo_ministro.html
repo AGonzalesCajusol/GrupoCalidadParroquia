@@ -1,0 +1,108 @@
+{% extends "index.html" %}
+{% block title %}Gestión de Tipo de Ministro{% endblock %}
+{% block cuerpo %}
+
+<div class="container mt-4">
+    <h1>Gestión de Tipos de Ministro</h1>
+
+    <!-- Botón para abrir el modal de "Agregar" -->
+    <button type="button" class="btn btn-primary mb-3" data-bs-toggle="modal" data-bs-target="#agregarModal">
+        Agregar Tipo de Ministro
+    </button>
+
+    <!-- Tabla de tipos de ministro -->
+    <table id="tipoMinistroTable" class="table table-striped">
+        <thead>
+            <tr>
+                <th>ID</th>
+                <th>Tipo de Ministro</th>
+                <th>Acciones</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for tipo in tipos_ministro %}
+            <tr>
+                <td>{{ tipo[0] }}</td>
+                <td>{{ tipo[1] }}</td>
+                <td>
+                    <button class="btn btn-warning btn-sm" onclick="abrirModalEditar('{{ tipo[0] }}', '{{ tipo[1] }}')">
+                        Editar
+                    </button>
+                    <form action="{{ url_for('procesar_eliminar_tipo_ministro') }}" method="POST" style="display:inline-block;">
+                        <input type="hidden" name="id" value="{{ tipo[0] }}">
+                        <button type="submit" class="btn btn-danger btn-sm" onclick="return confirm('¿Estás seguro de que deseas eliminar este tipo de ministro?');">
+                            Eliminar
+                        </button>
+                    </form>
+                </td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+</div>
+
+<!-- Modal para agregar un nuevo tipo de ministro -->
+<div class="modal fade" id="agregarModal" tabindex="-1" aria-labelledby="agregarModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <form action="{{ url_for('procesar_insertar_tipo_ministro') }}" method="POST">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="agregarModalLabel">Agregar Tipo de Ministro</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    <div class="mb-3">
+                        <label for="nombreAgregar" class="form-label">Nombre del Tipo de Ministro</label>
+                        <input type="text" class="form-control" id="nombreAgregar" name="nombre" required>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
+                    <button type="submit" class="btn btn-primary">Guardar</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+<!-- Modal para editar un tipo de ministro -->
+<div class="modal fade" id="editarModal" tabindex="-1" aria-labelledby="editarModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <form action="{{ url_for('procesar_actualizar_tipo_ministro') }}" method="POST">
+                <input type="hidden" id="editarId" name="id">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="editarModalLabel">Editar Tipo de Ministro</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    <div class="mb-3">
+                        <label for="nombreEditar" class="form-label">Nombre del Tipo de Ministro</label>
+                        <input type="text" class="form-control" id="nombreEditar" name="nombre" required>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
+                    <button type="submit" class="btn btn-primary">Guardar cambios</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+<!-- Scripts para manejar el modal de editar -->
+<script>
+    function abrirModalEditar(id, nombre) {
+        document.getElementById("editarId").value = id;
+        document.getElementById("nombreEditar").value = nombre;
+        var editarModal = new bootstrap.Modal(document.getElementById('editarModal'));
+        editarModal.show();
+    }
+</script>
+
+<!-- Inicialización de DataTables -->
+<script>
+    $('#tipoMinistroTable').DataTable()
+</script>
+
+{% endblock %}
