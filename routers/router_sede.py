@@ -9,6 +9,8 @@ from controladores.controlador_sede import (
 from controladores.controlador_congregacion import ( 
      obtener_congregacion,
      obtener_congregacion_por_id,
+     obtener_id_congregacion_por_nombre,
+     obtener_id_diosesis_por_nombre
 )
 from controladores.controlador_diocesis import ( 
      obtener_diocesis,
@@ -32,7 +34,7 @@ def registrar_rutas(app):
     # Ruta para insertar una nueva sede
     @app.route("/insertar_sede", methods=["POST"])
     def procesar_insertar_sede():
-        nombre = request.form["nombre"]
+        nombre = request.form["nombre_sede"]
         direccion = request.form["direccion"]
         creacion = request.form["creacion"]
         telefono = request.form["telefono"]
@@ -53,13 +55,15 @@ def registrar_rutas(app):
     @app.route("/actualizar_sede", methods=["POST"])
     def procesar_actualizar_sede():
         id = request.form["id"]  # Captura el ID desde el formulario
-        nombre = request.form["nombre"]  # Captura el nombre actualizado
-        direccion = request.form["direccion"]
-        creacion = request.form["creacion"]
-        telefono = request.form["telefono"]
-        correo = request.form["correo"]
-        id_congregacion = request.form["id_congregacion"]
-        id_diosesis = request.form["id_diosesis"]
+        nombre = request.form["nombreEditar"]  # Captura el nombre actualizado
+        direccion = request.form["direccionEditar"]
+        creacion = request.form["creacionEditar"]
+        telefono = request.form["telefonoEditar"]
+        correo = request.form["correoEditar"]
+        congregacion = request.form["id_congregacionEditar"]
+        id_congregacion= obtener_id_congregacion_por_nombre(congregacion)
+        diosesis = request.form["id_diosesisEditar"]
+        id_diosesis = obtener_id_diosesis_por_nombre(diosesis)
         actualizar_sede(nombre,direccion,creacion,telefono,correo,id_congregacion,id_diosesis, id)  # Llama a la función que actualiza en la base de datos
         flash("La sede fue actualizada exitosamente")
         return redirect(url_for("gestionar_sede"))

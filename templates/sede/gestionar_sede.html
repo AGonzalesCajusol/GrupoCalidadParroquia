@@ -19,8 +19,8 @@
                 <th scope="col" class="border">Creación</th>
                 <th scope="col" class="border">Telefono</th>
                 <th scope="col" class="border">Correo</th>
-                <th scope="col" class="border">ID congregacion</th>
-                <th scope="col" class="border">ID diosesis</th>
+                <th scope="col" class="border">Congregacion</th>
+                <th scope="col" class="border">Diócesis</th>
                 <th scope="col" class="border">Acciones</th>
             </tr>
         </thead>
@@ -66,8 +66,8 @@
                 </div>
                 <div class="modal-body">
                     <div class="mb-3">
-                        <label for="sede" class="form-label">Nombre de la Sede</label>
-                        <input type="text" class="form-control" id="sede" name="sede" required>
+                        <label for="nombre_sede" class="form-label">Nombre de la Sede</label>
+                        <input type="text" class="form-control" id="nombre_sede" name="nombre_sede" required>
                     </div>
                     <div class="mb-3">
                         <label for="direccion" class="form-label">Dirección</label>
@@ -101,11 +101,12 @@
                             {% endfor %}
                         </select>
                     </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
+                        <button type="submit" class="btn btn-primary">Guardar</button>
+                    </div>
                 </div>
-                <div class="modal-footer">
-                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
-                    <button type="submit" class="btn btn-primary">Guardar</button>
-                </div>
+                
             </form>
         </div>
     </div>
@@ -124,7 +125,7 @@
                 <div class="modal-body">
                     <div class="mb-3">
                         <label for="nombreEditar" class="form-label">Nombre de la Sede</label>
-                        <input type="text" class="form-control" id="nombreEditar" name="nombre" required>
+                        <input type="text" class="form-control" id="nombreEditar" name="nombreEditar" required>
                     </div>
                     <div class="mb-3">
                         <label for="direccionEditar" class="form-label">Dirección</label>
@@ -146,7 +147,7 @@
                         <label for="id_congregacionEditar">Congregación</label>
                         <select class="form-select" id="id_congregacionEditar" name="id_congregacionEditar" required>
                             {% for congre in congregacion %}
-                            <option value="{{ congre[0] }}">{{ congre[1] }}</option>
+                            <option value="{{ congre[1] }}">{{ congre[1] }}</option>
                             {% endfor %}
                         </select>
                     </div>
@@ -154,15 +155,16 @@
                         <label for="id_diosesisEditar">Diosesis</label>
                         <select class="form-select" id="id_diosesisEditar" name="id_diosesisEditar" required>
                             {% for dioss in diosesis %}
-                            <option value="{{ dioss[0] }}">{{ dioss[1] }}</option>
+                            <option value="{{ dioss[1] }}">{{ dioss[1] }}</option>
                             {% endfor %}
                         </select>
                     </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
+                        <button type="submit" class="btn btn-primary">Guardar cambios</button>
+                    </div>
                 </div>
-                <div class="modal-footer">
-                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
-                    <button type="submit" class="btn btn-primary">Guardar cambios</button>
-                </div>
+                
             </form>
         </div>
     </div>
