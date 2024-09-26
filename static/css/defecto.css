@@ -106,7 +106,7 @@ body {
     position: fixed; /* Esto mantiene el menú fijo mientras haces scroll */
     top: 81px; /* Ajusta si tienes un header */
     bottom: 0;
-    z-index: 1051;
+    z-index: 1;
     color: #033D8EBF;
     overflow-y: auto;
 }

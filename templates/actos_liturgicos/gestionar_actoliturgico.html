@@ -1,0 +1,111 @@
+{% extends "index.html" %}
+{% block title %}Gestión de Ministro{% endblock %}
+{% block cuerpo %}
+
+<div class="container mt-4">
+    <h1 class="titulo-gestion">Gestión de Acto litúrgico</h1>
+    <!-- Botón para abrir el modal de "Agregar" con ícono -->
+    <button type="button" class="btn btn-success mb-3 fw-bold" onclick="abrir('nuevo')">
+        <i class="bi bi-person-plus"></i> Agregar Acto Liturgico
+    </button>
+    <!-- DataTable para la gestión de ministros -->
+    <table id="actosTable" class="table table-hover table-striped col-4 text-center">
+        <thead>
+            <tr class="">
+                <th class="text-center">ID</th>
+                <th class="text-center">Acto Liturgico</th>
+                <th class="text-center">Prerequistos</th>
+                <th class="text-center">Acciones</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for la in lista_actosliturgicos %}
+            <tr>
+                <td class="text-center">{{ la[0] }}</td>
+                <td class="text-center">{{ la[1] }}</td>
+                <td class="text-center" id="prere">
+                    {% if la[2] == None or la[2] == Null%}
+                        Ninguno
+                    {% else %}
+                    {{ la[2] }}
+                    {% endif %}
+                </td>
+                <td class="">
+                    <div class="d-flex  justify-content-center ">
+                        <!-- Botón para editar -->
+                        <button class="btn btn-warning btn-sm me-2" onclick="abrir('modificar', '{{ la[0] }}', '{{ la[1] }}')">
+                            <i class="fas fa-edit"></i>
+                        </button>
+                    </div>
+
+                </td>
+
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+    <!-- Modal Maestra existente -->
+    <div class="modal fade" id="acciones" tabindex="-1" aria-labelledby="accionesLabel" aria-hidden="true">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h1 class="modal-title fs-5" id="titulo_modal"></h1>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body" id="body_modal">
+                    <form action="/ruta-a-tu-endpoint" method="POST">
+                        <input type="text" class="form-control" id="id_liturgia" name="id_liturgia" placeholder="Ingrese el ID de la liturgia" hidden>
+                        <div class="mb-3">
+                            <label for="nombre_liturgia" class="form-label">Nombre Liturgia</label>
+                            <input type="text" class="form-control" id="nombre_liturgia" name="nombre_liturgia" placeholder="Ingrese el nombre de la liturgia" required>
+                        </div>
+                    
+                        <div class="mb-3">
+                            <label for="nombre_prerequisito" class="form-label">Prerequisitos</label>
+                            <table class="table">
+                                <thead>
+                                    <tr>
+                                        <th>
+                                            Id_prerequisto
+                                        </th>
+                                        <th>
+                                            Nombre
+                                        </th>
+                                        <th>
+                                            Selección
+                                        </th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <tr>
+                                        <td>
+                                            1
+                                        </td>
+                                        <td>
+                                            Bautizo
+                                        </td>
+                                        <td>
+                                            <input type="checkbox">
+                                        </td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </div>
+                    </form>
+                    
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-primary" id="accion_modal"></button>
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cerrar</button>
+
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+<!-- Font Awesome para los iconos -->
+<script src="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/js/all.min.js"></script>
+
+
+
+{% endblock %}
