@@ -16,7 +16,7 @@
             <tr>
                 <th>ID Tipo</th>
                 <th>Nombre del Tipo</th>
-                <th>Monetario</th>
+                <th>Tipo</th>
                 <th>Acciones</th>
             </tr>
         </thead>
@@ -25,7 +25,7 @@
             <tr>
                 <td>{{ tipo[0] }}</td>
                 <td>{{ tipo[1] }}</td>
-                <td>{{ 'Sí' if tipo[2] else 'No' }}</td>
+                <td>{{ 'Monetario' if tipo[2] == 1 else 'No Monetario' }}</td>
                 <td>
                     <button class="btn btn-warning btn-sm" onclick="abrirModalEditar('{{ tipo[0] }}', '{{ tipo[1] }}', '{{ tipo[2] }}')">Modificar</button>
                     <form action="{{ url_for('eliminar_tipo_recaudacion') }}" method="POST" style="display:inline-block;">
@@ -54,8 +54,13 @@
                         <input type="text" class="form-control" name="nombre_tipo" required>
                     </div>
                     <div class="mb-3">
-                        <label for="monetario" class="form-label">¿Es Monetario?</label>
-                        <input type="checkbox" class="form-check-input" name="monetario">
+                        <label for="tipo" class="form-label">Tipo de Recaudación</label>
+                        <div>
+                            <input type="radio" class="form-check-input" name="tipo" value="1" required> Monetario
+                        </div>
+                        <div>
+                            <input type="radio" class="form-check-input" name="tipo" value="0" required> No Monetario
+                        </div>
                     </div>
                 </div>
                 <div class="modal-footer">
@@ -83,8 +88,13 @@
                         <input type="text" class="form-control" id="editarNombreTipo" name="nombre_tipo" required>
                     </div>
                     <div class="mb-3">
-                        <label for="monetario" class="form-label">¿Es Monetario?</label>
-                        <input type="checkbox" class="form-check-input" id="editarMonetario" name="monetario">
+                        <label for="tipo" class="form-label">Tipo de Recaudación</label>
+                        <div>
+                            <input type="radio" class="form-check-input" id="editarMonetario" name="tipo" value="1"> Monetario
+                        </div>
+                        <div>
+                            <input type="radio" class="form-check-input" id="editarNoMonetario" name="tipo" value="0"> No Monetario
+                        </div>
                     </div>
                 </div>
                 <div class="modal-footer">
@@ -98,10 +108,11 @@
 
 <!-- Scripts para manejar el modal de Editar -->
 <script>
-    function abrirModalEditar(id_tipo, nombre_tipo, monetario) {
+    function abrirModalEditar(id_tipo, nombre_tipo, tipo) {
         document.getElementById("editarIdTipo").value = id_tipo;
         document.getElementById("editarNombreTipo").value = nombre_tipo;
-        document.getElementById("editarMonetario").checked = monetario == 1;
+        document.getElementById("editarMonetario").checked = tipo == 1;
+        document.getElementById("editarNoMonetario").checked = tipo == 0;
         var editarModal = new bootstrap.Modal(document.getElementById('editarModal'));
         editarModal.show();
     }
