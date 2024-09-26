@@ -17,7 +17,8 @@
                 <th>ID</th>
                 <th>Sede</th>
                 <th>Monto</th>
-                <th>Descripción</th>
+                <th>tipo</th>
+                <th>Observaciones</th>
                 <th>Fecha</th>
                 <th>Hora</th>
                 <th>Acciones</th>
@@ -32,6 +33,7 @@
                 <td>{{ rec[3] }}</td>
                 <td>{{ rec[4] }}</td>
                 <td>{{ rec[5] }}</td>
+                <td>{{ rec[6] }}</td>
                 <td>
                     <button class="btn btn-warning btn-sm" onclick="abrirModalEditar('{{ rec[0] }}', '{{ rec[1] }}', '{{ rec[2] }}', '{{ rec[3] }}', '{{ rec[4] }}', '{{ rec[5] }}')">Modificar</button>
                     <form action="{{ url_for('eliminar_recaudacion') }}" method="POST" style="display:inline-block;">

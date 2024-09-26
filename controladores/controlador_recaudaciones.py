@@ -5,10 +5,14 @@ from bd import obtener_conexion
 def listar_recaudaciones():
     conexion = obtener_conexion()
     with conexion.cursor() as cursor:
-        cursor.execute("SELECT * FROM recaudacion")
+        cursor.execute('''SELECT re.id_recaudacion, se.nombre_sede, re.monto, tr.nombre_recaudacion ,re.observacion , re.fecha, re.hora FROM recaudacion as re inner join sede as se
+on se.id_sede = re.id_sede inner join tipo_recaudacion tr on 
+tr.id_tipo_recaudacion = re.id_tipo_recaudacion''')
         recaudaciones = cursor.fetchall()
     conexion.close()
-    return render_template('tipo_financiero/gestionar_recaudaciones.html', recaudaciones=recaudaciones)
+    return recaudaciones
+
+
 
 # Controlador para agregar una nueva recaudación
 def agregar_recaudacion():
