@@ -1,5 +1,6 @@
 from flask import render_template, request, redirect, url_for, flash
 from bd import obtener_conexion  # Asegúrate de que esta función exista
+import controladores.controlador_recaudaciones as ccr
 
 from controladores.controlador_recaudaciones import (
     listar_recaudaciones,
@@ -12,12 +13,8 @@ def registrar_rutas(app):
         # Ruta para gestionar las recaudaciones
     @app.route('/gestionar_recaudaciones', methods=['GET'])
     def gestionar_recaudaciones():
-        conexion = obtener_conexion()
-        with conexion.cursor() as cursor:
-            cursor.execute("SELECT * FROM recaudacion")
-            recaudaciones = cursor.fetchall()
-        conexion.close()
-        return render_template('tipo_financiero/gestionar_recaudaciones.html', recaudaciones=recaudaciones)
+        lista_recaudaciones = ccr.listar_recaudaciones()
+        return render_template('tipo_financiero/gestionar_recaudaciones.html', recaudaciones=lista_recaudaciones)
 
     # Ruta para agregar recaudación
     @app.route('/insertar_recaudacion', methods=['POST'])
@@ -27,15 +24,6 @@ def registrar_rutas(app):
         descripcion = request.form['descripcion']
         fecha = request.form['fecha']
         hora = request.form['hora']
-        
-        conexion = obtener_conexion()
-        with conexion.cursor() as cursor:
-            cursor.execute("""
-                INSERT INTO recaudacion (id_sede, monto, descripcion, fecha, hora)
-                VALUES (%s, %s, %s, %s, %s)
-            """, (id_sede, monto, descripcion, fecha, hora))
-        conexion.commit()
-        conexion.close()
         
         flash("Recaudación registrada correctamente")
         return redirect(url_for('gestionar_recaudaciones'))

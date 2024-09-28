@@ -40,23 +40,21 @@ def registrar_rutas(app):
         ministro = obtener_ministro_por_id(id)
         return render_template("ministro/editar_ministro.html", ministro=ministro)
 
-    # Ruta para manejar la actualización de un ministro
-    @app.route("/actualizar_ministro", methods=["POST"])
+    @app.route("/procesar_actualizar_ministro", methods=["POST"])
     def procesar_actualizar_ministro():
-        id = request.form["id"]  # Captura el ID desde el formulario
-        nombre = request.form["nombre"]  # Captura el nombre actualizado
+        id = request.form["id"]
+        nombre = request.form["nombre"]
         nacimiento = request.form["nacimiento"]
         ordenacion = request.form["ordenacion"]
         actividades = request.form["actividades"]
-        tipoministro = request.form["id_tipoministro"]
-        id_tipoministro= obtener_id_tipoMinistro_por_nombre(tipoministro)
-        sede = request.form["id_sede"]
-        id_sede= obtener_id_sede_por_nombre(sede)
-        cargo = request.form["id_cargo"]
-        id_cargo= obtener_id_cargo_por_nombre(cargo)
+        id_tipoministro = request.form["id_tipoministro"]
+        id_sede = request.form["id_sede"]
+        id_cargo = request.form["id_cargo"]
 
-        actualizar_ministro(nombre,nacimiento,ordenacion,actividades,id_tipoministro,id_sede,id_cargo, id)  # Llama a la función que actualiza en la base de datos
-        flash("El ministro fue actualizado exitosamente")
+        # Lógica para actualizar un ministro en la base de datos
+        actualizar_ministro( nombre, nacimiento, ordenacion, actividades, id_tipoministro, id_sede, id_cargo,id)
+
+        flash("Ministro actualizado exitosamente")
         return redirect(url_for("gestionar_ministro"))
 
 

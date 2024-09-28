@@ -8,20 +8,13 @@ from controladores.controlador_tipo_recaudacion import (
     eliminar_tipo_recaudacion
 )
 
-
 def registrar_rutas_tipo_recaudacion(app):
     # Ruta para gestionar los tipos de recaudación
     @app.route('/gestionar_tipo_recaudacion', methods=['GET'])
     def gestionar_tipo_recaudacion():
         conexion = obtener_conexion()
         with conexion.cursor() as cursor:
-            cursor.execute("""
-            SELECT recaudacion.id_recaudacion, sede.nombre_sede, tipo_recaudacion.nombre_recaudacion, 
-            recaudacion.monto, recaudacion.observacion, recaudacion.fecha, recaudacion.hora
-            FROM recaudacion
-            left JOIN sede ON recaudacion.id_sede = sede.id_sede
-            left  JOIN tipo_recaudacion ON recaudacion.id_tipo_recaudacion = tipo_recaudacion.id_tipo_recaudacion
-            """)
+            cursor.execute("SELECT * FROM tipo_recaudacion")
             tipos_recaudacion = cursor.fetchall()
         conexion.close()
         return render_template('tipo_financiero/gestionar_tipo_recaudacion.html', tipos_recaudacion=tipos_recaudacion)
@@ -30,11 +23,10 @@ def registrar_rutas_tipo_recaudacion(app):
     @app.route('/insertar_tipo_recaudacion', methods=['POST'])
     def insertar_tipo_recaudacion():
         nombre_tipo = request.form['nombre_tipo']
-        tipo = request.form['tipo']
         
         conexion = obtener_conexion()
         with conexion.cursor() as cursor:
-            cursor.execute("INSERT INTO tipo_recaudacion (nombre_recaudacion, tipo) VALUES (%s, %s)", (nombre_tipo, tipo))
+            cursor.execute("INSERT INTO tipo_recaudacion (nombre_recaudacion) VALUES (%s)", (nombre_tipo,))
         conexion.commit()
         conexion.close()
         
@@ -46,15 +38,14 @@ def registrar_rutas_tipo_recaudacion(app):
     def actualizar_tipo_recaudacion():
         id_tipo_recaudacion = request.form['id_tipo_recaudacion']
         nombre_tipo = request.form['nombre_tipo']
-        tipo = request.form['tipo']
         
         conexion = obtener_conexion()
         with conexion.cursor() as cursor:
             cursor.execute("""
                 UPDATE tipo_recaudacion
-                SET nombre_recaudacion = %s, tipo = %s
+                SET nombre_recaudacion = %s
                 WHERE id_tipo_recaudacion = %s
-            """, (nombre_tipo, tipo, id_tipo_recaudacion))
+            """, (nombre_tipo, id_tipo_recaudacion))
         conexion.commit()
         conexion.close()
         

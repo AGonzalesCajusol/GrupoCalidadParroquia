@@ -1,4 +1,5 @@
 from flask import Flask, render_template
+import routers.router_actosliturgicos
 import routers.router_diocesis
 import routers.router_main  # Importa las rutas generales
 import routers.router_ministro
@@ -46,6 +47,8 @@ routers.router_diocesis.registrar_rutas(app)
 routers.router_ministro.registrar_rutas(app)
 
 routers.router_cargo.registrar_rutas(app)
+
+routers.router_actosliturgicos.registrar_rutas(app)
 
 
 
