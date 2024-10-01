@@ -14,7 +14,7 @@ def obtener_diocesis():
     conexion = obtener_conexion()
     with conexion.cursor() as cursor:
         cursor.execute(
-            "SELECT id_diosesis, nombre_diosesis, id_departamento, id_provincia FROM diosesis"
+            "select ds.id_diosesis ,ds.nombre_diosesis, dp.nombre_departamento, pr.nombre_provincia from diosesis ds inner join departamento dp on ds.id_departamento = dp.id_departamento inner join provincia pr on ds.id_provincia = pr.id_provincia"
         )
         diosesis = cursor.fetchall()
     conexion.close()
