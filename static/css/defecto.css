@@ -1,7 +1,6 @@
 body {
     font-family: "Roboto", sans-serif;
-    padding-top: 60px;
-    overflow: auto;
+    padding-top: 60px;    
     color: #000000;
 }
 ::-webkit-scrollbar-track {
@@ -29,9 +28,11 @@ body {
     z-index: 1050;
     height: 60px;
     color: #033D8EBF;
-
 }
 
+.layout{
+    overflow-y: auto;
+}
 .header .logo {
     display: flex;
     align-items: center;
@@ -177,7 +178,8 @@ a.btn{
 .main-content {
     flex-grow: 1; /* Esto hace que el contenido principal ocupe el resto del espacio */
     margin-left: 250px; /* Deja el espacio suficiente para el menú fijo */
-    padding: 20px; 
+    padding: 20px;     
+    margin-bottom: 2cm;
 }
 
 /* Add padding to avoid content overlay */
