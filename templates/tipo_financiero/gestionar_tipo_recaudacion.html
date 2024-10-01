@@ -11,7 +11,7 @@
     </button>
 
     <!-- Tabla de tipos de recaudación -->
-    <table class="table table-striped">
+    <table class="table table-striped" id="tabla_tipo_recaudaciones">
         <thead>
             <tr>
                 <th>ID Tipo</th>
@@ -107,15 +107,8 @@
 </div>
 
 <!-- Scripts para manejar el modal de Editar -->
-<script>
-    function abrirModalEditar(id_tipo, nombre_tipo, tipo) {
-        document.getElementById("editarIdTipo").value = id_tipo;
-        document.getElementById("editarNombreTipo").value = nombre_tipo;
-        document.getElementById("editarMonetario").checked = tipo == 1;
-        document.getElementById("editarNoMonetario").checked = tipo == 0;
-        var editarModal = new bootstrap.Modal(document.getElementById('editarModal'));
-        editarModal.show();
-    }
-</script>
+
+<script src="/static/js/tipo_recaudaciones.js"></script>
+
 
 {% endblock %}
