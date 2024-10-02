@@ -21,7 +21,7 @@ def registrar_rutas(app):
     def insertar_recaudacion():
         id_sede = request.form['id_sede']
         monto = request.form['monto']
-        descripcion = request.form['descripcion']
+        descripcion = request.form['observacion']
         fecha = request.form['fecha']
         hora = request.form['hora']
         
@@ -34,7 +34,7 @@ def registrar_rutas(app):
         id_recaudacion = request.form['id_recaudacion']
         id_sede = request.form['id_sede']
         monto = request.form['monto']
-        descripcion = request.form['descripcion']
+        observacion = request.form['observacion']
         fecha = request.form['fecha']
         hora = request.form['hora']
         
@@ -42,9 +42,9 @@ def registrar_rutas(app):
         with conexion.cursor() as cursor:
             cursor.execute("""
                 UPDATE recaudacion 
-                SET id_sede = %s, monto = %s, descripcion = %s, fecha = %s, hora = %s
+                SET id_sede = %s, monto = %s, observacion = %s, fecha = %s, hora = %s
                 WHERE id_recaudacion = %s
-            """, (id_sede, monto, descripcion, fecha, hora, id_recaudacion))
+            """, (id_sede, monto, observacion, fecha, hora, id_recaudacion))
         conexion.commit()
         conexion.close()
         
