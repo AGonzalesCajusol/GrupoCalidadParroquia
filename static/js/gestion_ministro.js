@@ -1,11 +1,11 @@
 $(document).ready(function () {
-    $('#ministrosTable').DataTable({
-        "language": {
-            "url": "//cdn.datatables.net/plug-ins/1.13.1/i18n/es-ES.json"
-        }
+    var table = $('#ministrosTable').DataTable({
+        language: {
+            url: 'https://cdn.datatables.net/plug-ins/1.10.21/i18n/Spanish.json' // Traducción al español
+        },
     });
-    
 });
+
 
 function openModal(type, id = null, nombre = '', nacimiento = '', ordenacion = '', actividades = '', tipo = '', sede = '', cargo = '') {
     var modalTitle = '';

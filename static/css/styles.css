@@ -36,9 +36,7 @@ a.btn.btn-close{
     margin-bottom: 20px; 
 }
 
-#actosTable{
-    width: 800px;
-}
+
 .btnfloatante:hover{
     background-color: rgb(144, 146, 148);
     color: white;
