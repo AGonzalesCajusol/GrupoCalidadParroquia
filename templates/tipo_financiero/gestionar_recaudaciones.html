@@ -11,13 +11,13 @@
     </button>
 
     <!-- Tabla de recaudaciones -->
-    <table class="table table-striped">
+    <table class="table table-striped" id="tabla_recaudaciones">
         <thead>
             <tr>
                 <th>ID</th>
                 <th>Sede</th>
                 <th>Monto</th>
-                <th>tipo</th>
+                <th>Tipo</th>
                 <th>Observaciones</th>
                 <th>Fecha</th>
                 <th>Hora</th>
@@ -35,7 +35,7 @@
                 <td>{{ rec[5] }}</td>
                 <td>{{ rec[6] }}</td>
                 <td>
-                    <button class="btn btn-warning btn-sm" onclick="abrirModalEditar('{{ rec[0] }}', '{{ rec[1] }}', '{{ rec[2] }}', '{{ rec[3] }}', '{{ rec[4] }}', '{{ rec[5] }}')">Modificar</button>
+                    <button class="btn btn-warning btn-sm" onclick="abrirModalEditar('{{ rec[0] }}', '{{ rec[1] }}', '{{ rec[2] }}', '{{ rec[3] }}', '{{ rec[4] }}', '{{ rec[5] }}', '{{ rec[6] }}')">Modificar</button>
                     <form action="{{ url_for('eliminar_recaudacion') }}" method="POST" style="display:inline-block;">
                         <input type="hidden" name="id_recaudacion" value="{{ rec[0] }}">
                         <button type="submit" class="btn btn-danger btn-sm">Eliminar</button>
@@ -66,8 +66,8 @@
                         <input type="number" step="0.01" class="form-control" name="monto" required>
                     </div>
                     <div class="mb-3">
-                        <label for="descripcion" class="form-label">Descripción</label>
-                        <input type="text" class="form-control" name="descripcion" required>
+                        <label for="observacion" class="form-label">Observación</label>
+                        <textarea class="form-control" name="observacion" required></textarea>
                     </div>
                     <div class="mb-3">
                         <label for="fecha" class="form-label">Fecha</label>
@@ -107,8 +107,8 @@
                         <input type="number" step="0.01" class="form-control" id="editarMonto" name="monto" required>
                     </div>
                     <div class="mb-3">
-                        <label for="descripcion" class="form-label">Descripción</label> 
-                        <textarea type="text" class="form-control" id="editarDescripcion" name="descripcion" required> </textarea>
+                        <label for="observacion" class="form-label">Observación</label> 
+                        <textarea class="form-control" id="editarObservacion" name="observacion" required></textarea>
                     </div>
                     <div class="mb-3">
                         <label for="fecha" class="form-label">Fecha</label>
@@ -128,18 +128,5 @@
     </div>
 </div>
 
-<!-- Scripts para manejar el modal de Editar -->
-<script>
-    function abrirModalEditar(id, sede, monto, descripcion, fecha, hora) {
-        document.getElementById("editarId").value = id;
-        document.getElementById("editarSede").value = sede;
-        document.getElementById("editarMonto").value = monto;
-        document.getElementById("editarDescripcion").value = descripcion;
-        document.getElementById("editarFecha").value = fecha;
-        document.getElementById("editarHora").value = hora;
-        var editarModal = new bootstrap.Modal(document.getElementById('editarModal'));
-        editarModal.show();
-    }
-</script>
-
+<script src="/static/js/recaudaciones.js"></script>
 {% endblock %}

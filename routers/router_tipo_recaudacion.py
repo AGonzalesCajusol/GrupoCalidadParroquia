@@ -38,16 +38,17 @@ def registrar_rutas_tipo_recaudacion(app):
     def actualizar_tipo_recaudacion():
         id_tipo_recaudacion = request.form['id_tipo_recaudacion']
         nombre_tipo = request.form['nombre_tipo']
-        
+        tipo = request.form['tipo']
         conexion = obtener_conexion()
         with conexion.cursor() as cursor:
             cursor.execute("""
                 UPDATE tipo_recaudacion
-                SET nombre_recaudacion = %s
+                SET nombre_recaudacion = %s, tipo = %s
                 WHERE id_tipo_recaudacion = %s
-            """, (nombre_tipo, id_tipo_recaudacion))
+            """, (nombre_tipo, tipo, id_tipo_recaudacion))
         conexion.commit()
         conexion.close()
+
         
         flash("Tipo de recaudación actualizado correctamente")
         return redirect(url_for('gestionar_tipo_recaudacion'))
