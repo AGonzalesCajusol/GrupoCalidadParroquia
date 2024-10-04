@@ -12,10 +12,10 @@
             <thead>
                 <tr class="text-center">
                     <th>ID</th>
-                    <th>Apellidos y Nombres </th>
+                    <th>Apellidos y Nombres</th>
                     <th>Sede</th>
                     <th>Cargo</th>
-                    <th>Acciones</th>
+                    <th style="width: 200px;">Acciones</th> <!-- Estilo en línea con ancho fijo -->
                 </tr>
             </thead>
             <tbody>
@@ -25,6 +25,7 @@
                     <td>{{ ministro[1] }}</td> <!-- Nombre del ministro -->
                     <td>{{ ministro[7] }}</td> <!-- Sede -->
                     <td>{{ ministro[8] }}</td> <!-- Cargo -->
+
                     <td class="text-center">
                         <!-- Botón para ver detalles -->
                         <button class="btn btn-primary btn-sm" title="Ver"
@@ -38,12 +39,18 @@
                             <i class="fas fa-edit"></i>
                         </button>
 
+                        <button type="button" class="btn btn-secondary btn-sm" title="Dar de baja"
+                            onclick="darDeBajaMinistro('{{ ministro[0] }}')">
+                            <i class="fas fa-ban"></i> <!-- Ícono de FontAwesome -->
+                        </button>
 
                         <!-- Formulario para eliminar -->
                         <button type="button" class="btn btn-danger btn-sm" title="Eliminar"
                         onclick="eliminarMinistro('{{ ministro[0] }}')">
                         <i class="fas fa-trash-alt"></i>
                         </button>
+
+
                     
                     </td>
                 </tr>
@@ -85,7 +92,7 @@
                         <label for="id_tipoministro">Tipo de Ministro</label>
                         <select class="form-select" id="id_tipoministro" name="id_tipoministro" required>
                             {% for tipo in tipos %}
-                            <option value="{{ tipo[0] }}">{{ tipo[1] }}</option>
+                            <option value="{{ tipo[1] }}">{{ tipo[1] }}</option>
                             {% endfor %}
                         </select>
                     </div>
@@ -93,7 +100,7 @@
                         <label for="id_sede">Sede</label>
                         <select class="form-select" id="id_sede" name="id_sede" required>
                             {% for sede in sedes %}
-                            <option value="{{ sede[0] }}">{{ sede[1] }}</option>
+                            <option value="{{ sede[1] }}">{{ sede[1] }}</option>
                             {% endfor %}
                         </select>
                     </div>
@@ -101,7 +108,7 @@
                         <label for="id_cargo">Cargo</label>
                         <select class="form-select" id="id_cargo" name="id_cargo" required>
                             {% for cargo in cargos %}
-                            <option value="{{ cargo[0] }}">{{ cargo[1] }}</option>
+                            <option value="{{ cargo[1] }}">{{ cargo[1] }}</option>
                             {% endfor %}
                         </select>
                     </div>

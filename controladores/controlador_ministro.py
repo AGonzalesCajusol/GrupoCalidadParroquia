@@ -94,3 +94,4 @@ def eliminar_ministro(id_ministro):
         conexion.rollback()
     finally:
         conexion.close()
+

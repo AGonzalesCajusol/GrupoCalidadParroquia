@@ -289,22 +289,13 @@ th {
 
 
 
-/*BARRA DATA TABLE (BOTON & SEARCH )
-/* Estilo personalizado para reducir el tamaño del botón */
-.custom-btn {
-    font-size: 14px;  /* Tamaño de texto más pequeño */
-    padding: 5px 10px;  /* Reduce el padding */
-    align-items: right;
-  }
-  
+
   /* Ajustar tamaño del campo de búsqueda */
   .dataTables_filter input {
-    width: 120px !important; /* Reduce el ancho del campo de búsqueda */
-    height: 30px; /* Reduce la altura del campo de búsqueda */
+    width: 100px !important; /* Reduce el ancho del campo de búsqueda */
+    height: 25px; /* Reduce la altura del campo de búsqueda */
     font-size: 14px; /* Tamaño de fuente más pequeño */
-    padding: 5px;
-    margin-right: 195px;
-
+    margin-right: 25px;
   }
   
   
@@ -322,7 +313,7 @@ th {
   }
   
   .dataTables_filter input {
-    width: 450px !important;  /* Ajustar el ancho del campo de búsqueda */
+    width: 550px !important;  /* Ajustar el ancho del campo de búsqueda */
     height: 30px;  /* Reducir la altura del campo de búsqueda */
     font-size: 14px;  /* Reducir el tamaño de la fuente */
     padding: 5px;
@@ -331,10 +322,18 @@ th {
    
   }
   
-  /* Ajustar margen del selector "Show entries" */
-  .dataTables_length {
-    font-size: 14px; 
-    margin-right: 195px;
-  }
+
   
-  
+  /* Btn agregar ministro
+
+  /* Personalización del botón "Agregar ministro" */
+.btn-agregar-ministro {
+    font-size: 15px;  /* Tamaño de la fuente */
+    transition: background-color 0.3s ease;  /* Transición suave */
+    margin-right: 35px;
+}
+
+.btn-agregar-ministro:hover {
+    background-color: #218838;  /* Color más oscuro al pasar el cursor */
+    border-color: #218838;  /* Ajuste del color del borde */
+}
