@@ -1,4 +1,4 @@
-from flask import render_template, request, redirect, url_for, flash
+from flask import jsonify, render_template, request, redirect, url_for, flash
 from controladores.controlador_sede import *
 from controladores.controlador_ministro import *
 from controladores.controlador_cargo import *
@@ -20,48 +20,60 @@ def registrar_rutas(app):
     def formulario_registrar_ministro():
         return render_template("ministro/registrar_ministro.html", )
 
-    # Ruta para insertar un nuevo ministro
-    @app.route("/insertar_ministro", methods=["POST"])
-    def procesar_insertar_ministro():
-        nombre = request.form["nombre"]
-        nacimiento = request.form["nacimiento"]
-        ordenacion = request.form["ordenacion"]
-        actividades = request.form["actividades"]
-        id_tipoministro = request.form["id_tipoministro"]
-        id_sede = request.form["id_sede"]
-        id_cargo = request.form["id_cargo"]
-        insertar_ministro(nombre,nacimiento,ordenacion,actividades,id_tipoministro,id_sede,id_cargo)
-        flash("El ministro fue agregado exitosamente")
-        return redirect(url_for("gestionar_ministro"))
-
+   
     # Ruta para mostrar el formulario de edición de un ministro
     @app.route("/editar_ministro/<int:id>", methods=["GET"])
     def formulario_editar_ministro(id):
         ministro = obtener_ministro_por_id(id)
         return render_template("ministro/editar_ministro.html", ministro=ministro)
 
+
+
+
     @app.route("/procesar_actualizar_ministro", methods=["POST"])
     def procesar_actualizar_ministro():
-        id = request.form["id"]
-        nombre = request.form["nombre"]
-        nacimiento = request.form["nacimiento"]
-        ordenacion = request.form["ordenacion"]
-        actividades = request.form["actividades"]
-        id_tipoministro = request.form["id_tipoministro"]
-        id_sede = request.form["id_sede"]
-        id_cargo = request.form["id_cargo"]
+        try:
+            id = request.form["id"]
+            nombre = request.form["nombre"]
+            nacimiento = request.form["nacimiento"]
+            ordenacion = request.form["ordenacion"]
+            actividades = request.form["actividades"]
+            id_tipoministro = request.form["id_tipoministro"]
+            id_sede = request.form["id_sede"]
+            id_cargo = request.form["id_cargo"]
 
-        # Lógica para actualizar un ministro en la base de datos
-        actualizar_ministro( nombre, nacimiento, ordenacion, actividades, id_tipoministro, id_sede, id_cargo,id)
+            # Lógica para actualizar un ministro en la base de datos
+            actualizar_ministro(nombre, nacimiento, ordenacion, actividades, id_tipoministro, id_sede, id_cargo, id)
 
-        flash("Ministro actualizado exitosamente")
-        return redirect(url_for("gestionar_ministro"))
+            return jsonify(success=True)
+        except Exception as e:
+            return jsonify(success=False, message=str(e))
 
+  
 
-    # **Ruta para eliminar un ministro**
+    # Procesar la inserción de un ministro
+    @app.route("/insertar_ministro", methods=["POST"])
+    def procesar_insertar_ministro():
+        try:
+            nombre = request.form["nombre"]
+            nacimiento = request.form["nacimiento"]
+            ordenacion = request.form["ordenacion"]
+            actividades = request.form["actividades"]
+            id_tipoministro = request.form["id_tipoministro"]
+            id_sede = request.form["id_sede"]
+            id_cargo = request.form["id_cargo"]
+            
+            insertar_ministro(nombre, nacimiento, ordenacion, actividades, id_tipoministro, id_sede, id_cargo)
+            return jsonify(success=True)
+        except Exception as e:
+            return jsonify(success=False, message=str(e))
+
+    # Procesar la eliminación de un ministro
     @app.route("/eliminar_ministro", methods=["POST"])
     def procesar_eliminar_ministro():
-        id = request.form["id"]  # Captura el ID desde el formulario
-        eliminar_ministro(id)  # Llama a la función que elimina en la base de datos
-        flash("El ministro fue eliminado exitosamente")
-        return redirect(url_for("gestionar_ministro"))
+        data = request.get_json()
+        try:
+            eliminar_ministro(data['id'])
+            return jsonify(success=True)
+        except Exception as e:
+            return jsonify(success=False, message=str(e))

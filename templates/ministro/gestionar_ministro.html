@@ -5,56 +5,52 @@
 <div class="container mt-4">
     <h1 class="titulo-gestion">Gestión de Ministro</h1>
 
-    <!-- Botón para abrir el modal de "Agregar" -->
-    <button type="button" class="btn btn-success mb-3 fw-bold" data-bs-toggle="modal" onclick="openModal('add')">
-        <i class="bi bi-person-plus"></i> Agregar ministro
-    </button>
 
-    <!-- DataTable para la gestión de ministros -->
-    <table id="ministrosTable" class="table table-hover table-striped">
-        <thead>
-            <tr class="text-center">
-                <th>ID</th>
-                <th>Apellidos y Nombres </th>
-                <th>Sede</th>
-                <th>Cargo</th>
-                <th>Acciones</th>
-            </tr>
-        </thead>
-        <tbody>
-            {% for ministro in ministros %}
-            <tr>
-                <td>{{ ministro[0] }}</td> <!-- ID del ministro -->
-                <td>{{ ministro[1] }}</td> <!-- Nombre del ministro -->
-                <td>{{ ministro[7] }}</td> <!-- Sede -->
-                <td>{{ ministro[8] }}</td> <!-- Cargo -->
-                <td class="text-center">
-                    <!-- Botón para ver detalles -->
-                    <button class="btn btn-primary btn-sm" title="Ver"
-                        onclick="openModal('view', '{{ ministro[0] }}', '{{ ministro[1] }}', '{{ ministro[2] }}', '{{ ministro[3] }}', '{{ ministro[4] }}', '{{ ministro[6] }}', '{{ ministro[7] }}', '{{ ministro[8] }}')">
-                        <i class="fas fa-eye"></i>
-                    </button>
-
-                    <!-- Botón para editar -->
-                    <button class="btn btn-warning btn-sm" title="Editar"
-                        onclick="openModal('edit', '{{ ministro[0] }}', '{{ ministro[1] }}', '{{ ministro[2] }}', '{{ ministro[3] }}', '{{ ministro[4] }}', '{{ ministro[6] }}', '{{ ministro[7] }}', '{{ ministro[8] }}')">
-                        <i class="fas fa-edit"></i>
-                    </button>
-
-                    <!-- Formulario para eliminar -->
-                    <form action="{{ url_for('procesar_eliminar_ministro') }}" method="POST"
-                        style="display:inline-block;">
-                        <input type="hidden" name="id" value="{{ ministro[0] }}">
-                        <button type="submit" class="btn btn-danger btn-sm" title="Eliminar"
-                            onclick="return confirm('¿Estás seguro de que deseas eliminar este ministro?');">
-                            <i class="fas fa-trash-alt"></i>
+    <div>
+        <!-- DataTable para la gestión de ministros -->
+        <table id="ministrosTable" class="table table-hover table-striped">
+            <thead>
+                <tr class="text-center">
+                    <th>ID</th>
+                    <th>Apellidos y Nombres </th>
+                    <th>Sede</th>
+                    <th>Cargo</th>
+                    <th>Acciones</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for ministro in ministros %}
+                <tr>
+                    <td>{{ ministro[0] }}</td> <!-- ID del ministro -->
+                    <td>{{ ministro[1] }}</td> <!-- Nombre del ministro -->
+                    <td>{{ ministro[7] }}</td> <!-- Sede -->
+                    <td>{{ ministro[8] }}</td> <!-- Cargo -->
+                    <td class="text-center">
+                        <!-- Botón para ver detalles -->
+                        <button class="btn btn-primary btn-sm" title="Ver"
+                            onclick="openModal('view', '{{ ministro[0] }}', '{{ ministro[1] }}', '{{ ministro[2] }}', '{{ ministro[3] }}', '{{ ministro[4] }}', '{{ ministro[6] }}', '{{ ministro[7] }}', '{{ ministro[8] }}')">
+                            <i class="fas fa-eye"></i>
                         </button>
-                    </form>
-                </td>
-            </tr>
-            {% endfor %}
-        </tbody>
-    </table>
+
+                        <!-- Botón para editar -->
+                        <button class="btn btn-warning btn-sm" title="Editar"
+                            onclick="openModal('edit', '{{ ministro[0] }}', '{{ ministro[1] }}', '{{ ministro[2] }}', '{{ ministro[3] }}', '{{ ministro[4] }}', '{{ ministro[6] }}', '{{ ministro[7] }}', '{{ ministro[8] }}')">
+                            <i class="fas fa-edit"></i>
+                        </button>
+
+
+                        <!-- Formulario para eliminar -->
+                        <button type="button" class="btn btn-danger btn-sm" title="Eliminar"
+                        onclick="eliminarMinistro('{{ ministro[0] }}')">
+                        <i class="fas fa-trash-alt"></i>
+                        </button>
+                    
+                    </td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
 </div>
 
 <!-- Modal para Agregar/Ver/Editar Ministro -->
@@ -120,4 +116,11 @@
 </div>
 
 <script src="/static/js/gestion_ministro.js"></script>
+
+<script type="text/javascript">
+    const urlInsertarMinistro = "{{ url_for('procesar_insertar_ministro') }}";
+    const urlActualizarMinistro = "{{ url_for('procesar_actualizar_ministro') }}";
+</script>
+
+
 {% endblock %}

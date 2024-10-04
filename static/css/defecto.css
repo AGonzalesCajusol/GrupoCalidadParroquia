@@ -286,3 +286,55 @@ th {
     border-color: #02BA26 !important; /* Cambia también el borde */
 }
 
+
+
+
+/*BARRA DATA TABLE (BOTON & SEARCH )
+/* Estilo personalizado para reducir el tamaño del botón */
+.custom-btn {
+    font-size: 14px;  /* Tamaño de texto más pequeño */
+    padding: 5px 10px;  /* Reduce el padding */
+    align-items: right;
+  }
+  
+  /* Ajustar tamaño del campo de búsqueda */
+  .dataTables_filter input {
+    width: 120px !important; /* Reduce el ancho del campo de búsqueda */
+    height: 30px; /* Reduce la altura del campo de búsqueda */
+    font-size: 14px; /* Tamaño de fuente más pequeño */
+    padding: 5px;
+    margin-right: 195px;
+
+  }
+  
+  
+.d-flex {
+    display: flex;
+    flex-wrap: wrap;  /* Permitir que los elementos salten a una nueva línea si es necesario */
+    gap: 10px;  /* Espaciado entre los elementos */
+    align-items: center;
+  }
+  
+  /* Reducir el tamaño del botón y el campo de búsqueda */
+  .custom-btn {
+    font-size: 14px;  
+    padding: 4px 8px;  /* Reducir el padding del botón */
+  }
+  
+  .dataTables_filter input {
+    width: 450px !important;  /* Ajustar el ancho del campo de búsqueda */
+    height: 30px;  /* Reducir la altura del campo de búsqueda */
+    font-size: 14px;  /* Reducir el tamaño de la fuente */
+    padding: 5px;
+    background-color: white;
+    border-color: gray;
+   
+  }
+  
+  /* Ajustar margen del selector "Show entries" */
+  .dataTables_length {
+    font-size: 14px; 
+    margin-right: 195px;
+  }
+  
+  
