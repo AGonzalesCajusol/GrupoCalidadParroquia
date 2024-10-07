@@ -2,133 +2,138 @@ from flask import Flask, request, render_template, flash, redirect, url_for, jso
 import controladores.controlador_actosliturgicos as cal
 import json
 import urllib.parse
-
+import envio_correo 
 
 def registrar_rutas(app):
     @app.route("/gestionar_actosliturgicos", methods=["GET"])
     def gestionar_actosliturgicos():
-        lista_actosliturgicos = cal.obtener_actosliturgicos()  # Asegúrate de que esta función esté devolviendo los datos correctamente
-        return render_template("/actos_liturgicos/gestionar_actoliturgico.html", lista_actosliturgicos=lista_actosliturgicos, lis=lista_actosliturgicos)
+       
+        return render_template("/actos_liturgicos/gestionar_actoliturgico.html")
+    
+    @app.route("/modificarActoPrerequisito", methods=["POST"])
+    def modificarActoPrerequisito():
+        id = request.json['id']
+        actoliturgico = request.json['acto']
+        requisitos = request.json['requisitos']
+        monto = request.json['monto']
+        lista = cal.listar_actos_requisitosXid(id)
+        ##agregar
+        lista_agregar = []
+        ##eliminar
+        lista_eliminar = []
+        lista_actos = []
+
+        for li in lista:
+            lista_actos.append(li[2])
+
+        for el in lista_actos:
+            if el not in requisitos:
+                lista_eliminar.append(el)
+
+        for requi in requisitos:
+            if requi not in lista_actos:
+                lista_agregar.append(requi)
 
 
-    @app.route("/insertar_actoliturgico", methods=["POST"])
-    def insertar_actoliturgico():
-        data = request.get_json()
-        nombre = data.get('nombre_liturgia')
-        lista_actos = data.get('actos', [])
+        try:
+            cal.modificar_acto_requisitos(id,actoliturgico,monto,lista_eliminar,lista_agregar)
 
-        id_nombre = cal.insertar_nombreactoliturgico(nombre)
+            return jsonify({'estado': True})
+        except:
+            return jsonify({'estado': False})
         
+    @app.route("/registrarActoLiturgico_Requisitos", methods=["POST"])
+    def registrarActoLiturgico_Requisitos():
+        actoliturgico = request.json['acto']
+        requisitos = request.json['requisitos']
+        monto = request.json['monto']
+        estado = cal.insertar_acto_requisitos(actoliturgico,monto,requisitos)
+        return jsonify({'estado': estado})
+        
+    @app.route("/lista_actos_requisitos", methods=["GET"])
+    def lista_actos_requisitos():
+        lista = cal.listar_actos_requisitos()
+        resultado = []
+        if(lista):
+            for li in lista:
+                resultado.append({
+                    'id': li[0],
+                    'nombre': li[1],
+                    'requisito' : li[2],
+                    'monto': li[3]
+                })
 
-        if id_nombre and len(lista_actos) >0 :
-            try:
-                cal.asignar_acto_prerequisitos(id_nombre, lista_actos)
-                lista_actos = {
-                'estado': 1,
-                'respuesta':"Se registro y asigno correctamente",
-                }
-            except:
-                lista_actos = {
-                'estado': 0,
-                'respuesta':"Se registro y asigno correctamente",
-                }
-        return jsonify(lista_actos)
-
-
-    @app.route("/modificar_actoliturgico", methods=["POST"])
-    def modificar_actoliturgico():
-        id = request.form['id_liturgia']
-        nombre = request.form['nombre_liturgia']
-        cookie = request.cookies.get('seleccion')
-        lista_cookie = urllib.parse.unquote(cookie)
-        lista_cookie = json.loads(lista_cookie)
-
-        if cookie is None:
-            flash("No se encontraron datos a modificar", "danger")
-            return redirect(url_for('gestionar_actosliturgicos'))
-        try:
-            if ('Ninguno' in lista_cookie) or (len(lista_cookie) == 0):
-                if cal.eliminar_todosprerequisito(nombre,id):
-                    flash(f"Se modifico correctamente la liturgia con sus prerrequisitos", "success")
-                else:
-                    flash(f"LLave duplicada, revise el nombre de su liturgia: {nombre}", "danger")
-            else:
-                ##analizar
-                lista_acto = cal.listar_prerequisitosXid(id)
-                lista_agregar = []
-                lista_eliminar = []
-                lista_pre = []
-
-                for li in lista_acto:
-                    lista_pre.append(li[0])
-                    
-                for ele in lista_cookie:
-                    if ele not in lista_pre:
-                        lista_agregar.append(ele)
-
-                for ele_acto in lista_pre:
-                    if ele_acto not in lista_cookie:
-                        lista_eliminar.append(ele_acto)
-                        
-                try:
-                    cal.asignar_prerequisito_modificado(lista_agregar,id,nombre)
-                    cal.eliminar_prerequisito(lista_eliminar,id,nombre)
-                except:
-                    flash(f"LLave duplicada, revise el nombre de su liturgia: {nombre}", "danger")
-                return redirect(url_for('gestionar_actosliturgicos'))
-
-        except:
-            flash(f"LLave duplicada, revise el nombre de su liturgia: {nombre}", "danger")
-
-
-        return redirect(url_for('gestionar_actosliturgicos'))
-
-
-    @app.route("/retornar_prerequisitosXid/<int:id>", methods=["GET"])
-    def retornar_prerequisitosXid(id): 
-        lista = cal.listar_prerequisitosXid(id)
-        pre = [prerequisito for prerequisito in lista]
-        prere = {'prerequisitos': pre}
-        return jsonify(prere)
+        return jsonify(resultado)
     
+    @app.route("/actoporid/<int:id>", methods=["GET"])
+    def actoporid(id):
+        lista = cal.listar_actos_requisitosXid(id)
+        requisitos = []
+        if(lista):
+            for li in lista:
+                requisitos.append(li[2])
 
-    @app.route("/listar_Todoslosactosliturgicos", methods=["GET"])
-    def listar_Todoslosactosliturgicos():
-        try:
-            lista = cal.obtener_actosliturgicos()
-            lista_data = []
-            for row in lista:
-                valores = {
-                    'id': row[0],
-                    'nombreliturgia': row[1],
-                    'requisitos': row[2]
-                }
-                lista_data.append(valores)
+            if requisitos[0] is None : 
+                requisitos = ['Ninguno']
 
-            lista_actos = {
-                'estado': 1,
-                'respuesta':"Se listo correctamente los actos liturgicos",
-                'data': lista_data
+            resultado = {
+                'id': lista[0][0],
+                'nombre': lista[0][1],
+                'monto' : lista[0][3],
+                'requisito': requisitos
             }
+        return jsonify(resultado)
 
-        except:
-            lista_actos = [{
-                'estado': 0,
-                'mensaje': "No se pudo listar los actos liturgicos",
-                'data': 0 
-            }]
 
-        return jsonify(lista_actos)
-    
     @app.route("/duplicidad/<string:nombre>", methods=["GET"])
     def duplicidad(nombre):
-        try:
-            datos = cal.duplicidad(nombre)
-            if datos:
-                return jsonify({'name': True})
-            else:
-                return jsonify({'name':False})
-        except:
-            return jsonify(nombre)
-        return "hello"
+        lista = cal.duplicidad(nombre)
+        return jsonify({'existe': lista})
+    
+    @app.route("/requisitosXactoliturgico", methods=["GET"])  # Sin barra final
+    def requisitosXactoliturgico():
+        lista = cal.listar_nombres_actos()
+        requisitos = cal.listar_actos_requisitos()
 
+        return render_template('/actos_liturgicos/requisitos_actoliturgico.html', lista=lista, requisitos= requisitos)
+
+    @app.route("/filtrorequisitosxacto/<string:acto>", methods=["GET"]) 
+    def filtrorequisitosxacto(acto):
+        lista_actos = []
+        if(acto == "todos"):
+            requisitos = cal.listar_actos_requisitos()
+            for r in requisitos:
+                dato = {
+                    'id': r[0],
+                    'nombre_acto': r[1],
+                    'requisitos': r[2],
+                    'monto' : r[3]
+                }
+                lista_actos.append(dato)
+            
+        else:
+            r = cal.listar_requisitoXacto(acto)
+            dato = {
+                'id': r[0],
+                'nombre_acto': r[1],
+                'requisitos': r[2],
+                'monto' : r[3]
+            }
+            lista_actos.append(dato)
+        return jsonify({'data': lista_actos})
+    
+    @app.route('/enviar', methods=['POST'])
+    def enviar():
+        data = request.get_json()  # Extrae los datos de la solicitud
+        texto = data.get('text')
+        destinatario = data.get('dest')
+        try:
+            envio_correo.enviar(destinatario,texto)
+            return jsonify({'estado': 'Correcto'})
+        except:
+            return jsonify({'estado': 'Incorrecto'})
+
+        
+        
+
+        

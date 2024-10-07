@@ -6,7 +6,7 @@
     <h2 class="titulo-gestion">Gestión de Acto litúrgico</h2>
     <!-- Botón para abrir el modal de "Agregar" con ícono -->
     <button type="button" class="btn btn-success mb-3 fw-bold"  id="abrir" onclick=" abrir('nuevo')">
-        <i class="bi bi-person-plus"></i> Agregar Acto Liturgico
+        <i class="bi bi-person-plus"></i> Agregar acto litúrgico y requisitos
     </button>
     <!-- DataTable para la gestión de ministros -->
     <table id="actosTable" class="table table-hover table-striped  text-center">
@@ -14,7 +14,8 @@
             <tr class="">
                 <th class="text-center">ID</th>
                 <th class="text-center">Acto Liturgico</th>
-                <th class="text-center">Prerequistos</th>
+                <th class="text-center">Requisitos</th>
+                <th class="text-center">Monto</th>
                 <th class="text-center">Acciones</th>
             </tr>
         </thead>
@@ -24,7 +25,7 @@
     </table>
     <!-- Modal Maestra existente -->
     <div class="modal fade" id="acciones" tabindex="-1" aria-labelledby="accionesLabel" aria-hidden="true">
-        <div class="modal-dialog">
+        <div class="modal-dialog modal-dialog-centered">
             <div class="modal-content">
                 <div class="modal-header">
                     <h1 class="modal-title fs-5" id="titulo_modal"></h1>
@@ -32,9 +33,9 @@
                 </div>
                 <div class="modal-body" id="body_modal">
                     <form action="" method="POST" id="formulario_acto">
-                        <input type="text" class="form-control" id="id_liturgia" name="id_liturgia"
-                            placeholder="Ingrese el ID de la liturgia"  hidden>
                         <div class="" id="n_lit">
+                            <input type="text" class="form-control" id="clave"
+                            name="id" hidden>
                             <label for="nombre_liturgia" class="form-label">Nombre Liturgia</label>
                             <input minlength="2" type="text" class="form-control" id="nombre_liturgia"
                                 name="nombre_liturgia" placeholder="Ingrese el nombre de la liturgia" required>
@@ -42,27 +43,33 @@
                         <div id="mensaje1">
 
                         </div>
+                        <div class="" id="">
+                            <label for="monto_liturgia" class="form-label mt-2">Precio</label>
+                            <input type="number" class="form-control" id="monto_liturgia"  oninput="validar_monto()"
+                                name="monto_liturgia" >
+                        </div>
+                        <div id="mensaje3">
+
+                        </div>
+
+
                         <div class="mb-3">
                             <label for="asignar" class="form-label mt-2">Asigne los prerequisitos:</label>
                             <div class="d-flex">
-                                <select class="form-select w-100 me-3" aria-label="Default select example" id="chkselect" >
-                                    <option selected>Ninguno</option>
-                                    {% for la in lista_actosliturgicos %}
-                                    <option value="{{ la[1] }}"> {{ la[1] }} </option>
-                                    {% endfor %}
-
-                                  </select>
+                                <input type="text" class="form-control me-2" id="requisito" placeholder="Ingrese sus requisitos">
                                   <button  type="button" class="btn btn-primary" id="btnagg" onclick="agregar()"> 
                                   <i class="bi bi-plus-circle-fill"></i></button>
+
+                            </div>
+                            <div id="mensaje2">
                             </div>
                             <div class="mt-3" id="contenido_actos" >
-                                
                             </div>
                         </div>
                     </form>
                 </div>
                 <div class="modal-footer">
-                    <button type="button" class="btn btn-primary" form="formulario_acto" id="accion_modal" onclick="validar_envio()"></button>
+                    <button type="button" class="btn btn-primary" form="formulario_acto" id="accion_modal" onclick="validar_envio(this)"></button>
                     <button type="button" class="btn btn-secondary" data-bs-dismiss="modal" >Cerrar</button>
                 </div>
             </div>
@@ -71,20 +78,20 @@
         </div>
 
     </div>
-    {% with messages = get_flashed_messages(with_categories=true) %}
-    {% if messages %}
-      {% for category, message in messages %}
-        <div class="alert alert-{{ category }} alert-dismissible fade show alertas" role="alert">
-          <strong><i class="bi bi-check2 me-2"></i>{{ message }}</strong>
-          <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
-        </div>
-      {% endfor %}
-    {% endif %}
-  {% endwith %}
-  
+    <!-- Netamente para mostrar informacion-->
+    <div class="alert border-white  alert-dismissible fade show text-white" role="alert" id="alert-ok"  style="background-color: #02BA26; display: none;">
+        <i class="bi bi-check-lg text fs-5 me-2"></i>
+        <strong id="mensaje_ok">Se registró y asignó correctamente</strong>
+        <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+    </div>
+    <div class="alert border-white bg-danger alert-dismissible fade show text-white" role="alert" id="alert-no" style="display: none;">
+        <i class="bi bi-check-lg text fs-5 me-2"></i>
+        <strong id="mensaje_no">No se pudo registrar ni asignar, ya existe ese nombre de liturgia!!</strong>
+        <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+    </div>
+    
 </div>
 
 <!-- Font Awesome para los iconos -->
-<script src="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/js/all.min.js"></script>
 <script src="/static/js/acto_liturgico.js"></script>
 {% endblock %}

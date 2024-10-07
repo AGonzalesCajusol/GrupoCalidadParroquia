@@ -1,133 +1,227 @@
 var actos = []
 window.onload = function () {
-    listar_actosliturgicos();
+    listar();
+
 };
 
-function listar_actosliturgicos() {
-    const tbody = document.getElementById('actosBody');
-    tbody.innerHTML = ''; 
-
-    fetch('/listar_Todoslosactosliturgicos')
-        .then(response => response.json())
-        .then(data => {
-            if (data.estado === 1) {
-                data.data.forEach(elemento => {
-                    const row = document.createElement('tr');
-                    row.innerHTML = `
-                        <td class="text-center">${elemento.id}</td>
-                        <td>${elemento.nombreliturgia}</td>
-                        <td>${elemento.requisitos}</td>
-                        <td>
-                            <div class="d-flex justify-content-center">
-                                <button class="btn btn-warning btn-sm me-2"
-                                    onclick="abrir('modificar', '${elemento.id}', '${elemento.nombreliturgia}')">
-                                    <i class="fas fa-edit"></i>
-                                </button>
-                            </div>
-                        </td>
-                    `;
-                    tbody.appendChild(row); // Agrega la fila al tbody
-                });
-
-                $('#actosTable').DataTable(); // Asegúrate de tener jQuery y DataTables importados
-            } else {
-                console.error(data.mensaje); // Muestra mensaje si hay error
-            }
-        })
-        .catch(error => {
-            console.error('Error fetching data:', error); // Maneja errores
-        });
-}
-
-function abrir(accion){
+function abrir(accion, id){
     actos = []
     var myModal = new bootstrap.Modal(document.getElementById('acciones'));
     myModal.show();
     var titulo = document.getElementById('titulo_modal');
     var boton_modal = document.getElementById('accion_modal');
     document.getElementById('nombre_liturgia').value = "";
+    document.getElementById('monto_liturgia').value = "0.00";
+
+    //Limpiamos los camp
     var contenedor = document.getElementById('contenido_actos')
     contenedor.textContent = ''
-
-    var div_nombre = document.getElementById('mensaje1');
-    div_nombre.textContent = "";
+    var div_nombre1 = document.getElementById('mensaje1');
+    div_nombre1.textContent = "";
+    var div_nombre2 = document.getElementById('mensaje2');
+    div_nombre2.textContent = "";
+    var div_nombre3 = document.getElementById('mensaje3');
+    div_nombre3.textContent = "";
+    document.getElementById('requisito').value = ""; 
 
     if (accion == "nuevo"){
         titulo.textContent = "Agrega y Asigna los actos liturgicos";
         boton_modal.textContent = "Guardar";
-    }
-}
-
-function validar_envio(){
-    var nombre = document.getElementById('nombre_liturgia').value;
-    var div_nombre = document.getElementById('mensaje1');
-    div_nombre.textContent = '';
-    var label = document.createElement('label');
-    label.id = "label_modal1"; 
-    if (nombre.length < 3){
-        label.textContent = 'Ingrese valores mayores a 3 caracteres';
-        label.style.color = "Red";
-        div_nombre.appendChild(label); 
-    } else {
-        div_nombre.textContent = '';
-        //Validamos que no existan duplicados 
-        fetch(`/duplicidad/${nombre}`)
+    }else if( accion == "modificar"){
+        titulo.textContent = "Modificar y Asigna los actos liturgicos";
+        boton_modal.textContent = "Modificar";  
+        fetch(`/actoporid/${id}`)
         .then(response => response.json())
-        .then(data => {
-            if (data.name == true){
-                div_nombre.textContent = ""
-                label.textContent = 'Ya existe ese nombre como acto litúrgico';
-                label.style.color = "Red";
-                div_nombre.appendChild(label); 
-            }else{
-                const data = {
-                    nombre_liturgia: nombre,  // Cambiar 'nombre' a 'nombre_liturgia'
-                    actos: actos               // Cambiar 'datos' a 'actos'
-                };
-                
-                fetch('/insertar_actoliturgico', {
-                    method: 'POST',
-                    headers: {
-                        'Content-Type': 'application/json'
-                    },
-                    body: JSON.stringify(data)  // Convertir el objeto a JSON
-                })
-                .then(response => response.json())
-                .then(data => {
-                    alert(data.respuesta)
-                })
+        .then(elemento => {
+            console.log(elemento)
+            document.getElementById('clave').value = id;
+            document.getElementById('nombre_liturgia').value = elemento.nombre;
+            document.getElementById('monto_liturgia').value = elemento.monto;
+            actos = elemento.requisito;
+            console.log()
+            if (actos[0] == 'Ninguno'){
+                actos = []
             }
+            dibujar();
+            
         })
     }
 }
-function agregar(){
 
-    var nombre = document.getElementById('nombre_liturgia').value;
-    var div_nombre = document.getElementById('mensaje1');
-    div_nombre.textContent = '';
+function validar_envio(boton) {
+    // Limpiamos los mensajes de error anteriores
+    var div_mensaje1 = document.getElementById('mensaje1');
+    var div_mensaje3 = document.getElementById('mensaje3');
+    var div_mensaje2 = document.getElementById('contenido_actos');
+
+    div_mensaje1.textContent = '';
+    div_mensaje3.textContent = '';
+    var r = document.getElementById('requisito');
+
     var label = document.createElement('label');
-    var select = document.getElementById('chkselect')
-    label.id = "label_modal1"; 
-    if (nombre.length < 3){
+    var nombre_acto = document.getElementById('nombre_liturgia').value;
+    var monto = document.getElementById('monto_liturgia');
+    var valor = monto.value;
+    var formato = /^\d+(\.\d{1,2})?$/; // Formato válido para el monto
+    var error = false; // Variable para rastrear errores
+
+    // Validación del nombre del acto
+    if (nombre_acto.length < 4) {
         label.textContent = 'Ingrese valores mayores a 3 caracteres';
         label.style.color = "Red";
-        div_nombre.appendChild(label); 
-    }else{
-        //aca guardamos todos los datos 
-        if(select.value == "Ninguno"){
-            var contenedor = document.getElementById('contenido_actos')
-            contenedor.textContent = ""
-            actos = ['Ninguno']
+        div_mensaje1.appendChild(label);
+        error = true; // Marcamos que hay un error
+    }
 
-        }else{
-            if (actos.includes('Ninguno')) {
-                actos = actos.filter(acto => acto !== 'Ninguno');
-            }            
-            if (!actos.includes(select.value)){
-                actos.push(select.value);
+    if(valor == ''){
+        monto.value = '0.00';
+    }
+    // Validación del monto
+    if (!formato.test(valor)) {
+        label = document.createElement('label');
+        label.textContent = 'Ingrese un monto válido (hasta 2 decimales)';
+        label.style.color = "Red";
+        div_mensaje3.appendChild(label);
+        monto.value = '0.00';
+        error = true; // Marcamos que hay un error
+    }
+    // Si hay errores, no continuamos
+    if (error) {
+        return; // Salimos de la función
+    }
+
+    // Lógica para guardar o modificar
+    if (boton.textContent === "Guardar") {
+        const datos = {
+            acto: nombre_acto,
+            requisitos: actos,
+            monto: valor
+        };
+        fetch('/registrarActoLiturgico_Requisitos', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify(datos)  // Convertir el objeto a JSON
+        }).then(response => {
+            return response.json()
+        }).then(response => {
+
+            if (response.estado == true){
+                var alerta = document.getElementById('alert-ok');
+                alerta.style.display = "block";
+                limpiar();
+                listar();
+                setTimeout(function() {
+                    alerta.style.display = "none";
+                }, 3000);
+            }else{
+                var alerta = document.getElementById('alert-no');
+                alerta.style.display = "block";
+                setTimeout(function() {
+                    alerta.style.display = "none";
+                }, 3000);
             }
-        }
-        dibujar()
+        })
+        .catch(error => {
+            div_mensaje1.textContent = "";
+            label.textContent = 'Ya existe el acto liúrgico';
+            label.style.color = "Red";
+            div_mensaje1.appendChild(label);
+        });
+    } else if (boton.textContent === "Modificar") {
+        var ids= document.getElementById('clave').value
+        const datos = {
+            acto: nombre_acto,
+            requisitos: actos,
+            monto: valor,
+            id: ids
+        }; 
+        fetch('/modificarActoPrerequisito', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify(datos)  // Convertir el objeto a JSON
+        }).then(response => {
+            return response.json()
+        }).then(response => {
+            if (response){
+                var alerta = document.getElementById('alert-ok');
+                var mensaje = document.getElementById('mensaje_ok');
+                mensaje = "Se modifico correctamente"
+                alerta.style.display = "block";
+                limpiar();
+                listar();
+                $('#acciones').modal('hide');
+                setTimeout(function() {
+                    alerta.style.display = "none";
+                }, 3000);
+            }else{
+                var mensaje = document.getElementById('mensaje_no');
+                mensaje = "No se pudo modificar"
+                var alerta = document.getElementById('alert-no')
+                alerta.style.display = "block"
+                setTimeout(function() {
+                    alerta.style.display = "none";
+                }, 3000);
+            }
+        })
+        .catch(error => {
+
+        });
+    }
+}
+
+function limpiar(){
+    document.getElementById('nombre_liturgia').value = "";
+    document.getElementById('monto_liturgia').value = "0.00";
+    document.getElementById('requisito').value = "";
+    document.getElementById('contenido_actos').textContent = '';
+    actos = []
+}
+
+
+function agregar() {
+    // Obtenemos los campos de los elementos a validar
+    var nombre_acto = document.getElementById('nombre_liturgia').value;
+    var div_mensaje1 = document.getElementById('mensaje1');
+    var r = document.getElementById('requisito');
+    var requisito = r.value;
+    var div_mensaje2 = document.getElementById('mensaje2');
+
+    // Limpiamos los campos de mensajes anteriores
+    div_mensaje1.textContent = "";
+    div_mensaje2.textContent = "";
+
+    // Variable para ver si hay errores
+    var error = false;
+
+    // Validación del campo nombre_acto
+    if (nombre_acto.length < 4) {
+        var label1 = document.createElement('label');
+        label1.textContent = 'Ingrese valores mayores a 3 caracteres para el nombre del acto litúrgico';
+        label1.style.color = "Red";
+        div_mensaje1.appendChild(label1);
+        error = true;
+    }
+
+    // Validación del campo requisito
+    if (requisito.length < 3) {
+        var label2 = document.createElement('label');
+        label2.textContent = 'Ingrese valores de requisitos mayores a 2 caracteres';
+        label2.style.color = "Red";
+        div_mensaje2.appendChild(label2);
+        error = true;
+    }
+
+    // Si no hubo errores, agregar el requisito a la lista y limpiar el campo
+    if (!error) {
+        actos.push(requisito);
+        r.value = ""; // Limpiar el campo de requisitos
+        div_mensaje1.textContent = ""; // Limpiar mensajes previos
+        div_mensaje2.textContent = "";
+        dibujar();
     }
 }
 
@@ -141,7 +235,55 @@ function dibujar(){
         btn1.type = "button";
         btn1.classList.add('me-2','btn-close');
         label.textContent = elemento;
+        btn1.onclick = function(){
+            eliminar(this)
+        }
         label.appendChild(btn1);
         contenedor.appendChild(label);
     })
 }
+
+
+function eliminar(elemento) {
+    var requisito_eliminar = elemento.parentNode.textContent;
+    if (actos.includes(requisito_eliminar)){
+        var indice_elemento = actos.indexOf(requisito_eliminar);
+        actos.splice(indice_elemento,1);
+    }
+    dibujar();
+}
+
+function listar(){
+    const tbody = document.getElementById('actosBody');
+    tbody.innerHTML = '';
+    
+    if ($.fn.DataTable.isDataTable('#actosTable')) {
+        $('#actosTable').DataTable().destroy();
+    }
+    
+    fetch('/lista_actos_requisitos')
+        .then(response => response.json())
+        .then(elemento => {
+            elemento.forEach(elemento => {
+                const row = document.createElement('tr');
+                row.innerHTML = `
+                    <td class="text-center">${elemento.id}</td>
+                    <td>${elemento.nombre}</td>
+                    <td>${elemento.requisito}</td>
+                    <td>${elemento.monto}</td>
+                    <td>
+                        <div class="d-flex justify-content-center">
+                            <button class="btn btn-warning btn-sm me-2"
+                                onclick="abrir('modificar', '${elemento.id}')">
+                                <i class="fas fa-edit"></i>
+                            </button>
+                        </div>
+                    </td>
+                `;
+                tbody.appendChild(row); // Agrega la fila al tbody
+            });
+        $('#actosTable').DataTable();
+    })
+}
+
+

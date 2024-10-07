@@ -286,3 +286,12 @@ th {
     border-color: #02BA26 !important; /* Cambia también el borde */
 }
 
+.alert{
+    position: fixed;
+    bottom: 20px;
+    right: 20px;
+    z-index: 2050;
+    border-radius: 8px;
+    box-shadow: 0px 4px 12px rgba(0, 0, 0, 0.1);
+}
+

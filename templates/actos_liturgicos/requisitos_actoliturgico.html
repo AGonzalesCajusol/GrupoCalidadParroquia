@@ -1,0 +1,89 @@
+{% extends "index.html" %}
+{% block title %}Requisitos de acto liturgico{% endblock %}
+{% block cuerpo %}
+
+<div class="container mt-4">
+    <h2 class="titulo-gestion">Requisito por acto litúrgico</h2>
+    <div class="row">
+        <form action="" class="mb-4 col-6">
+            <label for="form-control">Seleccion su acto litúrgico</label>
+            <select name="actos" id="actos" class="form-select mt-1" onchange="filtrar()">
+                <option value="todos">todos</option>
+                {% for li in lista %}
+                <option value="{{ li[0] }}">{{ li[0] }}</option>
+                {% endfor %}
+            </select>       
+        </form>
+        <div class="col-6 -1" id="enviar">
+            <label for="form-control">Ingrese su correo para enviar:</label>
+            <div class="d-flex mt-1">
+                <input type="email" class="form-control me-2" id="correo">
+                <button class="btn btn-primary" onclick="enviar()">Enviar</button>
+            </div>
+        </div>
+    </div>
+
+    <table id="tabla_actos" class="table table-hover table-striped  text-center">
+        <thead>
+            <tr class="">
+                <th class="text-center">ID</th>
+                <th class="text-center">Acto Liturgico</th>
+                <th class="text-center">Requisitos</th>
+                <th class="text-center">Monto</th>
+            </tr>
+        </thead>
+        <tbody id="tabla_actosbody"> 
+            {% for re in requisitos %}
+            <tr>
+                <th class="text-center"> {{ re[0] }} </th>
+                <th> {{ re[1] }} </th>
+                <th> {{ re[2] }} </th>
+                <th class="text-center"> {{ re[3] }} </th>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+    
+    <div class="alert border-white bg-danger alert-dismissible fade show text-white" role="alert" id="alert-no" style="display: none;">
+        <i class="bi bi-check-lg text fs-5 me-2"></i>
+        <strong id="mensaje_no">No se pudo registrar ni asignar, ya existe ese nombre de liturgia!!</strong>
+        <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+    </div>
+    
+</div> 
+
+<div class="requisitos-container d-none" style="background-color: #f9f9f9; padding: 20px; border-radius: 5px;" id="con">
+    <h1 class="requisitos-title" style="color: #2c3e50;">Requisitos de Acto Litúrgico</h1>
+    <p class="requisitos-intro" style="color: #34495e;">Estimado/a, a continuación, se detallan los requisitos necesarios para llevar a cabo el acto litúrgico:</p>
+    
+    <table class="requisitos-table" style="width: 100%; border-collapse: collapse;">
+        <thead>
+            <tr class="table-header" style="background-color: #3498db; color: white;">
+                <th class="text-center" style="padding: 10px;">ID</th>
+                <th class="text-center" style="padding: 10px;">Acto Litúrgico</th>
+                <th class="text-center" style="padding: 10px;">Requisito</th>
+                <th class="text-center" style="padding: 10px;">Monto</th>
+            </tr>
+        </thead>
+        <tbody id="dato2" class="table-body">
+            {% for re in requisitos %}
+            <tr class="table-row">
+                <td style="padding: 10px; border: 1px solid #ddd;">{{ re[0] }}</td>
+                <td class="text-start" style="padding: 10px; border: 1px solid #ddd;">{{ re[1] }}</td>
+                <td class="text-start" style="padding: 10px; border: 1px solid #ddd;">{{ re[2] }}</td>
+                <td style="padding: 10px; border: 1px solid #ddd;">{{ re[3] }}</td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+    
+    <p class="contact-info" style="color: #34495e;">Si tienes alguna pregunta o necesitas más información, no dudes en ponerte en contacto con tu parroquia.</p>
+    <p class="farewell" style="color: #34495e;">Saludos cordiales,</p>
+    <div class="footer" style="margin-top: 20px; font-size: 12px; color: #7f8c8d;">
+        <p>&copy; 2024 Gatitos Ronron de la Chavarry S.A.C</p>
+    </div>
+</div>
+
+
+<script src="/static/js/requisitos_actos.js"></script>
+{% endblock %}

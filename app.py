@@ -20,6 +20,9 @@ app.secret_key = 'super-secret'
 def raiz():
     return render_template('inicio_sesion.html')
 
+#ruta_envio
+
+
 # Registrar las rutas definidas en router_main.py
 routers.router_main.registrar_rutas(app)
 
