@@ -286,6 +286,7 @@ th {
     border-color: #02BA26 !important; /* Cambia también el borde */
 }
 
+<<<<<<< HEAD
 .alert{
     position: fixed;
     bottom: 20px;
@@ -295,3 +296,56 @@ th {
     box-shadow: 0px 4px 12px rgba(0, 0, 0, 0.1);
 }
 
+=======
+
+
+
+
+  /* Ajustar tamaño del campo de búsqueda */
+  .dataTables_filter input {
+    width: 100px !important; /* Reduce el ancho del campo de búsqueda */
+    height: 25px; /* Reduce la altura del campo de búsqueda */
+    font-size: 14px; /* Tamaño de fuente más pequeño */
+    margin-right: 25px;
+  }
+  
+  
+.d-flex {
+    display: flex;
+    flex-wrap: wrap;  /* Permitir que los elementos salten a una nueva línea si es necesario */
+    gap: 10px;  /* Espaciado entre los elementos */
+    align-items: center;
+  }
+  
+  /* Reducir el tamaño del botón y el campo de búsqueda */
+  .custom-btn {
+    font-size: 14px;  
+    padding: 4px 8px;  /* Reducir el padding del botón */
+  }
+  
+  .dataTables_filter input {
+    width: 550px !important;  /* Ajustar el ancho del campo de búsqueda */
+    height: 30px;  /* Reducir la altura del campo de búsqueda */
+    font-size: 14px;  /* Reducir el tamaño de la fuente */
+    padding: 5px;
+    background-color: white;
+    border-color: gray;
+   
+  }
+  
+
+  
+  /* Btn agregar ministro
+
+  /* Personalización del botón "Agregar ministro" */
+.btn-agregar-ministro {
+    font-size: 15px;  /* Tamaño de la fuente */
+    transition: background-color 0.3s ease;  /* Transición suave */
+    margin-right: 35px;
+}
+
+.btn-agregar-ministro:hover {
+    background-color: #218838;  /* Color más oscuro al pasar el cursor */
+    border-color: #218838;  /* Ajuste del color del borde */
+}
+>>>>>>> a1b5b4caae351e9e4daded35dc6b67c3354ffb4a
