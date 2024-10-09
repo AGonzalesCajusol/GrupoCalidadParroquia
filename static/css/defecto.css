@@ -281,6 +281,13 @@ th {
     margin-bottom: 20px;
 }
 
+table.dataTable tbody td {
+    vertical-align: middle;
+    padding: 8px; /* Puedes ajustar este valor según necesites */
+    height: auto; /* Asegúrate de que la altura se ajuste automáticamente */
+}
+
+
 .btn-success {
     background-color: #02BA26 !important ; /* Color verde más claro */
     border-color: #02BA26 !important; /* Cambia también el borde */
