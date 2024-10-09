@@ -84,3 +84,14 @@ def eliminar_tipo_recaudacion(id_tipo_recaudacion):
         conexion.rollback()
     finally:
         conexion.close()
+def eliminar_tipo_recaudacion(id_tipo_recaudacion):
+    conexion = obtener_conexion()
+    try:
+        with conexion.cursor() as cursor:
+            cursor.execute("DELETE FROM tipo_recaudacion WHERE id_tipo_recaudacion = %s", (id_tipo_recaudacion,))
+        conexion.commit()
+    except Exception as e:
+        print(f"Error al eliminar tipo de recaudación: {e}")
+        conexion.rollback()
+    finally:
+        conexion.close()
