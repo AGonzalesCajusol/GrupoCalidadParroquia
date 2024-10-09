@@ -41,7 +41,7 @@ routers.router_secretaria.registrar_rutas(app)
 # Registrar las rutas definidas en router_recaudaciones.py
 routers.router_recaudaciones.registrar_rutas(app)
 # Registrar las rutas definidas en router_recaudaciones.py
-routers.router_tipo_recaudacion.registrar_rutas_tipo_recaudacion(app)
+routers.router_tipo_recaudacion.registrar_rutas(app)
 
 
 # Registrar las rutas definidas en router_diocesis.py
