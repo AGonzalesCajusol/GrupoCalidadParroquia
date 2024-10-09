@@ -1,15 +1,18 @@
-$('#ministrosTable').DataTable({
-    pageLength: 8,
-    dom: '<"d-flex justify-content-between align-items-center mb-3"<"d-flex"f><"d-flex justify-content-end button-section">>rt<"bottom"p>',
-    language: {
-        search: "Buscar:"
-    },
-    initComplete: function() {
-        $("div.button-section").html('<button type="button" class="btn btn-success btn-lg custom-btn ml-3 btn-agregar-ministro" data-bs-toggle="modal" onclick="openModal(\'add\')"><i class="bi bi-person-plus"></i> Agregar ministro</button>');
-    }
+$(document).ready(function () {
+    // Inicializar DataTable
+    var table = $('#ministrosTable').DataTable({
+        pageLength: 8,
+        dom: '<"d-flex justify-content-between align-items-center mb-3"<"d-flex"f><"d-flex justify-content-end button-section">>rt<"bottom"p>',  // Utilizar "justify-content-end" para alinear a la derecha
+        language: {
+            search: "Buscar:"  // Cambiar el texto de "Search" a "Buscar"
+        },
+        //dom: '<"d-flex justify-content-between align-items-center mb-3"<"d-flex"l<"d-flex justify-content-between align-items-center"f<"ml-3 button-section">>>rt<"bottom"p>',
+        initComplete: function () {
+            // Insertar el botón "Agregar ministro" dentro del div y alinearlo a la derecha
+            $("div.button-section").html('<button type="button" class="btn btn-success btn-lg custom-btn ml-3 btn-agregar-ministro" data-bs-toggle="modal" onclick="openModal(\'add\')"><i class="bi bi-person-plus"></i> Agregar ministro</button>');
+        }
+    });
 });
-
-
 
 // Función para abrir el modal para agregar, ver o editar un ministro
 function openModal(type, id = null, nombre = '', nacimiento = '', ordenacion = '', actividades = '', tipo = '', sede = '', cargo = '') {
@@ -39,13 +42,13 @@ function openModal(type, id = null, nombre = '', nacimiento = '', ordenacion = '
         document.getElementById('id_sede').value = sede;
         document.getElementById('id_cargo').value = cargo;
 
-        
-    
+
+
     } else if (type === 'view') {
         modalTitle = 'Ver Ministro';
         formAction = '';
         isReadOnly = true;
-        document.getElementById('saveChanges').style.display = 'none';  // Oculta el botón "Guardar" en el modo de visualización
+        document.getElementById('saveChanges').style.display = 'none'; 
 
         // Asignar valores al modal
         document.getElementById('ministroId').value = id;
@@ -73,7 +76,7 @@ function openModal(type, id = null, nombre = '', nacimiento = '', ordenacion = '
     ministroModal.show();
 
     // Manejo del envío del formulario
-    document.getElementById('ministroForm').onsubmit = function(event) {
+    document.getElementById('ministroForm').onsubmit = function (event) {
         event.preventDefault();  // Prevenir el envío del formulario tradicional
 
         let formData = new FormData(this);  // Recoger los datos del formulario
@@ -82,22 +85,22 @@ function openModal(type, id = null, nombre = '', nacimiento = '', ordenacion = '
             method: 'POST',
             body: formData
         })
-        .then(response => response.json())
-        .then(data => {
-            if (data.success) {
-                alert(type === 'edit' ? 'Ministro actualizado exitosamente' : 'Ministro agregado exitosamente');
-                if (type === 'add') {
-                    // Agregar el nuevo ministro a la tabla
-                    agregarMinistroATabla(data.ministro);  // Se asume que el servidor devuelve el nuevo ministro agregado
-                    limpiarModal();  // Limpiar los campos del modal para una nueva inserción
+            .then(response => response.json())
+            .then(data => {
+                if (data.success) {
+                    alert(type === 'edit' ? 'Ministro actualizado exitosamente' : 'Ministro agregado exitosamente');
+                    if (type === 'add') {
+                        // Agregar el nuevo ministro a la tabla
+                        agregarMinistroATabla(data.ministro);  // Se asume que el servidor devuelve el nuevo ministro agregado
+                        limpiarModal();  // Limpiar los campos del modal para una nueva inserción
+                    } else {
+                        location.reload();  // Recargar la página para reflejar los cambios si se está editando
+                    }
                 } else {
-                    location.reload();  // Recargar la página para reflejar los cambios si se está editando
+                    alert('Error al procesar el ministro');
                 }
-            } else {
-                alert('Error al procesar el ministro');
-            }
-        })
-        .catch(error => console.error('Error:', error));
+            })
+            .catch(error => console.error('Error:', error));
     };
 }
 

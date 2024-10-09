@@ -287,6 +287,9 @@ table.dataTable tbody td {
     height: auto; /* Asegúrate de que la altura se ajuste automáticamente */
 }
 
+.btn-agregar-ministro {
+    margin-right: 0 !important;  /* Elimina cualquier margen a la derecha */
+}
 
 .btn-success {
     background-color: #02BA26 !important ; /* Color verde más claro */
