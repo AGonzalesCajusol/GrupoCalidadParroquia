@@ -15,7 +15,48 @@ body {
   ::-webkit-scrollbar-thumb:hover {
     background-color: #2980b9; /* Cambiar color al hacer hover */
   }
+.header {
+    background-color: #ECEADE;
+    padding: 40px 50px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    border-bottom: 1px solid #dee2e6;
+    position: fixed;
+    top: 0;
+    width: 100%;
+    z-index: 1050;
+    height: 60px;
+    color: #033D8EBF;
+}
 
+.layout{
+    overflow-y: auto;
+}
+.header .logo {
+    display: flex;
+    align-items: center;
+}
+
+.header .logo h5 {
+    color: #033D8EBF;
+    font-weight: bold ;
+}
+
+.header .logo img {
+    height: 55px;
+    margin-right: 20px;
+    border-radius: 50%;
+
+}
+
+.header .menu-btn {
+    font-size: 2rem;
+    background: none;
+    border: none;
+    cursor: pointer;
+    color: #033D8EBF;
+    }
 
 .breadcrumb {
     margin: 70px 20px 10px 20px;
