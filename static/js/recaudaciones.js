@@ -1,48 +1,20 @@
-document.getElementById('previsualizarBtn').addEventListener('click', function () {
-    var año = document.getElementById("año").value;
-    if (!año) {
-        alert("Por favor selecciona un año");
-        return;
-    }
-
-    // Realizar la solicitud para obtener las recaudaciones del año seleccionado
-    fetch('/obtener_recaudaciones_por_anio', {
-        method: 'POST',
-        headers: {
-            'Content-Type': 'application/json'
-        },
-        body: JSON.stringify({año: año})
-    })
-    .then(response => response.json())
-    .then(data => {
-        // Mostrar la tabla
-        document.getElementById('tablaPrevisualizacion').style.display = 'block';
-
-        // Limpiar la tabla anterior
-        var tbody = document.getElementById('contenidoTabla');
-        tbody.innerHTML = '';
-
-        // Cargar los datos en la tabla
-        if (data.recaudaciones.length === 0) {
-            tbody.innerHTML = '<tr><td colspan="7">No se encontraron recaudaciones para el año seleccionado</td></tr>';
-        } else {
-            data.recaudaciones.forEach(rec => {
-                var row = `<tr>
-                    <td>${rec.id}</td>
-                    <td>${rec.fecha}</td>
-                    <td>${rec.monto}</td>
-                    <td>${rec.observacion}</td>
-                    <td>${rec.sede}</td>
-                    <td>${rec.tipo_recaudacion}</td>
-                    <td>${rec.tipo}</td>
-                </tr>`;
-                tbody.innerHTML += row;
-            });
+$(document).ready(function () {
+    $('#tabla_recaudaciones').DataTable({
+        "language": {
+            "url": "//cdn.datatables.net/plug-ins/1.13.1/i18n/es-ES.json"
         }
-
-        // Preparar los formularios de exportación
-        document.getElementById('exportarCSVAnio').value = año;
-        document.getElementById('exportarPDFAnio').value = año;
-    })
-    .catch(error => console.error('Error al obtener las recaudaciones:', error));
+    });
+    
 });
+
+
+function abrirModalEditar(id, sede, monto, descripcion, fecha, hora) {
+    document.getElementById("editarId").value = id;
+    document.getElementById("editarSede").value = sede;
+    document.getElementById("editarMonto").value = monto;
+    document.getElementById("editarDescripcion").value = descripcion;
+    document.getElementById("editarFecha").value = fecha;
+    document.getElementById("editarHora").value = hora;
+    var editarModal = new bootstrap.Modal(document.getElementById('editarModal'));
+    editarModal.show();
+}
