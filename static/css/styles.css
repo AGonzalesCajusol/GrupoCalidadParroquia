@@ -26,7 +26,14 @@ a.btn.btn-close{
     top: 20px;
     right: 0;
 }
-
+.header{
+    background: rgb(236,234,222);
+    width: auto;
+    height: 70px;
+    z-index: 100;
+    border-bottom: 3px solid #CB6040 ;
+    top: 0;
+}
 #mySidenav{
     position: absolute;
     height: calc(100vh - 80px); 

@@ -2,11 +2,11 @@
 import pymysql
 
 def obtener_conexion():
-  return pymysql.connect(host='parroquia-julonerick1-1f47.k.aivencloud.com',
-                          user='avnadmin',                           
-                          password='AVNS_IHAfaHy1gZL4PSuDJ6H',
+  return pymysql.connect(host='localhost',
+                          user='root',                           
+                          password='',
                          db='parroquia',
-                         port=24299)
+                         port=3306)
 
 # def obtener_conexion():
 #    return pymysql.connect(host='localhost',
