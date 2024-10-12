@@ -1,0 +1,64 @@
+{% extends "index.html" %}
+{% block title %}Exportar Recaudaciones{% endblock %}
+{% block cuerpo %}
+
+<div class="container mt-4">
+    <h1 class="titulo-gestion">Exportar Recaudaciones</h1>
+
+    <!-- Formulario para seleccionar el año -->
+    <form id="exportarRecaudacionesForm" method="POST" action="" onsubmit="return false;">
+        <div class="mb-3">
+            <label for="año" class="form-label">Selecciona el Año</label>
+            <select class="form-select" id="año" name="año" required>
+                <option value="" disabled selected>Selecciona un año</option>
+                {% for year in años %}
+                <option value="{{ year }}">{{ year }}</option>
+                {% endfor %}
+            </select>            
+        </div>
+
+        <div class="d-flex justify-content-between">
+            <!-- Botón para previsualizar las recaudaciones -->
+            <button type="button" class="btn btn-info" id="previsualizarBtn" onclick="cargarPrevisualizacion()">Previsualizar Recaudaciones</button>
+        </div>
+    </form>
+
+    <!-- Tabla de previsualización de recaudaciones -->
+    <div id="tablaPrevisualizacion" class="mt-4" style="display: none;">
+        <h3>Previsualización de Recaudaciones del Año Seleccionado</h3>
+        <table class="table table-striped table-bordered" id="tabla_recaudaciones">
+            <thead>
+                <tr>
+                    <th>ID</th>
+                    <th>Fecha</th>
+                    <th>Monto</th>
+                    <th>Observación</th>
+                    <th>Sede</th>
+                    <th>Tipo de Recaudación</th>
+                    <th>Monetaria/No Monetaria</th>
+                </tr>
+            </thead>
+            <tbody id="contenidoTabla">
+                <!-- Aquí se cargarán los datos con JavaScript -->
+            </tbody>
+        </table>
+
+        <!-- Botones para descargar CSV y PDF -->
+        <div class="d-flex justify-content-between mt-3">
+            <form method="POST" action="{{ url_for('exportar_recaudaciones_csv') }}" id="exportarCSV">
+                <input type="hidden" id="exportarCSVAnio" name="año">
+                <button type="submit" class="btn btn-success">Descargar en CSV</button>
+            </form>            
+            <form method="POST" action="{{ url_for('exportar_recaudaciones_pdf') }}" id="exportarPDF">
+                <input type="hidden" id="exportarPDFAnio" name="año">
+                <button type="submit" class="btn btn-primary">Descargar en PDF</button>
+            </form>            
+        </div>
+        
+    </div>
+
+</div>
+
+<!-- Enlazamos el archivo JavaScript correcto -->
+<script src="/static/js/expRecaudacion.js"></script>
+{% endblock %}

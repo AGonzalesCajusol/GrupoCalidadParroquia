@@ -90,6 +90,28 @@ function openModal(type, id = null, nombre = '', tipo = '') {
             .catch(error => console.error('Error:', error));
     };
 }
+// Función para eliminar un tipo de recaudación
+function eliminarTipoRecaudacion(id) {
+    if (confirm('¿Estás seguro de que deseas eliminar este tipo de recaudación?')) {
+        fetch('/eliminar_tipo_recaudacion', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify({ id: id })  // Enviar el ID del tipo de recaudación que se va a eliminar
+        })
+        .then(response => response.json())
+        .then(data => {
+            if (data.success) {
+                alert('Tipo de recaudación eliminado exitosamente');
+                location.reload();  // Recargar la página para reflejar los cambios
+            } else {
+                alert('Error al eliminar tipo de recaudación: ' + data.message);
+            }
+        })
+        .catch(error => console.error('Error:', error));
+    }
+}
 
 // Función para limpiar los campos del modal
 function limpiarModal() {
