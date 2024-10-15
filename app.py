@@ -1,10 +1,13 @@
 from flask import Flask, render_template
 import routers.router_actosliturgicos
+import routers.router_celebracion
 import routers.router_diocesis
+import routers.router_feligres
 import routers.router_main  # Importa las rutas generales
 import routers.router_ministro
 import routers.router_secretaria
 import routers.router_recaudaciones
+import routers.router_tema
 import routers.router_tipo_recaudacion  # Importa las rutas relacionadas con
 import routers.router_sede
 import routers.router_tipo_ministro # Importa las rutas relacionadas con tipos de ministro
@@ -53,7 +56,10 @@ routers.router_cargo.registrar_rutas(app)
 
 routers.router_actosliturgicos.registrar_rutas(app)
 
+routers.router_feligres.registrar_rutas(app)
 
+routers.router_tema.registrar_rutas(app)
 
+routers.router_celebracion.registrar_rutas(app)
 if __name__ == '__main__':
     app.run(debug=True)

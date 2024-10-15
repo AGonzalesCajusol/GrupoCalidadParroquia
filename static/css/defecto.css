@@ -1,20 +1,30 @@
 body {
     font-family: "Roboto", sans-serif;
-    padding-top: 60px;    
+    padding-top: 60px;
     color: #000000;
+    padding-bottom: 100px;
+    /* Asegurar espacio en la parte inferior */
 }
-::-webkit-scrollbar-track {
-    background: #020202; /* Color de fondo */
-}
-::-webkit-scrollbar-thumb {
-    background-color: #3498db; /* Color del thumb */
-    border-radius: 10px; /* Bordes redondeados */
-    border: 3px solid #f1f1f1; /* Espacio alrededor del thumb */
-  }
 
-  ::-webkit-scrollbar-thumb:hover {
-    background-color: #2980b9; /* Cambiar color al hacer hover */
-  }
+::-webkit-scrollbar-track {
+    background: #020202;
+    /* Color de fondo */
+}
+
+::-webkit-scrollbar-thumb {
+    background-color: #3498db;
+    /* Color del thumb */
+    border-radius: 10px;
+    /* Bordes redondeados */
+    border: 3px solid #f1f1f1;
+    /* Espacio alrededor del thumb */
+}
+
+::-webkit-scrollbar-thumb:hover {
+    background-color: #2980b9;
+    /* Cambiar color al hacer hover */
+}
+
 .header {
     background-color: #ECEADE;
     padding: 40px 50px;
@@ -30,9 +40,10 @@ body {
     color: #033D8EBF;
 }
 
-.layout{
+.layout {
     overflow-y: auto;
 }
+
 .header .logo {
     display: flex;
     align-items: center;
@@ -40,7 +51,7 @@ body {
 
 .header .logo h5 {
     color: #033D8EBF;
-    font-weight: bold ;
+    font-weight: bold;
 }
 
 .header .logo img {
@@ -56,14 +67,14 @@ body {
     border: none;
     cursor: pointer;
     color: #033D8EBF;
-    }
+}
 
 .breadcrumb {
     margin: 70px 20px 10px 20px;
 }
 
 .user-info {
-    
+
     font-size: 1rem;
     font-weight: 500;
     color: #000000;
@@ -101,33 +112,41 @@ body {
     color: #e09844;
 }
 
-.sidenav {    
-    width: 250px; /* Fija el ancho del menú lateral */
-    background-color: #ffffff;    
-    position: fixed; /* Esto mantiene el menú fijo mientras haces scroll */
-    top: 81px; /* Ajusta si tienes un header */
+.sidenav {
+    width: 250px;
+    /* Fija el ancho del menú lateral */
+    background-color: #ffffff;
+    position: fixed;
+    /* Esto mantiene el menú fijo mientras haces scroll */
+    top: 81px;
+    /* Ajusta si tienes un header */
     bottom: 0;
     z-index: 1;
     color: #033D8EBF;
-    overflow-y: auto;    
-    border-right: 5px solid #ECEADE; /* Aquí agregamos la línea separadora */
-    padding-right: 10px; 
+    overflow-y: auto;
+    border-right: 5px solid #ECEADE;
+    /* Aquí agregamos la línea separadora */
+    padding-right: 10px;
 }
 
-.layout{
+.layout {
     display: flex;
     height: 100vh;
 }
+
 .sidenav a {
-    color: #033D8EBF; /* Fondo azul para la opción activa */
-    font-weight: bold; /* Negrita para la opción activa */
+    color: #033D8EBF;
+    /* Fondo azul para la opción activa */
+    font-weight: bold;
+    /* Negrita para la opción activa */
 }
 
 /* Ajustes para los botones dentro de las colapsables */
-.sidenav  .btn {
+.sidenav .btn {
     background-color: transparent;
     border: none;
-    color: #033D8EBF; /* Texto gris claro */
+    color: #033D8EBF;
+    /* Texto gris claro */
 }
 
 
@@ -137,8 +156,10 @@ body {
 }
 
 .sidenav::-webkit-scrollbar-thumb {
-    background-color: #363636; /* Color del thumb */
-    border-radius: 5px; /* Bordes redondeados */
+    background-color: #363636;
+    /* Color del thumb */
+    border-radius: 5px;
+    /* Bordes redondeados */
 }
 
 .sidenav a {
@@ -146,7 +167,7 @@ body {
     text-decoration: none;
     font-size: 18px;
     color: rgb(2, 2, 2);
-    display: block;    
+    display: block;
     font-size: 15px;
 }
 
@@ -156,10 +177,11 @@ body {
     background-color: #dba24cd7;
 }
 
-#mySidenav i{
+#mySidenav i {
     margin-left: 15px;
 }
-a.btn{
+
+a.btn {
     background-color: rgb(255, 255, 255);
     padding: 10px 0 !important;
     font-size: 14px;
@@ -167,18 +189,21 @@ a.btn{
     border-radius: 0;
     border: none;
     text-align: start;
-    margin-left:15px;
-    margin-right: 12px ;
+    margin-left: 15px;
+    margin-right: 12px;
 }
 
-#selectacto{
+#selectacto {
     position: relative;
     bottom: 5px;
 }
+
 .main-content {
-    flex-grow: 1; /* Esto hace que el contenido principal ocupe el resto del espacio */
-    margin-left: 250px; /* Deja el espacio suficiente para el menú fijo */
-    padding: 20px;     
+    flex-grow: 1;
+    /* Esto hace que el contenido principal ocupe el resto del espacio */
+    margin-left: 250px;
+    /* Deja el espacio suficiente para el menú fijo */
+    padding: 20px;
     margin-bottom: 2cm;
 }
 
@@ -283,21 +308,84 @@ th {
 
 table.dataTable tbody td {
     vertical-align: middle;
-    padding: 8px; /* Puedes ajustar este valor según necesites */
-    height: auto; /* Asegúrate de que la altura se ajuste automáticamente */
+    padding: 8px;
+    /* Puedes ajustar este valor según necesites */
+    height: auto;
+    /* Asegúrate de que la altura se ajuste automáticamente */
 }
 
 .btn-agregar-ministro {
-    margin-right: 0 !important;  /* Elimina cualquier margen a la derecha */
+    margin-right: 0 !important;
+    /* Elimina cualquier margen a la derecha */
 }
 
 .btn-success {
-    background-color: #02BA26 !important ; /* Color verde más claro */
-    border-color: #02BA26 !important; /* Cambia también el borde */
+    background-color: #02BA26 !important;
+    /* Color verde más claro */
+    border-color: #02BA26 !important;
+    /* Cambia también el borde */
 }
 
-<<<<<<< HEAD
-.alert{
+#yearSelect {
+    width: 200px;
+    height: 40px;
+    font-size: 18px;
+}
+
+#calendar {
+    min-height: 600px;
+    /* Establecer una altura mínima para el calendario */
+    margin-bottom: auto !important;
+    /* Forzar el margen inferior */
+}
+
+
+.fc-button, .fc-button-primary, .fc-button-active {
+    background-color: #02BA26 !important;  /* Fondo verde brillante */
+    border-color: #02BA26 !important;      /* Borde verde brillante */
+    color: white !important;               /* Texto blanco */
+}
+
+/* Cambiar el color del texto cuando los botones están activos (por ejemplo, "Hoy") */
+.fc-button-primary.fc-button-active {
+    background-color: #029920 !important;  /* Verde más oscuro cuando está activo */
+    color: black !important;               /* Texto blanco */
+}
+
+/* Personalizar los iconos de las flechas */
+.fc-prev-button, .fc-next-button {
+    background-color: #02BA26 !important;  /* Fondo verde brillante */
+    color: black !important;               /* Color blanco para las flechas */
+}
+
+.fc-col-header-cell {
+    background-color: #02BA26 !important;  /* Fondo verde brillante */
+    color: black !important;               /* Texto blanco */
+}
+
+/* Reforzar el color del enlace dentro de las cabeceras */
+.fc-col-header-cell a {
+    color: black !important;  /* Cambiar el color del texto de los enlaces a blanco */
+    text-decoration: none !important;  /* Eliminar subrayado si lo tiene */
+}
+
+/* Cambiar el color de los días del mes dentro del calendario */
+.fc-daygrid-day-number {
+    color: black !important;  /* Texto blanco para los números de los días */
+}
+
+/* Cambiar el color de los días que no pertenecen al mes actual */
+.fc-day-other {
+    color: black !important;  /* Texto gris claro para los días fuera del mes actual */
+}
+
+/* Cambiar el color del día actual */
+.fc-day-today {
+    background-color: #f0f9e8 !important;  /* Fondo claro para el día de hoy */
+    color: black !important;  /* Texto negro para mejor visibilidad */
+}
+
+.alert {
     position: fixed;
     bottom: 20px;
     right: 20px;
@@ -306,56 +394,63 @@ table.dataTable tbody td {
     box-shadow: 0px 4px 12px rgba(0, 0, 0, 0.1);
 }
 
-=======
-
-
-
-
-  /* Ajustar tamaño del campo de búsqueda */
-  .dataTables_filter input {
-    width: 100px !important; /* Reduce el ancho del campo de búsqueda */
-    height: 25px; /* Reduce la altura del campo de búsqueda */
-    font-size: 14px; /* Tamaño de fuente más pequeño */
+/* Ajustar tamaño del campo de búsqueda */
+.dataTables_filter input {
+    width: 100px !important;
+    /* Reduce el ancho del campo de búsqueda */
+    height: 25px;
+    /* Reduce la altura del campo de búsqueda */
+    font-size: 14px;
+    /* Tamaño de fuente más pequeño */
     margin-right: 25px;
-  }
-  
-  
+}
+
+
 .d-flex {
     display: flex;
-    flex-wrap: wrap;  /* Permitir que los elementos salten a una nueva línea si es necesario */
-    gap: 10px;  /* Espaciado entre los elementos */
+    flex-wrap: wrap;
+    /* Permitir que los elementos salten a una nueva línea si es necesario */
+    gap: 10px;
+    /* Espaciado entre los elementos */
     align-items: center;
-  }
-  
-  /* Reducir el tamaño del botón y el campo de búsqueda */
-  .custom-btn {
-    font-size: 14px;  
-    padding: 4px 8px;  /* Reducir el padding del botón */
-  }
-  
-  .dataTables_filter input {
-    width: 550px !important;  /* Ajustar el ancho del campo de búsqueda */
-    height: 30px;  /* Reducir la altura del campo de búsqueda */
-    font-size: 14px;  /* Reducir el tamaño de la fuente */
+}
+
+/* Reducir el tamaño del botón y el campo de búsqueda */
+.custom-btn {
+    font-size: 14px;
+    padding: 4px 8px;
+    /* Reducir el padding del botón */
+}
+
+.dataTables_filter input {
+    width: 550px !important;
+    /* Ajustar el ancho del campo de búsqueda */
+    height: 30px;
+    /* Reducir la altura del campo de búsqueda */
+    font-size: 14px;
+    /* Reducir el tamaño de la fuente */
     padding: 5px;
     background-color: white;
     border-color: gray;
-   
-  }
-  
 
-  
-  /* Btn agregar ministro
+}
+
+
+
+/* Btn agregar ministro
 
   /* Personalización del botón "Agregar ministro" */
 .btn-agregar-ministro {
-    font-size: 15px;  /* Tamaño de la fuente */
-    transition: background-color 0.3s ease;  /* Transición suave */
+    font-size: 15px;
+    /* Tamaño de la fuente */
+    transition: background-color 0.3s ease;
+    /* Transición suave */
     margin-right: 35px;
 }
 
 .btn-agregar-ministro:hover {
-    background-color: #218838;  /* Color más oscuro al pasar el cursor */
-    border-color: #218838;  /* Ajuste del color del borde */
+    background-color: #218838;
+    /* Color más oscuro al pasar el cursor */
+    border-color: #218838;
+    /* Ajuste del color del borde */
 }
->>>>>>> a1b5b4caae351e9e4daded35dc6b67c3354ffb4a
