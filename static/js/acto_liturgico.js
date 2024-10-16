@@ -289,18 +289,19 @@ function eliminar(elemento) {
 
 function listar() {
     var tbody = document.getElementById('actosBody');
- 
+
     
     // Destruir DataTable si ya está inicializado
     if ($.fn.DataTable.isDataTable('#actosTable')) {
         $('#actosTable').DataTable().destroy();
     }
 
+    // Petición al servidor
     fetch('/lista_actos_requisitos')
         .then(response => response.json())
         .then(elemento => {
-            tbody = "";
-
+            tbody.textContent = '';
+            console.log(elemento);  // Para verificar el contenido
             elemento.forEach(elemento => {
                 const row = document.createElement('tr');
                 row.innerHTML = `
