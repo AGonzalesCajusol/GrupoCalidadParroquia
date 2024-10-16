@@ -204,7 +204,7 @@ function seleccionarOpcionPorTexto(selectElement, texto) {
 }
 
 
-function abrirModalVer(id, nombre, direccion, creacion, telefono, correo, monto, id_congregacion, id_diosesis) {
+function abrirModalVer(id, nombre, direccion, creacion, telefono, correo, monto,estado, id_congregacion, id_diosesis) {
     var modalSede = new bootstrap.Modal(document.getElementById('modalSede'));
 
     const modalTitle = document.getElementById('modalSedeLabel');
@@ -223,7 +223,7 @@ function abrirModalVer(id, nombre, direccion, creacion, telefono, correo, monto,
     document.getElementById('monto').value = monto;
 
     const estadoCheckbox = document.getElementById('estado');
-    estadoCheckbox.checked = estado;
+    estadoCheckbox.checked = (estado === true || estado === 'true' || estado === '1');
 
     let selectCongregacion = document.getElementById('id_congregacion');
     let selectDiosesis = document.getElementById('id_diosesis');
