@@ -22,7 +22,7 @@ def registrar_rutas(app):
     # Ruta para insertar una nueva congregación
     @app.route("/insertar_congregacion", methods=["POST"])
     def procesar_insertar_congregacion():
-        nombre = request.form["nombre"]
+        nombre = request.form["nombre_congregacion"]
         insertar_congregacion(nombre)
         flash("La congregación fue agregada exitosamente")
         return redirect(url_for("gestionar_congregacion"))
@@ -37,7 +37,7 @@ def registrar_rutas(app):
     @app.route("/actualizar_congregacion", methods=["POST"])
     def procesar_actualizar_congregacion():
         id = request.form["id"]  # Captura el ID desde el formulario
-        nombre = request.form["nombre"]  # Captura el nombre actualizado
+        nombre = request.form["nombre_congregacion"]  # Captura el nombre actualizado
         actualizar_congregacion(nombre, id)  # Llama a la función que actualiza en la base de datos
         flash("La congregación fue actualizada exitosamente")
         return redirect(url_for("gestionar_congregacion"))

@@ -8,8 +8,8 @@ $(document).ready(function () {
         },
         //dom: '<"d-flex justify-content-between align-items-center mb-3"<"d-flex"l<"d-flex justify-content-between align-items-center"f<"ml-3 button-section">>>rt<"bottom"p>',
         initComplete: function () {
-            // Insertar el botón "Agregar ministro" dentro del div y alinearlo a la derecha
-            $("div.button-section").html('<button type="button" class="btn btn-success btn-lg custom-btn ml-3 btn-agregar-ministro" data-bs-toggle="modal" data-bs-target="#agregarModal" onclick="abir()"><i class="bi bi-person-plus"></i> Agregar Sede </button>');
+            // Insertar el botón "Agregar sede" dentro del div y alinearlo a la derecha
+            $("div.button-section").html('<button type="button" class="btn btn-success btn-lg custom-btn ml-3 btn-agregar-ministro" data-bs-toggle="modal" data-bs-target="#agregarModal" onclick="abir()"><i class="bi bi-building"></i> Agregar Sede </button>');
         }
     });
 });
@@ -137,6 +137,12 @@ function abir() {
     document.getElementById('creacion').value = '';
     document.getElementById('telefono').value = '';
     document.getElementById('correo').value = '';
+    document.getElementById('monto').value = '';
+
+    const estadoCheckbox = document.getElementById('estado');
+    estadoCheckbox.checked = true;
+
+    document.getElementById('estado').setAttribute('disabled', true);
     document.getElementById('id_congregacion').value = '';
     document.getElementById('id_diosesis').value = '';
 
@@ -145,7 +151,7 @@ function abir() {
 
 
 
-function abrirModalEditar(id, nombre, direccion, creacion, telefono, correo, id_congregacion, id_diosesis) {
+function abrirModalEditar(id, nombre, direccion, creacion, telefono, correo, monto, estado, id_congregacion, id_diosesis) {
     var modalSede = new bootstrap.Modal(document.getElementById('modalSede'));
 
     const modalTitle = document.getElementById('modalSedeLabel');
@@ -165,6 +171,11 @@ function abrirModalEditar(id, nombre, direccion, creacion, telefono, correo, id_
     document.getElementById('creacion').value = creacion;
     document.getElementById('telefono').value = telefono;
     document.getElementById('correo').value = correo;
+    document.getElementById('monto').value = monto;
+
+    const estadoCheckbox = document.getElementById('estado');
+    estadoCheckbox.checked = (estado === true || estado === 'true' || estado === '1');
+
 
     let selectCongregacion = document.getElementById('id_congregacion');
     let selectDiosesis = document.getElementById('id_diosesis');
@@ -181,6 +192,7 @@ function abrirModalEditar(id, nombre, direccion, creacion, telefono, correo, id_
     modalSede.show();
 }
 
+
 // Función auxiliar para seleccionar la opción correcta en los select
 function seleccionarOpcionPorTexto(selectElement, texto) {
     for (let i = 0; i < selectElement.options.length; i++) {
@@ -192,14 +204,12 @@ function seleccionarOpcionPorTexto(selectElement, texto) {
 }
 
 
-function abrirModalVer(id, nombre, direccion, creacion, telefono, correo, id_congregacion, id_diosesis) {
+function abrirModalVer(id, nombre, direccion, creacion, telefono, correo, monto, id_congregacion, id_diosesis) {
     var modalSede = new bootstrap.Modal(document.getElementById('modalSede'));
 
     const modalTitle = document.getElementById('modalSedeLabel');
     const submitBtn = document.getElementById('submitBtn'); // Botón de submit
-    const cancelBtn = document.getElementById('cancelBtn'); // Botón de cancelar/cerrar
-    const formSede = document.getElementById('formSede'); // Obtener el formulario
-
+    
     modalTitle.textContent = 'Ver Sede';
     submitBtn.style.display = 'none'; // Ocultar el botón de Guardar
 
@@ -210,6 +220,10 @@ function abrirModalVer(id, nombre, direccion, creacion, telefono, correo, id_con
     document.getElementById('creacion').value = creacion;
     document.getElementById('telefono').value = telefono;
     document.getElementById('correo').value = correo;
+    document.getElementById('monto').value = monto;
+
+    const estadoCheckbox = document.getElementById('estado');
+    estadoCheckbox.checked = estado;
 
     let selectCongregacion = document.getElementById('id_congregacion');
     let selectDiosesis = document.getElementById('id_diosesis');
@@ -229,6 +243,8 @@ function abrirModalVer(id, nombre, direccion, creacion, telefono, correo, id_con
     document.getElementById('creacion').setAttribute('disabled', true);
     document.getElementById('telefono').setAttribute('disabled', true);
     document.getElementById('correo').setAttribute('disabled', true);
+    document.getElementById('monto').setAttribute('disabled', true);
+    document.getElementById('estado').setAttribute('disabled', true);
 
     // Bloquear los selects
     selectCongregacion.setAttribute('disabled', true);
@@ -242,6 +258,8 @@ function abrirModalVer(id, nombre, direccion, creacion, telefono, correo, id_con
         document.getElementById('creacion').removeAttribute('disabled');
         document.getElementById('telefono').removeAttribute('disabled');
         document.getElementById('correo').removeAttribute('disabled');
+        document.getElementById('monto').removeAttribute('disabled');
+        document.getElementById('estado').removeAttribute('disabled');
         selectCongregacion.removeAttribute('disabled');
         selectDiosesis.removeAttribute('disabled');
 
@@ -252,6 +270,42 @@ function abrirModalVer(id, nombre, direccion, creacion, telefono, correo, id_con
     // Mostrar el modal
     modalSede.show();
 }
+
+// function darBajaSede(id,estado) {
+    
+//     const formSede = document.getElementById('formSede'); 
+
+//     formSede.setAttribute('action', darBajaSedeURL);
+
+//     document.getElementById('sedeId').value = id;
+//     const estadoCheckbox = document.getElementById('estado');
+//     estadoCheckbox.checked = (estado === false || estado === 'false' || estado === '0');
+    
+//     alert('Estado de la sede cambiado exitosamente a Inactivo');
+
+//     formSede.submit();
+// }
+
+function darBajaSede(id, estado) {
+    // Comprobar si la sede ya está inactiva
+    if (estado === false || estado === 'false' || estado === '0') {
+        alert('La sede ya está dada de baja.');
+        return; // Salir de la función
+    }
+
+    const formSede = document.getElementById('formSede'); 
+
+    formSede.setAttribute('action', darBajaSedeURL);
+
+    document.getElementById('sedeId').value = id;
+    const estadoCheckbox = document.getElementById('estado');
+    estadoCheckbox.checked = true; // Marcamos como inactivo
+
+    alert('Estado de la sede cambiado exitosamente a Inactivo');
+
+    formSede.submit();
+}
+
 
 
 

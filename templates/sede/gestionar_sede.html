@@ -2,47 +2,59 @@
 {% block title %}Gestión de Sede{% endblock %}
 {% block cuerpo %}
 
+
 <div class="container mt-4">
     <h1 class="titulo-gestion">Gestión de Sede</h1>
 
     <table id="sedeTable" class="table table-hover table-striped">
         <thead class="table-light">
             <tr class="text-center">
-                <th scope="col" class="border">ID</th>
-                <th scope="col" class="border">Sede</th>
-                <th scope="col" class="border">Dirección</th>
-                <th scope="col" class="border">Creación</th>
-                <th scope="col" class="border">Telefono</th>
-                <th scope="col" class="border">Correo</th>
-                <th scope="col" class="border">Congregacion</th>
-                <th scope="col" class="border">Diócesis</th>
-                <th scope="col" class="border">Acciones</th>
+                <th style="vertical-align: middle; text-align: center;">ID</th>
+                <th style="vertical-align: middle; text-align: center;">Sede</th>
+                <th style="vertical-align: middle; text-align: center;">Dirección</th>
+                <th style="vertical-align: middle; text-align: center;">Telefono</th>
+                <th style="vertical-align: middle; text-align: center;">Correo</th>
+                <!-- <th style="vertical-align: middle; text-align: center;">Monto</th> -->
+                <th style="vertical-align: middle; text-align: center;">Estado</th>
+                <!-- <th style="vertical-align: middle; text-align: center;">Congregacion</th>
+                <th style="vertical-align: middle; text-align: center;">Diócesis</th> -->
+                
+                <th style="vertical-align: middle; text-align: center; width: 200px;">Acciones</th>
             </tr>
         </thead>
         <tbody>
             {% for sed in sede %}
             <tr>
-                <td class="border">{{ sed[0] }}</td> <!-- ID del sede -->
-                <td class="border">{{ sed[1] }}</td> <!-- Nombre de la sede -->
-                <td class="border">{{ sed[2] }}</td> <!-- dirección -->
-                <td class="border">{{ sed[3] }}</td> <!-- creación -->
-                <td class="border">{{ sed[4] }}</td> <!-- telefono -->
-                <td class="border">{{ sed[5] }}</td> <!-- correo -->
-                <td class="border">{{ sed[6] }}</td> <!-- id congregación -->
-                <td class="border">{{ sed[7] }}</td> <!-- id diosesis -->
+                <td class="text-center border">{{ sed[0] }}</td> <!-- ID del sede -->
+                <td>{{ sed[1] }}</td> <!-- Nombre de la sede -->
+                <td>{{ sed[2] }}</td> <!-- dirección -->
+                <!-- <td>{{ sed[3] }}</td> creación -->
+                <td>{{ sed[4] }}</td> <!-- telefono -->
+                <td>{{ sed[5] }}</td> <!-- correo -->
+                <!-- <td>{{ sed[6] }}</td>  monto -->
+                <!-- <td>{{ sed[7] }}</td>  Estado -->
+                <td>{{ 'Activo' if sed[7] == 1 else 'Inactivo' }}</td>
+                <!-- <td>{{ sed[8] }}</td>  id congregación -->
+                <!-- <td>{{ sed[9] }}</td> id diosesis-->
+                
                 <td class="text-center border">
-
                     <button class="btn btn-primary btn-sm" title="Ver"
-                        onclick="abrirModalVer('{{ sed[0] }}', '{{ sed[1] }}', '{{ sed[2] }}', '{{ sed[3] }}', '{{ sed[4] }}', '{{ sed[5] }}', '{{ sed[6] }}', '{{ sed[7] }}')">
+                        onclick="abrirModalVer('{{ sed[0] }}', '{{ sed[1] }}', '{{ sed[2] }}', '{{ sed[3] }}', '{{ sed[4] }}', '{{ sed[5] }}', '{{ sed[6] }}', '{{ sed[7] }}', '{{ sed[8] }}')">
                         <i class="fas fa-eye"></i>
                     </button>
 
-                    <button class="btn btn-warning btn-sm"  title="Editar"
-                        onclick="abrirModalEditar('{{ sed[0] }}', '{{ sed[1] }}', '{{ sed[2] }}', '{{ sed[3] }}', '{{ sed[4] }}', '{{ sed[5] }}', '{{ sed[6] }}', '{{ sed[7] }}')">
+                    <button class="btn btn-warning btn-sm" title="Editar"
+                        onclick="abrirModalEditar('{{ sed[0] }}', '{{ sed[1] }}', '{{ sed[2] }}', '{{ sed[3] }}', '{{ sed[4] }}', '{{ sed[5] }}', '{{ sed[6] }}', '{{ sed[7] }}', '{{ sed[8] }}', '{{ sed[9] }}')">
                         <i class="fas fa-edit"></i>
                     </button>
 
-                    <form action="{{ url_for('procesar_eliminar_sede') }}" method="POST" style="display:inline-block;" title="Eliminar">
+                    <button type="button" class="btn btn-secondary btn-sm" title="Dar de baja"
+                            onclick="darBajaSede('{{ sed[0] }}')">
+                            <i class="fas fa-ban"></i> <!-- Ícono de FontAwesome -->
+                        </button>
+
+                    <form action="{{ url_for('procesar_eliminar_sede') }}" method="POST" style="display:inline-block;"
+                        title="Eliminar">
                         <input type="hidden" name="id" value="{{ sed[0] }}">
                         <button type="submit" class="btn btn-danger btn-sm"
                             onclick="return confirm('¿Estás seguro de que deseas eliminar esta sede?');">
@@ -53,8 +65,6 @@
             </tr>
             {% endfor %}
         </tbody>
-
-
     </table>
 </div>
 
@@ -91,6 +101,15 @@
                         <input type="email" class="form-control" id="correo" name="correo" required>
                     </div>
                     <div class="mb-3">
+                        <label for="monto" class="form-label">Monto</label>
+                        <input type="number" class="form-control" id="monto" name="monto" required>
+                    </div>
+                    <div class="mb-3">
+                        <label for="estado" class="form-label">Estado</label>
+                        <input type="checkbox" class="form-check-input" id="estado" name="estado">
+                        <label class="form-check-label" for="estado">Activo</label>
+                    </div>                    
+                    <div class="mb-3">
                         <label for="id_congregacion">Congregación</label>
                         <select class="form-select" id="id_congregacion" name="id_congregacion" required>
                             {% for congre in congregacion %}
@@ -123,6 +142,9 @@
     // Definir las URLs de acción generadas por Flask
     const insertarSedeURL = "{{ url_for('procesar_insertar_sede') }}";
     const actualizarSedeURL = "{{ url_for('procesar_actualizar_sede') }}";
+    const darBajaSedeURL = "{{ url_for('procesar_darBaja_sede') }}";
 </script>
+
+
 
 {% endblock %}
