@@ -166,3 +166,29 @@ def listar_requisitoXacto(acto):
         raise("Error en la consulta")
     finally:
         conexion.close()  
+
+def eliminaracto_requisitos(id):
+    conexion = obtener_conexion()
+    try:
+        with conexion.cursor() as cursor:
+            cursor.execute('''
+                SELECT * 
+                FROM actoliturgico AS al
+                LEFT JOIN charlas AS ch ON ch.id_charla = al.id_actoliturgico
+                LEFT JOIN intencion AS it ON it.id_actoliturgico = al.id_actoliturgico
+                WHERE al.id_actoliturgico = %s AND (ch.id_charla IS NOT NULL OR it.id_actoliturgico IS NOT NULL);
+                ''', (id,))
+            
+            if cursor.rowcount == 0:
+                cursor.execute('DELETE FROM requisito WHERE id_actoliturgico = %s;', (id,))
+                cursor.execute('DELETE FROM actoliturgico WHERE id_actoliturgico = %s;', (id,))
+                conexion.commit() 
+                return True
+        
+        return False
+
+    except Exception as e:
+        print(f"Error en la consulta: {e}")  # Muestra el error para depuración
+        return False
+    finally:
+        conexion.close()

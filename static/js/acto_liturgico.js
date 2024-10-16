@@ -1,19 +1,24 @@
 var actos = []
 window.onload = function () {
     listar();
-
+    listar();
+    listar();
 };
 
-function abrir(accion, id){
+function abrir(accion, id,nombre, requisito,monto){
     actos = []
     var myModal = new bootstrap.Modal(document.getElementById('acciones'));
-    myModal.show();
     var titulo = document.getElementById('titulo_modal');
     var boton_modal = document.getElementById('accion_modal');
+    boton_modal.style.display = "block"; 
+
     document.getElementById('nombre_liturgia').value = "";
     document.getElementById('monto_liturgia').value = "0.00";
+    document.getElementById('monto_liturgia').disabled = false;
+    document.getElementById('nombre_liturgia').disabled = false;
+    document.getElementById('asignar_requisitos').style.removeProperty('display');
 
-    //Limpiamos los camp
+    //Limpiamos los campos
     var contenedor = document.getElementById('contenido_actos')
     contenedor.textContent = ''
     var div_nombre1 = document.getElementById('mensaje1');
@@ -25,9 +30,13 @@ function abrir(accion, id){
     document.getElementById('requisito').value = ""; 
 
     if (accion == "nuevo"){
+        myModal.show();
+
         titulo.textContent = "Agrega y Asigna los actos liturgicos";
         boton_modal.textContent = "Guardar";
     }else if( accion == "modificar"){
+        myModal.show();
+
         titulo.textContent = "Modificar y Asigna los actos liturgicos";
         boton_modal.textContent = "Modificar";  
         fetch(`/actoporid/${id}`)
@@ -45,6 +54,31 @@ function abrir(accion, id){
             dibujar();
             
         })
+    }else if(accion == "ver"){
+        myModal.show();
+        document.getElementById('asignar_requisitos').style.setProperty('display', 'none', 'important');
+        boton_modal.style.display = "none"; 
+        titulo.textContent = "Visualizar acto litúrgico con sus requisitos";
+        document.getElementById('nombre_liturgia').value = nombre;
+        document.getElementById('nombre_liturgia').disabled = true;
+        document.getElementById('monto_liturgia').value = monto;
+        document.getElementById('monto_liturgia').disabled = true;
+        contenedor.textContent = requisito;
+    }else if(accion == "eliminar"){
+        const resultado = confirm("¿Estás seguro de que deseas eliminar este acto litúrgico con sus requisitos?");
+        if (resultado) {
+            fetch(`/eliminaracto_requisitos/${id}`)
+            .then(data => data.json())
+            .then(elemento =>{
+                if(elemento.resultado = true){
+                    alert("Se elimino correctamente!!");
+                    listar();
+                }else{
+                    alert("No se pudo eliminar debido a que existen que se relacionan")
+                }
+            }
+            )
+        }
     }
 }
 
@@ -253,17 +287,20 @@ function eliminar(elemento) {
     dibujar();
 }
 
-function listar(){
-    const tbody = document.getElementById('actosBody');
-    tbody.innerHTML = '';
+function listar() {
+    var tbody = document.getElementById('actosBody');
+ 
     
+    // Destruir DataTable si ya está inicializado
     if ($.fn.DataTable.isDataTable('#actosTable')) {
         $('#actosTable').DataTable().destroy();
     }
-    
+
     fetch('/lista_actos_requisitos')
         .then(response => response.json())
         .then(elemento => {
+            tbody = "";
+
             elemento.forEach(elemento => {
                 const row = document.createElement('tr');
                 row.innerHTML = `
@@ -273,17 +310,33 @@ function listar(){
                     <td>${elemento.monto}</td>
                     <td>
                         <div class="d-flex justify-content-center">
-                            <button class="btn btn-warning btn-sm me-2"
+                            <button class="btn btn-primary btn-sm" title="Ver"
+                                onclick="abrir('ver', '${elemento.id}', '${elemento.nombre}', '${elemento.requisito}', '${elemento.monto}')">
+                                <i class="fas fa-eye"></i>
+                            </button>
+
+                            <button class="btn btn-warning btn-sm"
                                 onclick="abrir('modificar', '${elemento.id}')">
                                 <i class="fas fa-edit"></i>
+                            </button>
+                            <button type="button" class="btn btn-danger btn-sm" title="Eliminar"
+                                onclick="abrir('eliminar', '${elemento.id}')">
+                                <i class="fas fa-trash-alt"></i>
                             </button>
                         </div>
                     </td>
                 `;
-                tbody.appendChild(row); // Agrega la fila al tbody
+                tbody.appendChild(row); // Agregar la fila al tbody
             });
-        $('#actosTable').DataTable();
-    })
+
+            // Inicializar DataTable después de agregar las filas
+            $('#actosTable').DataTable();
+
+            console.log('Tabla actualizada correctamente');
+        })
+        .catch(error => {
+            console.error('Error al obtener los datos:', error);  // Manejar errores
+        });
 }
 
 

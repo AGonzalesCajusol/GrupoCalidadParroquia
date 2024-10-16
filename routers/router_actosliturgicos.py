@@ -132,6 +132,15 @@ def registrar_rutas(app):
             return jsonify({'estado': 'Correcto'})
         except:
             return jsonify({'estado': 'Incorrecto'})
+        
+
+    @app.route("/eliminaracto_requisitos/<int:id>", methods=["GET"])
+    def eliminaracto_requisitos(id):
+        resultado = cal.eliminaracto_requisitos(id)
+        return jsonify({'estado': resultado})
+        
+
+    
 
         
         

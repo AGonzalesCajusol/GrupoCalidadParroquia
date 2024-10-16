@@ -1,0 +1,60 @@
+{% extends "inicio_sesion.html"  %}
+{% block titulo %} Crear cuenta {% endblock %}
+{% block principal %}
+<h2 class="text-center">Crear cuenta</h2>
+<form>
+    <div class="mb-3">
+        <label for="dni" class="form-label">DNI</label>
+        <input type="text" class="form-control" id="dni" placeholder="Ingrese su DNI" maxlength="8">
+    </div>
+
+    <div class="mb-2">
+        <label for="apellidos" class="form-label">Apellidos</label>
+        <input type="text" class="form-control" id="apellidos" placeholder="Ingrese sus apellidos">
+    </div>
+
+    <div class="mb-2">
+        <label for="nombres" class="form-label">Nombres</label>
+        <input type="text" class="form-control" id="nombres" placeholder="Ingrese sus nombres">
+    </div>
+
+    <div class="mb-2">
+        <label for="fecha_nacimiento" class="form-label">Fecha de Nacimiento</label>
+        <input type="date" class="form-control" id="fecha_nacimiento">
+    </div>
+
+    <div class="mb-2">
+        <label for="estado_civil" class="form-label">Estado Civil</label>
+        <select class="form-select" id="estado_civil">
+            <option value="">Seleccione su estado civil</option>
+            <option value="soltero">Soltero</option>
+            <option value="casado">Casado</option>
+            <option value="viudo">Viudo</option>
+        </select>
+    </div>
+
+    <div class="mb-2">
+        <label for="sexo" class="form-label">Sexo</label>
+        <select class="form-select" id="sexo">
+            <option value="">Seleccione su sexo</option>
+            <option value="masculino">Masculino</option>
+            <option value="femenino">Femenino</option>
+        </select>
+    </div>
+
+    <div>
+        <label for="password" class="form-label">Contraseña</label>
+        <div class="mb-2 d-flex">
+            <input type="password" class="form-control me-2" id="password" placeholder="Ingrese su contraseña" >
+            <button class="btn btn-primary" onclick="ver(this)" >Ver</button>
+        </div>
+    </div>
+
+    <div class="d-grid mb-2">
+        <button type="submit" class="btn btn-primary">Crear Cuenta</button>
+    </div>
+</form>
+<script>
+
+</script>
+{% endblock %}
