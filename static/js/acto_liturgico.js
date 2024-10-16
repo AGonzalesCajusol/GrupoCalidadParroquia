@@ -1,3 +1,16 @@
+$(document).ready(function () {
+    var table = $('#actoliturgicotable').DataTable({
+        pageLength: 8,
+        dom: '<"d-flex justify-content-between align-items-center mb-3"<"d-flex"f><"d-flex justify-content-end button-section">>rt<"bottom"p>', 
+        language: {
+            search: "Buscar:" 
+        },
+        initComplete: function () {
+            $("div.button-section").html('<button type="button" class="btn btn-success btn-lg custom-btn ml-3 btn-agregar-ministro" data-bs-toggle="modal" onclick="abrir(\'nuevo\')"><i class="bi bi-person-plus"></i> Agregar acto liturgico</button>');
+        }
+    });
+});
+
 var actos = []
 window.onload = function () {
     listar();

@@ -6,7 +6,7 @@ $(document).ready(function () {
             search: "Buscar:"
         },
         initComplete: function () {
-            $("div.button-section").html('<button type="button" class="btn btn-success btn-lg custom-btn ml-3 btn-agregar-diocesis" data-bs-toggle="modal" onclick="openModal(\'add\')"><i class="bi bi-building"></i> Agregar diócesis</button>');
+            $("div.button-section").html('<button type="button" class="btn btn-success btn-lg custom-btn ml-3 btn-agregar-ministro" data-bs-toggle="modal" onclick="openModal(\'add\')"><i class="bi bi-person-plus"></i> Agregar diocesis</button>');
         }
     });
 });
