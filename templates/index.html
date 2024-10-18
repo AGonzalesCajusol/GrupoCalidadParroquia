@@ -7,7 +7,6 @@
     <title>{% block title %}Sistema de Gestión de Parroquias{% endblock %}</title>
     <link rel="shortcut icon" href="{{ url_for('static', filename='img/iconoiglesia.png') }}" type="image/x-icon" />
 
-    <!-- Bootstrap Icons -->
     <link href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-icons/1.8.1/font/bootstrap-icons.min.css"
         rel="stylesheet" />
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet"
@@ -26,22 +25,18 @@
     <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
     <link rel="stylesheet" href="https://cdn.datatables.net/1.13.4/css/jquery.dataTables.min.css">
     <script src="https://cdn.datatables.net/1.13.4/js/jquery.dataTables.min.js"></script>
-
-
 </head>
 
 <body>
     <div class="header">
         <div class="d-flex align-items-center">
 
-            <a href="{{ url_for('inicio') }}" class="text-decoration-none">
+            <a href="{{ url_for('gestionar_celebracion') }}" class="text-decoration-none">
                 <div class="logo">
                     <img src="{{ url_for('static', filename='img/iconoiglesia.png') }}" alt="Point Roo" />
                     <h5>Parroquia Vianey</h5>
                 </div>
             </a>
-
-
         </div>
         <div class="user-actions">
             <a class="btn-logout nav-link" href="">
@@ -50,8 +45,6 @@
             </a>
         </div>
     </div>
-
-
 
     <!-- Sidenav -->
     <div class="layout" >
@@ -86,9 +79,8 @@
                         <i class="bi bi-person-badge-fill ms-1"></i> Ministro
                     </a>
 
-
-                    <a class="btn btn-outline-primary mt-2">
-                        <i class="bi bi-globe"></i> Opcion 2
+                    <a class="btn btn-outline-primary" href="{{ url_for('gestionar_feligres') }}">
+                        <i class="bi bi-person-badge-fill ms-1"></i> Feligres
                     </a>
 
                 </div>
@@ -166,18 +158,18 @@
                     <a href="{{ url_for('requisitosXactoliturgico') }}" class="btn btn-outline-primary mt-2">
                         <i class="bi bi-globe"></i> Requisitos por acto litúrgico
                     </a>
-                    
+
+                    <a href="{{ url_for('gestionar_tema') }}" class="btn btn-outline-primary mt-2">
+                        <i class="bi bi-globe"></i> Gestion de temas
+                    </a>                    
                 </div>
             </div>
-
     </div>
-    
     <div class="main-content mt-3 me-5" style="max-height: 400px;">
         {% block cuerpo %}
         {% endblock %}
     </div>
 </div>
-
 </body>
 <script src="{{ url_for('static', filename = '/js/defecto.js')}}"></script>
 <script src="{{ url_for('static', filename = '/js/solicitudes.js')}}"></script>

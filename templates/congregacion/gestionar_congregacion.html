@@ -2,104 +2,85 @@
 {% block title %}Gestión de Congregacion{% endblock %}
 {% block cuerpo %}
 
+
 <div class="container mt-4">
-    <h1>Gestión de Congregación</h1>
+    <h1 class="titulo-gestion">Gestión de Congregación</h1>
 
-    <!-- Botón para abrir el modal de "Agregar" -->
-    <button type="button" class="btn btn-primary mb-3" data-bs-toggle="modal" data-bs-target="#agregarModal">
-        Agregar Congregación
-    </button>
+        <table id="sedeTable" class="table table-hover table-striped">
+            <thead class="table-light">
+                <tr class="text-center">
+                    <th style="vertical-align: middle; text-align: center;">ID</th>
+                    <th style="vertical-align: middle; text-align: center;">Congregación</th>
+                    <th style="vertical-align: middle; text-align: center; width: 200px;">Acciones</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for congre in congregacion %}
+                <tr>
+                    <td class="text-center border">{{ congre[0] }}</td> <!-- ID del congregacion -->
+                    <td>{{ congre[1] }}</td> <!-- Nombre de la congregacion -->
 
-    <table class="table table-hover table-group-divider table align-middle">
-        <thead class="table-light">
-            <tr class="text-center">
-                <th scope="col" class="border">ID</th>
-                <th scope="col" class="border">Congregación</th>
-                <th scope="col" class="border">Acciones</th>
-            </tr>
-        </thead>
-        <tbody>
-            {% for congre in congregacion %}
-            <tr>
-                <td class="border">{{ congre[0] }}</td>  <!-- ID del congregacion -->
-                <td class="border">{{ congre[1] }}</td>  <!-- Nombre de la congregacion -->
-                <td class="text-center border">
-                    <button class="btn btn-warning btn-sm" onclick="abrirModalEditar('{{ congre[0] }}', '{{ congre[1] }}')">
-                        Editar
-                    </button>
-        
-                    <form action="{{ url_for('procesar_eliminar_congregacion') }}" method="POST" style="display:inline-block;">
-                        <input type="hidden" name="id" value="{{ congre[0] }}">
-                        <button type="submit" class="btn btn-danger btn-sm" onclick="return confirm('¿Estás seguro de que deseas eliminar esta congregación?');">
-                            Eliminar
+                    <td class="text-center border">
+
+                        <button class="btn btn-primary btn-sm" title="Ver"
+                            onclick="abrirModalVerC('{{ congre[0] }}', '{{ congre[1] }}')">
+                            <i class="fas fa-eye"></i>
                         </button>
-                    </form>
-                </td>
-            </tr>
-            {% endfor %}
-        </tbody>
-        
-        
-    </table>
+
+                        <button class="btn btn-warning btn-sm" title="Editar"
+                            onclick="abrirModalEditarC('{{ congre[0] }}', '{{ congre[1] }}')">
+                            <i class="fas fa-edit"></i>
+                        </button>
+
+                        <form action="{{ url_for('procesar_eliminar_congregacion') }}" method="POST"
+                            style="display:inline-block;" title="Eliminar">
+                            <input type="hidden" name="id" value="{{ congre[0] }}">
+                            <button type="submit" class="btn btn-danger btn-sm"
+                                onclick="return confirm('¿Estás seguro de que deseas eliminar esta congregación?');">
+                                <i class="fas fa-trash-alt"></i>
+                            </button>
+                        </form>
+                    </td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
 </div>
 
-<!-- Modal para Agregar -->
-<div class="modal fade" id="agregarModal" tabindex="-1" aria-labelledby="agregarModalLabel" aria-hidden="true">
+
+<!-- Modal para Agregar o Editar -->
+<div class="modal fade" id="modalCongregacion" tabindex="-1" aria-labelledby="modalCongregacionLabel" aria-hidden="true">
     <div class="modal-dialog">
         <div class="modal-content">
-            <form action="{{ url_for('procesar_insertar_congregacion') }}" method="POST">
+            <form id="formCongregacion" action="{{ url_for('procesar_insertar_congregacion') }}" method="POST">
+                <input type="hidden" id="congregacionId" name="id">
                 <div class="modal-header">
-                    <h5 class="modal-title" id="agregarModalLabel">Agregar Congregación</h5>
+                    <h5 class="modal-title" id="ModalCongregacionLabel">Agregar Congregación</h5>
                     <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
                 </div>
                 <div class="modal-body">
                     <div class="mb-3">
-                        <label for="nombreAgregar" class="form-label">Nombre de la Congregación</label>
-                        <input type="text" class="form-control" id="nombreAgregar" name="nombre" required>
+                        <label for="nombre_congregacion" class="form-label">Nombre de la Congregación</label>
+                        <input type="text" class="form-control" id="nombre_congregacion" name="nombre_congregacion" required>
                     </div>
                 </div>
                 <div class="modal-footer">
-                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
-                    <button type="submit" class="btn btn-primary">Guardar</button>
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cerrar</button>
+                    <button type="submit" class="btn btn-primary" id="submitBtn"></button>
                 </div>
-            </form>
         </div>
+        </form>
     </div>
 </div>
 
-<!-- Modal para Editar -->
-<div class="modal fade" id="editarModal" tabindex="-1" aria-labelledby="editarModalLabel" aria-hidden="true">
-    <div class="modal-dialog">
-        <div class="modal-content">
-            <form action="{{ url_for('procesar_actualizar_congregacion') }}" method="POST">
-                <input type="hidden" id="editarId" name="id">
-                <div class="modal-header">
-                    <h5 class="modal-title" id="editarModalLabel">Editar Congregación</h5>
-                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-                </div>
-                <div class="modal-body">
-                    <div class="mb-3">
-                        <label for="nombreEditar" class="form-label">Nombre de la Congregación</label>
-                        <input type="text" class="form-control" id="nombreEditar" name="nombre" required>
-                    </div>
-                </div>
-                <div class="modal-footer">
-                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
-                    <button type="submit" class="btn btn-primary">Guardar cambios</button>
-                </div>
-            </form>
-        </div>
-    </div>
-</div>
 
-<!-- Scripts para manejar el modal de Editar -->
+<script src="/static/js/congregacion.js"></script>
+
 <script>
-    function abrirModalEditar(id, nombre) {
-        document.getElementById("editarId").value = id;
-        document.getElementById("nombreEditar").value = nombre;
-        var editarModal = new bootstrap.Modal(document.getElementById('editarModal'));
-        editarModal.show();
-    }
+    // Definir las URLs de acción generadas por Flask
+    const insertarCongreURL = "{{ url_for('procesar_insertar_congregacion') }}";
+    const actualizarCongreURL = "{{ url_for('procesar_actualizar_congregacion') }}";
 </script>
+
 
 {% endblock %}

@@ -3,139 +3,102 @@
 {% block cuerpo %}
 
 <div class="container mt-4">
-    <h1>Gestión de Diócesis</h1>
+    <h1 class="titulo-gestion">Gestión de Diócesis</h1>
 
-    <!-- Botón para abrir el modal de "Agregar" -->
-    <button type="button" class="btn btn-primary mb-3" data-bs-toggle="modal" data-bs-target="#agregarModal">
-        Agregar diócesis
-    </button>
+    <div>
+        <!-- DataTable para la gestión de diócesis -->
+        <table id="diocesisTable" class="table table-hover table-striped">
+            <thead>
+                <th style="vertical-align: middle; text-align: center;">ID</th>
+                <th style="vertical-align: middle; text-align: center;">Nombre</th>
+                <th style="vertical-align: middle; text-align: center;">Departamento</th>
+                <th style="vertical-align: middle; text-align: center;">Provincia</th>
+                <th style="vertical-align: middle; text-align: center; width: 200px;">Acciones</th>
+            </thead>
+            <tbody>
+                {% for diocesis in diocesis %}
+                <tr>
+                    <td class="text-center">{{ diocesis[0] }}</td> <!-- ID de la diócesis -->
+                    <td>{{ diocesis[1] }}</td> <!-- Nombre de la diócesis -->
+                    <td>{{ diocesis[2] }}</td> <!-- Departamento -->
+                    <td>{{ diocesis[3] }}</td> <!-- Provincia -->
 
-    <table class="table table-hover table-group-divider table align-middle">
-        <thead class="table-light">
-            <tr class="text-center">
-                <th scope="col" class="border">ID</th>
-                <th scope="col" class="border">Diócesis</th>
-                <th scope="col" class="border">Departamento</th>
-                <th scope="col" class="border">Provincia</th>                    
-                <th scope="col" class="border">Acciones</th>
-            </tr>
-        </thead>
-        <tbody>
-            {% for diocesis in diocesis %}
-            <tr>
-                <td class="border">{{ diocesis[0] }}</td>  <!-- ID de la diócesis -->
-                <td class="border">{{ diocesis[1] }}</td>  <!-- Nombre de la diócesis -->
-                <td class="border">{{ diocesis[2] }}</td>  <!-- ID del departamento -->
-                <td class="border">{{ diocesis[3] }}</td>  <!-- ID de la provincia -->
-                <td class="text-center border">
-                    <button class="btn btn-warning btn-sm" onclick="abrirModalEditar('{{ diocesis[0] }}', '{{ diocesis[1] }}', '{{ diocesis[2] }}', '{{ diocesis[3] }}')">
-                        Editar
-                    </button>
-        
-                    <form action="{{ url_for('procesar_eliminar_diocesis') }}" method="POST" style="display:inline-block;">
-                        <input type="hidden" name="id" value="{{ diocesis[0] }}">
-                        <button type="submit" class="btn btn-danger btn-sm" onclick="return confirm('¿Estás seguro de que deseas eliminar esta diócesis?');">
-                            Eliminar
+                    <td class="text-center">
+                        <!-- Botón para ver detalles -->
+                        <button class="btn btn-primary btn-sm" title="Ver"
+                            onclick="openModal('view', '{{ diocesis[0] }}', '{{ diocesis[1] }}', '{{ diocesis[2] }}', '{{ diocesis[3] }}')">
+                            <i class="fas fa-eye"></i>
                         </button>
-                    </form>
-                </td>
-            </tr>
-            {% endfor %}
-        </tbody>
-    </table>
+
+                        <!-- Botón para editar -->
+                        <button class="btn btn-warning btn-sm" title="Editar"
+                            onclick="openModal('edit', '{{ diocesis[0] }}', '{{ diocesis[1] }}', '{{ diocesis[2] }}', '{{ diocesis[3] }}')">
+                            <i class="fas fa-edit"></i>
+                        </button>
+
+                        <!-- Botón para eliminar -->
+                        <form action="{{ url_for('procesar_eliminar_diocesis') }}" method="POST" style="display:inline-block;">
+                            <input type="hidden" name="id" value="{{ diocesis[0] }}">
+                            <button type="submit" class="btn btn-danger btn-sm" title="Eliminar"
+                                onclick="return confirm('¿Estás seguro de que deseas eliminar esta diócesis?');">
+                                <i class="fas fa-trash-alt"></i>
+                            </button>
+                        </form>
+                    </td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
 </div>
 
-<!-- Modal para Agregar -->
-<div class="modal fade" id="agregarModal" tabindex="-1" aria-labelledby="agregarModalLabel" aria-hidden="true">
+<!-- Modal para Agregar/Ver/Editar Diócesis -->
+<div class="modal fade" id="diocesisModal" tabindex="-1" aria-labelledby="diocesisModalLabel" aria-hidden="true">
     <div class="modal-dialog">
         <div class="modal-content">
-            <form action="{{ url_for('procesar_insertar_diocesis') }}" method="POST">
+            <form id="diocesisForm" action="" method="POST">
+                <input type="hidden" id="diocesisId" name="id">
+
                 <div class="modal-header">
-                    <h5 class="modal-title" id="agregarModalLabel">Agregar diócesis</h5>
+                    <h5 class="modal-title" id="diocesisModalLabel">Modal Title</h5>
                     <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
                 </div>
                 <div class="modal-body">
                     <div class="mb-3">
-                        <label for="nombreAgregar" class="form-label">Nombre de la diócesis</label>
-                        <input type="text" class="form-control" id="nombreAgregar" name="nombre" required>
+                        <label for="nombre" class="form-label">Nombre de la diócesis</label>
+                        <input type="text" class="form-control" id="nombre" name="nombre" required>
                     </div>
                     <div class="mb-3">
-                        <label for="id_departamento">Departamento</label>
+                        <label for="id_departamento" class="form-label">Departamento</label>
                         <select class="form-select" id="id_departamento" name="id_departamento" required>
-                            {% for depar in departamento %}
-                            <option value="{{ depar[0] }}">{{ depar[1] }}</option>
+                            {% for departamento in departamento %}
+                            <option value="{{ departamento[0] }}">{{ departamento[1] }}</option>
                             {% endfor %}
                         </select>
                     </div>
                     <div class="mb-3">
-                        <label for="id_provincia">Provincia</label>
+                        <label for="id_provincia" class="form-label">Provincia</label>
                         <select class="form-select" id="id_provincia" name="id_provincia" required>
-                            {% for provin in provincia %}
-                            <option value="{{ provin[0] }}">{{ provin[1] }}</option>
+                            {% for provincia in provincia %}
+                            <option value="{{ provincia[0] }}">{{ provincia[1] }}</option>
                             {% endfor %}
                         </select>
                     </div>
                 </div>
                 <div class="modal-footer">
-                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
-                    <button type="submit" class="btn btn-primary">Guardar</button>
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cerrar</button>
+                    <button type="submit" class="btn btn-primary" id="saveChanges">Guardar</button>
                 </div>
             </form>
         </div>
     </div>
 </div>
 
-<!-- Modal para Editar -->
-<div class="modal fade" id="editarModal" tabindex="-1" aria-labelledby="editarModalLabel" aria-hidden="true">
-    <div class="modal-dialog">
-        <div class="modal-content">
-            <form action="{{ url_for('procesar_actualizar_diocesis') }}" method="POST">
-                <input type="hidden" id="editarId" name="id">
-                <div class="modal-header">
-                    <h5 class="modal-title" id="editarModalLabel">Editar diócesis</h5>
-                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-                </div>
-                <div class="modal-body">
-                    <div class="mb-3">
-                        <label for="nombreEditar" class="form-label">Nombre de la diócesis</label>
-                        <input type="text" class="form-control" id="nombreEditar" name="nombre" required>
-                    </div>
-                    <div class="mb-3">
-                        <label for="id_departamentoEditar">Departamento</label>
-                        <select class="form-select" id="id_departamentoEditar" name="id_departamentoEditar" required>
-                            {% for depar in departamento %}
-                            <option value="{{ depar[0] }}">{{ depar[1] }}</option>
-                            {% endfor %}
-                        </select>
-                    </div>
-                    <div class="mb-3">
-                        <label for="id_provinciaEditar">Provincia</label>
-                        <select class="form-select" id="id_provinciaEditar" name="id_provinciaEditar" required>
-                            {% for provin in provincia %}
-                            <option value="{{ provin[0] }}">{{ provin[1] }}</option>
-                            {% endfor %}
-                        </select>
-                    </div>
-                </div>
-                <div class="modal-footer">
-                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
-                    <button type="submit" class="btn btn-primary">Guardar cambios</button>
-                </div>
-            </form>
-        </div>
-    </div>
-</div>
+<script src="/static/js/diocesis.js"></script>
 
-<!-- Scripts para manejar el modal de Editar -->
-<script>
-    function abrirModalEditar(id, nombre, id_departamento, id_provincia) {
-        document.getElementById("editarId").value = id;
-        document.getElementById("nombreEditar").value = nombre;
-        document.getElementById("id_departamentoEditar").value = id_departamento;
-        document.getElementById("id_provinciaEditar").value = id_provincia;
-        var editarModal = new bootstrap.Modal(document.getElementById('editarModal'));
-        editarModal.show();
-    }
+<script type="text/javascript">
+    const urlInsertarDiocesis = "{{ url_for('procesar_insertar_diocesis') }}";
+    const urlActualizarDiocesis = "{{ url_for('procesar_actualizar_diocesis') }}";
 </script>
 
 {% endblock %}

@@ -1,3 +1,21 @@
+$(document).ready(function () {
+    // Inicializar DataTable
+    var table = $('#sedeTable').DataTable({
+        pageLength: 8,
+        dom: '<"d-flex justify-content-between align-items-center mb-3"<"d-flex"f><"d-flex justify-content-end button-section">>rt<"bottom"p>',  // Utilizar "justify-content-end" para alinear a la derecha
+        language: {
+            search: "Buscar:"  // Cambiar el texto de "Search" a "Buscar"
+        },
+        //dom: '<"d-flex justify-content-between align-items-center mb-3"<"d-flex"l<"d-flex justify-content-between align-items-center"f<"ml-3 button-section">>>rt<"bottom"p>',
+        initComplete: function () {
+            // Insertar el botón "Agregar sede" dentro del div y alinearlo a la derecha
+            $("div.button-section").html('<button type="button" class="btn btn-success btn-lg custom-btn ml-3 btn-agregar-ministro" data-bs-toggle="modal" data-bs-target="#agregarModal" onclick="abir()"><i class="bi bi-building"></i> Agregar Sede </button>');
+        }
+    });
+});
+
+
+
 // Validación para Nombre de la Sede
 document.getElementById('nombre_sede').addEventListener('input', function () {
     const nombreSede = this.value.trim();  // Elimina espacios en blanco al inicio y al final
@@ -119,15 +137,21 @@ function abir() {
     document.getElementById('creacion').value = '';
     document.getElementById('telefono').value = '';
     document.getElementById('correo').value = '';
+    document.getElementById('monto').value = '';
+
+    const estadoCheckbox = document.getElementById('estado');
+    estadoCheckbox.checked = true;
+
+    document.getElementById('estado').setAttribute('disabled', true);
     document.getElementById('id_congregacion').value = '';
     document.getElementById('id_diosesis').value = '';
-    
+
     modalSede.show();
 }
 
 
 
-function abrirModalEditar(id, nombre, direccion, creacion, telefono, correo, id_congregacion, id_diosesis) {
+function abrirModalEditar(id, nombre, direccion, creacion, telefono, correo, monto, estado, id_congregacion, id_diosesis) {
     var modalSede = new bootstrap.Modal(document.getElementById('modalSede'));
 
     const modalTitle = document.getElementById('modalSedeLabel');
@@ -147,6 +171,11 @@ function abrirModalEditar(id, nombre, direccion, creacion, telefono, correo, id_
     document.getElementById('creacion').value = creacion;
     document.getElementById('telefono').value = telefono;
     document.getElementById('correo').value = correo;
+    document.getElementById('monto').value = monto;
+
+    const estadoCheckbox = document.getElementById('estado');
+    estadoCheckbox.checked = (estado === true || estado === 'true' || estado === '1');
+
 
     let selectCongregacion = document.getElementById('id_congregacion');
     let selectDiosesis = document.getElementById('id_diosesis');
@@ -163,6 +192,7 @@ function abrirModalEditar(id, nombre, direccion, creacion, telefono, correo, id_
     modalSede.show();
 }
 
+
 // Función auxiliar para seleccionar la opción correcta en los select
 function seleccionarOpcionPorTexto(selectElement, texto) {
     for (let i = 0; i < selectElement.options.length; i++) {
@@ -172,3 +202,111 @@ function seleccionarOpcionPorTexto(selectElement, texto) {
         }
     }
 }
+
+
+function abrirModalVer(id, nombre, direccion, creacion, telefono, correo, monto,estado, id_congregacion, id_diosesis) {
+    var modalSede = new bootstrap.Modal(document.getElementById('modalSede'));
+
+    const modalTitle = document.getElementById('modalSedeLabel');
+    const submitBtn = document.getElementById('submitBtn'); // Botón de submit
+    
+    modalTitle.textContent = 'Ver Sede';
+    submitBtn.style.display = 'none'; // Ocultar el botón de Guardar
+
+    // Llenar los campos con los datos existentes
+    document.getElementById('sedeId').value = id;
+    document.getElementById('nombre_sede').value = nombre;
+    document.getElementById('direccion').value = direccion;
+    document.getElementById('creacion').value = creacion;
+    document.getElementById('telefono').value = telefono;
+    document.getElementById('correo').value = correo;
+    document.getElementById('monto').value = monto;
+
+    const estadoCheckbox = document.getElementById('estado');
+    estadoCheckbox.checked = (estado === true || estado === 'true' || estado === '1');
+
+    let selectCongregacion = document.getElementById('id_congregacion');
+    let selectDiosesis = document.getElementById('id_diosesis');
+
+    // Asignar la congregación y la diócesis basándose en el nombre (texto) mostrado en las opciones
+    if (selectCongregacion) {
+        seleccionarOpcionPorTexto(selectCongregacion, id_congregacion);
+    }
+
+    if (selectDiosesis) {
+        seleccionarOpcionPorTexto(selectDiosesis, id_diosesis);
+    }
+
+    // Bloquear los campos para solo permitir ver los datos usando 'disabled' para el estilo gris
+    document.getElementById('nombre_sede').setAttribute('disabled', true);
+    document.getElementById('direccion').setAttribute('disabled', true);
+    document.getElementById('creacion').setAttribute('disabled', true);
+    document.getElementById('telefono').setAttribute('disabled', true);
+    document.getElementById('correo').setAttribute('disabled', true);
+    document.getElementById('monto').setAttribute('disabled', true);
+    document.getElementById('estado').setAttribute('disabled', true);
+
+    // Bloquear los selects
+    selectCongregacion.setAttribute('disabled', true);
+    selectDiosesis.setAttribute('disabled', true);
+
+    // Al cerrar el modal, restablecer los campos
+    document.getElementById('modalSede').addEventListener('hidden.bs.modal', function () {
+        // Eliminar el atributo 'disabled' de los campos
+        document.getElementById('nombre_sede').removeAttribute('disabled');
+        document.getElementById('direccion').removeAttribute('disabled');
+        document.getElementById('creacion').removeAttribute('disabled');
+        document.getElementById('telefono').removeAttribute('disabled');
+        document.getElementById('correo').removeAttribute('disabled');
+        document.getElementById('monto').removeAttribute('disabled');
+        document.getElementById('estado').removeAttribute('disabled');
+        selectCongregacion.removeAttribute('disabled');
+        selectDiosesis.removeAttribute('disabled');
+
+        // Volver a mostrar el botón de Guardar si es necesario en otros contextos
+        submitBtn.style.display = 'block'; 
+    });
+
+    // Mostrar el modal
+    modalSede.show();
+}
+
+// function darBajaSede(id,estado) {
+    
+//     const formSede = document.getElementById('formSede'); 
+
+//     formSede.setAttribute('action', darBajaSedeURL);
+
+//     document.getElementById('sedeId').value = id;
+//     const estadoCheckbox = document.getElementById('estado');
+//     estadoCheckbox.checked = (estado === false || estado === 'false' || estado === '0');
+    
+//     alert('Estado de la sede cambiado exitosamente a Inactivo');
+
+//     formSede.submit();
+// }
+
+function darBajaSede(id, estado) {
+    // Comprobar si la sede ya está inactiva
+    if (estado === false || estado === 'false' || estado === '0') {
+        alert('La sede ya está dada de baja.');
+        return; // Salir de la función
+    }
+
+    const formSede = document.getElementById('formSede'); 
+
+    formSede.setAttribute('action', darBajaSedeURL);
+
+    document.getElementById('sedeId').value = id;
+    const estadoCheckbox = document.getElementById('estado');
+    estadoCheckbox.checked = true; // Marcamos como inactivo
+
+    alert('Estado de la sede cambiado exitosamente a Inactivo');
+
+    formSede.submit();
+}
+
+
+
+
+

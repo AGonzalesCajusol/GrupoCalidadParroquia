@@ -5,62 +5,68 @@
 <div class="container mt-4">
     <h1 class="titulo-gestion">Gestión de Tipos de Recaudación</h1>
 
-    <div>
-        <!-- DataTable para la gestión de tipos de recaudación -->
-        <table id="tiposRecaudacionTable" class="table table-hover table-striped">
-            <thead>
+    <table id="tipoRecaudacionTable" class="table table-hover table-striped">
+        <thead class="table-light">
+            <tr class="text-center">
                 <th style="vertical-align: middle; text-align: center;">ID</th>
                 <th style="vertical-align: middle; text-align: center;">Nombre de Recaudación</th>
                 <th style="vertical-align: middle; text-align: center;">Tipo</th>
+                <th style="vertical-align: middle; text-align: center;">Estado</th>
                 <th style="vertical-align: middle; text-align: center; width: 200px;">Acciones</th>
-            </thead>
-            <tbody>
-                {% for tipo in tipos_recaudacion %}
-                <tr>
-                    <td class="text-center">{{ tipo[0] }}</td> <!-- ID del tipo de recaudación -->
-                    <td>{{ tipo[1] }}</td> <!-- Nombre del tipo de recaudación -->
-                    <td>{{ 'Monetario' if tipo[2] == '1' else 'No Monetario' }}</td> <!-- Tipo: 1 para Monetario, 0 para No Monetario -->
-                    <td class="text-center">
-                        <!-- Botón para ver detalles -->
-                        <button class="btn btn-primary btn-sm" title="Ver"
-                            onclick="openModal('view', '{{ tipo[0] }}', '{{ tipo[1] }}', '{{ tipo[2] }}')">
-                            <i class="fas fa-eye"></i>
-                        </button>
+            </tr>
+        </thead>
+        <tbody>
+            {% for tipo in tipos_recaudacion %}
+            <tr>
+                <td class="text-center border">{{ tipo[0] }}</td> <!-- ID del tipo de recaudación -->
+                <td>{{ tipo[1] }}</td> <!-- Nombre del tipo de recaudación -->
+                <td>{{ 'Monetario' if tipo[2] == 1 else 'No Monetario' }}</td> <!-- Tipo -->
+                <td>{{ 'Activo' if tipo[3] == 1 else 'Inactivo' }}</td> <!-- Estado -->
+                <td class="text-center border">
+                    <button class="btn btn-primary btn-sm" title="Ver"
+                        onclick="abrirModalVer('{{ tipo[0] }}', '{{ tipo[1] }}', '{{ tipo[2] }}', '{{ tipo[3] }}')">
+                        <i class="fas fa-eye"></i>
+                    </button>
 
-                        <!-- Botón para editar -->
-                        <button class="btn btn-warning btn-sm" title="Editar"
-                            onclick="openModal('edit', '{{ tipo[0] }}', '{{ tipo[1] }}', '{{ tipo[2] }}')">
-                            <i class="fas fa-edit"></i>
-                        </button>
+                    <button class="btn btn-warning btn-sm" title="Editar"
+                        onclick="abrirModalEditar('{{ tipo[0] }}', '{{ tipo[1] }}', '{{ tipo[2] }}', '{{ tipo[3] }}')">
+                        <i class="fas fa-edit"></i>
+                    </button>
 
-                        <!-- Botón para eliminar -->
-                        <button type="button" class="btn btn-danger btn-sm" title="Eliminar"
-                            onclick="eliminarTipoRecaudacion('{{ tipo[0] }}')">
+                    <button type="button" class="btn btn-secondary btn-sm" title="Dar de baja"
+                            onclick="darBajaTipoRecaudacion('{{ tipo[0] }}')">
+                        <i class="fas fa-ban"></i> <!-- Ícono de FontAwesome -->
+                    </button>
+
+                    <form action="{{ url_for('procesar_eliminar_tipo_recaudacion') }}" method="POST" style="display:inline-block;"
+                        title="Eliminar">
+                        <input type="hidden" name="id" value="{{ tipo[0] }}">
+                        <button type="submit" class="btn btn-danger btn-sm"
+                            onclick="return confirm('¿Estás seguro de que deseas eliminar este tipo de recaudación?');">
                             <i class="fas fa-trash-alt"></i>
                         </button>
-                    </td>
-                </tr>
-                {% endfor %}
-            </tbody>
-        </table>
-    </div>
+                    </form>
+                </td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
 </div>
 
-<!-- Modal para Agregar/Ver/Editar Tipo de Recaudación -->
-<div class="modal fade" id="tipoRecaudacionModal" tabindex="-1" aria-labelledby="tipoRecaudacionModalLabel" aria-hidden="true">
+<!-- Modal para Agregar o Editar -->
+<div class="modal fade" id="modalRecaudacion" tabindex="-1" aria-labelledby="modalRecaudacionLabel" aria-hidden="true">
     <div class="modal-dialog">
         <div class="modal-content">
-            <form id="tipoRecaudacionForm" action="" method="POST">
+            <form id="formRecaudacion" action="{{ url_for('procesar_insertar_tipo_recaudacion') }}" method="POST">
                 <input type="hidden" id="tipoRecaudacionId" name="id">
-
                 <div class="modal-header">
-                    <h5 class="modal-title" id="tipoRecaudacionModalLabel">Modal Title</h5>
+                    <h5 class="modal-title" id="modalRecaudacionLabel">Agregar Tipo de Recaudación</h5>
                     <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
                 </div>
                 <div class="modal-body">
                     <div class="mb-3">
-                        <label for="nombre" class="form-label">Nombre del Tipo de Recaudación</label>
-                        <input type="text" class="form-control" id="nombre" name="nombre_recaudacion" required>
+                        <label for="nombre_recaudacion" class="form-label">Nombre de la Recaudación</label>
+                        <input type="text" class="form-control" id="nombre_recaudacion" name="nombre_recaudacion" required>
                     </div>
                     <div class="mb-3">
                         <label for="tipo" class="form-label">Tipo</label>
@@ -69,10 +75,15 @@
                             <option value="0">No Monetario</option>
                         </select>
                     </div>
+                    <div class="mb-3">
+                        <label for="estado" class="form-label">Estado</label>
+                        <input type="checkbox" class="form-check-input" id="estado" name="estado">
+                        <label class="form-check-label" for="estado">Activo</label>
+                    </div>
                 </div>
                 <div class="modal-footer">
                     <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cerrar</button>
-                    <button type="submit" class="btn btn-primary" id="saveChanges">Guardar</button>
+                    <button type="submit" class="btn btn-primary" id="submitBtn"></button>
                 </div>
             </form>
         </div>
@@ -81,9 +92,11 @@
 
 <script src="/static/js/tipo_recaudaciones.js"></script>
 
-<script type="text/javascript">
-    const urlInsertarTipoRecaudacion = "{{ url_for('procesar_insertar_tipo_recaudacion') }}";
-    const urlActualizarTipoRecaudacion = "{{ url_for('procesar_actualizar_tipo_recaudacion') }}";
+<script>
+    // Definir las URLs de acción generadas por Flask
+    const insertarTipoRecaudacionURL = "{{ url_for('procesar_insertar_tipo_recaudacion') }}";
+    const actualizarTipoRecaudacionURL = "{{ url_for('procesar_actualizar_tipo_recaudacion') }}";
+    const darBajaTipoRecaudacionURL = "{{ url_for('procesar_dar_baja_tipo_recaudacion') }}";
 </script>
 
 {% endblock %}

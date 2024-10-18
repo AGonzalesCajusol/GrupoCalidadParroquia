@@ -1,0 +1,211 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-QWTKZyjpPEjISv5WaRU9OFeRpok6YctnYmDr5pNlyT2bRjXh0JMhjY6hW+ALEwIH" crossorigin="anonymous">
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js" integrity="sha384-YvpcrYf0tY3lHB60NNkmXc5s9fDVZLESaAA55NDzOxhy9GkcIdslK1eN7N6jIeHz" crossorigin="anonymous"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/animate.css/4.1.1/animate.min.css">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
+    <link rel="stylesheet" href="/static/css/principal_feligres.css">
+</head>
+
+<body>
+    <header class="navbar navbar-expand-lg  shadow-sm w-100 position-fixed">
+        <div class="container-fluid">
+            <a class="navbar-brand me-2" href="#">
+                <img src="/static/img/celebracion.avif" alt="Logo Iglesia" width="40" height="40" class="d-inline-block align-text-top">
+                <a class="nav-link" href="#">Iglesia vianney</a>
+            </a>
+            <div class="collapse navbar-collapse justify-content-end ms-4" id="navbarNav">
+                <ul class="navbar-nav me-auto mb-2 mb-lg-0">
+                    <li class="nav-item">
+                        <a class="nav-link" href="#">Calendario</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="#">Registros</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="#">Eventos</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="#">Configuración</a>
+                    </li>
+                </ul>
+                <div class="d-flex align-items-center mt-1">
+                    <a onclick="finalizar_sesion()"  class="text-decoration-none text-black btn"><span class="me-3"><i class="bi bi-door-closed-fill"></i><strong> Salir</strong></span></a>
+                    <button type="button" class="btn btn-link position-relative text-black me-4" >
+                        <i class="bi bi-bell"></i>
+                            <span class="position-absolute top-0 start-100 translate-middle badge rounded-pill bg-danger">
+                            3 <span class="visually-hidden">nuevas notificaciones</span>
+                        </span>
+                    </button>
+                    <span class="me-3">Bienvenido, <strong>{{ usuario if usuario else '' }}</strong></span>
+ 
+                </div>
+            </div>
+        </div>
+    </header>
+    <div class="continue_footer" id="box_image">
+        <div class="text-white p-2" id="inicial">
+            <span class="ms-4 me-4 ">"Dios dispone todas las cosas para el bien de quienes lo aman"</span>
+            <br>
+            <span>Romanos 8:28</span>
+        </div>
+    </div>
+    <div class="mt-3 animate__animated animate__bounce" id="central">
+        Historia de la diosesís de Chiclayo
+    </div>
+    <div class="clearfix mb-4 wrapper ">
+        <img src="/static/img/iglesia1.jpg" alt="Diócesis de Chiclayo" class="img-fluid float-start me-3 mb-3">
+        <p>
+            Cuando fue creada la Diócesis, el 17 de diciembre de 1956, por Su Santidad Pío XII con la bula <em>Sicut materfamilias</em>, “la ciudad de Chiclayo tenía entonces 96,000 habitantes, con cuatro Parroquias en la ciudad: Santa María (La Matriz), La Verónica, San Vicente y el Señor de los Milagros”. Su territorio comprendía las tres provincias políticas del departamento de Lambayeque, más tres provincias cajamarquinas: Santa Cruz, Chota y Cutervo. Años más tarde, el 7 de abril de 1965, las provincias de Chota y Cutervo fueron desmembradas para erigir una Prelatura territorial encomendada a los Padres Agustinos Recoletos.
+            <br><br>
+            Su primer Obispo fue Mons. Daniel Figueroa Villón (1956-1967). Seis años antes había sido nombrado Obispo auxiliar Mons. Luis Sánchez Moreno-Lira, quien a la muerte de Mons. Daniel, estuvo como Administrador Apostólico durante un año, hasta que tomó posesión de la Diócesis el segundo Obispo, el 18 de mayo de 1968, Mons. Ignacio María de Orbegozo y Goicoechea (1968-1998). En 1997, fue nombrado Obispo Coadjutor Mons. Jesús Moliné Labarta, quien asumió como Obispo de Chiclayo el 4 de mayo de 1998, ejerciendo hasta el 3 de noviembre de 2014, cuando fue nombrado el cuarto Obispo Mons. Robert Francis Prevost Martínez O.S.A. La labor apostólica en Chiclayo de Mons. Robert Prevost terminó el 10 de abril de 2023, cuando fue nombrado como Prefecto del Dicasterio para los Obispos. A su salida, Mons. Guillermo Antonio Cornejo Monzón asumió como Administrador Apostólico de la Diócesis de Chiclayo, desde el 11 de abril de 2023 hasta el 15 de marzo del 2024. El 14 de febrero fue nombrado el quinto Obispo de Chiclayo, Mons. Edinson Edgardo Farfán Córdova, O.S.A., quien tomó posesión de la Diócesis el 16 de marzo de 2024.
+            <br><br>
+            Nuestra Iglesia Particular de Chiclayo tiene cincuenta Parroquias y dos sectores pastorales, distribuidas en cinco zonas pastorales (arciprestazgos): Zona Centro-Este, Oeste, Norte, Litoral y Este-Sierra. Los dos sectores pastorales se encuentran en la sierra de Ferreñafe, atendidos por religiosas de la Congregación “Jesús Verbo y Víctima”. En la Diócesis de Chiclayo trabajan 122 sacerdotes, de los cuales 107 son diocesanos y 15 religiosos.
+        </p>
+    </div>
+    <div class="mt-3 animate__animated animate__bounce" id="central">
+        Referentes
+    </div>
+    <div class="row boxes mt-4  animate__animated  animate__backInRight" >
+        <div class="col-3 ms-5" >
+            <div class="card card-i">
+
+            </div>
+            <div class="card-text">
+                Monseñor xxxxxxczxczcx
+            </div>
+        </div>
+        <div class="col-3" >
+            <div class="card card-i" >
+
+            </div>
+        </div>
+        <div class="col-3" >
+            <div class="card card-i" >
+  
+            </div>
+        </div>
+        <div class="col-2" >
+            <div class="card card-i">
+   
+            </div>
+        </div>
+    </div>
+    <div class="mt-3 animate__animated animate__bounce" id="central">
+        Galería
+    </div>
+
+    <div class="row boxes mt-4  animate__animated  animate__backInRight" >
+        <div class="col-3 ms-5" >
+            <div class="card" id="b1">
+                <div class="m-auto">
+                        
+                </div>
+            </div>
+        </div>
+        <div class="col-3" >
+            <div class="card" id="b2">
+                <div class="m-auto">
+
+                </div>
+            </div>
+        </div>
+        <div class="col-3" >
+            <div class="card" id="b3">
+                <div class="m-auto">
+
+                </div>
+            </div>
+        </div>
+        <div class="col-2" >
+            <div class="card" id="b4">
+                <div class="m-auto">
+
+                </div>
+            </div>
+        </div>
+
+        <div class="col-3 ms-5 mt-5" >
+            <div class="card" id="b1">
+                <div class="m-auto">
+                        
+                </div>
+            </div>
+        </div>
+        <div class="col-3 mt-5" >
+            <div class="card" id="b2">
+                <div class="m-auto">
+
+                </div>
+            </div>
+        </div>
+        <div class="col-3 mt-5" >
+            <div class="card" id="b3">
+                <div class="m-auto">
+
+                </div>
+            </div>
+        </div>
+        <div class="col-2 mt-5" >
+            <div class="card" id="b4">
+                <div class="m-auto">
+
+                </div>
+            </div>
+        </div>
+        
+    </div>
+
+    <footer class="parroquia-footer bg-dark text-white pt-4 mt-5">
+        <div class="container">
+            <div class="row">
+                <!-- Información de la Parroquia -->
+                <div class="col-md-4">
+                    <h5 class="text-uppercase">Parroquia de San José</h5>
+                    <p>
+                        Ubicada en el corazón de la ciudad, nuestra parroquia está al servicio de la comunidad. Únete a nuestras celebraciones y actividades.
+                    </p>
+                </div>
+    
+                <!-- Enlaces Rápidos -->
+                <div class="col-md-4">
+                    <h5 class="text-uppercase">Enlaces Rápidos</h5>
+                    <ul class="list-unstyled">
+                        <li><a href="#" class="text-white">Inicio</a></li>
+                        <li><a href="#" class="text-white">Misiones</a></li>
+                        <li><a href="#" class="text-white">Horarios de Misa</a></li>
+                        <li><a href="#" class="text-white">Contacto</a></li>
+                    </ul>
+                </div>
+    
+                <!-- Redes Sociales -->
+                <div class="col-md-4">
+                    <h5 class="text-uppercase">Síguenos en</h5>
+                    <a href="https://www.facebook.com" class="text-white me-3" target="_blank">
+                        <i class="fab fa-facebook fa-2x"></i>
+                    </a>
+                    <a href="https://www.twitter.com" class="text-white me-3" target="_blank">
+                        <i class="fab fa-twitter fa-2x"></i>
+                    </a>
+                    <a href="https://www.instagram.com" class="text-white" target="_blank">
+                        <i class="fab fa-instagram fa-2x"></i>
+                    </a>
+                </div>
+            </div>
+    
+            <!-- Derechos Reservados -->
+            <div class="row mt-4">
+                <div class="col-12 text-center">
+                    <p class="mb-0">&copy; 2024 Parroquia de San José. Todos los derechos reservados.</p>
+                </div>
+            </div>
+        </div>
+    </footer>
+    
+</body>
+</html>
+<script src="/static/js/sesion.js"></script>

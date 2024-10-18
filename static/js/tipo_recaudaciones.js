@@ -1,121 +1,132 @@
 $(document).ready(function () {
     // Inicializar DataTable
-    var table = $('#tiposRecaudacionTable').DataTable({
+    var table = $('#tipoRecaudacionTable').DataTable({
         pageLength: 8,
-        dom: '<"d-flex justify-content-between align-items-center mb-3"<"d-flex"f><"d-flex justify-content-end button-section">>rt<"bottom"p>',  // Utilizar "justify-content-end" para alinear a la derecha
+        dom: '<"d-flex justify-content-between align-items-center mb-3"<"d-flex"f><"d-flex justify-content-end button-section">>rt<"bottom"p>',
         language: {
-            search: "Buscar:"  // Cambiar el texto de "Search" a "Buscar"
+            search: "Buscar:"
         },
         initComplete: function () {
             // Insertar el botón "Agregar tipo de recaudación" dentro del div y alinearlo a la derecha
-            $("div.button-section").html('<button type="button" class="btn btn-success btn-lg custom-btn ml-3 btn-agregar-tipo" data-bs-toggle="modal" onclick="openModal(\'add\')"><i class="bi bi-person-plus"></i> Agregar Tipo de Recaudación</button>');
+            $("div.button-section").html('<button type="button" class="btn btn-success btn-lg custom-btn ml-3 btn-agregar-tipo" data-bs-toggle="modal" data-bs-target="#agregarModal" onclick="abrirModalAgregar()"><i class="bi bi-plus-circle"></i> Agregar Tipo de Recaudación </button>');
         }
     });
 });
 
-// Función para abrir el modal para agregar, ver o editar un tipo de recaudación
-function openModal(type, id = null, nombre = '', tipo = '') {
-    var modalTitle = '';
-    var formAction = '';
-    var isReadOnly = false;
-
-    if (type === 'add') {
-        modalTitle = 'Agregar Tipo de Recaudación';
-        formAction = urlInsertarTipoRecaudacion;  // URL global para insertar tipo de recaudación
-        isReadOnly = false;
-        limpiarModal();  // Limpiar campos al abrir el modal para agregar
-        document.getElementById('saveChanges').style.display = 'block';
-    } else if (type === 'edit') {
-        modalTitle = 'Editar Tipo de Recaudación';
-        formAction = urlActualizarTipoRecaudacion;  // URL global para actualizar tipo de recaudación
-        isReadOnly = false;
-        document.getElementById('saveChanges').style.display = 'block';
-
-        // Asignar valores al modal
-        document.getElementById('tipoRecaudacionId').value = id;
-        document.getElementById('nombre').value = nombre;
-        document.getElementById('tipo').value = tipo;
-
-    } else if (type === 'view') {
-        modalTitle = 'Ver Tipo de Recaudación';
-        formAction = '';
-        isReadOnly = true;
-        document.getElementById('saveChanges').style.display = 'none'; 
-
-        // Asignar valores al modal
-        document.getElementById('tipoRecaudacionId').value = id;
-        document.getElementById('nombre').value = nombre;
-        document.getElementById('tipo').value = tipo;
+// Validación para Nombre de Recaudación
+document.getElementById('nombre_recaudacion').addEventListener('input', function () {
+    const nombreRecaudacion = this.value.trim();
+    if (nombreRecaudacion === '') {
+        this.setCustomValidity('El nombre de la recaudación no puede estar vacío ni contener solo espacios en blanco.');
+    } else {
+        this.setCustomValidity('');
     }
+});
 
-    // Configuración del modal
-    document.getElementById('tipoRecaudacionModalLabel').innerText = modalTitle;
-    document.getElementById('tipoRecaudacionForm').action = formAction;
+// Abrir el modal para agregar un nuevo tipo de recaudación
+function abrirModalAgregar() {
+    var modalRecaudacion = new bootstrap.Modal(document.getElementById('modalRecaudacion'));
 
-    // Hacer los campos de solo lectura si es el modo "Ver"
-    document.querySelectorAll('#tipoRecaudacionForm input, #tipoRecaudacionForm select').forEach(function (input) {
-        input.readOnly = isReadOnly;
-        input.disabled = isReadOnly;
-    });
+    const modalTitle = document.getElementById('modalRecaudacionLabel');
+    const submitBtn = document.getElementById('submitBtn');
+    const formRecaudacion = document.getElementById('formRecaudacion');
 
-    // Inicializar y mostrar el modal
-    var tipoRecaudacionModal = new bootstrap.Modal(document.getElementById('tipoRecaudacionModal'));
-    tipoRecaudacionModal.show();
+    modalTitle.textContent = 'Agregar Tipo de Recaudación';
+    submitBtn.textContent = 'Guardar';
 
-    // Manejo del envío del formulario
-    document.getElementById('tipoRecaudacionForm').onsubmit = function (event) {
-        event.preventDefault();  // Prevenir el envío del formulario tradicional
+    // Cambiar el action del formulario para que apunte a la ruta de inserción
+    formRecaudacion.setAttribute('action', insertarTipoRecaudacionURL);
 
-        let formData = new FormData(this);  // Recoger los datos del formulario
-
-        fetch(formAction, {
-            method: 'POST',
-            body: formData
-        })
-            .then(response => response.json())
-            .then(data => {
-                if (data.success) {
-                    alert(type === 'edit' ? 'Tipo de recaudación actualizado exitosamente' : 'Tipo de recaudación agregado exitosamente');
-                    if (type === 'add') {
-                        // Agregar el nuevo tipo de recaudación a la tabla
-                        agregarTipoRecaudacionATabla(data.tipo_recaudacion);  // Se asume que el servidor devuelve el nuevo tipo agregado
-                        limpiarModal();  // Limpiar los campos del modal para una nueva inserción
-                    } else {
-                        location.reload();  // Recargar la página para reflejar los cambios si se está editando
-                    }
-                } else {
-                    alert('Error al procesar el tipo de recaudación');
-                }
-            })
-            .catch(error => console.error('Error:', error));
-    };
-}
-// Función para eliminar un tipo de recaudación
-function eliminarTipoRecaudacion(id) {
-    if (confirm('¿Estás seguro de que deseas eliminar este tipo de recaudación?')) {
-        fetch('/eliminar_tipo_recaudacion', {
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/json'
-            },
-            body: JSON.stringify({ id: id })  // Enviar el ID del tipo de recaudación que se va a eliminar
-        })
-        .then(response => response.json())
-        .then(data => {
-            if (data.success) {
-                alert('Tipo de recaudación eliminado exitosamente');
-                location.reload();  // Recargar la página para reflejar los cambios
-            } else {
-                alert('Error al eliminar tipo de recaudación: ' + data.message);
-            }
-        })
-        .catch(error => console.error('Error:', error));
-    }
-}
-
-// Función para limpiar los campos del modal
-function limpiarModal() {
+    // Limpiar campos del modal
     document.getElementById('tipoRecaudacionId').value = '';
-    document.getElementById('nombre').value = '';
-    document.getElementById('tipo').value = '';
+    document.getElementById('nombre_recaudacion').value = '';
+    document.getElementById('tipo').value = '1';
+    document.getElementById('estado').checked = true;
+
+    document.getElementById('estado').setAttribute('disabled', true);
+
+    modalRecaudacion.show();
 }
+
+// Abrir el modal para editar un tipo de recaudación
+function abrirModalEditar(id, nombre, tipo, estado) {
+    var modalRecaudacion = new bootstrap.Modal(document.getElementById('modalRecaudacion'));
+
+    const modalTitle = document.getElementById('modalRecaudacionLabel');
+    const submitBtn = document.getElementById('submitBtn');
+    const formRecaudacion = document.getElementById('formRecaudacion');
+
+    modalTitle.textContent = 'Editar Tipo de Recaudación';
+    submitBtn.textContent = 'Guardar cambios';
+
+    // Cambiar el action del formulario para que apunte a la ruta de actualización
+    formRecaudacion.setAttribute('action', actualizarTipoRecaudacionURL);
+
+    // Llenar los campos con los datos existentes
+    document.getElementById('tipoRecaudacionId').value = id;
+    document.getElementById('nombre_recaudacion').value = nombre;
+    document.getElementById('tipo').value = tipo;
+
+    const estadoCheckbox = document.getElementById('estado');
+    estadoCheckbox.checked = (estado === true || estado === 'true' || estado === '1');
+
+    modalRecaudacion.show();
+}
+
+// Abrir el modal para ver los detalles de un tipo de recaudación
+function abrirModalVer(id, nombre, tipo, estado) {
+    var modalRecaudacion = new bootstrap.Modal(document.getElementById('modalRecaudacion'));
+
+    const modalTitle = document.getElementById('modalRecaudacionLabel');
+    const submitBtn = document.getElementById('submitBtn');
+
+    modalTitle.textContent = 'Ver Tipo de Recaudación';
+    submitBtn.style.display = 'none'; // Ocultar el botón de Guardar
+
+    // Llenar los campos con los datos existentes
+    document.getElementById('tipoRecaudacionId').value = id;
+    document.getElementById('nombre_recaudacion').value = nombre;
+    document.getElementById('tipo').value = tipo;
+
+    const estadoCheckbox = document.getElementById('estado');
+    estadoCheckbox.checked = (estado === true || estado === 'true' || estado === '1');
+
+    // Deshabilitar los campos
+    document.getElementById('nombre_recaudacion').setAttribute('disabled', true);
+    document.getElementById('tipo').setAttribute('disabled', true);
+    document.getElementById('estado').setAttribute('disabled', true);
+
+    // Mostrar el modal
+    modalRecaudacion.show();
+
+    // Al cerrar el modal, restablecer los campos
+    document.getElementById('modalRecaudacion').addEventListener('hidden.bs.modal', function () {
+        document.getElementById('nombre_recaudacion').removeAttribute('disabled');
+        document.getElementById('tipo').removeAttribute('disabled');
+        document.getElementById('estado').removeAttribute('disabled');
+
+        // Mostrar el botón de Guardar si es necesario en otros contextos
+        submitBtn.style.display = 'block';
+    });
+}
+
+// Función para dar de baja un tipo de recaudación
+function darBajaTipoRecaudacion(id, estado) {
+    if (estado === false || estado === 'false' || estado === '0') {
+        alert('El tipo de recaudación ya está dado de baja.');
+        return;
+    }
+
+    const formRecaudacion = document.getElementById('formRecaudacion');
+
+    formRecaudacion.setAttribute('action', darBajaTipoRecaudacionURL);
+
+    document.getElementById('tipoRecaudacionId').value = id;
+    const estadoCheckbox = document.getElementById('estado');
+    estadoCheckbox.checked = true; // Cambiamos a inactivo
+
+    alert('El estado del tipo de recaudación ha sido cambiado exitosamente a Inactivo');
+
+    formRecaudacion.submit();
+}
+

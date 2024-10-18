@@ -1,0 +1,72 @@
+{% extends "inicio_sesion.html"  %}
+{% block titulo %} Crear cuenta {% endblock %}
+{% block principal %}
+<h2 class="text-center">Crear cuenta</h2>
+<form action="/registrar_feligresweb" method="POST" id="formulario-11">
+    <div class="mb-1">
+        <label for="dni11" class="form-label">DNI</label>
+        <input type="number" class="form-control" id="dni11" name="dni11" placeholder="Ingrese su DNI" required>
+    </div>
+
+    <div class="mb-1">
+        <label for="apellidos11" class="form-label">Apellidos</label>
+        <input type="text" class="form-control" id="apellidos11" name="apellidos11" placeholder="Ingrese sus apellidos" required>
+    </div>
+
+    <div class="mb-1">
+        <label for="nombres11" class="form-label">Nombres</label>
+        <input type="text" class="form-control" id="nombres11" name="nombres11" placeholder="Ingrese sus nombres" required>
+    </div>
+
+    <div class="mb-1">
+        <label for="fecha_nacimiento11" class="form-label">Fecha de Nacimiento</label>
+        <input type="date" class="form-control" id="fecha_nacimiento11" name="fecha_nacimiento11" required>
+    </div>
+
+    <div class="mb-1">
+        <label for="estado_civil11" class="form-label">Estado Civil</label>
+        <select class="form-select" id="estado_civil11" name="estado_civil11" required>
+            <option value="">Seleccione su estado civil</option>
+            <option value="soltero">Soltero</option>
+            <option value="casado">Casado</option>
+            <option value="viudo">Viudo</option>
+        </select>
+    </div>
+
+    <div class="mb-1">
+        <label for="sexo11" class="form-label">Sexo</label>
+        <select class="form-select" id="sexo11" name="sexo11" required>
+            <option value="">Seleccione su sexo</option>
+            <option value="masculino">Masculino</option>
+            <option value="femenino">Femenino</option>
+        </select>
+    </div>
+
+    <div>
+        <label for="password11" class="form-label">Contraseña</label>
+        <div class="mb-2 align-items-center">
+            <input type="password" class="form-control d-inline me-2" id="password11" name="contraseña11" placeholder="Ingrese su contraseña" required>
+            <button type="button" class="btn btn-primary" onclick="ver_contraseña()">
+                <i class="bi bi-eye-fill" id="boton_ver"></i>
+            </button>
+        </div>
+        <div id="passwordError" class="text-danger" style="display:none;"></div> <!-- Mensaje de error -->
+    </div>
+    
+    <div class="mb-2">
+        <label for="sede11" class="form-label">Sede</label>
+        <select class="form-select" id="sede11" name="sede11" >
+            <option value="0">Seleccione su sede</option>
+            {% for sede in sedes %}
+                <option value="{{ sede[0] }}">{{ sede[1] }}</option>
+            {% endfor %}
+        </select>
+    </div>
+
+    <div class="d-grid mb-2">
+        <button type="submit" class="btn btn-primary">Crear Cuenta</button>
+    </div>
+</form>
+
+<script src="/static/js/inicio_sesionfeligres.js"></script>
+{% endblock %}

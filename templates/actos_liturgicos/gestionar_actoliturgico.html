@@ -1,15 +1,11 @@
 {% extends "index.html" %}
-{% block title %}Gestión de Ministro{% endblock %}
+{% block title %}Gestión de acto liturgico{% endblock %}
 {% block cuerpo %}
 
 <div class="container mt-4">
     <h2 class="titulo-gestion">Gestión de Acto litúrgico</h2>
-    <!-- Botón para abrir el modal de "Agregar" con ícono -->
-    <button type="button" class="btn btn-success mb-3 fw-bold"  id="abrir" onclick=" abrir('nuevo')">
-        <i class="bi bi-person-plus"></i> Agregar acto litúrgico y requisitos
-    </button>
-    <!-- DataTable para la gestión de ministros -->
-    <table id="actosTable" class="table table-hover table-striped  text-center">
+    
+    <table id="actoliturgicotable" class="table table-hover table-striped  text-center">
         <thead>
             <tr class="">
                 <th class="text-center">ID</th>
@@ -49,17 +45,13 @@
                                 name="monto_liturgia" >
                         </div>
                         <div id="mensaje3">
-
                         </div>
-
-
                         <div class="mb-3">
                             <label for="asignar" class="form-label mt-2">Asigne los prerequisitos:</label>
-                            <div class="d-flex">
+                            <div class="d-flex" id="asignar_requisitos">
                                 <input type="text" class="form-control me-2" id="requisito" placeholder="Ingrese sus requisitos">
                                   <button  type="button" class="btn btn-primary" id="btnagg" onclick="agregar()"> 
                                   <i class="bi bi-plus-circle-fill"></i></button>
-
                             </div>
                             <div id="mensaje2">
                             </div>
