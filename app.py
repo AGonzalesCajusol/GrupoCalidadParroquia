@@ -19,17 +19,12 @@ app = Flask(__name__)
 app.secret_key = 'super-secret'
 
 
-
-
-
 # Ruta para la página de inicio de sesión
 @app.route('/')
 def raiz():
     return render_template('inicio_sesion.html')
 
-@app.route('/crearcuenta')
-def crearcuenta():
-    return render_template('crear_cuenta.html')
+
 
 #ruta_envio
 

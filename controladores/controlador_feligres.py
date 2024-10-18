@@ -1,4 +1,6 @@
 from bd import obtener_conexion
+from hashlib import sha256
+
 
 def insertar_feligres(dni, apellidos, nombres, fecha_nacimiento, estado_civil, sexo, id_sede):
     conexion = obtener_conexion()
@@ -74,5 +76,35 @@ def eliminar_feligres(id_feligres):
     except Exception as e:
         print(f"Error al eliminar feligrés: {e}")
         conexion.rollback()
+    finally:
+        conexion.close()
+
+def verificarcuentaFeligres(dni,apellidos, nombres, fecha_nacimiento, estado_civil, sexo, token,contraseña,id_sede,estado):
+    conexion = obtener_conexion()
+    try:
+        with conexion.cursor() as cursor:
+            cursor.execute("select * from feligres where dni = %s", (dni,))
+            filas = cursor.fetchone()
+
+            if filas:
+                print("Si existe ese usuario")
+            else:
+                cursor.execute("""
+                INSERT INTO Feligres (dni, apellidos, nombres, fecha_nacimiento, estado_civil, sexo, id_sede)
+                VALUES (%s, %s, %s, %s, %s, %s, %s)
+                """, (dni, apellidos, nombres, fecha_nacimiento, estado_civil, sexo, id_sede))
+                id_feligres = cursor.lastrowid()
+                
+                password = sha256(contraseña.encode('utf-8')).hexdigest()
+                
+                cursor.execute("""
+                INSERT INTO cuenta (id_feligres,estado,token,contraseña)
+                VALUES (%s, %s, %s, %s)
+                """, (id_feligres, estado, token, password))
+                print("Usuario no registrado, se registro con exito!!")
+                return 1
+
+    except Exception as e:
+        print(f"Error al eliminar feligrés: {e}")
     finally:
         conexion.close()

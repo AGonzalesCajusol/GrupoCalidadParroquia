@@ -15,6 +15,14 @@ def obtener_sede():
     conexion.close()
     return sede
 
+def obtener_sedeparacuenta():
+    conexion = obtener_conexion()
+    with conexion.cursor() as cursor:
+        cursor.execute("select id_sede, nombre_sede from sede where estado= 1;")
+        sede = cursor.fetchall()
+    conexion.close()
+    return sede
+
 def obtener_sede_por_id(id):
     conexion = obtener_conexion()
     sede = None

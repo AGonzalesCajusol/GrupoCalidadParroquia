@@ -20,7 +20,9 @@ html, body {
     align-items: center;
     overflow: hidden; /* Asegura que no haya scroll en este contenedor */
 }
-
+#password11 {
+    width: 84%;
+}
 
 #presentacion::before {
     content: "";

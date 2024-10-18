@@ -1,90 +1,117 @@
 from flask import request, redirect, url_for, render_template, flash
 from bd import obtener_conexion
+from datetime import datetime
 
-# Controlador para listar las recaudaciones
-def listar_recaudaciones():
+def insertar_recaudacion(monto, observacion, id_sede, id_tipo_recaudacion):
     conexion = obtener_conexion()
-    recaudaciones = []
     try:
         with conexion.cursor() as cursor:
-            cursor.execute('''SELECT re.id_recaudacion, se.nombre_sede, re.monto, tr.nombre_recaudacion, re.observacion, re.fecha, re.hora 
-                              FROM recaudacion AS re 
-                              LEFT JOIN sede AS se ON se.id_sede = re.id_sede 
-                              LEFT JOIN tipo_recaudacion tr ON tr.id_tipo_recaudacion = re.id_tipo_recaudacion''')
-            recaudaciones = cursor.fetchall()
+            cursor.execute("SELECT COALESCE(MAX(id_recaudacion) + 1, 1) as siguiente_id FROM recaudacion")
+            siguiente_id = cursor.fetchone()[0]
+
+            fecha_actual = datetime.now().strftime('%Y-%m-%d')
+            hora_actual = datetime.now().strftime('%H:%M:%S')
+
+            # Inserción de la nueva recaudación
+            cursor.execute("""
+                INSERT INTO recaudacion (id_recaudacion, fecha, hora, monto, observacion, id_sede, id_tipo_recaudacion) 
+                VALUES (%s, %s, %s, %s, %s, %s, %s)
+            """, (siguiente_id, fecha_actual, hora_actual, monto, observacion, id_sede, id_tipo_recaudacion))
+
+        # Confirmar la transacción
+        conexion.commit()
+        return siguiente_id  # Devuelve el ID de la nueva recaudación insertada
     except Exception as e:
-        flash(f"Error al obtener recaudaciones: {str(e)}", "danger")
+        print(f"Error al insertar recaudación: {e}")
+        conexion.rollback()  # Revertir la transacción en caso de error
+        return None
+    finally:
+        conexion.close()  # Asegurarse de cerrar la conexión
+
+def obtener_recaudaciones():
+    conexion = obtener_conexion()
+    try:
+        with conexion.cursor() as cursor:
+            cursor.execute("""
+                SELECT r.id_recaudacion, r.fecha, r.hora, r.monto, r.observacion, s.nombre_sede AS nombre_sede, tr.nombre_recaudacion AS nombre_tipo_recaudacion 
+                FROM recaudacion r
+                JOIN sede s ON r.id_sede = s.id_sede
+                JOIN tipo_recaudacion tr ON r.id_tipo_recaudacion = tr.id_tipo_recaudacion
+            """)
+            recaudaciones = cursor.fetchall()
+        return recaudaciones
+    except Exception as e:
+        print(f"Error al obtener recaudaciones: {e}")
+        return []
     finally:
         conexion.close()
-    
-    return recaudaciones
 
-
-# Controlador para agregar una nueva recaudación
-def agregar_recaudacion():
-    if request.method == 'POST':
-        id_sede = request.form['id_sede']
-        monto = request.form['monto']
-        observacion = request.form['observacion']
-        fecha = request.form['fecha']
-        hora = request.form['hora']
         
-        conexion = obtener_conexion()
-        try:
-            with conexion.cursor() as cursor:
-                cursor.execute("""
-                    INSERT INTO recaudacion (id_sede, monto, observacion, fecha, hora)
-                    VALUES (%s, %s, %s, %s, %s)
-                """, (id_sede, monto, observacion, fecha, hora))
-            conexion.commit()
-            flash('Recaudación registrada correctamente', "success")
-        except Exception as e:
-            conexion.rollback()
-            flash(f"Error al registrar recaudación: {str(e)}", "danger")
-        finally:
-            conexion.close()
+def obtener_recaudacion_por_id(id_recaudacion):
+    conexion = obtener_conexion()
+    try:
+        with conexion.cursor() as cursor:
+            cursor.execute("""
+                SELECT id_recaudacion, fecha, hora, monto, observacion, id_sede, id_tipo_recaudacion 
+                FROM recaudacion 
+                WHERE id_recaudacion = %s
+            """, (id_recaudacion,))
+            recaudacion = cursor.fetchone()
+        return recaudacion
+    except Exception as e:
+        print(f"Error al obtener recaudación por id: {e}")
+        return None
+    finally:
+        conexion.close()
 
-        return redirect(url_for('gestionar_recaudaciones'))
+def actualizar_recaudacion(monto, observacion, id_sede, id_tipo_recaudacion, id_recaudacion):
+    conexion = obtener_conexion()
+    try:
+        with conexion.cursor() as cursor:
+            cursor.execute("""
+                UPDATE recaudacion 
+                SET monto = %s, observacion = %s, id_sede = %s, id_tipo_recaudacion = %s 
+                WHERE id_recaudacion = %s
+            """, (monto, observacion, id_sede, id_tipo_recaudacion, id_recaudacion))
+        conexion.commit()
+    except Exception as e:
+        print(f"Error al actualizar recaudación: {e}")
+        conexion.rollback()
+    finally:
+        conexion.close()
 
-
-# Controlador para actualizar una recaudación existente
-def actualizar_recaudacion():
-    if request.method == 'POST':
-        id_recaudacion = request.form['id_recaudacion']
-        id_sede = request.form['id_sede']
-        monto = request.form['monto']
-        observacion = request.form['observacion']
-        fecha = request.form['fecha']
-        hora = request.form['hora']
-        
-        conexion = obtener_conexion()
-        try:
-            with conexion.cursor() as cursor:
-                cursor.execute("""
-                    UPDATE recaudacion
-                    SET id_sede = %s, monto = %s, observacion = %s, fecha = %s, hora = %s
-                    WHERE id_recaudacion = %s
-                """, (id_sede, monto, observacion, fecha, hora, id_recaudacion))
-            conexion.commit()
-            flash('Recaudación actualizada correctamente', "success")
-        except Exception as e:
-            conexion.rollback()
-            flash(f"Error al actualizar recaudación: {str(e)}", "danger")
-        finally:
-            conexion.close()
-
-        return redirect(url_for('gestionar_recaudaciones'))
-
-# Controlador para eliminar una recaudación
-def eliminar_recaudacion():
-    if request.method == 'POST':
-        id_recaudacion = request.form['id_recaudacion']
-        
-        conexion = obtener_conexion()
+def eliminar_recaudacion(id_recaudacion):
+    conexion = obtener_conexion()
+    try:
         with conexion.cursor() as cursor:
             cursor.execute("DELETE FROM recaudacion WHERE id_recaudacion = %s", (id_recaudacion,))
         conexion.commit()
+    except Exception as e:
+        print(f"Error al eliminar recaudación: {e}")
+        conexion.rollback()
+    finally:
         conexion.close()
-
-        flash('Recaudación eliminada correctamente')
-        return redirect(url_for('listar_recaudaciones'))
+def obtener_tipos_recaudacion():
+    conexion = obtener_conexion()  # Asumiendo que tienes una función para obtener la conexión
+    try:
+        with conexion.cursor() as cursor:
+            cursor.execute("SELECT id_tipo_recaudacion, nombre_recaudacion FROM tipo_recaudacion")
+            tipos_recaudacion = cursor.fetchall()
+        return tipos_recaudacion
+    except Exception as e:
+        print(f"Error al obtener tipos de recaudación: {e}")
+        return []
+    finally:
+        conexion.close()
+def obtener_id_sede_por_nombre(nombre_sede):
+    conexion = obtener_conexion()
+    try:
+        with conexion.cursor() as cursor:
+            cursor.execute("SELECT id_sede FROM sede WHERE nombre_sede = %s", (nombre_sede,))
+            id_sede = cursor.fetchone()[0]  # Devuelve el primer resultado
+        return id_sede
+    except Exception as e:
+        print(f"Error al obtener ID de la sede: {e}")
+        return None
+    finally:
+        conexion.close()

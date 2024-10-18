@@ -3,125 +3,114 @@
 {% block cuerpo %}
 
 <div class="container mt-4">
-    <h1>Gestión de Recaudaciones</h1>
+    <h1 class="titulo-gestion">Gestión de Recaudaciones</h1>
 
-    <!-- Tabla de recaudaciones -->
-    <table class="table table-striped" id="tabla_recaudaciones">
-        <thead>
-            <tr>
-                <th>ID</th>
-                <th>Sede</th>
-                <th>Monto</th>
-                <th>Tipo</th>
-                <th>Observaciones</th>
-                <th>Fecha</th>
-                <th>Hora</th>
-                <th>Acciones</th>
-            </tr>
-        </thead>
-        <tbody>
-            {% for rec in recaudaciones %}
-            <tr>
-                <td>{{ rec[0] }}</td>
-                <td>{{ rec[1] }}</td>
-                <td>{{ rec[2] }}</td>
-                <td>{{ rec[3] }}</td>
-                <td>{{ rec[4] }}</td>
-                <td>{{ rec[5] }}</td>
-                <td>{{ rec[6] }}</td>
-                <td>
-                    <button class="btn btn-warning btn-sm" onclick="openModal('edit', '{{ rec[0] }}', '{{ rec[1] }}', '{{ rec[2] }}', '{{ rec[3] }}', '{{ rec[4] }}', '{{ rec[5] }}', '{{ rec[6] }}')">Modificar</button>
-                    <form action="{{ url_for('eliminar_recaudacion') }}" method="POST" style="display:inline-block;">
-                        <input type="hidden" name="id_recaudacion" value="{{ rec[0] }}">
-                        <button type="submit" class="btn btn-danger btn-sm">Eliminar</button>
-                    </form>
-                </td>
-            </tr>
-            {% endfor %}
-        </tbody>
-    </table>
+    <div>
+        <!-- DataTable para la gestión de recaudaciones -->
+        <table id="recaudacionesTable" class="table table-hover table-striped">
+            <thead>
+                <th style="vertical-align: middle; text-align: center;">ID</th>
+                <th style="vertical-align: middle; text-align: center;">Monto</th>
+                <th style="vertical-align: middle; text-align: center;">Observación</th>
+                <th style="vertical-align: middle; text-align: center;">Sede</th>
+                <th style="vertical-align: middle; text-align: center;">Tipo Recaudación</th>
+                <th style="vertical-align: middle; text-align: center; width: 200px;">Acciones</th>
+            </thead>
+            <tbody>
+                {% for recaudacion in recaudaciones %}
+                <tr>
+                    <td class="text-center">{{ recaudacion[0] }}</td> <!-- ID de la recaudación -->
+                    <td>{{ recaudacion[3] }}</td> <!-- Monto -->
+                    <td>{{ recaudacion[4] }}</td> <!-- Observación -->
+                    <td>{{ recaudacion[5] }}</td> <!-- Nombre de la sede -->
+                    <td>{{ recaudacion[6] }}</td> <!-- Nombre del tipo de recaudación -->
+                    <td class="text-center">
+                        <!-- Botón para ver detalles -->
+                        <button class="btn btn-primary btn-sm" title="Ver"
+                            onclick="openModal('view', '{{ recaudacion[0] }}', '{{ recaudacion[3] }}', '{{ recaudacion[4] }}', '{{ recaudacion[5] }}', '{{ recaudacion[7] }}', '{{ recaudacion[6] }}')">
+                            <i class="fas fa-eye"></i>
+                        </button>
+
+                        <!-- Botón para editar -->
+                        <button class="btn btn-warning btn-sm" title="Editar"
+                            onclick="openModal('edit', '{{ recaudacion[0] }}', '{{ recaudacion[3] }}', '{{ recaudacion[4] }}', '{{ recaudacion[5] }}', '{{ recaudacion[7] }}')">
+                            <i class="fas fa-edit"></i>
+                        </button>
+
+                        <!-- Botón para eliminar -->
+                        <button type="button" class="btn btn-danger btn-sm" title="Eliminar"
+                            onclick="eliminarRecaudacion('{{ recaudacion[0] }}')">
+                            <i class="fas fa-trash-alt"></i>
+                        </button>
+                    </td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
 </div>
 
-<!-- Modal para agregar -->
-<div class="modal fade" id="agregarModal" tabindex="-1" aria-labelledby="agregarModalLabel" aria-hidden="true">
+<!-- Modal para Agregar/Ver/Editar Recaudación -->
+<div class="modal fade" id="recaudacionModal" tabindex="-1" aria-labelledby="recaudacionModalLabel" aria-hidden="true">
     <div class="modal-dialog">
         <div class="modal-content">
-            <form action="{{ url_for('insertar_recaudacion') }}" method="POST">
+            <form id="recaudacionForm" action="" method="POST">
+                <input type="hidden" id="recaudacionId" name="id">
+
+                <!-- Campo oculto para registrar el ID de la sede -->
+                <input type="hidden" id="id_sede" name="id_sede" value="{{ id_sede_central }}">
+
                 <div class="modal-header">
-                    <h5 class="modal-title" id="agregarModalLabel">Registrar Recaudación</h5>
+                    <h5 class="modal-title" id="recaudacionModalLabel">Modal Title</h5>
                     <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
                 </div>
                 <div class="modal-body">
+                    <!-- Campo para mostrar el nombre de la sede (completamente ineditable con disabled) -->
                     <div class="mb-3">
-                        <label for="id_sede" class="form-label">ID Sede</label>
-                        <input type="number" class="form-control" name="id_sede" required>
+                        <label for="sede" class="form-label">Sede</label>
+                        <input type="text" class="form-control" id="sede" value="Sede Central" disabled>
                     </div>
+
                     <div class="mb-3">
                         <label for="monto" class="form-label">Monto</label>
-                        <input type="number" step="0.01" class="form-control" name="monto" required>
+                        <input type="text" class="form-control" id="monto" name="monto" required>
                     </div>
                     <div class="mb-3">
                         <label for="observacion" class="form-label">Observación</label>
-                        <textarea class="form-control" name="observacion" required></textarea>
+                        <input type="text" class="form-control" id="observacion" name="observacion" required>
                     </div>
                     <div class="mb-3">
+                        <label for="id_tipo_recaudacion" class="form-label">Tipo de Recaudación</label>
+                        <select class="form-select" id="id_tipo_recaudacion" name="id_tipo_recaudacion" required>
+                            {% for tipo in tipos %}
+                            <option value="{{ tipo[0] }}">{{ tipo[1] }}</option>
+                            {% endfor %}
+                        </select>
+                    </div>
+                    <div class="mb-3" id="fecha_container">
                         <label for="fecha" class="form-label">Fecha</label>
-                        <input type="date" class="form-control" name="fecha" required>
+                        <input type="text" class="form-control" id="fecha" name="fecha" readonly>
                     </div>
-                    <div class="mb-3">
+                    <div class="mb-3" id="hora_container">
                         <label for="hora" class="form-label">Hora</label>
-                        <input type="time" class="form-control" name="hora" required>
+                        <input type="text" class="form-control" id="hora" name="hora" readonly>
                     </div>
                 </div>
                 <div class="modal-footer">
-                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
-                    <button type="submit" class="btn btn-primary">Guardar</button>
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cerrar</button>
+                    <button type="submit" class="btn btn-primary" id="saveChanges">Guardar</button>
                 </div>
             </form>
         </div>
     </div>
 </div>
 
-<!-- Modal para editar -->
-<div class="modal fade" id="editarModal" tabindex="-1" aria-labelledby="editarModalLabel" aria-hidden="true">
-    <div class="modal-dialog">
-        <div class="modal-content">
-            <form action="{{ url_for('actualizar_recaudacion') }}" method="POST">
-                <input type="hidden" id="editarId" name="id_recaudacion">
-                <div class="modal-header">
-                    <h5 class="modal-title" id="editarModalLabel">Modificar Recaudación</h5>
-                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-                </div>
-                <div class="modal-body">
-                    <div class="mb-3">
-                        <label for="id_sede" class="form-label">ID Sede</label>
-                        <input type="number" class="form-control" id="editarSede" name="id_sede" required>
-                    </div>
-                    <div class="mb-3">
-                        <label for="monto" class="form-label">Monto</label>
-                        <input type="number" step="0.01" class="form-control" id="editarMonto" name="monto" required>
-                    </div>
-                    <div class="mb-3">
-                        <label for="observacion" class="form-label">Observación</label> 
-                        <textarea class="form-control" id="editarObservacion" name="observacion" required></textarea>
-                    </div>
-                    <div class="mb-3">
-                        <label for="fecha" class="form-label">Fecha</label>
-                        <input type="date" class="form-control" id="editarFecha" name="fecha" required>
-                    </div>
-                    <div class="mb-3">
-                        <label for="hora" class="form-label">Hora</label>
-                        <input type="time" class="form-control" id="editarHora" name="hora" required>
-                    </div>
-                </div>
-                <div class="modal-footer">
-                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
-                    <button type="submit" class="btn btn-primary">Guardar cambios</button>
-                </div>
-            </form>
-        </div>
-    </div>
-</div>
 
 <script src="/static/js/recaudaciones.js"></script>
+
+<script type="text/javascript">
+    const urlInsertarRecaudacion = "{{ url_for('procesar_insertar_recaudacion') }}";
+    const urlActualizarRecaudacion = "{{ url_for('procesar_actualizar_recaudacion') }}";
+</script>
+
 {% endblock %}
