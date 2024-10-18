@@ -50,7 +50,7 @@ def obtener_id_cargo_por_nombre(nombre):
         conexion = obtener_conexion()
         id_cargo = None
         with conexion.cursor() as cursor:
-            cursor.execute("select id_cargo from cargo WHERE cargo = %s", (nombre,))
+            cursor.execute("select C.id_cargo from cargo C WHERE C.cargo = %s", (nombre,))
             resultado = cursor.fetchone()
             if resultado:
                 id_cargo = resultado[0]

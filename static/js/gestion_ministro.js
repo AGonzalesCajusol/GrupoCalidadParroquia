@@ -2,116 +2,121 @@ $(document).ready(function () {
     // Inicializar DataTable
     var table = $('#ministrosTable').DataTable({
         pageLength: 8,
-        dom: '<"d-flex justify-content-between align-items-center mb-3"<"d-flex"f><"d-flex justify-content-end button-section">>rt<"bottom"p>',  // Utilizar "justify-content-end" para alinear a la derecha
+        dom: '<"d-flex justify-content-between align-items-center mb-3"<"d-flex"f><"d-flex justify-content-end button-section">>rt<"bottom"p>',
         language: {
-            search: "Buscar:"  // Cambiar el texto de "Search" a "Buscar"
+            search: "Buscar:"
         },
-        //dom: '<"d-flex justify-content-between align-items-center mb-3"<"d-flex"l<"d-flex justify-content-between align-items-center"f<"ml-3 button-section">>>rt<"bottom"p>',
         initComplete: function () {
-            // Insertar el botón "Agregar ministro" dentro del div y alinearlo a la derecha
+            // Insertar el botón "Agregar ministro"
             $("div.button-section").html('<button type="button" class="btn btn-success btn-lg custom-btn ml-3 btn-agregar-ministro" data-bs-toggle="modal" onclick="openModal(\'add\')"><i class="bi bi-person-plus"></i> Agregar ministro</button>');
         }
     });
 });
 
-// Función para abrir el modal para agregar, ver o editar un ministro
-function openModal(type, id = null, nombre = '', nacimiento = '', ordenacion = '', actividades = '', tipo = '', sede = '', cargo = '') {
+
+
+
+function openModal(type, id = null, nombre = '', documento = '', nacimiento = '', ordenacion = '', actividades = '', tipo = '', sede = '', cargo = '') {
     var modalTitle = '';
     var formAction = '';
     var isReadOnly = false;
 
     if (type === 'add') {
         modalTitle = 'Agregar Ministro';
-        formAction = urlInsertarMinistro;  // URL global para insertar ministro
-        isReadOnly = false;
-        limpiarModal();  // Limpiar campos al abrir el modal para agregar
-        document.getElementById('saveChanges').style.display = 'block';
+        formAction = '/insertar_ministro';  // Asegúrate de que coincida con la ruta de Flask
+        limpiarModal();
+        document.getElementById('passwordSection').style.display = 'block';
+        document.getElementById('confirmPasswordSection').style.display = 'block';
     } else if (type === 'edit') {
         modalTitle = 'Editar Ministro';
-        formAction = urlActualizarMinistro;  // URL global para actualizar ministro
+        formAction = '/procesar_actualizar_ministro';  // Asegúrate de que coincida con la ruta de Flask
         isReadOnly = false;
-        document.getElementById('saveChanges').style.display = 'block';
-
-        // Asignar valores al modal
         document.getElementById('ministroId').value = id;
         document.getElementById('nombre').value = nombre;
+        document.getElementById('documento').value = documento;
         document.getElementById('nacimiento').value = nacimiento;
         document.getElementById('ordenacion').value = ordenacion;
         document.getElementById('actividades').value = actividades;
         document.getElementById('id_tipoministro').value = tipo;
         document.getElementById('id_sede').value = sede;
         document.getElementById('id_cargo').value = cargo;
-
-
-
+        document.getElementById('passwordSection').style.display = 'block';
+        document.getElementById('confirmPasswordSection').style.display = 'block';
     } else if (type === 'view') {
         modalTitle = 'Ver Ministro';
-        formAction = '';
-        isReadOnly = true;
-        document.getElementById('saveChanges').style.display = 'none'; 
-
-        // Asignar valores al modal
+        formAction = '';  // No habrá acción de envío de formulario
+        isReadOnly = true;  // Marcar todos los campos como solo lectura
         document.getElementById('ministroId').value = id;
         document.getElementById('nombre').value = nombre;
+        document.getElementById('documento').value = documento;
         document.getElementById('nacimiento').value = nacimiento;
         document.getElementById('ordenacion').value = ordenacion;
         document.getElementById('actividades').value = actividades;
         document.getElementById('id_tipoministro').value = tipo;
         document.getElementById('id_sede').value = sede;
         document.getElementById('id_cargo').value = cargo;
+        document.getElementById('passwordSection').style.display = 'none';
+        document.getElementById('confirmPasswordSection').style.display = 'none';  // Ocultar los campos de contraseña en modo "Ver"
     }
 
-    // Configuración del modal
+    // Configurar el modal
     document.getElementById('ministroModalLabel').innerText = modalTitle;
     document.getElementById('ministroForm').action = formAction;
 
-    // Hacer los campos de solo lectura si es el modo "Ver"
+    // Hacer todos los campos de solo lectura si es el modo "Ver"
     document.querySelectorAll('#ministroForm input, #ministroForm select').forEach(function (input) {
         input.readOnly = isReadOnly;
         input.disabled = isReadOnly;
     });
 
-    // Inicializar y mostrar el modal
+    // Mostrar el modal
     var ministroModal = new bootstrap.Modal(document.getElementById('ministroModal'));
     ministroModal.show();
-
-    // Manejo del envío del formulario
-    document.getElementById('ministroForm').onsubmit = function (event) {
-        event.preventDefault();  // Prevenir el envío del formulario tradicional
-
-        let formData = new FormData(this);  // Recoger los datos del formulario
-
-        fetch(formAction, {
-            method: 'POST',
-            body: formData
-        })
-            .then(response => response.json())
-            .then(data => {
-                if (data.success) {
-                    alert(type === 'edit' ? 'Ministro actualizado exitosamente' : 'Ministro agregado exitosamente');
-                    if (type === 'add') {
-                        // Agregar el nuevo ministro a la tabla
-                        agregarMinistroATabla(data.ministro);  // Se asume que el servidor devuelve el nuevo ministro agregado
-                        limpiarModal();  // Limpiar los campos del modal para una nueva inserción
-                    } else {
-                        location.reload();  // Recargar la página para reflejar los cambios si se está editando
-                    }
-                } else {
-                    alert('Error al procesar el ministro');
-                }
-            })
-            .catch(error => console.error('Error:', error));
-    };
 }
 
-// Función para limpiar los campos del modal
+
+function eliminarMinistro(id) {
+    if (confirm("¿Estás seguro de que deseas eliminar este ministro?")) {
+        fetch('/eliminar_ministro', {
+            method: 'POST',  // O 'DELETE' si es más adecuado en tu caso
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify({ id: id })
+        })
+        .then(response => response.json())
+        .then(data => {
+            if (data.success) {
+                alert('Ministro eliminado exitosamente');
+                location.reload();  // Recargar la página para reflejar los cambios
+            } else {
+                alert('Error al eliminar el ministro: ' + data.message);
+            }
+        })
+        .catch(error => console.error('Error:', error));
+    }
+}
+
+
+// Función para encriptar la contraseña (SHA-256)
+async function sha256(message) {
+    const msgBuffer = new TextEncoder().encode(message);
+    const hashBuffer = await crypto.subtle.digest('SHA-256', msgBuffer);
+    const hashArray = Array.from(new Uint8Array(hashBuffer));
+    const hashHex = hashArray.map(b => b.toString(16).padStart(2, '0')).join('');
+    return hashHex;
+}
+
 function limpiarModal() {
     document.getElementById('ministroId').value = '';
     document.getElementById('nombre').value = '';
+    document.getElementById('documento').value = '';
     document.getElementById('nacimiento').value = '';
     document.getElementById('ordenacion').value = '';
     document.getElementById('actividades').value = '';
     document.getElementById('id_tipoministro').value = '';
     document.getElementById('id_sede').value = '';
     document.getElementById('id_cargo').value = '';
+    document.getElementById('password').value = '';
+    document.getElementById('confirmPassword').value = '';
 }
