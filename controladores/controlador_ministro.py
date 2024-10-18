@@ -22,7 +22,7 @@ def insertar_ministro(nombre_ministro, numero_documento, fecha_nacimiento, fecha
 
             # Encriptar la contraseña antes de insertarla
             contraseña_encriptada = encriptar_contraseña(contraseña)
-
+        
             # Inserción del nuevo ministro
             cursor.execute("""
                 INSERT INTO ministro (id_ministro, nombre_ministro, numero_documento, fecha_nacimiento, fecha_ordenacion, fin_actividades, token, tipoministro, id_sede, id_cargo, contraseña) 

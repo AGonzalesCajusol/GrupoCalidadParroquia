@@ -79,32 +79,58 @@ def eliminar_feligres(id_feligres):
     finally:
         conexion.close()
 
-def verificarcuentaFeligres(dni,apellidos, nombres, fecha_nacimiento, estado_civil, sexo, token,contraseña,id_sede,estado):
+def verificarcuentaFeligres(dni, apellidos, nombres, fecha_nacimiento, estado_civil, sexo, token, contraseña, id_sede, estado):
     conexion = obtener_conexion()
+    valor = 0
     try:
         with conexion.cursor() as cursor:
-            cursor.execute("select * from feligres where dni = %s", (dni,))
+            cursor.execute("SELECT * FROM feligres WHERE dni = %s", (dni,))
             filas = cursor.fetchone()
 
             if filas:
-                print("Si existe ese usuario")
+                print("El usuario ya existe.")
+                valor = 0  # Indica que el usuario ya existe
             else:
                 cursor.execute("""
-                INSERT INTO Feligres (dni, apellidos, nombres, fecha_nacimiento, estado_civil, sexo, id_sede)
+                INSERT INTO feligres (dni, apellidos, nombres, fecha_nacimiento, estado_civil, sexo, id_sede)
                 VALUES (%s, %s, %s, %s, %s, %s, %s)
                 """, (dni, apellidos, nombres, fecha_nacimiento, estado_civil, sexo, id_sede))
-                id_feligres = cursor.lastrowid()
+                id_feligres = cursor.lastrowid
                 
                 password = sha256(contraseña.encode('utf-8')).hexdigest()
                 
                 cursor.execute("""
-                INSERT INTO cuenta (id_feligres,estado,token,contraseña)
+                INSERT INTO cuenta (id_feligres, estado, token, contraseña)
                 VALUES (%s, %s, %s, %s)
                 """, (id_feligres, estado, token, password))
-                print("Usuario no registrado, se registro con exito!!")
-                return 1
-
+                
+                print("Usuario registrado con éxito.")
+                valor = 1  # Indica que se registró exitosamente
+        conexion.commit()
     except Exception as e:
-        print(f"Error al eliminar feligrés: {e}")
+        print(f"Error al verificar o registrar el feligrés: {e}")
     finally:
         conexion.close()
+    
+    return valor
+
+def iniciosesion(dni, contraseña):
+    conexion = obtener_conexion()
+    valor = 0
+    contraseña = sha256(contraseña.encode('utf-8')).hexdigest()
+    print(contraseña)
+    try:
+        with conexion.cursor() as cursor:
+            cursor.execute("""
+                SELECT
+                    CASE 
+                        WHEN EXISTS (SELECT 1 FROM ministro WHERE contraseña = %s AND numero_documento = %s) THEN 1
+                        WHEN EXISTS (SELECT 1 FROM feligres AS fe INNER JOIN cuenta AS cu ON fe.id_feligres = cu.id_feligres WHERE dni = %s AND contraseña = %s) THEN 2
+                        ELSE 0
+                    END AS resultado;
+            """, (contraseña, dni, dni, contraseña))
+            
+            resultado = cursor.fetchone()
+            return resultado[0]  # Retorna 1, 2 o 0
+    except:
+        return 0

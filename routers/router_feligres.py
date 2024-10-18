@@ -40,22 +40,27 @@ def registrar_rutas(app):
         apellidos = request.form['apellidos11']
         nombres = request.form['nombres11']
         fecha_nacimiento = request.form['fecha_nacimiento11']
-        estado_civil = request.form['estado_civil11']
-        sexo = request.form['sexo11']
+        estado_civil = request.form['estado_civil11'][0].lower()
+        sexo = request.form['sexo11'][0].lower()
         contraseña = request.form['contraseña11']
         sede = request.form['sede11']
 
         valor = str(random.randint(1,1024))
         token = sha256(valor.encode('utf-8')).hexdigest()
         valor = verificarcuentaFeligres(dni,apellidos,nombres,fecha_nacimiento,estado_civil,sexo,token,contraseña,sede,estado='a')
-        response = make_response(render_template('/feligres/principal_feligres.html', usuario=nombres))
+        response = redirect(url_for('principal'))
 
         # Establecer las cookies
         response.set_cookie('dni', dni)
         response.set_cookie('token', token)
         response.set_cookie('tipo', 'feligres')
+        response.set_cookie('nombre', f"{apellidos} {nombres}")  # Agregar cookie con nombre completo
 
         return response
+
+    @app.route("/principal", methods=["GET"])
+    def principal():
+        return render_template('/feligres/principal_feligres.html')
 
 
     # Ruta para insertar un nuevo feligrés
@@ -100,3 +105,4 @@ def registrar_rutas(app):
         eliminar_feligres(id_feligres)
         flash("El feligrés fue eliminado exitosamente")
         return redirect(url_for("gestionar_feligres"))
+    

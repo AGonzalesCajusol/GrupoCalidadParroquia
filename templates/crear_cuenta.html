@@ -2,7 +2,7 @@
 {% block titulo %} Crear cuenta {% endblock %}
 {% block principal %}
 <h2 class="text-center">Crear cuenta</h2>
-<form action="/registrar_feligresweb" method="POST" id="formulario-11">
+<form action="/registrar_feligresweb" method="POST" name="formulario-11" id="formulario-11">
     <div class="mb-1">
         <label for="dni11" class="form-label">DNI</label>
         <input type="number" class="form-control" id="dni11" name="dni11" placeholder="Ingrese su DNI" required>
@@ -47,10 +47,10 @@
         <div class="mb-2 align-items-center">
             <input type="password" class="form-control d-inline me-2" id="password11" name="contraseña11" placeholder="Ingrese su contraseña" required>
             <button type="button" class="btn btn-primary" onclick="ver_contraseña()">
-                <i class="bi bi-eye-fill" id="boton_ver"></i>
+                <i class="bi-eye-slash-fill" id="boton_ver"></i>
             </button>
         </div>
-        <div id="passwordError" class="text-danger" style="display:none;"></div> <!-- Mensaje de error -->
+        <div id="passwordError" class="text-danger" style="display:none;"></div>
     </div>
     
     <div class="mb-2">
@@ -67,6 +67,7 @@
         <button type="submit" class="btn btn-primary">Crear Cuenta</button>
     </div>
 </form>
+
 
 <script src="/static/js/inicio_sesionfeligres.js"></script>
 {% endblock %}

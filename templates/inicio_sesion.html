@@ -9,8 +9,7 @@
     <link rel="stylesheet" href="/static/css/inicio_sesion.css">
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
     <script src="https://unpkg.com/just-validate@latest/dist/just-validate.production.min.js"></script>
-    <script src="https://unpkg.com/browse/just-validate-plugin-date@1.2.0/dist/just-validate-plugin-date.production.min.js"></script>    
-
+    
 </head>
 <body>
     <div class="container-fluid">
@@ -20,14 +19,14 @@
                     <div class="col-lg-4 col-sm-7 col-md-6 col-6" id="caja_inicio">
                         {% block principal  %}
                         <h2 class="text-center">Iniciar Sesión</h2>
-                        <form>
+                        <form action="/verificarusuario" method="post">
                             <div class="mb-3">
-                                <label for="username" class="form-label">Nombre de Usuario</label>
-                                <input type="text" class="form-control" id="username" placeholder="Ingrese su nombre de usuario" >
+                                <label for="username" class="form-label">Dni de Usuario</label>
+                                <input type="text" class="form-control" id="dni22" name="dni22" placeholder="Ingrese su dni de usuario" >
                             </div>
                             <div class="mb-3">
                                 <label for="password" class="form-label">Contraseña</label>
-                                <input type="password" class="form-control" id="password" placeholder="Ingrese su contraseña" >
+                                <input type="password" class="form-control" id="password22" name="password22" placeholder="Ingrese su contraseña" >
                             </div>
                             <div class="mb-3 form-check">
                                 <input type="checkbox" class="form-check-input" id="rememberMe">
@@ -37,8 +36,7 @@
                                     <a href="{{ url_for('crearcuenta') }}" class="">Crear cuenta</a>
                                 </div>
                             </div>
-
-                            <a href="{{ url_for('inicio') }}" class="btn btn-primary w-100">Iniciar Sesión</a>                                                     
+                            <button class="btn btn-primary">Iniciar Sesión</button>
                         </form>
                         {% endblock %}
                     </div>
