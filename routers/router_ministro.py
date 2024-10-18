@@ -6,10 +6,7 @@ from controladores.controlador_tipo_ministro import *
 import hashlib
 
 # Función para encriptar contraseñas usando SHA-256
-def encriptar_contraseña(contraseña):
-    """Encripta una contraseña usando SHA-256."""
-    sha_signature = hashlib.sha256(contraseña.encode()).hexdigest()
-    return sha_signature
+
 
 def registrar_rutas(app):
     # Ruta para gestionar ministros
@@ -42,6 +39,9 @@ def registrar_rutas(app):
             contraseña = request.form.get("password")
             confirmar_contraseña = request.form.get("confirmPassword")
 
+            # Imprimir la contraseña ingresada por el usuario
+            print(f"Contraseña ingresada: {contraseña}")
+
             # Validar que las contraseñas coinciden
             if not contraseña or not confirmar_contraseña:
                 return jsonify(success=False, message="Las contraseñas no pueden estar vacías"), 400
@@ -51,20 +51,13 @@ def registrar_rutas(app):
             # Encriptar la contraseña antes de almacenarla
             contraseña_encriptada = encriptar_contraseña(contraseña)
 
+            # Imprimir la contraseña encriptada
+            print(f"Contraseña encriptada: {contraseña_encriptada}")
+
             # Obtener el id_tipoministro, id_sede y id_cargo a partir del nombre
             id_tipoministro = obtener_id_tipoMinistro_por_nombre(tipo_ministro_nombre)
             id_sede = obtener_id_sede_por_nombre(sede_nombre)
             id_cargo = obtener_id_cargo_por_nombre(cargo_nombre)
-
-            
-
-
-
-            # Imprimir los IDs para asegurarnos de que están obtenidos correctamente
-            print(f"id_tipoministro: {id_tipoministro}, id_sede: {id_sede}, id_cargo: {id_cargo}")
-
-            if not id_tipoministro or not id_sede or not id_cargo:
-                return jsonify(success=False, message="Datos no válidos para el tipo de ministro, sede o cargo"), 400
 
             # Insertar el ministro en la base de datos
             insertar_ministro(nombre, documento, nacimiento, ordenacion, actividades, id_tipoministro, id_sede, id_cargo, contraseña_encriptada)

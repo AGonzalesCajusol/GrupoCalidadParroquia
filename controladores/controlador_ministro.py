@@ -8,10 +8,13 @@ def generar_token():
 
 def encriptar_contraseña(contraseña):
     # Encripta la contraseña usando SHA-256
-    sha_signature = hashlib.sha256(contraseña.encode()).hexdigest()
+    print(f"Encriptando la contraseña: {contraseña}")  # Añadimos un print para ver la contraseña antes de encriptar
+    sha_signature = hashlib.sha256(contraseña.encode('utf8')).hexdigest()
+    print(f"Resultado de la encriptación: {sha_signature}")  # Añadimos un print para ver la contraseña encriptada
     return sha_signature
 
-def insertar_ministro(nombre_ministro, numero_documento, fecha_nacimiento, fecha_ordenacion, fin_actividades, tipoministro, id_sede, id_cargo, contraseña):
+
+def insertar_ministro(nombre_ministro, numero_documento, fecha_nacimiento, fecha_ordenacion, fin_actividades, tipoministro, id_sede, id_cargo, contraseña_encriptada):
     token = generar_token()  # Genera un token aleatorio
     conexion = obtener_conexion()
     try:
@@ -20,8 +23,6 @@ def insertar_ministro(nombre_ministro, numero_documento, fecha_nacimiento, fecha
             cursor.execute("SELECT COALESCE(MAX(id_ministro) + 1, 1) as siguiente_id FROM ministro")
             siguiente_id = cursor.fetchone()[0]
 
-            # Encriptar la contraseña antes de insertarla
-            contraseña_encriptada = encriptar_contraseña(contraseña)
 
             # Inserción del nuevo ministro
             cursor.execute("""
@@ -39,12 +40,11 @@ def insertar_ministro(nombre_ministro, numero_documento, fecha_nacimiento, fecha
     finally:
         conexion.close()  # Asegurarse de cerrar la conexión
 
-def actualizar_ministro(nombre_ministro, numero_documento, fecha_nacimiento, fecha_ordenacion, fin_actividades, tipoministro, id_sede, id_cargo, id_ministro, contraseña=None):
+def actualizar_ministro(nombre_ministro, numero_documento, fecha_nacimiento, fecha_ordenacion, fin_actividades, tipoministro, id_sede, id_cargo, id_ministro, contraseña_encriptada=None):
     conexion = obtener_conexion()
     try:
         with conexion.cursor() as cursor:
-            if contraseña:  # Si se proporciona una contraseña, encriptarla y actualizarla
-                contraseña_encriptada = encriptar_contraseña(contraseña)
+            if contraseña_encriptada:  # Si se proporciona una contraseña, encriptarla y actualizarla
                 cursor.execute("""
                     UPDATE ministro 
                     SET nombre_ministro = %s, numero_documento = %s, fecha_nacimiento = %s, fecha_ordenacion = %s, fin_actividades = %s, tipoministro = %s, id_sede = %s, id_cargo = %s, contraseña = %s
