@@ -1,6 +1,7 @@
 from bd import obtener_conexion
 
-def insertar_tipo_recaudacion(nombre_recaudacion, tipo):
+# Función para insertar un nuevo tipo de recaudación
+def insertar_tipo_recaudacion(nombre_recaudacion, tipo, estado=True):  # El estado por defecto es 'Activo'
     conexion = obtener_conexion()
     try:
         with conexion.cursor() as cursor:
@@ -8,11 +9,11 @@ def insertar_tipo_recaudacion(nombre_recaudacion, tipo):
             cursor.execute("SELECT COALESCE(MAX(id_tipo_recaudacion) + 1, 1) as siguiente_id FROM tipo_recaudacion")
             siguiente_id = cursor.fetchone()[0]
 
-            # Inserción del nuevo tipo de recaudación
+            # Inserción del nuevo tipo de recaudación con estado
             cursor.execute("""
-                INSERT INTO tipo_recaudacion (id_tipo_recaudacion, nombre_recaudacion, tipo) 
-                VALUES (%s, %s, %s)
-            """, (siguiente_id, nombre_recaudacion, tipo))
+                INSERT INTO tipo_recaudacion (id_tipo_recaudacion, nombre_recaudacion, tipo, estado) 
+                VALUES (%s, %s, %s, %s)
+            """, (siguiente_id, nombre_recaudacion, tipo, estado))
         
         # Confirmar la transacción
         conexion.commit()
@@ -24,12 +25,13 @@ def insertar_tipo_recaudacion(nombre_recaudacion, tipo):
     finally:
         conexion.close()  # Asegurarse de cerrar la conexión
 
+# Función para obtener todos los tipos de recaudación
 def obtener_tipos_recaudacion():
     conexion = obtener_conexion()
     try:
         with conexion.cursor() as cursor:
             cursor.execute("""
-                SELECT id_tipo_recaudacion, nombre_recaudacion, tipo 
+                SELECT id_tipo_recaudacion, nombre_recaudacion, tipo, estado 
                 FROM tipo_recaudacion
             """)
             tipos_recaudacion = cursor.fetchall()
@@ -40,12 +42,13 @@ def obtener_tipos_recaudacion():
     finally:
         conexion.close()
 
+# Función para obtener un tipo de recaudación por su ID
 def obtener_tipo_recaudacion_por_id(id_tipo_recaudacion):
     conexion = obtener_conexion()
     try:
         with conexion.cursor() as cursor:
             cursor.execute("""
-                SELECT id_tipo_recaudacion, nombre_recaudacion, tipo 
+                SELECT id_tipo_recaudacion, nombre_recaudacion, tipo, estado 
                 FROM tipo_recaudacion 
                 WHERE id_tipo_recaudacion = %s
             """, (id_tipo_recaudacion,))
@@ -57,15 +60,16 @@ def obtener_tipo_recaudacion_por_id(id_tipo_recaudacion):
     finally:
         conexion.close()
 
-def actualizar_tipo_recaudacion(nombre_recaudacion, tipo, id_tipo_recaudacion):
+# Función para actualizar un tipo de recaudación
+def actualizar_tipo_recaudacion(nombre_recaudacion, tipo, estado, id_tipo_recaudacion):
     conexion = obtener_conexion()
     try:
         with conexion.cursor() as cursor:
             cursor.execute("""
                 UPDATE tipo_recaudacion 
-                SET nombre_recaudacion = %s, tipo = %s 
+                SET nombre_recaudacion = %s, tipo = %s, estado = %s
                 WHERE id_tipo_recaudacion = %s
-            """, (nombre_recaudacion, tipo, id_tipo_recaudacion))
+            """, (nombre_recaudacion, tipo, estado, id_tipo_recaudacion))
         conexion.commit()
     except Exception as e:
         print(f"Error al actualizar tipo de recaudación: {e}")
@@ -73,6 +77,7 @@ def actualizar_tipo_recaudacion(nombre_recaudacion, tipo, id_tipo_recaudacion):
     finally:
         conexion.close()
 
+# Función para eliminar un tipo de recaudación
 def eliminar_tipo_recaudacion(id_tipo_recaudacion):
     conexion = obtener_conexion()
     try:
@@ -81,6 +86,24 @@ def eliminar_tipo_recaudacion(id_tipo_recaudacion):
         conexion.commit()
     except Exception as e:
         print(f"Error al eliminar tipo de recaudación: {e}")
+        conexion.rollback()
+    finally:
+        conexion.close()
+
+# Función para dar de baja un tipo de recaudación (cambiar estado a "Inactivo")
+def dar_baja_tipo_recaudacion(id_tipo_recaudacion):
+    conexion = obtener_conexion()
+    try:
+        with conexion.cursor() as cursor:
+            # Cambiar el estado a inactivo (0)
+            cursor.execute("""
+                UPDATE tipo_recaudacion 
+                SET estado = %s
+                WHERE id_tipo_recaudacion = %s
+            """, (False, id_tipo_recaudacion))  # False representa inactivo
+        conexion.commit()
+    except Exception as e:
+        print(f"Error al dar de baja el tipo de recaudación: {e}")
         conexion.rollback()
     finally:
         conexion.close()
