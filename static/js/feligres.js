@@ -99,3 +99,61 @@ function limpiarModal() {
     document.getElementById('sexo').value = '';
     document.getElementById('id_sede').value = '';
 }
+
+
+
+//Segunda parte, Registro de usuario web
+
+
+/*function crear_cuenta(){
+    let dni = document.getElementById('dni11');
+    let apellidos = document.getElementById('apellidos11');
+    let nombres = document.getElementById('nombres11');
+    let f_naci = document.getElementById('fecha_nacimiento11');
+    let estado_civil = document.getElementById('estado_civil11');
+    let sexo = document.getElementById('sexo11');
+    let passw = document.getElementById('password11');
+
+
+    let datos_enviar = {
+        "dni": dni.value,
+        "apellidos": apellidos.value,
+        "nombres": nombres.value,
+        "fecha_nac": f_naci.value,
+        "estado_civil": estado_civil.value[0].toLowerCase(),
+        "sexo": sexo.value[0].toLowerCase(),
+        "contraseña": passw.value
+    }
+
+    // Enviar datos al servidor usando fetch
+    fetch('/registrar_feligresweb', {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json'
+        },
+        body: JSON.stringify(datos_enviar)
+    })
+    .then(response => response.json())  // Convertir la respuesta en JSON
+    .then(data => {
+        console.log('Datos recibidos desde el servidor:', data);
+        alert('Cuenta creada exitosamente');
+    })
+    .catch(error => {
+        console.error('Error al enviar los datos:', error);
+        alert('Error al crear la cuenta');
+    });
+
+}
+*/
+ 
+
+
+
+function validar_campos11(){
+    dni = document.getElementById('dni11');
+    apellidos = document.getElementById('apellidos11');
+    nombres = document.getElementById('nombres11');
+    f_naci = document.getElementById('f_naci11');
+    estado_civil = document.getElementById('estado_civil11');
+    sexo = document.getElementById('sexo11');
+}
