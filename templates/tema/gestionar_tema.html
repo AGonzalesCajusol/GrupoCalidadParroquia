@@ -70,7 +70,7 @@
                         <label for="id_actoliturgico" class="form-label">Acto Litúrgico</label>
                         <select class="form-select" id="id_actoliturgico" name="id_actoliturgico" required>
                             {% for acto in actos %}
-                            <option value="{{ acto[0] }}">{{ acto[1] }}</option>
+                            <option value="{{ acto[0] }}">{{ acto[0] }}</option>
                             {% endfor %}
                         </select>
                     </div>
