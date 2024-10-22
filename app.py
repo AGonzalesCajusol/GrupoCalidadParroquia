@@ -60,7 +60,6 @@ routers.router_diocesis.registrar_rutas(app)
 routers.router_ministro.registrar_rutas(app)
 
 routers.router_cargo.registrar_rutas(app)
-
 routers.router_actosliturgicos.registrar_rutas(app)
 
 routers.router_feligres.registrar_rutas(app)

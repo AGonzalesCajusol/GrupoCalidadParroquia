@@ -9,7 +9,13 @@ $(document).ready(function () {
         initComplete: function () {
             // Insertar el botón "Agregar recaudación" dentro del div y alinearlo a la derecha
             $("div.button-section").html('<button type="button" class="btn btn-success btn-lg custom-btn ml-3 btn-agregar-recaudacion" data-bs-toggle="modal" onclick="openModal(\'add\')"><i class="bi bi-person-plus"></i> Agregar Recaudación</button>');
+        
+        // Insertar el botón "Exportar recaudaciones" con el mismo estilo
+        $("div.button-section").append('<button type="button" class="btn btn-success btn-lg custom-btn ml-3" data-bs-toggle="modal" data-bs-target="#exportModal"><i class="bi bi-file-earmark-arrow-down"></i> Exportar Recaudaciones</button>');
+        
         }
+
+        
     });
 });
 
@@ -66,6 +72,9 @@ function openModal(type, id = null, monto = '', observacion = '', id_sede = '', 
 
         document.getElementById('fecha_container').style.display = 'block';
         document.getElementById('hora_container').style.display = 'block';
+        // Asignar estado
+        const estadoCheckbox = document.getElementById('estado');
+        estadoCheckbox.checked = (estado === '1' || estado === true);
     }
 
     // Configuración del título del modal
@@ -82,6 +91,30 @@ function openModal(type, id = null, monto = '', observacion = '', id_sede = '', 
     var recaudacionModal = new bootstrap.Modal(document.getElementById('recaudacionModal'));
     recaudacionModal.show();
 }
+// funcion dar de baja 
+function darBajaRecaudacion(id) {
+    if (confirm('¿Estás seguro de que deseas dar de baja esta recaudación?')) {
+        fetch('/dar_baja_recaudacion', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify({ id: id })
+        })
+        .then(response => response.json())
+        .then(data => {
+            if (data.success) {
+                alert('Recaudación dada de baja exitosamente');
+                location.reload();
+            } else {
+                alert('Error al dar de baja la recaudación');
+            }
+        })
+        .catch(error => console.error('Error:', error));
+    }
+}
+
+
 
 // Función para limpiar los campos del modal
 function limpiarModal() {

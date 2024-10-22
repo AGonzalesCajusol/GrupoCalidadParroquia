@@ -10,8 +10,11 @@
         <table id="recaudacionesTable" class="table table-hover table-striped">
             <thead>
                 <th style="vertical-align: middle; text-align: center;">ID</th>
+                <th style="vertical-align: middle; text-align: center;">Fecha</th>
+                <th style="vertical-align: middle; text-align: center;">Hora</th>
                 <th style="vertical-align: middle; text-align: center;">Monto</th>
                 <th style="vertical-align: middle; text-align: center;">Observación</th>
+                <th style="vertical-align: middle; text-align: center;">Estado</th>
                 <th style="vertical-align: middle; text-align: center;">Sede</th>
                 <th style="vertical-align: middle; text-align: center;">Tipo Recaudación</th>
                 <th style="vertical-align: middle; text-align: center; width: 200px;">Acciones</th>
@@ -20,21 +23,28 @@
                 {% for recaudacion in recaudaciones %}
                 <tr>
                     <td class="text-center">{{ recaudacion[0] }}</td> <!-- ID de la recaudación -->
+                    <td>{{ recaudacion[1] }}</td> <!-- Fecha -->
+                    <td>{{ recaudacion[2] }}</td> <!-- Hora -->
                     <td>{{ recaudacion[3] }}</td> <!-- Monto -->
                     <td>{{ recaudacion[4] }}</td> <!-- Observación -->
-                    <td>{{ recaudacion[5] }}</td> <!-- Nombre de la sede -->
-                    <td>{{ recaudacion[6] }}</td> <!-- Nombre del tipo de recaudación -->
+                    <td>{{ 'Activo' if recaudacion[5] == 1 else 'Inactivo' }}</td> <!-- Estado -->
+                    <td>{{ recaudacion[6] }}</td> <!-- Nombre de la sede -->
+                    <td>{{ recaudacion[7] }}</td> <!-- Tipo de recaudación -->
                     <td class="text-center">
                         <!-- Botón para ver detalles -->
                         <button class="btn btn-primary btn-sm" title="Ver"
-                            onclick="openModal('view', '{{ recaudacion[0] }}', '{{ recaudacion[3] }}', '{{ recaudacion[4] }}', '{{ recaudacion[5] }}', '{{ recaudacion[7] }}', '{{ recaudacion[6] }}')">
+                            onclick="openModal('view', '{{ recaudacion[0] }}', '{{ recaudacion[1] }}', '{{ recaudacion[2] }}', '{{ recaudacion[3] }}', '{{ recaudacion[4] }}', '{{ recaudacion[5] }}', '{{ recaudacion[6] }}', '{{ recaudacion[7] }}')">
                             <i class="fas fa-eye"></i>
                         </button>
 
                         <!-- Botón para editar -->
                         <button class="btn btn-warning btn-sm" title="Editar"
-                            onclick="openModal('edit', '{{ recaudacion[0] }}', '{{ recaudacion[3] }}', '{{ recaudacion[4] }}', '{{ recaudacion[5] }}', '{{ recaudacion[7] }}')">
+                            onclick="openModal('edit', '{{ recaudacion[0] }}', '{{ recaudacion[1] }}', '{{ recaudacion[2] }}', '{{ recaudacion[3] }}', '{{ recaudacion[4] }}', '{{ recaudacion[5] }}', '{{ recaudacion[6] }}', '{{ recaudacion[7] }}')">
                             <i class="fas fa-edit"></i>
+                        </button>
+                        <button class="btn btn-secondary btn-sm" title="Dar de baja"
+                            onclick="darBajaRecaudacion('{{ recaudacion[0] }}')">
+                            <i class="fas fa-ban"></i>
                         </button>
 
                         <!-- Botón para eliminar -->
@@ -80,6 +90,12 @@
                         <input type="text" class="form-control" id="observacion" name="observacion" required>
                     </div>
                     <div class="mb-3">
+                        <label for="estado" class="form-label">Estado</label>
+                        <input type="checkbox" class="form-check-input" id="estado" name="estado" checked>
+                        <label class="form-check-label" for="estado">Activo</label>
+                    </div>
+                    
+                    <div class="mb-3">
                         <label for="id_tipo_recaudacion" class="form-label">Tipo de Recaudación</label>
                         <select class="form-select" id="id_tipo_recaudacion" name="id_tipo_recaudacion" required>
                             {% for tipo in tipos %}
@@ -104,7 +120,6 @@
         </div>
     </div>
 </div>
-
 
 <script src="/static/js/recaudaciones.js"></script>
 
