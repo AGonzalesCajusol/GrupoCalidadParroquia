@@ -1,0 +1,143 @@
+{% extends "index.html" %}
+{% block title %}Gestión de Egresos{% endblock %}
+{% block cuerpo %}
+
+<div class="container mt-4">
+    <h1>Gestión de Egresos</h1>
+
+    <!-- Botón para abrir el modal de "Agregar" -->
+    <button type="button" class="btn btn-primary mb-3" data-bs-toggle="modal" data-bs-target="#agregarModal">
+        Registrar Egreso
+    </button>
+
+    <!-- Tabla de egresos -->
+    <table class="table table-striped">
+        <thead>
+            <tr>
+                <th>ID Egreso</th>
+                <th>ID Sede</th>
+                <th>Monto</th>
+                <th>Descripción</th>
+                <th>Fecha</th>
+                <th>Hora</th>
+                <th>Acciones</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for egreso in egresos %}
+            <tr>
+                <td>{{ egreso[0] }}</td>
+                <td>{{ egreso[1] }}</td>
+                <td>{{ egreso[2] }}</td>
+                <td>{{ egreso[3] }}</td>
+                <td>{{ egreso[4] }}</td>
+                <td>{{ egreso[5] }}</td>
+                <td>
+                    <button class="btn btn-warning btn-sm" onclick="abrirModalEditar('{{ egreso[0] }}', '{{ egreso[1] }}', '{{ egreso[2] }}', '{{ egreso[3] }}', '{{ egreso[4] }}', '{{ egreso[5] }}')">Modificar</button>
+                    <form action="{{ url_for('eliminar_egreso') }}" method="POST" style="display:inline-block;">
+                        <input type="hidden" name="id_egreso" value="{{ egreso[0] }}">
+                        <button type="submit" class="btn btn-danger btn-sm">Eliminar</button>
+                    </form>
+                </td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+</div>
+
+<!-- Modal para agregar -->
+<div class="modal fade" id="agregarModal" tabindex="-1" aria-labelledby="agregarModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <form action="{{ url_for('insertar_egreso') }}" method="POST">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="agregarModalLabel">Registrar Egreso</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    <div class="mb-3">
+                        <label for="id_sede" class="form-label">ID Sede</label>
+                        <input type="number" class="form-control" name="id_sede" required>
+                    </div>
+                    <div class="mb-3">
+                        <label for="monto" class="form-label">Monto</label>
+                        <input type="number" step="0.01" class="form-control" name="monto" required>
+                    </div>
+                    <div class="mb-3">
+                        <label for="descripcion" class="form-label">Descripción</label>
+                        <input type="text" class="form-control" name="descripcion" required>
+                    </div>
+                    <div class="mb-3">
+                        <label for="fecha" class="form-label">Fecha</label>
+                        <input type="date" class="form-control" name="fecha" required>
+                    </div>
+                    <div class="mb-3">
+                        <label for="hora" class="form-label">Hora</label>
+                        <input type="time" class="form-control" name="hora" required>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
+                    <button type="submit" class="btn btn-primary">Guardar</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+<!-- Modal para editar -->
+<div class="modal fade" id="editarModal" tabindex="-1" aria-labelledby="editarModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <form action="{{ url_for('actualizar_egreso') }}" method="POST">
+                <input type="hidden" id="editarId" name="id_egreso">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="editarModalLabel">Modificar Egreso</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    <div class="mb-3">
+                        <label for="id_sede" class="form-label">ID Sede</label>
+                        <input type="number" class="form-control" id="editarSede" name="id_sede" required>
+                    </div>
+                    <div class="mb-3">
+                        <label for="monto" class="form-label">Monto</label>
+                        <input type="number" step="0.01" class="form-control" id="editarMonto" name="monto" required>
+                    </div>
+                    <div class="mb-3">
+                        <label for="descripcion" class="form-label">Descripción</label>
+                        <textarea class="form-control" id="editarDescripcion" name="descripcion" required></textarea>
+                    </div>
+                    <div class="mb-3">
+                        <label for="fecha" class="form-label">Fecha</label>
+                        <input type="date" class="form-control" id="editarFecha" name="fecha" required>
+                    </div>
+                    <div class="mb-3">
+                        <label for="hora" class="form-label">Hora</label>
+                        <input type="time" class="form-control" id="editarHora" name="hora" required>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
+                    <button type="submit" class="btn btn-primary">Guardar cambios</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+<!-- Scripts para manejar el modal de Editar -->
+<script>
+    function abrirModalEditar(id, sede, monto, descripcion, fecha, hora) {
+        document.getElementById("editarId").value = id;
+        document.getElementById("editarSede").value = sede;
+        document.getElementById("editarMonto").value = monto;
+        document.getElementById("editarDescripcion").value = descripcion;
+        document.getElementById("editarFecha").value = fecha;
+        document.getElementById("editarHora").value = hora;
+        var editarModal = new bootstrap.Modal(document.getElementById('editarModal'));
+        editarModal.show();
+    }
+</script>
+
+{% endblock %}

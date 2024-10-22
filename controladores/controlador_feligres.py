@@ -7,7 +7,7 @@ def insertar_feligres(dni, apellidos, nombres, fecha_nacimiento, estado_civil, s
     try:
         with conexion.cursor() as cursor:
             cursor.execute("""
-                INSERT INTO Feligres (dni, apellidos, nombres, fecha_nacimiento, estado_civil, sexo, id_sede)
+                INSERT INTO feligres (dni, apellidos, nombres, fecha_nacimiento, estado_civil, sexo, id_sede)
                 VALUES (%s, %s, %s, %s, %s, %s, %s)
             """, (dni, apellidos, nombres, fecha_nacimiento, estado_civil, sexo, id_sede))
         conexion.commit()
@@ -23,10 +23,10 @@ def obtener_feligreses():
         with conexion.cursor() as cursor:
             cursor.execute("""
                 SELECT f.id_feligres, f.dni, f.apellidos, f.nombres, f.fecha_nacimiento, f.estado_civil, f.sexo, s.nombre_sede 
-                FROM Feligres f
-                INNER JOIN Sede s ON f.id_sede = s.id_sede
+                FROM feligres f
+                INNER JOIN sede s ON f.id_sede = s.id_sede
             """)
-            feligreses = cursor.fetchall()
+            feligreses = cursor.fetchall()            
         return feligreses
     except Exception as e:
         print(f"Error al obtener feligreses: {e}")
@@ -40,7 +40,7 @@ def obtener_feligres_por_id(id_feligres):
         with conexion.cursor() as cursor:
             cursor.execute("""
                 SELECT id_feligres, dni, apellidos, nombres, fecha_nacimiento, estado_civil, sexo, id_sede 
-                FROM Feligres 
+                FROM feligres 
                 WHERE id_feligres = %s
             """, (id_feligres,))
             feligres = cursor.fetchone()
@@ -56,7 +56,7 @@ def actualizar_feligres(dni, apellidos, nombres, fecha_nacimiento, estado_civil,
     try:
         with conexion.cursor() as cursor:
             cursor.execute("""
-                UPDATE Feligres 
+                UPDATE feligres 
                 SET dni = %s, apellidos = %s, nombres = %s, fecha_nacimiento = %s, estado_civil = %s, sexo = %s, id_sede = %s
                 WHERE id_feligres = %s
             """, (dni, apellidos, nombres, fecha_nacimiento, estado_civil, sexo, id_sede, id_feligres))
@@ -71,10 +71,10 @@ def eliminar_feligres(id_feligres):
     conexion = obtener_conexion()
     try:
         with conexion.cursor() as cursor:
-            cursor.execute("DELETE FROM Feligres WHERE id_feligres = %s", (id_feligres,))
+            cursor.execute("DELETE FROM feligres WHERE id_feligres = %s", (id_feligres,))
         conexion.commit()
     except Exception as e:
-        print(f"Error al eliminar feligrés: {e}")
+        print(f"Error al eliminar feligres: {e}")
         conexion.rollback()
     finally:
         conexion.close()
