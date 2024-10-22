@@ -66,15 +66,24 @@ def registrar_rutas(app):
 
             # Llamamos a la función para insertar la recaudación
             success = insertar_recaudacion(monto, observacion, id_sede, id_tipo_recaudacion)
-            
+        
             if success:
-                return jsonify(success=True)
+                flash("Recaudación agregada exitosamente", "success")
+                return redirect(url_for("gestionar_recaudaciones"))  # Redirige a la página principal
             else:
-                return jsonify(success=False, message="Error al insertar la recaudación")
+                flash("Error al agregar la recaudación", "danger")
+                return redirect(url_for("gestionar_recaudaciones"))
         except Exception as e:
-            return jsonify(success=False, message=str(e))
+            flash(f"Error: {str(e)}", "danger")
+            return redirect(url_for("gestionar_recaudaciones"))
 
-
+    # procesar dar de baja
+    @app.route("/dar_baja_recaudacion", methods=["POST"])
+    def procesar_dar_baja_recaudacion():
+        id = request.form.get('id')
+        dar_baja_recaudacion(id)
+        flash("La recaudación fue dada de baja exitosamente")
+        return redirect(url_for("gestionar_recaudaciones"))
 
     # Procesar la eliminación de una recaudación
     @app.route("/eliminar_recaudacion", methods=["POST"])
