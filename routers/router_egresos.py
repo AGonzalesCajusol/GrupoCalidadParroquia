@@ -14,7 +14,7 @@ def registrar_rutas(app):
     def gestionar_egresos():
         conexion = obtener_conexion()
         with conexion.cursor() as cursor:
-            cursor.execute("SELECT * FROM egresos")
+            cursor.execute("SELECT * FROM egreso")
             egresos = cursor.fetchall()
         conexion.close()
         return render_template('egresos/gestionar_egresos.html', egresos=egresos)
@@ -31,7 +31,7 @@ def registrar_rutas(app):
         conexion = obtener_conexion()
         with conexion.cursor() as cursor:
             cursor.execute("""
-                INSERT INTO egresos (id_sede, monto, descripcion, fecha, hora)
+                INSERT INTO egreso (id_sede, monto, descripcion, fecha, hora)
                 VALUES (%s, %s, %s, %s, %s)
             """, (id_sede, monto, descripcion, fecha, hora))
         conexion.commit()
@@ -61,7 +61,7 @@ def registrar_rutas(app):
                     # Actualizar el egreso si la sede existe
                     cursor.execute(
                         """
-                        UPDATE egresos 
+                        UPDATE egreso 
                         SET id_sede = %s, monto = %s, descripcion = %s, fecha = %s, hora = %s
                         WHERE id_egreso = %s
                         """,
@@ -89,7 +89,7 @@ def registrar_rutas(app):
 
         conexion = obtener_conexion()
         with conexion.cursor() as cursor:
-            cursor.execute("DELETE FROM egresos WHERE id_egreso = %s", (id_egreso,))
+            cursor.execute("DELETE FROM egreso WHERE id_egreso = %s", (id_egreso,))
         conexion.commit()
         conexion.close()
 
