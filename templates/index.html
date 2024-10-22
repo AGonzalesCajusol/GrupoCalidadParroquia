@@ -47,58 +47,95 @@
     </div>
 
     <!-- Sidenav -->
-    <div class="layout" >
+    <div class="layout">
         <div id="mySidenav" class="sidenav">
 
             <div>
 
-
-                <!------------------------- Modulo de Usuarios ------------------------->
-                <a class="btn btn-primary  mb-2 mt-2" data-bs-toggle="collapse" href="#moduloUsuarios" role="button"
-                    aria-expanded="false" aria-controls="moduloUsuarios">
-                    <i class="bi bi-person-fill"></i> Gestión de Usuarios
+                <!------------------------- Modulo de seguridad ------------------------->
+                <a class="btn btn-primary  mb-2 mt-2" data-bs-toggle="collapse" href="#moduloSeguridad" role="button"
+                    aria-expanded="false" aria-controls="moduloSeguridad">
+                    <i class="bi bi-shield-lock"></i> Gestión de seguridad
                 </a>
 
-                <div class="collapse ms-4 mt-2" id="moduloUsuarios">
+                <div class="collapse ms-4 mt-2" id="moduloSeguridad">
                     <a class="btn btn-outline-primary">
-                        <i class="bi bi-globe"></i> Opcion 1
+                        <i class="bi bi-arrow-return-right"></i></i> Opcion 1
                     </a>
 
                     <a class="btn btn-outline-primary mt-2 mb-2">
-                        <i class="bi bi-globe"></i> Opcion 2
+                        <i class="bi bi-arrow-return-right"></i> Opcion 2
                     </a>
 
                 </div>
-                <!------------------------- Modulo de  Ministros ------------------------->
-                <a class="btn btn-primary" data-bs-toggle="collapse" href="#moduloMinistros" role="button"
-                    aria-expanded="false" aria-controls="moduloMinistros">
-                    <i class="bi bi-bank"></i> Gestión de Ministros
+
+                <!------------------------- Modulo de secretaria ------------------------->
+                <a class="btn btn-primary  mb-2 mt-2" data-bs-toggle="collapse" href="#moduloSecretaria" role="button"
+                    aria-expanded="false" aria-controls="moduloSecretaria">
+                    <i class="bi bi-card-list"></i> Gestión de secretaria
                 </a>
-                <div class="collapse ms-4 mt-2" id="moduloMinistros">
+                <div class="collapse ms-4 mt-2" id="moduloSecretaria">
                     <a class="btn btn-outline-primary" href="{{ url_for('gestionar_ministro') }}">
-                        <i class="bi bi-person-badge-fill ms-1"></i> Ministro
+                        <i class="bi bi-arrow-return-right"></i> Ministro
+                    </a>
+
+                    <a class="btn btn-outline-primary" href="{{ url_for('gestionar_tipo_ministro') }}">
+                        <i class="bi bi-arrow-return-right"></i> Tipo de Ministro
                     </a>
 
                     <a class="btn btn-outline-primary" href="{{ url_for('gestionar_feligres') }}">
-                        <i class="bi bi-person-badge-fill ms-1"></i> Feligres
+                        <i class="bi bi-arrow-return-right"></i> Feligres
+                    </a>
+
+                    <a href="{{ url_for('solicitudes') }}" class="btn btn-outline-primary">
+
+                        <i class="bi bi-arrow-return-right"></i> Solicitudes
+                        <span class="ms-4 mt-1 translate-middle badge rounded-pill bg-danger">
+                            99+
+                            <span class="visually-hidden">unread messages</span>
+                        </span>
                     </a>
 
                 </div>
-                <!------------------------- Modulo Personal Parroquial ------------------------->
-                <a class="btn btn-primary  mt-2" data-bs-toggle="collapse" href="#moduloPersonalParroquial"
-                    role="button" aria-expanded="false" aria-controls="moduloPersonalParroquial">
-                    <i class="bi bi-person-lines-fill"></i> Personal Parroquial
+                <!------------------------- Modulo de catequesis ------------------------->
+                <a class="btn btn-primary  mb-2 mt-2" data-bs-toggle="collapse" href="#moduloCatequesis" role="button"
+                    aria-expanded="false" aria-controls="moduloCatequesis">
+                    <i class="bi bi-book"></i> Gestión de catequesis
+                </a>                
+                <div class="collapse ms-4 mt-2" id="moduloCatequesis">
+                    <a href="{{ url_for('gestionar_actosliturgicos') }}" class="btn btn-outline-primary mt-2">
+                        <i class="bi bi-arrow-return-right"></i> Gestion Actos liturgicos
+                    </a>
+                    <a href="{{ url_for('requisitosXactoliturgico') }}" class="btn btn-outline-primary mt-2">
+                        <i class="bi bi-arrow-return-right"></i> Requisitos por acto litúrgico
+                    </a>
+
+                    <a href="{{ url_for('gestionar_tema') }}" class="btn btn-outline-primary mt-2">
+                        <i class="bi bi-arrow-return-right"></i> Gestion de temas
+                    </a>
+                </div>
+
+                <!------------------------- Modulo de parroquial ------------------------->
+                <a class="btn btn-primary  mb-2 mt-2" data-bs-toggle="collapse" href="#moduloParroquial" role="button"
+                    aria-expanded="false" aria-controls="moduloParroquial">
+                    <i class="bi bi-people-fill"></i> Gestión parroquial
                 </a>
-                <div class="collapse ms-4 mt-2" id="moduloPersonalParroquial">
-                    <a class="btn btn-outline-primary" href="{{ url_for('gestionar_tipo_ministro') }}">
-                        <i class="bi bi-person-badge-fill ms-1"></i> Tipo de Ministro
+
+                <div class="collapse ms-4 mt-2" id="moduloParroquial">
+                    <a href="{{ url_for('gestionar_congregacion') }}" class="btn btn-outline-primary">
+                        <i class="bi bi-arrow-return-right"></i> Congregación
                     </a>
 
-                    <a class="btn btn-outline-primary mt-2">
-                        <i class="bi bi-globe"></i> Opcion 2
+                    <a href="{{ url_for('gestionar_diocesis') }}" class="btn btn-outline-primary">
+                        <i class="bi bi-arrow-return-right"></i> Diocesis
+                    </a>
+
+                    <a href="{{ url_for('gestionar_sede') }}" class="btn btn-outline-primary">
+                        <i class="bi bi-arrow-return-right"></i> Sede
                     </a>
 
                 </div>
+
                 <!------------------------- Módulo de Gestión Financiera ------------------------->
                 <a class="btn btn-primary  mt-2" data-bs-toggle="collapse" href="#moduloFinanzas" role="button"
                     aria-expanded="false" aria-controls="moduloFinanzas">
@@ -106,70 +143,21 @@
                 </a>
                 <div class="collapse ms-4 mt-2" id="moduloFinanzas">
                     <a href="{{ url_for('gestionar_recaudaciones') }}" class="btn btn-outline-primary">
-                        <i class="bi bi-globe"></i> Recaudaciones
+                        <i class="bi bi-arrow-return-right"></i> Recaudaciones
                     </a>
 
                     <a href="{{ url_for('gestionar_tipo_recaudacion') }}" class="btn btn-outline-primary">
-                        <i class="bi bi-globe"></i> Tipo Recaudaciones
+                        <i class="bi bi-arrow-return-right"></i> Tipo Recaudaciones
                     </a>
 
-                    <a class="btn btn-outline-primary mt-2">
-                        <i class="bi bi-globe"></i> Opcion 2
-                    </a>
-
-                </div>
-                <!------------------------- Módulo de Ubicación ------------------------->
-                <a class="btn btn-primary  mt-2" data-bs-toggle="collapse" href="#moduloUbicacion" role="button"
-                    aria-expanded="false" aria-controls="moduloUbicacion">
-                    <i class="bi bi-geo-alt"></i> Ubicación
-                </a>
-                <div class="collapse ms-4 mt-2" id="moduloUbicacion">
-                    <a href="{{ url_for('gestionar_congregacion') }}" class="btn btn-outline-primary">
-                        <i class="bi bi-person-badge-fill ms-1"></i> Congregación
-                    </a>
-
-                    <a href="{{ url_for('gestionar_diocesis') }}" class="btn btn-outline-primary">
-                        <i class="bi bi-person-badge-fill ms-1"></i> Diocesis
-                    </a>
-
-                    <a href="{{ url_for('gestionar_sede') }}" class="btn btn-outline-primary">
-                        <i class="bi bi-person-badge-fill ms-1"></i> Sede
-                    </a>
-
-                </div>
-                <!------------------------- Módulo de Seguimiento secretaria ------------------------->
-                <a class="btn btn-primary  mt-2 " data-bs-toggle="collapse" href="#moduloseguimiento" role="button"
-                    aria-expanded="false" aria-controls="moduloseguimiento">
-                    <i class="bi bi-person-square"></i> Secretaria
-                </a>
-                <div class="collapse ms-4 mt-2" id="moduloseguimiento">
-                    <a href="{{ url_for('solicitudes') }}" class="btn btn-outline-primary">
-
-                        <i class="bi bi-person-badge-fill ms-1"></i> Solicitudes
-                        <span class="ms-4 mt-1 translate-middle badge rounded-pill bg-danger">
-                            99+
-                            <span class="visually-hidden">unread messages</span>
-                        </span>
-                    </a>
-
-                    <a href="{{ url_for('gestionar_actosliturgicos') }}" class="btn btn-outline-primary mt-2">
-                        <i class="bi bi-globe"></i> Gestion Actos liturgicos
-                    </a>
-                    <a href="{{ url_for('requisitosXactoliturgico') }}" class="btn btn-outline-primary mt-2">
-                        <i class="bi bi-globe"></i> Requisitos por acto litúrgico
-                    </a>
-
-                    <a href="{{ url_for('gestionar_tema') }}" class="btn btn-outline-primary mt-2">
-                        <i class="bi bi-globe"></i> Gestion de temas
-                    </a>                    
                 </div>
             </div>
+        </div>
+        <div class="main-content mt-3 me-5" style="max-height: 400px;">
+            {% block cuerpo %}
+            {% endblock %}
+        </div>
     </div>
-    <div class="main-content mt-3 me-5" style="max-height: 400px;">
-        {% block cuerpo %}
-        {% endblock %}
-    </div>
-</div>
 </body>
 <script src="{{ url_for('static', filename = '/js/defecto.js')}}"></script>
 <script src="{{ url_for('static', filename = '/js/solicitudes.js')}}"></script>
