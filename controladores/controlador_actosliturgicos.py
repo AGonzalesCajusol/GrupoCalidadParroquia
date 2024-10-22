@@ -192,3 +192,11 @@ def eliminaracto_requisitos(id):
         return False
     finally:
         conexion.close()
+
+def obtener_acto():
+    conexion = obtener_conexion()
+    with conexion.cursor() as cursor:
+        cursor.execute("SELECT nombre_liturgia from actoliturgico")
+        sede = cursor.fetchall()
+    conexion.close()
+    return sede
