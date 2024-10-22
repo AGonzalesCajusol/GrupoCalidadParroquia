@@ -10,17 +10,14 @@ $(document).ready(function () {
             // Insertar el botón "Agregar recaudación" dentro del div y alinearlo a la derecha
             $("div.button-section").html('<button type="button" class="btn btn-success btn-lg custom-btn ml-3 btn-agregar-recaudacion" data-bs-toggle="modal" onclick="openModal(\'add\')"><i class="bi bi-person-plus"></i> Agregar Recaudación</button>');
         
-        // Insertar el botón "Exportar recaudaciones" con el mismo estilo
-        $("div.button-section").append('<button type="button" class="btn btn-success btn-lg custom-btn ml-3" data-bs-toggle="modal" data-bs-target="#exportModal"><i class="bi bi-file-earmark-arrow-down"></i> Exportar Recaudaciones</button>');
-        
+            // Insertar el botón "Exportar recaudaciones" con el mismo estilo
+            $("div.button-section").append('<button type="button" class="btn btn-success btn-lg custom-btn ml-3" data-bs-toggle="modal" data-bs-target="#exportModal"><i class="bi bi-file-earmark-arrow-down"></i> Exportar Recaudaciones</button>');
         }
-
-        
     });
 });
 
 // Función para abrir el modal para agregar, ver o editar una recaudación
-function openModal(type, id = null, monto = '', observacion = '', id_sede = '', id_tipo_recaudacion = '', fecha = '', hora = '') {
+function openModal(type, id = null, fecha = '', hora = '', monto = '', observacion = '', estado = '', id_sede = '', id_tipo_recaudacion = '', tipo_recaudacion_nombre = '') {
     var modalTitle = '';
     var formAction = '';
     var isReadOnly = false;
@@ -34,6 +31,9 @@ function openModal(type, id = null, monto = '', observacion = '', id_sede = '', 
         document.getElementById('fecha_container').style.display = 'none';
         document.getElementById('hora_container').style.display = 'none';
 
+        document.getElementById('id_tipo_recaudacion').style.display = 'block';
+        document.getElementById('tipo_recaudacion_text').style.display = 'none'; // Ocultar el campo de texto para agregar
+
     } else if (type === 'edit') {
         modalTitle = 'Editar Recaudación';
         formAction = urlActualizarRecaudacion;
@@ -42,10 +42,15 @@ function openModal(type, id = null, monto = '', observacion = '', id_sede = '', 
 
         // Asignar valores al modal
         document.getElementById('recaudacionId').value = id;
+        document.getElementById('fecha').value = fecha;
+        document.getElementById('hora').value = hora;
         document.getElementById('monto').value = monto;
         document.getElementById('observacion').value = observacion;
-        document.getElementById('sede').value = id_sede;
+        document.getElementById('sede').value = id_sede;  // Sede asignada correctamente
         document.getElementById('id_tipo_recaudacion').value = id_tipo_recaudacion;
+
+        document.getElementById('id_tipo_recaudacion').style.display = 'block'; // Mostrar el select en modo edición
+        document.getElementById('tipo_recaudacion_text').style.display = 'none'; // Ocultar el campo de texto
 
         document.getElementById('fecha_container').style.display = 'none';
         document.getElementById('hora_container').style.display = 'none';
@@ -58,23 +63,23 @@ function openModal(type, id = null, monto = '', observacion = '', id_sede = '', 
 
         // Asignar valores al modal en modo solo lectura
         document.getElementById('recaudacionId').value = id;
-        document.getElementById('monto').value = monto;
-        document.getElementById('observacion').value = observacion;
-        document.getElementById('sede').value = id_sede;  // Mostrar el nombre de la sede
-
-        // Asignar el tipo de recaudación al select
-        let tipoRecaudacionSelect = document.getElementById('id_tipo_recaudacion');
-        tipoRecaudacionSelect.value = id_tipo_recaudacion; // Selecciona el tipo de recaudación
-
-        // Asignar fecha y hora
         document.getElementById('fecha').value = fecha;
         document.getElementById('hora').value = hora;
+        document.getElementById('monto').value = monto;
+        document.getElementById('observacion').value = observacion;
+        document.getElementById('sede').value = id_sede;  // Mostrar el nombre de la sede correctamente
+
+        // Mostrar el campo de texto para el tipo de recaudación
+        document.getElementById('tipo_recaudacion_text').value = tipo_recaudacion_nombre; // Mostrar el nombre del tipo de recaudación como texto
+        document.getElementById('tipo_recaudacion_text').style.display = 'block';  // Mostrar el campo de texto
+        document.getElementById('id_tipo_recaudacion').style.display = 'none';  // Ocultar el select
+
+        // Asignar el estado
+        const estadoCheckbox = document.getElementById('estado');
+        estadoCheckbox.checked = (estado === '1' || estado === true);
 
         document.getElementById('fecha_container').style.display = 'block';
         document.getElementById('hora_container').style.display = 'block';
-        // Asignar estado
-        const estadoCheckbox = document.getElementById('estado');
-        estadoCheckbox.checked = (estado === '1' || estado === true);
     }
 
     // Configuración del título del modal
@@ -91,7 +96,9 @@ function openModal(type, id = null, monto = '', observacion = '', id_sede = '', 
     var recaudacionModal = new bootstrap.Modal(document.getElementById('recaudacionModal'));
     recaudacionModal.show();
 }
-// funcion dar de baja 
+
+
+// Función para dar de baja una recaudación
 function darBajaRecaudacion(id) {
     if (confirm('¿Estás seguro de que deseas dar de baja esta recaudación?')) {
         fetch('/dar_baja_recaudacion', {
@@ -114,8 +121,6 @@ function darBajaRecaudacion(id) {
     }
 }
 
-
-
 // Función para limpiar los campos del modal
 function limpiarModal() {
     document.getElementById('recaudacionId').value = '';
@@ -123,6 +128,7 @@ function limpiarModal() {
     document.getElementById('observacion').value = '';
     document.getElementById('id_sede').value = '';
     document.getElementById('id_tipo_recaudacion').value = '';
+    document.getElementById('tipo_recaudacion_text').value = ''; // Limpiar también el campo de texto para tipo de recaudación
     document.getElementById('fecha').value = '';
     document.getElementById('hora').value = '';
 }
