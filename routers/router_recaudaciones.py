@@ -6,6 +6,7 @@ from reportlab.lib import colors  # Importa solo colors
 from reportlab.platypus import *  # Importa todas las herramientas de ReportLab para tablas y plantillas
 from reportlab.lib.units import *  # Importa todas las unidades de medida, como inch
 import csv  # Este lo dejamos como está, ya que no tiene tantas funciones y no es necesario usar *
+from reportlab.lib.styles import getSampleStyleSheet
 
 
 def registrar_rutas(app):
@@ -168,48 +169,117 @@ def registrar_rutas(app):
             print(f"Error al exportar recaudaciones en CSV: {e}")
             return redirect(url_for('exportar_recaudaciones'))
 
+    @app.route('/generar_pdf_previsualizacion', methods=['POST'])
+    def generar_pdf_previsualizacion():
+        año = request.form['año']
+        recaudaciones = obtener_recaudaciones_por_año(año)
+        sede = "Sede Central"  # Puedes cambiar esta parte si el valor es dinámico
+
+        # Genera el PDF y guárdalo temporalmente en una ruta accesible
+        output = BytesIO()
+        pdf = SimpleDocTemplate(output, pagesize=letter, rightMargin=30, leftMargin=30, topMargin=30, bottomMargin=18)
+
+        styles = getSampleStyleSheet()
+        title = Paragraph(f"Recaudaciones de la Sede Central del año {año}", styles['Title'])
+        subtitulo = Paragraph(f"Exportación recaudación del año {año} - {sede}", styles['Heading2'])
+
+        data = [['ID', 'Sede', 'Tipo', 'Descripción', 'Fecha', 'Monto']]
+        for rec in recaudaciones:
+            fecha_formateada = rec[1].strftime('%d-%m-%Y')
+            data.append([rec[0], rec[4], rec[5], rec[3], fecha_formateada, rec[2]])
+
+        colWidths = [0.6 * inch, 1.5 * inch, 1.5 * inch, 1.8 * inch, 1 * inch, 1 * inch]
+        table = Table(data, colWidths=colWidths, repeatRows=1)
+
+        style = TableStyle([
+            ('BACKGROUND', (0, 0), (-1, 0), colors.HexColor("#f5f5dc")),
+            ('TEXTCOLOR', (0, 0), (-1, 0), colors.HexColor("#274e77")),
+            ('ALIGN', (0, 0), (-1, -1), 'CENTER'),
+            ('FONTNAME', (0, 0), (-1, 0), 'Helvetica-Bold'),
+            ('FONTSIZE', (0, 0), (-1, 0), 12),
+            ('BOTTOMPADDING', (0, 0), (-1, 0), 12),
+            ('BACKGROUND', (0, 1), (-1, -1), colors.white),
+            ('TEXTCOLOR', (0, 1), (-1, -1), colors.black),
+            ('GRID', (0, 0), (-1, -1), 0.5, colors.black),
+            ('ALIGN', (3, 1), (3, -1), 'LEFT'),
+            ('ALIGN', (2, 1), (2, -1), 'LEFT')
+        ])
+        table.setStyle(style)
+
+        elements = [title, Spacer(1, 12), subtitulo, Spacer(1, 12), table]
+        pdf.build(elements)
+
+        # Guardar el PDF en un archivo temporal en la carpeta estática
+        with open("static/preview_recaudaciones.pdf", "wb") as f:
+            f.write(output.getvalue())
+
+        return jsonify({"success": True, "preview_url": "/static/preview_recaudaciones.pdf"})
 
     @app.route('/exportar_recaudaciones_pdf', methods=['POST'])
     def exportar_recaudaciones_pdf():
         año = request.form['año']
         recaudaciones = obtener_recaudaciones_por_año(año)
+        sede = "Sede Central"  # Si la sede es fija, si es variable puedes ajustarlo
 
         # Crear un archivo PDF en memoria
         output = BytesIO()
-        pdf = SimpleDocTemplate(output, pagesize=letter)
+        pdf = SimpleDocTemplate(output, pagesize=letter, rightMargin=30, leftMargin=30, topMargin=30, bottomMargin=18)
 
-        # Crear una lista para la tabla sin la columna de Monetario/No Monetario
-        data = [['ID', 'Fecha', 'Monto', 'Descripción', 'Sede', 'Tipo de Recaudación']]  # Encabezado de la tabla
+        # Crear un estilo de texto para los títulos
+        styles = getSampleStyleSheet()
+        title = Paragraph(f"Recaudaciones de la Sede Central del año {año}", styles['Title'])
+        
+        # Agregar un subtítulo para la tabla
+        subtitulo = Paragraph(f"Exportación recaudación del año {año} - {sede}", styles['Heading2'])
 
-        # Añadir las filas de las recaudaciones
+        # Crear una lista para la tabla con el orden de columnas solicitado
+        data = [['ID', 'Sede', 'Tipo', 'Descripción', 'Fecha', 'Monto']]  # Encabezado de la tabla
+
+        # Añadir las filas de las recaudaciones en el orden solicitado
         for rec in recaudaciones:
-            data.append([rec[0], rec[1].strftime('%Y-%m-%d'), rec[2], rec[3], rec[4], rec[5]])
+            # Convertir la fecha al formato día-mes-año
+            fecha_formateada = rec[1].strftime('%d-%m-%Y')
+            data.append([rec[0], rec[4], rec[5], rec[3], fecha_formateada, rec[2]])
 
         # Configurar los anchos de columna (ajústalos según tu necesidad)
-        colWidths = [0.8 * inch, 1.2 * inch, 1 * inch, 1.8 * inch, 1.5 * inch, 1.5 * inch]
+        colWidths = [0.6 * inch, 1.5 * inch, 1.5 * inch, 1.8 * inch, 1 * inch, 1 * inch]
 
         # Crear la tabla con los datos y los anchos de columna personalizados
-        table = Table(data, colWidths=colWidths)
+        table = Table(data, colWidths=colWidths, repeatRows=1)  # repeatRows=1 para que el encabezado se repita en cada página
 
-        # Aplicar estilo a la tabla con colores personalizados: azul, blanco y beige
+        # Aplicar estilo a la tabla con colores personalizados: cabecera beige, letras azules
         style = TableStyle([
-            ('BACKGROUND', (0, 0), (-1, 0), colors.HexColor("#274e77")),  # Encabezado color azul (hex: #274e77)
-            ('TEXTCOLOR', (0, 0), (-1, 0), colors.whitesmoke),  # Texto blanco en el encabezado
-            ('ALIGN', (0, 0), (-1, -1), 'CENTER'),
+            ('BACKGROUND', (0, 0), (-1, 0), colors.HexColor("#f5f5dc")),  # Fondo beige para la cabecera
+            ('TEXTCOLOR', (0, 0), (-1, 0), colors.HexColor("#274e77")),  # Texto azul en la cabecera
+            ('ALIGN', (0, 0), (-1, -1), 'CENTER'),  # Alinear todo al centro inicialmente
             ('FONTNAME', (0, 0), (-1, 0), 'Helvetica-Bold'),
             ('FONTSIZE', (0, 0), (-1, 0), 12),
             ('BOTTOMPADDING', (0, 0), (-1, 0), 12),
-            ('BACKGROUND', (0, 1), (-1, -1), colors.HexColor("#f5f5dc")),  # Fondo beige para las celdas (hex: #f5f5dc)
+            ('BACKGROUND', (0, 1), (-1, -1), colors.white),  # Fondo blanco para las celdas de datos
             ('TEXTCOLOR', (0, 1), (-1, -1), colors.black),  # Texto negro para el contenido de las celdas
-            ('GRID', (0, 0), (-1, -1), 0.5, colors.black)  # Bordes de la tabla en negro
+            ('GRID', (0, 0), (-1, -1), 0.5, colors.black),  # Bordes de la tabla en negro
+
+            # Alinear a la izquierda las columnas de "Descripción" y "Tipo de Recaudación"
+            ('ALIGN', (3, 1), (3, -1), 'LEFT'),  # Alinear la columna de "Descripción" a la izquierda
+            ('ALIGN', (2, 1), (2, -1), 'LEFT')   # Alinear la columna de "Tipo de Recaudación" a la izquierda
         ])
         table.setStyle(style)
 
         # Construir el PDF
-        elements = []
-        elements.append(table)
-        pdf.build(elements)
+        elements = [title, Spacer(1, 12), subtitulo, Spacer(1, 12), table]
+        pdf.build(elements, onFirstPage=_add_page_number, onLaterPages=_add_page_number)
 
         # Preparar el archivo PDF para la descarga
         output.seek(0)
         return send_file(output, mimetype='application/pdf', as_attachment=True, download_name=f'recaudaciones_{año}.pdf')
+
+
+def _add_page_number(canvas, doc):
+    """Agregar números de página en el pie del PDF"""
+    page_num = canvas.getPageNumber()
+    text = f"Página {page_num}"
+    canvas.drawRightString(200 * mm, 15 * mm, text)
+
+
+
+
