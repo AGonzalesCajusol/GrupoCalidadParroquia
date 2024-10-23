@@ -106,7 +106,7 @@
                         <label for="id_sede" class="form-label">Sede</label>
                         <select class="form-select" id="id_sede" name="id_sede" required>
                             {% for sede in sedes %}
-                            <option value="{{ sede[0] }}">{{ sede[1] }}</option>
+                            <option value="{{ sede[1] }}">{{ sede[1] }}</option>
                             {% endfor %}
                         </select>
                     </div>

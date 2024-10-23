@@ -9,15 +9,19 @@ $(document).ready(function () {
         initComplete: function () {
             // Insertar el botón "Agregar recaudación" dentro del div y alinearlo a la derecha
             $("div.button-section").html('<button type="button" class="btn btn-success btn-lg custom-btn ml-3 btn-agregar-recaudacion" data-bs-toggle="modal" onclick="openModal(\'add\')"><i class="bi bi-person-plus"></i> Agregar Recaudación</button>');
+        
+            // Insertar el botón "Exportar recaudaciones" con el mismo estilo
+            $("div.button-section").append('<button type="button" class="btn btn-success btn-lg custom-btn ml-3" data-bs-toggle="modal" data-bs-target="#exportModal"><i class="bi bi-file-earmark-arrow-down"></i> Exportar Recaudaciones</button>');
         }
     });
 });
 
 // Función para abrir el modal para agregar, ver o editar una recaudación
-function openModal(type, id = null, monto = '', observacion = '', id_sede = '', id_tipo_recaudacion = '', fecha = '', hora = '') {
+function openModal(type, id = null, fecha = '', hora = '', monto = '', observacion = '', estado = '', id_sede = '', id_tipo_recaudacion = '', tipo_recaudacion_nombre = '') {
     var modalTitle = '';
     var formAction = '';
     var isReadOnly = false;
+    console.log('Tipo de Recaudación:', tipo_recaudacion_nombre);
 
     if (type === 'add') {
         modalTitle = 'Agregar Recaudación';
@@ -28,7 +32,12 @@ function openModal(type, id = null, monto = '', observacion = '', id_sede = '', 
         document.getElementById('fecha_container').style.display = 'none';
         document.getElementById('hora_container').style.display = 'none';
 
-    } else if (type === 'edit') {
+        console.log(tipo_recaudacion_nombre); // Para verificar que el valor se está pasando correctamente
+
+        document.getElementById('tipo_recaudacion_text').value = tipo_recaudacion_nombre; // Mostrar el nombre del tipo de recaudación como texto
+        document.getElementById('tipo_recaudacion_text').style.display = 'block';  // Mostrar el campo de texto
+        document.getElementById('id_tipo_recaudacion').style.display = 'none';  // Ocultar el select
+
         modalTitle = 'Editar Recaudación';
         formAction = urlActualizarRecaudacion;
         isReadOnly = false;
@@ -36,10 +45,17 @@ function openModal(type, id = null, monto = '', observacion = '', id_sede = '', 
 
         // Asignar valores al modal
         document.getElementById('recaudacionId').value = id;
+        document.getElementById('fecha').value = fecha;
+        document.getElementById('hora').value = hora;
         document.getElementById('monto').value = monto;
         document.getElementById('observacion').value = observacion;
-        document.getElementById('sede').value = id_sede;
+        document.getElementById('sede').value = id_sede;  // Sede asignada correctamente
         document.getElementById('id_tipo_recaudacion').value = id_tipo_recaudacion;
+
+        console.log(tipo_recaudacion_nombre); // Para verificar que el valor se está pasando correctamente
+
+        document.getElementById('id_tipo_recaudacion').value = id_tipo_recaudacion; // Mostrar el nombre del tipo de recaudación como texto
+
 
         document.getElementById('fecha_container').style.display = 'none';
         document.getElementById('hora_container').style.display = 'none';
@@ -52,17 +68,17 @@ function openModal(type, id = null, monto = '', observacion = '', id_sede = '', 
 
         // Asignar valores al modal en modo solo lectura
         document.getElementById('recaudacionId').value = id;
-        document.getElementById('monto').value = monto;
-        document.getElementById('observacion').value = observacion;
-        document.getElementById('sede').value = id_sede;  // Mostrar el nombre de la sede
-
-        // Asignar el tipo de recaudación al select
-        let tipoRecaudacionSelect = document.getElementById('id_tipo_recaudacion');
-        tipoRecaudacionSelect.value = id_tipo_recaudacion; // Selecciona el tipo de recaudación
-
-        // Asignar fecha y hora
         document.getElementById('fecha').value = fecha;
         document.getElementById('hora').value = hora;
+        document.getElementById('monto').value = monto;
+        document.getElementById('observacion').value = observacion;
+        document.getElementById('sede').value = id_sede;  // Mostrar el nombre de la sede correctamente
+
+
+        document.getElementById('id_tipo_recaudacion').value = id_tipo_recaudacion; // Mostrar el nombre del tipo de recaudación como texto
+        
+        const estadoCheckbox = document.getElementById('estado');
+        estadoCheckbox.checked = (estado === '1' || estado === true);
 
         document.getElementById('fecha_container').style.display = 'block';
         document.getElementById('hora_container').style.display = 'block';
@@ -83,6 +99,30 @@ function openModal(type, id = null, monto = '', observacion = '', id_sede = '', 
     recaudacionModal.show();
 }
 
+
+// Función para dar de baja una recaudación
+function darBajaRecaudacion(id) {
+    if (confirm('¿Estás seguro de que deseas dar de baja esta recaudación?')) {
+        fetch('/dar_baja_recaudacion', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify({ id: id })
+        })
+        .then(response => response.json())
+        .then(data => {
+            if (data.success) {
+                alert('Recaudación dada de baja exitosamente');
+                location.reload();
+            } else {
+                alert('Error al dar de baja la recaudación');
+            }
+        })
+        .catch(error => console.error('Error:', error));
+    }
+}
+
 // Función para limpiar los campos del modal
 function limpiarModal() {
     document.getElementById('recaudacionId').value = '';
@@ -90,6 +130,7 @@ function limpiarModal() {
     document.getElementById('observacion').value = '';
     document.getElementById('id_sede').value = '';
     document.getElementById('id_tipo_recaudacion').value = '';
+    document.getElementById('tipo_recaudacion_text').value = ''; // Limpiar también el campo de texto para tipo de recaudación
     document.getElementById('fecha').value = '';
     document.getElementById('hora').value = '';
 }
@@ -116,3 +157,66 @@ function eliminarRecaudacion(id) {
         .catch(error => console.error('Error:', error));
     }
 }
+
+
+$(document).ready(function () {
+    // Cuando se abra el modal de exportación, cargar las recaudaciones por año
+    $('#exportModal').on('show.bs.modal', function () {
+        var año = $('#año').val();
+        cargarRecaudacionesPorAnio(año);
+    });
+
+    // Cambiar las recaudaciones cuando se seleccione otro año
+    $('#año').change(function () {
+        var año = $(this).val();
+        cargarRecaudacionesPorAnio(año);
+    });
+
+    // Función para cargar recaudaciones por año
+    function cargarRecaudacionesPorAnio(año) {
+        $.ajax({
+            url: '/obtener_recaudaciones_por_anio',
+            method: 'POST',
+            contentType: 'application/json',
+            data: JSON.stringify({ año: año }),
+            success: function (response) {
+                var tbody = $('#previsualizacionTable tbody');
+                tbody.empty(); // Limpiar tabla
+
+                if (response.recaudaciones) {
+                    response.recaudaciones.forEach(function (recaudacion) {
+                        tbody.append(`
+                            <tr>
+                                <td>${recaudacion.id}</td>
+                                <td>${recaudacion.fecha}</td>
+                                <td>${recaudacion.monto}</td>
+                                <td>${recaudacion.observacion}</td>
+                                <td>${recaudacion.sede}</td>
+                                <td>${recaudacion.tipo_recaudacion}</td>
+                            </tr>
+                        `);
+                    });
+                } else {
+                    tbody.append('<tr><td colspan="7" class="text-center">No se encontraron recaudaciones</td></tr>');
+                }
+            },
+            error: function (error) {
+                console.error('Error al cargar las recaudaciones:', error);
+            }
+        });
+    }
+
+    // Manejar el botón de exportación
+    $('#exportarButton').click(function () {
+        var tipoExportacion = $('#tipo_exportacion').val();
+        var form = $('#exportForm');
+
+        if (tipoExportacion === 'csv') {
+            form.attr('action', '/exportar_recaudaciones_csv');
+        } else if (tipoExportacion === 'pdf') {
+            form.attr('action', '/exportar_recaudaciones_pdf');
+        }
+
+        form.submit(); // Enviar el formulario para la exportación
+    });
+});

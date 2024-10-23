@@ -7,12 +7,15 @@ from controladores.controlador_tema import (
     eliminar_tema
 )
 
+import controladores.controlador_actosliturgicos  as acto 
+
 def registrar_rutas(app):
     # Ruta para gestionar temas
     @app.route("/gestionar_tema", methods=["GET"])
     def gestionar_tema():
         temas = obtener_temas()
-        return render_template("tema/gestionar_tema.html", temas=temas)
+        actos = acto.obtener_acto()
+        return render_template("tema/gestionar_tema.html", temas=temas, actos = actos)
 
     # Ruta para mostrar el formulario de registro de un nuevo tema
     @app.route("/registrar_tema", methods=["GET"])

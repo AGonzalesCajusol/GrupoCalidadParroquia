@@ -2,7 +2,7 @@ from flask import request, redirect, url_for, render_template, flash
 from bd import obtener_conexion
 from datetime import datetime
 
-def insertar_recaudacion(monto, observacion, id_sede, id_tipo_recaudacion):
+def insertar_recaudacion(monto, observacion, id_sede, id_tipo_recaudacion, estado=True):
     conexion = obtener_conexion()
     try:
         with conexion.cursor() as cursor:
@@ -14,26 +14,25 @@ def insertar_recaudacion(monto, observacion, id_sede, id_tipo_recaudacion):
 
             # Inserción de la nueva recaudación
             cursor.execute("""
-                INSERT INTO recaudacion (id_recaudacion, fecha, hora, monto, observacion, id_sede, id_tipo_recaudacion) 
-                VALUES (%s, %s, %s, %s, %s, %s, %s)
-            """, (siguiente_id, fecha_actual, hora_actual, monto, observacion, id_sede, id_tipo_recaudacion))
+                INSERT INTO recaudacion (id_recaudacion, fecha, hora, monto, observacion, estado, id_sede, id_tipo_recaudacion)
+                VALUES (%s, %s, %s, %s, %s, %s, %s, %s)
+            """, (siguiente_id, fecha_actual, hora_actual, monto, observacion, estado, id_sede, id_tipo_recaudacion))
 
-        # Confirmar la transacción
         conexion.commit()
-        return siguiente_id  # Devuelve el ID de la nueva recaudación insertada
+        return siguiente_id
     except Exception as e:
         print(f"Error al insertar recaudación: {e}")
-        conexion.rollback()  # Revertir la transacción en caso de error
+        conexion.rollback()
         return None
     finally:
-        conexion.close()  # Asegurarse de cerrar la conexión
+        conexion.close()
 
 def obtener_recaudaciones():
     conexion = obtener_conexion()
     try:
         with conexion.cursor() as cursor:
             cursor.execute("""
-                SELECT r.id_recaudacion, r.fecha, r.hora, r.monto, r.observacion, s.nombre_sede AS nombre_sede, tr.nombre_recaudacion AS nombre_tipo_recaudacion 
+                SELECT r.id_recaudacion, r.fecha, r.hora, r.monto, r.observacion, r.estado, s.nombre_sede, tr.nombre_recaudacion
                 FROM recaudacion r
                 JOIN sede s ON r.id_sede = s.id_sede
                 JOIN tipo_recaudacion tr ON r.id_tipo_recaudacion = tr.id_tipo_recaudacion
@@ -45,6 +44,7 @@ def obtener_recaudaciones():
         return []
     finally:
         conexion.close()
+
 
         
 def obtener_recaudacion_por_id(id_recaudacion):
@@ -64,21 +64,39 @@ def obtener_recaudacion_por_id(id_recaudacion):
     finally:
         conexion.close()
 
-def actualizar_recaudacion(monto, observacion, id_sede, id_tipo_recaudacion, id_recaudacion):
+def dar_baja_recaudacion(id_recaudacion):
     conexion = obtener_conexion()
     try:
         with conexion.cursor() as cursor:
             cursor.execute("""
                 UPDATE recaudacion 
-                SET monto = %s, observacion = %s, id_sede = %s, id_tipo_recaudacion = %s 
+                SET estado = %s 
                 WHERE id_recaudacion = %s
-            """, (monto, observacion, id_sede, id_tipo_recaudacion, id_recaudacion))
+            """, (False, id_recaudacion))  # False para marcar como inactivo
+        conexion.commit()
+    except Exception as e:
+        print(f"Error al dar de baja la recaudación: {e}")
+        conexion.rollback()
+    finally:
+        conexion.close()
+
+
+def actualizar_recaudacion(monto, observacion, id_sede, id_tipo_recaudacion, estado, id_recaudacion):
+    conexion = obtener_conexion()
+    try:
+        with conexion.cursor() as cursor:
+            cursor.execute("""
+                UPDATE recaudacion
+                SET fecha = NOW(), hora = NOW(), monto = %s, observacion = %s, estado = %s, id_sede = %s, id_tipo_recaudacion = %s
+                WHERE id_recaudacion = %s
+            """, (monto, observacion, estado, id_sede, id_tipo_recaudacion, id_recaudacion))
         conexion.commit()
     except Exception as e:
         print(f"Error al actualizar recaudación: {e}")
         conexion.rollback()
     finally:
         conexion.close()
+
 
 def eliminar_recaudacion(id_recaudacion):
     conexion = obtener_conexion()
@@ -115,3 +133,69 @@ def obtener_id_sede_por_nombre(nombre_sede):
         return None
     finally:
         conexion.close()
+
+
+def obtener_recaudaciones_por_año(año):
+    conexion = obtener_conexion()
+    try:
+        with conexion.cursor() as cursor:
+            cursor.execute("""
+                SELECT r.id_recaudacion, r.fecha, r.monto, r.observacion, s.nombre_sede, tr.nombre_recaudacion, r.estado
+                FROM recaudacion r
+                JOIN sede s ON r.id_sede = s.id_sede
+                JOIN tipo_recaudacion tr ON r.id_tipo_recaudacion = tr.id_tipo_recaudacion
+                WHERE YEAR(r.fecha) = %s
+            """, (año,))
+            recaudaciones = cursor.fetchall()
+        return recaudaciones
+    except Exception as e:
+        print(f"Error al obtener recaudaciones por año: {e}")
+        return []
+    finally:
+        conexion.close()
+
+# Obtener recaudaciones por año Exportar###
+def obtener_recaudaciones_por_año(año):
+    conexion = obtener_conexion()
+    with conexion.cursor() as cursor:
+        cursor.execute("""
+            SELECT 
+                r.id_recaudacion AS id,
+                r.fecha,
+                r.monto,
+                r.observacion,
+                s.nombre_sede AS sede,
+                t.nombre_recaudacion AS tipo_recaudacion,
+                CASE
+                    WHEN t.tipo = 1 THEN 'Monetaria'
+                    WHEN t.tipo = 0 THEN 'No Monetaria'
+                    ELSE 'Desconocido'
+                END AS tipo
+            FROM 
+                recaudacion r
+            JOIN 
+                sede s ON r.id_sede = s.id_sede
+            JOIN 
+                tipo_recaudacion t ON r.id_tipo_recaudacion = t.id_tipo_recaudacion
+            WHERE 
+                YEAR(r.fecha) = %s
+        """, (año,))
+        recaudaciones = cursor.fetchall()
+    
+    return recaudaciones
+
+
+def obtener_rango_de_años():
+    conexion = obtener_conexion()
+    with conexion.cursor() as cursor:
+        cursor.execute("""
+            SELECT MIN(YEAR(fecha)) as año_minimo, MAX(YEAR(fecha)) as año_maximo
+            FROM recaudacion;
+        """)
+        rango_años = cursor.fetchone()
+        
+    # Verifica que el rango de años sea válido
+    if rango_años:
+        año_minimo, año_maximo = rango_años
+        return list(range(año_minimo, año_maximo + 1))
+    return []
