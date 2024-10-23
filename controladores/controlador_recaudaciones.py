@@ -133,3 +133,69 @@ def obtener_id_sede_por_nombre(nombre_sede):
         return None
     finally:
         conexion.close()
+
+
+def obtener_recaudaciones_por_año(año):
+    conexion = obtener_conexion()
+    try:
+        with conexion.cursor() as cursor:
+            cursor.execute("""
+                SELECT r.id_recaudacion, r.fecha, r.monto, r.observacion, s.nombre_sede, tr.nombre_recaudacion, r.estado
+                FROM recaudacion r
+                JOIN sede s ON r.id_sede = s.id_sede
+                JOIN tipo_recaudacion tr ON r.id_tipo_recaudacion = tr.id_tipo_recaudacion
+                WHERE YEAR(r.fecha) = %s
+            """, (año,))
+            recaudaciones = cursor.fetchall()
+        return recaudaciones
+    except Exception as e:
+        print(f"Error al obtener recaudaciones por año: {e}")
+        return []
+    finally:
+        conexion.close()
+
+# Obtener recaudaciones por año Exportar###
+def obtener_recaudaciones_por_año(año):
+    conexion = obtener_conexion()
+    with conexion.cursor() as cursor:
+        cursor.execute("""
+            SELECT 
+                r.id_recaudacion AS id,
+                r.fecha,
+                r.monto,
+                r.observacion,
+                s.nombre_sede AS sede,
+                t.nombre_recaudacion AS tipo_recaudacion,
+                CASE
+                    WHEN t.tipo = 1 THEN 'Monetaria'
+                    WHEN t.tipo = 0 THEN 'No Monetaria'
+                    ELSE 'Desconocido'
+                END AS tipo
+            FROM 
+                recaudacion r
+            JOIN 
+                sede s ON r.id_sede = s.id_sede
+            JOIN 
+                tipo_recaudacion t ON r.id_tipo_recaudacion = t.id_tipo_recaudacion
+            WHERE 
+                YEAR(r.fecha) = %s
+        """, (año,))
+        recaudaciones = cursor.fetchall()
+    
+    return recaudaciones
+
+
+def obtener_rango_de_años():
+    conexion = obtener_conexion()
+    with conexion.cursor() as cursor:
+        cursor.execute("""
+            SELECT MIN(YEAR(fecha)) as año_minimo, MAX(YEAR(fecha)) as año_maximo
+            FROM recaudacion;
+        """)
+        rango_años = cursor.fetchone()
+        
+    # Verifica que el rango de años sea válido
+    if rango_años:
+        año_minimo, año_maximo = rango_años
+        return list(range(año_minimo, año_maximo + 1))
+    return []

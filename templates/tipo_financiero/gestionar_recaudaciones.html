@@ -122,6 +122,63 @@
         </div>
     </div>
 </div>
+<!-- Modal para Exportar Recaudaciones -->
+<div class="modal fade" id="exportModal" tabindex="-1" aria-labelledby="exportModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="exportModalLabel">Exportar Recaudaciones</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <form id="exportForm" method="POST" action="">
+                    <!-- Selección de año -->
+                    <div class="row mb-3">
+                        <div class="col-md-6">
+                            <label for="año" class="form-label">Seleccione el año</label>
+                            <select class="form-select" id="año" name="año" required>
+                                {% for año in años %}
+                                <option value="{{ año }}">{{ año }}</option>
+                                {% endfor %}
+                            </select>
+                        </div>
+                        <!-- Selección de formato de exportación -->
+                        <div class="col-md-6">
+                            <label for="tipo_exportacion" class="form-label">Seleccione el formato de exportación</label>
+                            <select class="form-select" id="tipo_exportacion" name="tipo_exportacion" required>
+                                <option value="csv">Excel (CSV)</option>
+                                <option value="pdf">PDF</option>
+                            </select>
+                        </div>
+                    </div>
+                </form>
+
+                <!-- Previsualización de recaudaciones -->
+                <div class="table-responsive" style="max-height: 300px; overflow-y: auto;">
+                    <table id="previsualizacionTable" class="table table-striped">
+                        <thead>
+                            <tr>
+                                <th>ID</th>
+                                <th>Fecha</th>
+                                <th>Monto</th>
+                                <th>Descripción</th>
+                                <th>Sede</th>
+                                <th>Tipo Recaudación</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <!-- Aquí se llenarán las recaudaciones mediante AJAX -->
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cerrar</button>
+                <button type="button" class="btn btn-primary" id="exportarButton">Exportar</button>
+            </div>
+        </div>
+    </div>
+</div>
 
 <script src="/static/js/recaudaciones.js"></script>
 

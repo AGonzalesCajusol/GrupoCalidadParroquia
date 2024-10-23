@@ -155,3 +155,66 @@ function eliminarRecaudacion(id) {
         .catch(error => console.error('Error:', error));
     }
 }
+
+
+$(document).ready(function () {
+    // Cuando se abra el modal de exportación, cargar las recaudaciones por año
+    $('#exportModal').on('show.bs.modal', function () {
+        var año = $('#año').val();
+        cargarRecaudacionesPorAnio(año);
+    });
+
+    // Cambiar las recaudaciones cuando se seleccione otro año
+    $('#año').change(function () {
+        var año = $(this).val();
+        cargarRecaudacionesPorAnio(año);
+    });
+
+    // Función para cargar recaudaciones por año
+    function cargarRecaudacionesPorAnio(año) {
+        $.ajax({
+            url: '/obtener_recaudaciones_por_anio',
+            method: 'POST',
+            contentType: 'application/json',
+            data: JSON.stringify({ año: año }),
+            success: function (response) {
+                var tbody = $('#previsualizacionTable tbody');
+                tbody.empty(); // Limpiar tabla
+
+                if (response.recaudaciones) {
+                    response.recaudaciones.forEach(function (recaudacion) {
+                        tbody.append(`
+                            <tr>
+                                <td>${recaudacion.id}</td>
+                                <td>${recaudacion.fecha}</td>
+                                <td>${recaudacion.monto}</td>
+                                <td>${recaudacion.observacion}</td>
+                                <td>${recaudacion.sede}</td>
+                                <td>${recaudacion.tipo_recaudacion}</td>
+                            </tr>
+                        `);
+                    });
+                } else {
+                    tbody.append('<tr><td colspan="7" class="text-center">No se encontraron recaudaciones</td></tr>');
+                }
+            },
+            error: function (error) {
+                console.error('Error al cargar las recaudaciones:', error);
+            }
+        });
+    }
+
+    // Manejar el botón de exportación
+    $('#exportarButton').click(function () {
+        var tipoExportacion = $('#tipo_exportacion').val();
+        var form = $('#exportForm');
+
+        if (tipoExportacion === 'csv') {
+            form.attr('action', '/exportar_recaudaciones_csv');
+        } else if (tipoExportacion === 'pdf') {
+            form.attr('action', '/exportar_recaudaciones_pdf');
+        }
+
+        form.submit(); // Enviar el formulario para la exportación
+    });
+});

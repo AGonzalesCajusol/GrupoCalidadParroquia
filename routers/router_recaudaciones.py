@@ -1,5 +1,12 @@
-from flask import jsonify, render_template, request, redirect, url_for, flash
+from flask import jsonify, render_template, request, redirect, url_for, flash,send_file
 from controladores.controlador_recaudaciones import *
+from io import * 
+from reportlab.lib.pagesizes import *  # Importa todo relacionado con tamaños de página
+from reportlab.lib import colors  # Importa solo colors
+from reportlab.platypus import *  # Importa todas las herramientas de ReportLab para tablas y plantillas
+from reportlab.lib.units import *  # Importa todas las unidades de medida, como inch
+import csv  # Este lo dejamos como está, ya que no tiene tantas funciones y no es necesario usar *
+
 
 def registrar_rutas(app):
     # Ruta para gestionar recaudaciones
@@ -8,7 +15,9 @@ def registrar_rutas(app):
         recaudaciones = obtener_recaudaciones()
         id_sede_central = obtener_id_sede_por_nombre("Sede Central")  # Obtén el ID de "Sede Central"
         tipos = obtener_tipos_recaudacion()  # Obtén los tipos de recaudación
-        return render_template("tipo_financiero/gestionar_recaudaciones.html", recaudaciones=recaudaciones, tipos=tipos)
+        años = obtener_rango_de_años()  # Obtenemos el rango de años disponibles en la BD
+        return render_template("tipo_financiero/gestionar_recaudaciones.html", recaudaciones=recaudaciones, tipos=tipos, años=años)
+
 
 
     # Ruta para mostrar el formulario de registro de una nueva recaudación
@@ -94,3 +103,113 @@ def registrar_rutas(app):
             return jsonify(success=True)
         except Exception as e:
             return jsonify(success=False, message=str(e))
+
+###Exportar##
+    @app.route('/obtener_recaudaciones_por_anio', methods=['POST'])
+    def obtener_recaudaciones_por_anio():
+        try:
+            # Obtener el dato JSON enviado por el cliente
+            data = request.get_json()
+            año = data.get('año')
+
+            if not año:
+                return jsonify({'error': 'Año no proporcionado'}), 400
+
+            # Llamar a la función para obtener las recaudaciones por año
+            recaudaciones = obtener_recaudaciones_por_año(año)
+
+            # Procesar las recaudaciones y devolver el JSON correcto
+            recaudaciones_json = []
+            for rec in recaudaciones:
+                recaudaciones_json.append({
+                    'id': rec[0],
+                    'fecha': rec[1].strftime('%Y-%m-%d'),
+                    'monto': rec[2],
+                    'observacion': rec[3],
+                    'sede': rec[4],
+                    'tipo_recaudacion': rec[5],
+                    'tipo': rec[6]
+                })
+
+            return jsonify({'recaudaciones': recaudaciones_json})
+
+        except Exception as e:
+            print(f"Error: {e}")
+            return jsonify({'error': 'Error al obtener las recaudaciones'}), 500
+
+    @app.route('/exportar_recaudaciones_csv', methods=['POST'])
+    def exportar_recaudaciones_csv():
+        try:
+            año = request.form['año']
+            recaudaciones = obtener_recaudaciones_por_año(año)
+
+            # Crear un archivo CSV en memoria
+            si = StringIO()
+            cw = csv.writer(si, delimiter=',', quotechar='"', quoting=csv.QUOTE_MINIMAL)
+            
+            # Escribir BOM al principio del archivo para que Excel lo reconozca correctamente
+            si.write('\ufeff')
+
+            # Escribir el encabezado
+            cw.writerow(['ID', 'Fecha', 'Monto', 'Descripción', 'Sede', 'Tipo de Recaudación', 'Monetaria/No Monetaria'])
+
+            # Escribir las recaudaciones
+            for rec in recaudaciones:
+                cw.writerow([rec[0], rec[1], rec[2], rec[3], rec[4], rec[5], rec[6]])
+
+            # Preparar el archivo CSV para la descarga
+            output = BytesIO()
+            output.write(si.getvalue().encode('utf-8'))
+            output.seek(0)
+
+            return send_file(output, mimetype='text/csv', as_attachment=True, download_name=f'recaudaciones_{año}.csv')
+
+        except Exception as e:
+            print(f"Error al exportar recaudaciones en CSV: {e}")
+            return redirect(url_for('exportar_recaudaciones'))
+
+
+    @app.route('/exportar_recaudaciones_pdf', methods=['POST'])
+    def exportar_recaudaciones_pdf():
+        año = request.form['año']
+        recaudaciones = obtener_recaudaciones_por_año(año)
+
+        # Crear un archivo PDF en memoria
+        output = BytesIO()
+        pdf = SimpleDocTemplate(output, pagesize=letter)
+
+        # Crear una lista para la tabla sin la columna de Monetario/No Monetario
+        data = [['ID', 'Fecha', 'Monto', 'Descripción', 'Sede', 'Tipo de Recaudación']]  # Encabezado de la tabla
+
+        # Añadir las filas de las recaudaciones
+        for rec in recaudaciones:
+            data.append([rec[0], rec[1].strftime('%Y-%m-%d'), rec[2], rec[3], rec[4], rec[5]])
+
+        # Configurar los anchos de columna (ajústalos según tu necesidad)
+        colWidths = [0.8 * inch, 1.2 * inch, 1 * inch, 1.8 * inch, 1.5 * inch, 1.5 * inch]
+
+        # Crear la tabla con los datos y los anchos de columna personalizados
+        table = Table(data, colWidths=colWidths)
+
+        # Aplicar estilo a la tabla con colores personalizados: azul, blanco y beige
+        style = TableStyle([
+            ('BACKGROUND', (0, 0), (-1, 0), colors.HexColor("#274e77")),  # Encabezado color azul (hex: #274e77)
+            ('TEXTCOLOR', (0, 0), (-1, 0), colors.whitesmoke),  # Texto blanco en el encabezado
+            ('ALIGN', (0, 0), (-1, -1), 'CENTER'),
+            ('FONTNAME', (0, 0), (-1, 0), 'Helvetica-Bold'),
+            ('FONTSIZE', (0, 0), (-1, 0), 12),
+            ('BOTTOMPADDING', (0, 0), (-1, 0), 12),
+            ('BACKGROUND', (0, 1), (-1, -1), colors.HexColor("#f5f5dc")),  # Fondo beige para las celdas (hex: #f5f5dc)
+            ('TEXTCOLOR', (0, 1), (-1, -1), colors.black),  # Texto negro para el contenido de las celdas
+            ('GRID', (0, 0), (-1, -1), 0.5, colors.black)  # Bordes de la tabla en negro
+        ])
+        table.setStyle(style)
+
+        # Construir el PDF
+        elements = []
+        elements.append(table)
+        pdf.build(elements)
+
+        # Preparar el archivo PDF para la descarga
+        output.seek(0)
+        return send_file(output, mimetype='application/pdf', as_attachment=True, download_name=f'recaudaciones_{año}.pdf')
