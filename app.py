@@ -40,7 +40,6 @@ routers.router_congregacion.registrar_rutas(app)
 
 # Registrar las rutas definidas en router_sede.py
 routers.router_sede.registrar_rutas(app)
-
 # Secretaria
 routers.router_secretaria.registrar_rutas(app)
 

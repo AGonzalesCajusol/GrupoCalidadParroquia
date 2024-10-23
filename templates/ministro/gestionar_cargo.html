@@ -1,39 +1,52 @@
 {% extends "index.html" %}
-{% block title %}Gestión de Cargo{% endblock %}
+{% block title %}Gestión de Cargos{% endblock %}
 {% block cuerpo %}
 
 <div class="container mt-4">
-    <h1>Gestión de Cargo</h1>
+    <h1 class="titulo-gestion">Gestión de Cargos</h1>
 
-    <!-- Botón para abrir el modal de "Agregar" -->
-    <button type="button" class="btn btn-primary mb-3" data-bs-toggle="modal" data-bs-target="#agregarModal">
-        Agregar Cargo
-    </button>
-
-    <!-- Tabla de Cargo -->
-    <table id="CargoTable" class="table table-striped">
+    <!-- Tabla de cargos -->
+    <table id="cargoTable" class="table table-hover table-striped">
         <thead>
-            <tr>
-                <th>ID</th>
-                <th>Cargo</th>
-                <th>Acciones</th>
-            </tr>
+            <th>ID</th>
+            <th>Nombre del Cargo</th>
+            <th style="vertical-align: middle; text-align: center;">Estado</th>
+            <th style="vertical-align: middle; text-align: center; width: 200px;">Acciones</th>
         </thead>
         <tbody>
             {% for cargo in cargos %}
             <tr>
-                <td>{{ cargo[0] }}</td>
-                <td>{{ cargo[1] }}</td>
-                <td>
-                    <button class="btn btn-warning btn-sm" onclick="abrirModalEditar('{{ cargo[0] }}', '{{ cargo[1] }}')">
-                        Editar
+                <td class="text-center">{{ cargo[0] }}</td> <!-- ID del cargo -->
+                <td>{{ cargo[1] }}</td> <!-- Nombre del cargo -->
+                <td class="text-center">{{ 'Activo' if cargo[2] == 1 else 'Inactivo' }}</td> <!-- Estado -->
+
+                <td class="text-center">
+                    <!-- Botón para ver detalles -->
+                    <button class="btn btn-primary btn-sm" title="Ver"
+                        onclick="openModal('view', '{{ cargo[0] }}', '{{ cargo[1] }}')">
+                        <i class="fas fa-eye"></i>
                     </button>
-                    <form action="{{ url_for('procesar_eliminar_cargo') }}" method="POST" style="display:inline-block;">
-                        <input type="hidden" name="id" value="{{ cargo[0] }}">
-                        <button type="submit" class="btn btn-danger btn-sm" onclick="return confirm('¿Estás seguro de que deseas eliminar este cargo?');">
-                            Eliminar
-                        </button>
-                    </form>
+
+                    <!-- Botón para editar -->
+                    <button class="btn btn-warning btn-sm" title="Editar"
+                        onclick="openModal('edit', '{{ cargo[0] }}', '{{ cargo[1] }}')">
+                        <i class="fas fa-edit"></i>
+                    </button>
+
+                    <button type="button" class="btn btn-secondary btn-sm" title="Dar de baja"
+                        onclick="darDeBajaCargo('{{ cargo[0] }}')">
+                        <i class="fas fa-ban"></i> <!-- Ícono de FontAwesome -->
+                    </button>
+                    
+                    <!-- Formulario para eliminar -->
+                    <button type="button" class="btn btn-danger btn-sm" title="Eliminar"
+                        onclick="eliminarCargo('{{ cargo[0] }}')">
+                        <i class="fas fa-trash-alt"></i>
+
+                    </button>
+
+
+
                 </td>
             </tr>
             {% endfor %}
@@ -41,88 +54,46 @@
     </table>
 </div>
 
-<!-- Modal para agregar un nuevo cargo -->
-<div class="modal fade" id="agregarModal" tabindex="-1" aria-labelledby="agregarModalLabel" aria-hidden="true">
+<!-- Modal para Agregar/Ver/Editar Cargo -->
+<div class="modal fade" id="cargoModal" tabindex="-1" aria-labelledby="cargoModalLabel" aria-hidden="true">
     <div class="modal-dialog">
         <div class="modal-content">
-            <form action="{{ url_for('procesar_insertar_cargo') }}" method="POST">
+            <form id="cargoForm" action="" method="POST">
+                <input type="hidden" id="cargoId" name="id">
+
                 <div class="modal-header">
-                    <h5 class="modal-title" id="agregarModalLabel">Agregar Cargo</h5>
+                    <h5 class="modal-title" id="cargoModalLabel">Modal Title</h5>
                     <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
                 </div>
                 <div class="modal-body">
+                    <!-- Información del cargo -->
                     <div class="mb-3">
-                        <label for="nombreAgregar" class="form-label">Nombre del Cargo</label>
-                        <input type="text" class="form-control" id="nombreAgregar" name="nombre" required>
+                        <label for="nombre" class="form-label">Nombre del Cargo</label>
+                        <input type="text" class="form-control" id="nombre" name="nombre" required>
+                    </div>
+
+                    <!-- Checkbox para el estado del cargo -->
+                    <div class="form-check">
+                        <input class="form-check-input" type="checkbox" id="estado" name="estado">
+                        <label class="form-check-label" for="estado">
+                            Activo
+                        </label>
                     </div>
                 </div>
                 <div class="modal-footer">
-                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
-                    <button type="submit" class="btn btn-primary">Guardar</button>
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cerrar</button>
+                    <button type="submit" class="btn btn-primary" id="saveChanges">Guardar</button>
                 </div>
             </form>
         </div>
     </div>
 </div>
 
-<!-- Modal para editar un tipo de ministro -->
-<div class="modal fade" id="editarModal" tabindex="-1" aria-labelledby="editarModalLabel" aria-hidden="true">
-    <div class="modal-dialog">
-        <div class="modal-content">
-            <form action="{{ url_for('procesar_actualizar_cargo') }}" method="POST">
-                <form action="{{ url_for('procesar_actualizar_cargo') }}" method="POST">
-                <input type="hidden" id="editarId" name="id">
-                <div class="modal-header">
-                    <h5 class="modal-title" id="editarModalLabel">Editar Cargo</h5>
-                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-                </div>
-                <div class="modal-body">
-                    <div class="mb-3">
-                        <label for="nombreEditar" class="form-label">Nombre del Cargo</label>
-                        <input type="text" class="form-control" id="nombreEditar" name="nombre" required>
-                    </div>
-                </div>
-                <div class="modal-footer">
-                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
-                    <button type="submit" class="btn btn-primary">Guardar cambios</button>
-                </div>
-            </form>
-        </div>
-    </div>
-</div>
+<script src="/static/js/gestion_cargo.js"></script>
 
-<!-- Scripts para manejar el modal de editar -->
-<script>
-    function abrirModalEditar(id, nombre) {
-        document.getElementById("editarId").value = id;
-        document.getElementById("nombreEditar").value = nombre;
-        var editarModal = new bootstrap.Modal(document.getElementById('editarModal'));
-        editarModal.show();
-    }
-</script>
-
-<!-- jQuery -->
-<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
-
-<!-- Bootstrap JS -->
-<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
-
-<!-- DataTables JS -->
-<script src="https://cdn.datatables.net/1.13.1/js/jquery.dataTables.min.js"></script>
-
-<!-- Inicialización de DataTables -->
-<script>
-    $(document).ready(function() {
-        $('#CargoTable').DataTable({
-            "language": {
-                "url": "//cdn.datatables.net/plug-ins/1.13.1/i18n/es-ES.json"
-            },
-            "paging": true,
-            "searching": true,
-            "ordering": true,
-            "responsive": true
-        });
-    });
+<script type="text/javascript">
+    const urlInsertarCargo = "{{ url_for('procesar_insertar_cargo') }}";
+    const urlActualizarCargo = "{{ url_for('procesar_actualizar_cargo') }}";
 </script>
 
 {% endblock %}

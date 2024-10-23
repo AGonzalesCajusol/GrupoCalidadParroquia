@@ -21,8 +21,8 @@ def obtener_temas():
         with conexion.cursor() as cursor:
             cursor.execute("""
                 SELECT t.id_tema, t.descripcion, a.nombre_liturgia 
-                FROM Tema t
-                INNER JOIN ActoLiturgico a ON t.id_actoliturgico = a.id_actoliturgico
+                FROM tema t
+                INNER JOIN actoliturgico a ON t.id_actoliturgico = a.id_actoliturgico
             """)
             temas = cursor.fetchall()
         return temas
@@ -74,5 +74,23 @@ def eliminar_tema(id_tema):
     except Exception as e:
         print(f"Error al eliminar tema: {e}")
         conexion.rollback()
+    finally:
+        conexion.close()
+
+
+def obtener_tema_por_acto(acto):
+    conexion = obtener_conexion()
+    try:
+        with conexion.cursor() as cursor:
+            cursor.execute("""
+                SELECT t.id_tema, t.descripcion, t.id_actoliturgico 
+                FROM tema t  inner join actoliturgico al on al.id_actoliturgico=t.id_actoliturgico
+                WHERE al.id_actoliturgico  = %s
+            """, (acto,))
+            tema = cursor.fetchone()
+        return tema
+    except Exception as e:
+        print(f"Error al obtener tema por id: {e}")
+        return None
     finally:
         conexion.close()

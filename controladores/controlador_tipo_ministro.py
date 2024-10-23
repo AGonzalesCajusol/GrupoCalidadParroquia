@@ -17,7 +17,7 @@ def insertar_tipo_ministro(nombre):
 def obtener_tipos_ministro():
     conexion = obtener_conexion()
     with conexion.cursor() as cursor:
-        cursor.execute("SELECT id_tipoministro, tipo_ministro FROM tipo_ministro")
+        cursor.execute("SELECT id_tipoministro, tipo_ministro, estado FROM tipo_ministro")
         tipos_ministro = cursor.fetchall()
     conexion.close()
     return tipos_ministro
