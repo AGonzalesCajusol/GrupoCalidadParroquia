@@ -31,10 +31,12 @@ function openModal(type, id = null, fecha = '', hora = '', monto = '', observaci
         document.getElementById('fecha_container').style.display = 'none';
         document.getElementById('hora_container').style.display = 'none';
 
-        document.getElementById('id_tipo_recaudacion').style.display = 'block';
-        document.getElementById('tipo_recaudacion_text').style.display = 'none'; // Ocultar el campo de texto para agregar
+        console.log(tipo_recaudacion_nombre); // Para verificar que el valor se está pasando correctamente
 
-    } else if (type === 'edit') {
+        document.getElementById('tipo_recaudacion_text').value = tipo_recaudacion_nombre; // Mostrar el nombre del tipo de recaudación como texto
+        document.getElementById('tipo_recaudacion_text').style.display = 'block';  // Mostrar el campo de texto
+        document.getElementById('id_tipo_recaudacion').style.display = 'none';  // Ocultar el select
+
         modalTitle = 'Editar Recaudación';
         formAction = urlActualizarRecaudacion;
         isReadOnly = false;
