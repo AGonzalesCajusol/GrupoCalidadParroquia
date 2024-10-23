@@ -54,9 +54,8 @@ function openModal(type, id = null, fecha = '', hora = '', monto = '', observaci
 
         console.log(tipo_recaudacion_nombre); // Para verificar que el valor se está pasando correctamente
 
-        document.getElementById('tipo_recaudacion_text').value = tipo_recaudacion_nombre; // Mostrar el nombre del tipo de recaudación como texto
-        document.getElementById('tipo_recaudacion_text').style.display = 'block';  // Mostrar el campo de texto
-        document.getElementById('id_tipo_recaudacion').style.display = 'none';  // Ocultar el select
+        document.getElementById('id_tipo_recaudacion').value = id_tipo_recaudacion; // Mostrar el nombre del tipo de recaudación como texto
+
 
         document.getElementById('fecha_container').style.display = 'none';
         document.getElementById('hora_container').style.display = 'none';
@@ -75,13 +74,9 @@ function openModal(type, id = null, fecha = '', hora = '', monto = '', observaci
         document.getElementById('observacion').value = observacion;
         document.getElementById('sede').value = id_sede;  // Mostrar el nombre de la sede correctamente
 
-         console.log(tipo_recaudacion_nombre); // Para verificar que el valor se está pasando correctamente
 
-        document.getElementById('tipo_recaudacion_text').value = tipo_recaudacion_nombre; // Mostrar el nombre del tipo de recaudación como texto
-        document.getElementById('tipo_recaudacion_text').style.display = 'block';  // Mostrar el campo de texto
-        document.getElementById('id_tipo_recaudacion').style.display = 'none';  // Ocultar el select
-
-        // Asignar el estado
+        document.getElementById('id_tipo_recaudacion').value = id_tipo_recaudacion; // Mostrar el nombre del tipo de recaudación como texto
+        
         const estadoCheckbox = document.getElementById('estado');
         estadoCheckbox.checked = (estado === '1' || estado === true);
 
