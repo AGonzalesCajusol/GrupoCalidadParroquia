@@ -21,6 +21,7 @@ function openModal(type, id = null, fecha = '', hora = '', monto = '', observaci
     var modalTitle = '';
     var formAction = '';
     var isReadOnly = false;
+    console.log('Tipo de Recaudación:', tipo_recaudacion_nombre);
 
     if (type === 'add') {
         modalTitle = 'Agregar Recaudación';
@@ -51,8 +52,11 @@ function openModal(type, id = null, fecha = '', hora = '', monto = '', observaci
         document.getElementById('sede').value = id_sede;  // Sede asignada correctamente
         document.getElementById('id_tipo_recaudacion').value = id_tipo_recaudacion;
 
-        document.getElementById('id_tipo_recaudacion').style.display = 'block'; // Mostrar el select en modo edición
-        document.getElementById('tipo_recaudacion_text').style.display = 'none'; // Ocultar el campo de texto
+        console.log(tipo_recaudacion_nombre); // Para verificar que el valor se está pasando correctamente
+
+        document.getElementById('tipo_recaudacion_text').value = tipo_recaudacion_nombre; // Mostrar el nombre del tipo de recaudación como texto
+        document.getElementById('tipo_recaudacion_text').style.display = 'block';  // Mostrar el campo de texto
+        document.getElementById('id_tipo_recaudacion').style.display = 'none';  // Ocultar el select
 
         document.getElementById('fecha_container').style.display = 'none';
         document.getElementById('hora_container').style.display = 'none';
@@ -71,7 +75,8 @@ function openModal(type, id = null, fecha = '', hora = '', monto = '', observaci
         document.getElementById('observacion').value = observacion;
         document.getElementById('sede').value = id_sede;  // Mostrar el nombre de la sede correctamente
 
-        // Mostrar el campo de texto para el tipo de recaudación
+         console.log(tipo_recaudacion_nombre); // Para verificar que el valor se está pasando correctamente
+
         document.getElementById('tipo_recaudacion_text').value = tipo_recaudacion_nombre; // Mostrar el nombre del tipo de recaudación como texto
         document.getElementById('tipo_recaudacion_text').style.display = 'block';  // Mostrar el campo de texto
         document.getElementById('id_tipo_recaudacion').style.display = 'none';  // Ocultar el select

@@ -66,9 +66,12 @@ def registrar_rutas(app):
             observacion = request.form["observacion"]
             nombre_sede = "Sede Central"  # Puedes cambiar esto por cualquier sede que quieras obtener
             id_tipo_recaudacion = request.form["id_tipo_recaudacion"]
+            
 
             # Obtener el ID de la sede por su nombre
             id_sede = obtener_id_sede_por_nombre(nombre_sede)
+            id_tipo_recaudacion = obtener_recaudacion_por_id(id_tipo_recaudacion)
+
 
             # Verificar si se obtuvo un ID válido para la sede
             if not id_sede:

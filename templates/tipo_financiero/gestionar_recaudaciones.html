@@ -104,7 +104,7 @@
                         <input type="text" class="form-control" id="tipo_recaudacion_text" readonly style="display: none;">
                         <select class="form-select" id="id_tipo_recaudacion" name="id_tipo_recaudacion" required>
                             {% for tipo in tipos %}
-                            <option value="{{ tipo[0] }}">{{ tipo[1] }}</option>
+                            <option value="{{ tipo[1] }}">{{ tipo[1] }}</option>
                             {% endfor %}
                         </select>
                     </div>
