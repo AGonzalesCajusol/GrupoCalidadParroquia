@@ -29,6 +29,7 @@ def registrar_rutas(app):
             response.set_cookie('nombre', nom)
             response.set_cookie('token', tk)
             response.set_cookie('tipo',tp)
+            print(request.cookies.get('tipo'))
 
             return response
         elif valor == 2:
