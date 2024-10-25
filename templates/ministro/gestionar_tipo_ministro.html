@@ -1,33 +1,47 @@
 {% extends "index.html" %}
-{% block title %}Gestión de Tipo de Ministro{% endblock %}
+{% block title %}Gestión de Tipos de Ministro{% endblock %}
 {% block cuerpo %}
 
 <div class="container mt-4">
-    <h1 class="titulo-gestion">Gestión de tipos de ministro</h1>
+    <h1 class="titulo-gestion">Gestión de Tipos de Ministro</h1>
 
     <table id="tipoMinistroTable" class="table table-hover table-striped">
         <thead>
-            <tr>
-                <th style="vertical-align: middle; text-align: center;">ID</th>
-                <th style="vertical-align: middle; text-align: center;">Tipo de Ministro</th>
-                <th  style="vertical-align: middle; text-align: center; width: 200px" >Acciones</th>
-            </tr>
+            <th style="vertical-align: middle; text-align: center;">ID</th>
+            <th style="vertical-align: middle; text-align: center;">Tipo de Ministro</th>
+            <th style="vertical-align: middle; text-align: center;">Estado</th>
+            <th style="vertical-align: middle; text-align: center; width: 200px;">Acciones</th>
         </thead>
         <tbody>
             {% for tipo in tipos_ministro %}
             <tr>
-                <td class="text-center">{{ tipo[0] }}</td>
-                <td>{{ tipo[1] }}</td>
+                <td class="text-center">{{ tipo[0] }}</td> <!-- ID del tipo de ministro -->
+                <td>{{ tipo[1] }}</td> <!-- Tipo de ministro -->
+                <td class="text-center">{{ 'Activo' if tipo[2] == 1 else 'Inactivo' }}</td> <!-- Estado -->
+
                 <td class="text-center">
+                    <button class="btn btn-primary btn-sm" title="Ver"
+                        onclick="openModal('view', '{{ tipo[0] }}', '{{ tipo[1] }}', '{{ tipo[2] }}')">
+                        <i class="fas fa-eye"></i>
+                    </button>
+
                     <button class="btn btn-warning btn-sm" title="Editar"
-                    onclick="openModal('edit', '{{ tipo[0] }}', '{{ tipo[1] }}')">
-                    <i class="fas fa-edit"></i>
+                        onclick="openModal('edit', '{{ tipo[0] }}', '{{ tipo[1] }}', '{{ tipo[2] }}')">
+                        <i class="fas fa-edit"></i>
                     </button>
-                    
+
+                    <button type="button" class="btn btn-secondary btn-sm" title="Dar de Baja"
+                        onclick="darDeBajaTipoMinistro('{{ tipo[0] }}')">
+                        <i class="fas fa-ban"></i>
+                    </button>
+
                     <button type="button" class="btn btn-danger btn-sm" title="Eliminar"
-                    onclick="eliminarTipoMinistro('{{ tipo[0] }}')">
-                    <i class="fas fa-trash-alt"></i>
+                        onclick="eliminarTipoMinistro('{{ tipo[0] }}')">
+                        <i class="fas fa-trash-alt"></i>
+
                     </button>
+
+                    
                 </td>
             </tr>
             {% endfor %}
@@ -35,25 +49,34 @@
     </table>
 </div>
 
-<!-- Modal para agregar/editar tipo de ministro -->
-<div class="modal fade" id="TipoMinistroModal" tabindex="-1" aria-labelledby="TipoMinistroModalLabel" aria-hidden="true">
+<!-- Modal para Agregar/Ver/Editar Tipo de Ministro -->
+<div class="modal fade" id="tipoMinistroModal" tabindex="-1" aria-labelledby="tipoMinistroModalLabel"
+    aria-hidden="true">
     <div class="modal-dialog">
         <div class="modal-content">
-            <form id="TipoMinistroForm" action="" method="POST">
-                <input type="hidden" id="TipoMinistroId" name="id">
+            <form id="tipoMinistroForm" action="" method="POST">
+                <input type="hidden" id="tipoMinistroId" name="id">
+
                 <div class="modal-header">
-                    <h5 class="modal-title" id="TipoMinistroModalLabel">Título del Modal</h5>
+                    <h5 class="modal-title" id="tipoMinistroModalLabel">Modal Title</h5>
                     <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
                 </div>
                 <div class="modal-body">
                     <div class="mb-3">
-                        <label for="nombre" class="form-label">Nombre del Tipo de Ministro</label>
-                        <input type="text" class="form-control" id="nombre" name="nombre" required>
+                        <label for="tipo" class="form-label">Tipo de Ministro</label>
+                        <input type="text" class="form-control" id="tipo" name="tipo" required>
+                    </div>
+
+                    <div class="form-check">
+                        <input class="form-check-input" type="checkbox" id="estado" name="estado">
+                        <label class="form-check-label" for="estado">
+                            Activo
+                        </label>
                     </div>
                 </div>
                 <div class="modal-footer">
-                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
-                    <button type="submit" id="saveChanges" class="btn btn-primary">Guardar</button>
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cerrar</button>
+                    <button type="submit" class="btn btn-primary" id="saveChanges">Guardar</button>
                 </div>
             </form>
         </div>
@@ -61,10 +84,10 @@
 </div>
 
 <script src="/static/js/gestion_tipo_ministro.js"></script>
-<script type="text/javascript">
-    const urlInsertarTipoMinistro = "{{ url_for('procesar_insertar_tipo_ministro') }}";
-    const urlActualizarTipoMinistro = "{{ url_for('procesar_actualizar_tipo_ministro') }}";
-</script>
 
+<script type="text/javascript">
+    const urlInsertarTipo = "{{ url_for('procesar_insertar_tipo_ministro') }}";
+    const urlActualizarTipo = "{{ url_for('procesar_actualizar_tipo_ministro') }}";
+</script>
 
 {% endblock %}

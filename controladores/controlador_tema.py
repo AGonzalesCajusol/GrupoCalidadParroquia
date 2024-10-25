@@ -5,7 +5,7 @@ def insertar_tema(descripcion, id_actoliturgico):
     try:
         with conexion.cursor() as cursor:
             cursor.execute("""
-                INSERT INTO Tema (descripcion, id_actoliturgico)
+                INSERT INTO tema (descripcion, id_actoliturgico)
                 VALUES (%s, %s)
             """, (descripcion, id_actoliturgico))
         conexion.commit()
@@ -21,8 +21,8 @@ def obtener_temas():
         with conexion.cursor() as cursor:
             cursor.execute("""
                 SELECT t.id_tema, t.descripcion, a.nombre_liturgia 
-                FROM Tema t
-                INNER JOIN ActoLiturgico a ON t.id_actoliturgico = a.id_actoliturgico
+                FROM tema t
+                INNER JOIN actoliturgico a ON t.id_actoliturgico = a.id_actoliturgico
             """)
             temas = cursor.fetchall()
         return temas
@@ -38,7 +38,7 @@ def obtener_tema_por_id(id_tema):
         with conexion.cursor() as cursor:
             cursor.execute("""
                 SELECT id_tema, descripcion, id_actoliturgico 
-                FROM Tema 
+                FROM tema 
                 WHERE id_tema = %s
             """, (id_tema,))
             tema = cursor.fetchone()
@@ -54,7 +54,7 @@ def actualizar_tema(descripcion, id_actoliturgico, id_tema):
     try:
         with conexion.cursor() as cursor:
             cursor.execute("""
-                UPDATE Tema 
+                UPDATE tema 
                 SET descripcion = %s, id_actoliturgico = %s 
                 WHERE id_tema = %s
             """, (descripcion, id_actoliturgico, id_tema))
@@ -69,10 +69,28 @@ def eliminar_tema(id_tema):
     conexion = obtener_conexion()
     try:
         with conexion.cursor() as cursor:
-            cursor.execute("DELETE FROM Tema WHERE id_tema = %s", (id_tema,))
+            cursor.execute("DELETE FROM tema WHERE id_tema = %s", (id_tema,))
         conexion.commit()
     except Exception as e:
         print(f"Error al eliminar tema: {e}")
         conexion.rollback()
+    finally:
+        conexion.close()
+
+
+def obtener_tema_por_acto(acto):
+    conexion = obtener_conexion()
+    try:
+        with conexion.cursor() as cursor:
+            cursor.execute("""
+                SELECT t.id_tema, t.descripcion, t.id_actoliturgico 
+                FROM tema t  inner join actoliturgico al on al.id_actoliturgico=t.id_actoliturgico
+                WHERE al.id_actoliturgico  = %s
+            """, (acto,))
+            tema = cursor.fetchone()
+        return tema
+    except Exception as e:
+        print(f"Error al obtener tema por id: {e}")
+        return None
     finally:
         conexion.close()

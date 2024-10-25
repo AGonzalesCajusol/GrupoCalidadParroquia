@@ -31,12 +31,19 @@ def obtener_cargo_por_id(id):
     conexion.close()
     return cargo
 
-def actualizar_cargo(nombre, id):
+# Actualizar un cargo existente
+def actualizar_cargo(id_cargo, nombre=None, estado=1):
     conexion = obtener_conexion()
-    with conexion.cursor() as cursor:
-        cursor.execute("UPDATE cargo SET cargo = %s WHERE id_cargo = %s", (nombre, id))
-    conexion.commit()
-    conexion.close()
+    try:
+        with conexion.cursor() as cursor:
+            if nombre:
+                cursor.execute("UPDATE cargo SET nombre = %s, estado = %s WHERE id_cargo = %s", (nombre, estado, id_cargo))
+            else:
+                cursor.execute("UPDATE cargo SET estado = %s WHERE id_cargo = %s", (estado, id_cargo))
+        conexion.commit()
+    finally:
+        conexion.close()
+
 
 def eliminar_cargo(id):
     conexion = obtener_conexion()

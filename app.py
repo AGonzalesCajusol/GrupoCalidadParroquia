@@ -13,7 +13,7 @@ import routers.router_sede
 import routers.router_tipo_ministro # Importa las rutas relacionadas con tipos de ministro
 import routers.router_congregacion  # Importa las rutas relacionadas con
 import routers.router_cargo
-import controladores.controlador_feligres as cfel
+
 
 app = Flask(__name__)
 app.secret_key = 'super-secret'
@@ -66,7 +66,6 @@ routers.router_congregacion.registrar_rutas(app)
 
 # Registrar las rutas definidas en router_sede.py
 routers.router_sede.registrar_rutas(app)
-
 # Secretaria
 routers.router_secretaria.registrar_rutas(app)
 
@@ -75,6 +74,9 @@ routers.router_recaudaciones.registrar_rutas(app)
 # Registrar las rutas definidas en router_recaudaciones.py
 routers.router_tipo_recaudacion.registrar_rutas(app)
 
+# Registrar las rutas definidas en router_egresos.py
+routers.router_egresos.registrar_rutas(app)
+
 
 # Registrar las rutas definidas en router_diocesis.py
 routers.router_diocesis.registrar_rutas(app)
@@ -82,7 +84,6 @@ routers.router_diocesis.registrar_rutas(app)
 routers.router_ministro.registrar_rutas(app)
 
 routers.router_cargo.registrar_rutas(app)
-
 routers.router_actosliturgicos.registrar_rutas(app)
 
 routers.router_feligres.registrar_rutas(app)

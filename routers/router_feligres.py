@@ -19,8 +19,8 @@ def registrar_rutas(app):
     @app.route("/gestionar_feligres", methods=["GET"])
     def gestionar_feligres():
         feligreses = obtener_feligreses()
-        return render_template("/feligres/gestionar_feligres.html", feligreses=feligreses)
-
+        sedes = csede.obtener_sede()
+        return render_template("/feligres/gestionar_feligres.html", feligreses=feligreses, sedes = sedes )
 
 
     # Ruta para mostrar el formulario de registro de un nuevo feligrés
