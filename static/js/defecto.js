@@ -30,8 +30,6 @@ function modificar(e) {
     });
 }
 
-
-
 function confirmarEliminacion(e) {
     e.preventDefault();
 
