@@ -27,31 +27,56 @@
     <link rel="stylesheet" href="https://cdn.datatables.net/1.13.4/css/jquery.dataTables.min.css">
     <script src="https://cdn.datatables.net/1.13.4/js/jquery.dataTables.min.js"></script>
 </head>
-
+<style>
+    #head_ind{
+        top: 0;
+    }
+</style>
 <body>
     <div id="spinner" class="spinner-overlay">
         <div class="spinner"></div>
     </div>
-    <div class="header">
-        <div class="d-flex align-items-center">
-
-            <a href="{{ url_for('gestionar_celebracion') }}" class="text-decoration-none">
-                <div class="logo">
-                    <img src="{{ url_for('static', filename='img/iconoiglesia.png') }}" alt="Point Roo" />
-                    <h5>Parroquia Vianey</h5>
-                </div>
-            </a>
-        </div>
-        <div class="user-actions">
-            <a class="btn-logout nav-link" href="">
-                <i class="bi bi-box-arrow-right"> </i>
-                Cerrar sesión
-            </a>
-        </div>
-    </div>
-
     <!-- Sidenav -->
     <div class="layout">
+        <header class="navbar navbar-expand-lg  shadow-sm w-100 position-fixed" id="head_ind">
+            <div class="container-fluid">
+                <a class="navbar-brand me-2" href="#">
+                    <img src="/static/img/celebracion.avif" alt="Logo Iglesia" width="40" height="40" class="d-inline-block align-text-top">
+                    <a class="nav-link" href="#">Iglesia vianney</a>
+                </a>
+                <div class="collapse navbar-collapse justify-content-end ms-4" id="navbarNav">
+                    <ul class="navbar-nav me-auto mb-2 mb-lg-0">
+                        <li class="nav-item">
+                            <a class="nav-link" href="#">Calendario</a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link" href="#">Registros</a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link" href="#">Eventos</a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link" href="#">Configuración</a>
+                        </li>
+                    </ul>
+                    <div class="d-flex align-items-center mt-1">
+                        <button type="button" class="btn btn-link position-relative text-black me-4" >
+                            <i class="bi bi-bell"></i>
+                                <span class="position-absolute top-0 start-100 translate-middle badge rounded-pill bg-danger">
+                                3 <span class="visually-hidden">nuevas notificaciones</span>
+                            </span>
+                        </button>
+                        {% if request.cookies.get('nombre') %}
+                            <a onclick="finalizar_sesion()"  class="text-decoration-none text-black btn"><span class="me-3"><i class="bi bi-door-closed-fill"></i><strong> Salir</strong></span></a>
+                            <span class="me-3">Bienvenido, <strong>{{ request.cookies.get('nombre') }}</strong></span>
+                        {% else %}
+                            <a href="{{ url_for('raiz') }}" class="text-decoration-none text-black btn"><span class="me-3">Bienvenido! Inicie Sesion</strong></span></a>
+                        {% endif %}
+                    </div>
+                </div>
+            </div>                    
+    
+        </header>
         <div id="mySidenav" class="sidenav">
 
             <div>

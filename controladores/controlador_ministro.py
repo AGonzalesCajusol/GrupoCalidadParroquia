@@ -115,3 +115,21 @@ def eliminar_ministro(id_ministro):
         conexion.rollback()
     finally:
         conexion.close()
+
+def retornar_datos_ministro(num_doc):
+    conexion = obtener_conexion()
+    try:
+        with conexion.cursor() as cursor:
+            cursor.execute('''
+                SELECT mn.numero_documento, mn.nombre_ministro, mn.token, c.cargo 
+                FROM ministro AS mn 
+                INNER JOIN cargo AS c ON c.id_cargo = mn.id_cargo
+                WHERE mn.numero_documento = %s
+            ''', (num_doc,))
+            return cursor.fetchone()
+    finally:
+        conexion.close()
+
+    
+        
+

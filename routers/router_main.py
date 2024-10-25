@@ -1,5 +1,6 @@
 from flask import render_template, request, redirect, url_for, make_response
 import controladores.controlador_feligres as cfel
+import controladores.controlador_ministro as cmin
 import random
 from hashlib import sha256
 
@@ -21,13 +22,13 @@ def registrar_rutas(app):
         token_h = sha256(token.encode('utf-8')).hexdigest()
 
         if valor == 1:
-            
-
+            #Falta actualizar tokeeeen
+            dn, nom, tk, tp = cmin.retornar_datos_ministro(dni)
             response = make_response(redirect(url_for('inicio')))   
-            response.set_cookie('dni', dni)
-            response.set_cookie('nombre', "Erick tu papi")
-            response.set_cookie('token', token_h)
-            response.set_cookie('tipo',"Muy bueno" )
+            response.set_cookie('dni', dn)
+            response.set_cookie('nombre', nom)
+            response.set_cookie('token', tk)
+            response.set_cookie('tipo',tp)
 
             return response
         elif valor == 2:
