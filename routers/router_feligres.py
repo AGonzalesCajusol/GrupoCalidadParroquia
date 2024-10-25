@@ -54,7 +54,7 @@ def registrar_rutas(app):
         response.set_cookie('dni', dni)
         response.set_cookie('token', token)
         response.set_cookie('tipo', 'feligres')
-        response.set_cookie('nombre', f"{apellidos} {nombres}")  # Agregar cookie con nombre completo
+        response.set_cookie('nombre', f"{apellidos} {nombres}")
 
         return response
 

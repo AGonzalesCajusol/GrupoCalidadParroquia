@@ -12,6 +12,16 @@ function closeNav() {
 
 
 
+window.addEventListener('load', function() {
+    const spinner = document.getElementById('spinner');
+    const content = document.getElementById('content');
+
+    spinner.style.display = 'none';
+    content.style.display = 'block';
+});
+
+
+
 //MODIFICAR >>>> onclick="return modificar()"
 function modificar(e) {
     e.preventDefault();

@@ -188,7 +188,7 @@ def eliminaracto_requisitos(id):
         return False
 
     except Exception as e:
-        print(f"Error en la consulta: {e}")  # Muestra el error para depuración
+        conexion.rollback()
         return False
     finally:
         conexion.close()

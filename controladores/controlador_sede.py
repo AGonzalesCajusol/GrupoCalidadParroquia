@@ -3,7 +3,7 @@ from bd import obtener_conexion
 def insertar_sede(nombre_sede,direccion,creacion,telefono,correo,monto,congregacion,diosesis):
     conexion = obtener_conexion()
     with conexion.cursor() as cursor:
-        cursor.execute("INSERT INTO sede(nombre_sede,direccion,creacion,telefono,correo,monto,id_congregacion,id_diosesis) VALUES (%s,%s,%s,%s,%s,%s,%s,%s)", (nombre_sede,direccion,creacion,telefono,correo,monto,congregacion,diosesis))
+        cursor.execute("INSERT INTO sede(nombre_sede,direccion,creacion,telefono,correo,monto,id_congregacion,id_diosesis) VALUES (%s,%s,%s,%s,%s,%s,%s,%s)", (nombre_sede,direccion,creacion,telefono,correo,monto,congregacion,diosesis))  
     conexion.commit()
     conexion.close()
 

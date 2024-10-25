@@ -131,6 +131,58 @@ def iniciosesion(dni, contraseña):
             """, (contraseña, dni, dni, contraseña))
             
             resultado = cursor.fetchone()
-            return resultado[0]  # Retorna 1, 2 o 0
+            return resultado[0]
     except:
         return 0
+    
+def varificar_sessionFeligres(dni,token):
+    conexion = obtener_conexion()
+    valor = 0
+    try:
+        with conexion.cursor() as cursor:
+            cursor.execute("""
+                SELECT * FROM feligres AS fe INNER JOIN cuenta AS cu ON fe.id_feligres = cu.id_feligres WHERE fe.dni = %s AND cu.token = %s
+            """, (dni,token))
+            resultado = cursor.fetchone()
+            if  resultado:
+                valor = 1
+
+        return valor
+    except:
+        return valor
+
+
+def actualizarTokenFeligres(dni, token):
+    conexion = obtener_conexion()
+    try:
+        with conexion.cursor() as cursor:
+            # 1. Actualiza el token
+            cursor.execute("""
+                UPDATE feligres AS fe 
+                INNER JOIN cuenta AS cu ON fe.id_feligres = cu.id_feligres 
+                SET cu.token = %s 
+                WHERE fe.dni = %s;
+            """, (token, dni))
+            conexion.commit()
+
+            # 2. Obtiene el nombre y apellido del feligres
+            cursor.execute("""
+                SELECT fe.nombres
+                FROM feligres AS fe 
+                WHERE fe.dni = %s;
+            """, (dni,))
+            resultado = cursor.fetchone()
+            
+            if resultado:
+                return resultado[0]  # Devuelve el resultado (nombres, apellidos)
+            else:
+                print("Feligres no encontrado.")
+                return None  # Si no se encuentra el feligres
+
+    except Exception as e:
+        print(f"Error al actualizar feligrés: {e}")
+        conexion.rollback()  # Revertir cambios si ocurre un error
+        return None  # Devuelve None en caso de error
+
+    finally:
+        conexion.close()  # Cierra la conexión

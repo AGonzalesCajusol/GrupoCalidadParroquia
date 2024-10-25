@@ -28,6 +28,9 @@
 </head>
 
 <body>
+    <div id="spinner" class="spinner-overlay">
+        <div class="spinner"></div>
+    </div>
     <div class="header">
         <div class="d-flex align-items-center">
 
@@ -166,12 +169,12 @@
             </div>
     </div>
     <div class="main-content mt-3 me-5" style="max-height: 400px;">
+        
         {% block cuerpo %}
+
         {% endblock %}
     </div>
 </div>
 </body>
 <script src="{{ url_for('static', filename = '/js/defecto.js')}}"></script>
-<script src="{{ url_for('static', filename = '/js/solicitudes.js')}}"></script>
-
 </html>
