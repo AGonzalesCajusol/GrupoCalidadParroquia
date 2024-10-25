@@ -10,17 +10,12 @@ function closeNav() {
     document.getElementById('abrir').style.visibility = 'visible'; // Mostrar el botón de abrir
 }
 
-
-
-window.addEventListener('load', function() {
-    const spinner = document.getElementById('spinner');
-    const content = document.getElementById('content');
-
-    spinner.style.display = 'none';
-    content.style.display = 'block';
-});
-
-
+window.onload = function() {
+    setTimeout(function() {
+        $('#spinner').fadeOut(); // Oculta el spinner con un efecto fadeOut después de 2 segundos
+        $('body').removeClass('hidden'); // Muestra el contenido eliminando la clase hidden
+    }, 500); // 2000 milisegundos = 2 segundos
+};
 
 //MODIFICAR >>>> onclick="return modificar()"
 function modificar(e) {
