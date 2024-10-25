@@ -25,9 +25,9 @@ def registrar_rutas(app):
 
             response = make_response(redirect(url_for('inicio')))   
             response.set_cookie('dni', dni)
-            response.set_cookie('nombre', nombre)
+            response.set_cookie('nombre', "Erick tu papi")
             response.set_cookie('token', token_h)
-            response.set_cookie('tipo', )
+            response.set_cookie('tipo',"Muy bueno" )
 
             return response
         elif valor == 2:

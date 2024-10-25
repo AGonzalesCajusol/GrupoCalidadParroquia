@@ -13,36 +13,13 @@ import routers.router_sede
 import routers.router_tipo_ministro # Importa las rutas relacionadas con tipos de ministro
 import routers.router_congregacion  # Importa las rutas relacionadas con
 import routers.router_cargo
-
+import routers.router_egresos
 
 app = Flask(__name__)
 app.secret_key = 'super-secret'
 
 
 #decorador ministros
-def verificar_sessionMinistros():
-    token = request.cookies.get('token')
-    dni = request.cookies.get('dni')
-
-#decorador feligres
-def verificar_sessionFeligres():
-    token = request.cookies.get('token')
-    dni = request.cookies.get('dni')
-    r = cfel(dni,token)
-
-def requiere_feligres(func):
-    from functools import wraps
-    @wraps(func)
-    def decorador(*args, **kwargs):
-        token = request.cookies.get('token')
-        dni = request.cookies.get('dni')
-        r = cfel(dni, token)
-        if r != 1:  
-            return redirect(url_for('raiz'))
-        else:
-            return func(*args, **kwargs)
-
-    return decorador
 
 
 # Ruta para la página de inicio de sesión
