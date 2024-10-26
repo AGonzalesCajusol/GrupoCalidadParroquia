@@ -10,7 +10,7 @@ def insertar_congregacion(nombre):
 def obtener_congregacion():
     conexion = obtener_conexion()
     with conexion.cursor() as cursor:
-        cursor.execute("SELECT id_congregacion, nombre_congregacion FROM congregacion")
+        cursor.execute("SELECT id_congregacion, nombre_congregacion, estado FROM congregacion")
         congregacion = cursor.fetchall()
     conexion.close()
     return congregacion
@@ -19,15 +19,15 @@ def obtener_congregacion_por_id(id):
     conexion = obtener_conexion()
     congregacion = None
     with conexion.cursor() as cursor:
-        cursor.execute("SELECT id_congregacion, nombre_congregacion FROM congregacion WHERE id_congregacion = %s", (id,))
+        cursor.execute("SELECT id_congregacion, nombre_congregacion, estado FROM congregacion WHERE id_congregacion = %s", (id,))
         congregacion = cursor.fetchone()
     conexion.close()
     return congregacion
 
-def actualizar_congregacion(nombre, id):
+def actualizar_congregacion(nombre,estado, id):
     conexion = obtener_conexion()
     with conexion.cursor() as cursor:
-        cursor.execute("UPDATE congregacion SET nombre_congregacion = %s WHERE id_congregacion = %s", (nombre, id))
+        cursor.execute("UPDATE congregacion SET nombre_congregacion = %s, estado = %s WHERE id_congregacion = %s", (nombre,estado, id))
     conexion.commit()
     conexion.close()
 
@@ -59,3 +59,10 @@ def obtener_id_diosesis_por_nombre(nombre):
                 id_diosesis = resultado[0]
         conexion.close()
         return id_diosesis
+
+def darBaja_congregacion(id):
+    conexion = obtener_conexion()
+    with conexion.cursor() as cursor:
+        cursor.execute("UPDATE congregacion set estado = %s WHERE id_congregacion = %s", (0,id,))
+    conexion.commit()
+    conexion.close()
