@@ -1,4 +1,4 @@
-from flask import render_template, request, redirect, url_for, flash
+from flask import render_template, request, redirect, url_for, flash,jsonify
 import traceback  # Para capturar detalles del error
 from controladores.controlador_tipo_recaudacion import (
     insertar_tipo_recaudacion,
@@ -64,15 +64,27 @@ def registrar_rutas(app):
     # Ruta para eliminar un tipo de recaudación
     @app.route("/eliminar_tipo_recaudacion", methods=["POST"])
     def procesar_eliminar_tipo_recaudacion():
-        id = request.form["id"]  # Captura el ID desde el formulario
-        resultado = eliminar_tipo_recaudacion(id)  # Llama a la función que elimina en la base de datos
-        if resultado:  # Si hay un mensaje de error (la función no devuelve None)
-            flash(resultado, "danger")
-        else:
-            flash("El tipo de recaudación fue eliminado exitosamente", "success")
+        id = request.form["id"]
+        resultado = eliminar_tipo_recaudacion(id)
         
-        return redirect(url_for("gestionar_tipo_recaudacion"))
-
+        if resultado:
+            # Si hay un error, devuelve el mensaje de error
+            message = "No se puede eliminar el tipo de recaudación porque está referenciado en otra tabla."
+            return jsonify({"success": False, "message": message}), 400
+        else:
+            tipos_recaudacion = obtener_tipos_recaudacion()
+            tipos_recaudacion_data = [
+                {
+                    "id": tipo[0],
+                    "nombre": tipo[1],
+                    "tipo": "Monetario" if tipo[2] == 1 else "No Monetario",
+                    "estado": "Activo" if tipo[3] == 1 else "Inactivo"
+                }
+                for tipo in tipos_recaudacion
+            ]
+            message = "El tipo de recaudación fue eliminado exitosamente"
+            return jsonify({"success": True, "tipos_recaudacion": tipos_recaudacion_data, "message": message})
+    
     # Ruta para dar de baja un tipo de recaudación
     @app.route("/dar_baja_tipo_recaudacion", methods=["POST"])
     def procesar_dar_baja_tipo_recaudacion():

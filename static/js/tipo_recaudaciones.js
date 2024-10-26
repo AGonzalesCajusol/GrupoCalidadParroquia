@@ -129,19 +129,148 @@ function darBajaTipoRecaudacion(id, estado) {
 
     formRecaudacion.submit();
 }
+
+function eliminarTipoRecaudacion(event, id) {
+    event.preventDefault();
+
+    const button = event.target.querySelector('button[type="submit"]');
+    if (button) {
+        button.disabled = true; // Desactivar el botón para evitar múltiples clics
+    }
+
+    if (confirm("¿Estás seguro de que deseas eliminar este tipo de recaudación?")) {
+        fetch("/eliminar_tipo_recaudacion", {
+            method: "POST",
+            headers: {
+                "Content-Type": "application/x-www-form-urlencoded",
+            },
+            body: `id=${encodeURIComponent(id)}`
+        })
+        .then(response => response.json())
+        .then(data => {
+            if (button) {
+                button.disabled = false; // Rehabilitar el botón después de la respuesta
+            }
+
+            if (data.success) {
+                actualizarTabla(data.tipos_recaudacion);
+                mostrarAlerta(data.message, "success"); // Mostrar mensaje de éxito
+            } else {
+                mostrarAlerta(data.message, "danger"); // Mostrar mensaje de error
+            }
+        })
+        .catch(error => {
+            console.error("Error:", error);
+            if (button) {
+                button.disabled = false;
+            }
+            mostrarAlerta("Ocurrió un error al intentar eliminar el tipo de recaudación.", "danger");
+        });
+    } else {
+        if (button) {
+            button.disabled = false; // Rehabilitar el botón si se cancela la confirmación
+        }
+    }
+}
+
+// Función para mostrar el mensaje en la interfaz
+function mostrarAlerta(mensaje, tipo) {
+    const alertContainer = document.createElement("div");
+    alertContainer.className = `alert alert-${tipo} alert-dismissible fade show`;
+    alertContainer.role = "alert";
+    alertContainer.innerHTML = `
+        ${mensaje}
+        <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+    `;
+
+    // Insertar la alerta en la parte superior de la sección de mensajes
+    const mensajesContainer = document.querySelector(".container.mt-3");
+    if (mensajesContainer) {
+        mensajesContainer.appendChild(alertContainer);
+    } else {
+        // Si no hay un contenedor específico, agregar la alerta al body
+        document.body.appendChild(alertContainer);
+    }
+
+    // Hacer que desaparezca automáticamente después de 3 segundos
+    setTimeout(() => {
+        alertContainer.classList.remove("show");
+        alertContainer.style.transition = "opacity 0.5s ease-out";
+        alertContainer.style.opacity = "0";
+        setTimeout(() => alertContainer.remove(), 500);
+    }, 3000);
+}
+// Función para actualizar la tabla con nuevos datos
+function actualizarTabla(tiposRecaudacion) {
+    const table = $('#tipoRecaudacionTable').DataTable();
+    table.clear();
+
+    tiposRecaudacion.forEach(tipo => {
+        table.row.add([
+            `<td class="text-center border">${tipo.id}</td>`,
+            `<td>${tipo.nombre}</td>`,
+            `<td>${tipo.tipo}</td>`,
+            `<td>${tipo.estado}</td>`,
+            `<td class="text-center border">
+                <button class="btn btn-primary btn-sm" title="Ver"
+                    onclick="abrirModalVer('${tipo.id}', '${tipo.nombre}', '${tipo.tipo}', '${tipo.estado}')">
+                    <i class="fas fa-eye"></i>
+                </button>
+                <button class="btn btn-warning btn-sm" title="Editar"
+                    onclick="abrirModalEditar('${tipo.id}', '${tipo.nombre}', '${tipo.tipo}', '${tipo.estado}')">
+                    <i class="fas fa-edit"></i>
+                </button>
+                <button class="btn btn-secondary btn-sm" title="Dar de baja"
+                        onclick="darBajaTipoRecaudacion('${tipo.id}', '${tipo.estado === "Activo" ? 1 : 0}')"
+                        ${tipo.estado === "Inactivo" ? 'disabled' : ''}>
+                    <i class="fas fa-ban"></i>
+                </button>
+                <form style="display:inline-block;" 
+                      onsubmit="eliminarTipoRecaudacion(event, '${tipo.id}')">
+                    <button type="submit" class="btn btn-danger btn-sm"
+                            onclick="return confirm('¿Estás seguro de que deseas eliminar este tipo de recaudación?');">
+                        <i class="fas fa-trash-alt"></i>
+                    </button>
+                </form>
+            </td>`
+        ]).draw(false);
+    });
+}
+
 document.addEventListener("DOMContentLoaded", function() {
-    // Seleccionar todos los elementos de alerta
+    // Seleccionar todos los elementos de alerta que tengan la clase 'alert-dismissible'
     const alertElements = document.querySelectorAll('.alert-dismissible');
     
-    // Iterar sobre cada alerta y configurar un temporizador
+    // Iterar sobre cada alerta y configurar un temporizador para que desaparezcan
     alertElements.forEach(alert => {
         setTimeout(() => {
-            // Iniciar el desvanecimiento ajustando la opacidad y el tiempo de transición
-            alert.style.transition = "opacity 0.5s ease-out";
-            alert.style.opacity = "0";  // Reducir la opacidad a 0
+            alert.classList.remove("show"); // Iniciar la transición para ocultar la alerta
+            alert.style.transition = "opacity 0.5s ease-out"; // Suavizar la transición
+            alert.style.opacity = "0"; // Ajustar la opacidad a 0 para el desvanecimiento
 
-            // Eliminar el elemento después de la animación
+            // Remover el elemento después de la animación
             setTimeout(() => alert.remove(), 500);
-        }, 3000);  // Espera 3 segundos antes de iniciar el desvanecimiento
+        }, 3000);  // Esperar 3 segundos antes de iniciar el desvanecimiento
     });
 });
+
+function mostrarMensaje(mensaje, tipo) {
+    const alertContainer = document.createElement("div");
+    alertContainer.className = `alert alert-${tipo} alert-dismissible fade show position-fixed bottom-0 start-0 m-3`;
+    alertContainer.role = "alert";
+    alertContainer.style.zIndex = "1050"; // Asegurar que el mensaje esté sobre otros elementos
+    alertContainer.innerHTML = `
+        ${mensaje}
+        <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+    `;
+
+    // Agregar la alerta al body para que se muestre en la esquina inferior izquierda
+    document.body.appendChild(alertContainer);
+
+    // Desaparecer la alerta después de 3 segundos
+    setTimeout(() => {
+        alertContainer.classList.remove("show");
+        alertContainer.style.opacity = "0";
+        setTimeout(() => alertContainer.remove(), 500);
+    }, 3000);
+}
