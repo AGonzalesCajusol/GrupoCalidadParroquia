@@ -26,7 +26,7 @@ def registrar_rutas(app):
     def procesar_insertar_tipo_recaudacion():
         nombre_recaudacion = request.form["nombre_recaudacion"]
         tipo = request.form["tipo"]
-        estado = request.form.get('estado') == 'on'  # Obtiene el estado del checkbox (activo o inactivo)
+        estado = request.form.get("estado", default="1")
         insertar_tipo_recaudacion(nombre_recaudacion, tipo, estado)
         flash("El tipo de recaudación fue agregado exitosamente")
         return redirect(url_for("gestionar_tipo_recaudacion"))
@@ -65,9 +65,16 @@ def registrar_rutas(app):
     @app.route("/eliminar_tipo_recaudacion", methods=["POST"])
     def procesar_eliminar_tipo_recaudacion():
         id = request.form["id"]  # Captura el ID desde el formulario
-        eliminar_tipo_recaudacion(id)  # Llama a la función que elimina en la base de datos
-        flash("El tipo de recaudación fue eliminado exitosamente")
+        resultado = eliminar_tipo_recaudacion(id)  # Llama a la función que elimina en la base de datos
+        
+        if resultado:  # Si hay un mensaje de error (la función no devuelve None)
+            flash(resultado, "danger")
+        else:
+            flash("El tipo de recaudación fue eliminado exitosamente", "success")
+        
         return redirect(url_for("gestionar_tipo_recaudacion"))
+
+
 
     # Ruta para dar de baja un tipo de recaudación
     @app.route("/dar_baja_tipo_recaudacion", methods=["POST"])

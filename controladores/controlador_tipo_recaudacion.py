@@ -82,13 +82,25 @@ def eliminar_tipo_recaudacion(id_tipo_recaudacion):
     conexion = obtener_conexion()
     try:
         with conexion.cursor() as cursor:
+            # Verificar si existen registros en recaudacion que usen este tipo de recaudación
+            cursor.execute("SELECT COUNT(*) FROM recaudacion WHERE id_tipo_recaudacion = %s", (id_tipo_recaudacion,))
+            count = cursor.fetchone()[0]
+            
+            if count > 0:
+                # Retorna un mensaje específico si existen relaciones
+                return "No se puede eliminar este tipo de recaudación porque está asociado con registros existentes."
+            
+            # Proceder con la eliminación si no existen relaciones
             cursor.execute("DELETE FROM tipo_recaudacion WHERE id_tipo_recaudacion = %s", (id_tipo_recaudacion,))
         conexion.commit()
     except Exception as e:
         print(f"Error al eliminar tipo de recaudación: {e}")
         conexion.rollback()
+        return f"Error al eliminar tipo de recaudación: {e}"
     finally:
         conexion.close()
+    
+    return None  # Devuelve None si no hubo problemas
 
 # Función para dar de baja un tipo de recaudación (cambiar estado a "Inactivo")
 def dar_baja_tipo_recaudacion(id_tipo_recaudacion):
