@@ -113,7 +113,9 @@
                         <label for="id_congregacion">Congregación</label>
                         <select class="form-select" id="id_congregacion" name="id_congregacion" required>
                             {% for congre in congregacion %}
-                            <option value="{{ congre[0] }}">{{ congre[1] }}</option>
+                                {% if congre[2] == 1 %}
+                                    <option value="{{ congre[0] }}">{{ congre[1] }}</option>
+                                {% endif %}
                             {% endfor %}
                         </select>
                     </div>
