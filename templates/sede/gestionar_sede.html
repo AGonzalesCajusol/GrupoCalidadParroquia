@@ -18,7 +18,7 @@
                 <th style="vertical-align: middle; text-align: center;">Estado</th>
                 <!-- <th style="vertical-align: middle; text-align: center;">Congregacion</th>
                 <th style="vertical-align: middle; text-align: center;">Diócesis</th> -->
-                
+
                 <th style="vertical-align: middle; text-align: center; width: 200px;">Acciones</th>
             </tr>
         </thead>
@@ -39,7 +39,7 @@
                 
                 <td class="text-center border">
                     <button class="btn btn-primary btn-sm" title="Ver"
-                        onclick="abrirModalVer('{{ sed[0] }}', '{{ sed[1] }}', '{{ sed[2] }}', '{{ sed[3] }}', '{{ sed[4] }}', '{{ sed[5] }}', '{{ sed[6] }}', '{{ sed[7] }}', '{{ sed[8] }}')">
+                        onclick="abrirModalVer('{{ sed[0] }}', '{{ sed[1] }}', '{{ sed[2] }}', '{{ sed[3] }}', '{{ sed[4] }}', '{{ sed[5] }}', '{{ sed[6] }}', '{{ sed[7] }}', '{{ sed[8] }}','{{ sed[9] }}')">
                         <i class="fas fa-eye"></i>
                     </button>
 
@@ -49,9 +49,9 @@
                     </button>
 
                     <button type="button" class="btn btn-secondary btn-sm" title="Dar de baja"
-                            onclick="darBajaSede('{{ sed[0] }}')">
-                            <i class="fas fa-ban"></i> <!-- Ícono de FontAwesome -->
-                        </button>
+                        onclick="darBajaSede('{{ sed[0] }}')">
+                        <i class="fas fa-ban"></i>
+                    </button>
 
                     <form action="{{ url_for('procesar_eliminar_sede') }}" method="POST" style="display:inline-block;"
                         title="Eliminar">
@@ -108,7 +108,7 @@
                         <label for="estado" class="form-label">Estado</label>
                         <input type="checkbox" class="form-check-input" id="estado" name="estado">
                         <label class="form-check-label" for="estado">Activo</label>
-                    </div>                    
+                    </div>
                     <div class="mb-3">
                         <label for="id_congregacion">Congregación</label>
                         <select class="form-select" id="id_congregacion" name="id_congregacion" required>
@@ -124,6 +124,16 @@
                             <option value="{{ dioss[0] }}">{{ dioss[1] }}</option>
                             {% endfor %}
                         </select>
+                    </div>
+                    <div>
+                        <h6>Actos liturgicos</h6>
+                        {% for acto in actoliturgico %}
+                        <div class="mb-3">
+                            <input type="checkbox" class="form-check-input" id="estado-{{ acto[0] }}"
+                                name="estado-{{ acto[0] }}">
+                            <label class="form-check-label" for="estado-{{ acto[0] }}">{{ acto[1] }}</label>
+                        </div>
+                        {% endfor %}
                     </div>
                 </div>
                 <div class="modal-footer">
@@ -144,7 +154,6 @@
     const actualizarSedeURL = "{{ url_for('procesar_actualizar_sede') }}";
     const darBajaSedeURL = "{{ url_for('procesar_darBaja_sede') }}";
 </script>
-
 
 
 {% endblock %}

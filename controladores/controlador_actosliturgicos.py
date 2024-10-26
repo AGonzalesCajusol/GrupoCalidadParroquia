@@ -200,3 +200,17 @@ def obtener_acto():
         sede = cursor.fetchall()
     conexion.close()
     return sede
+
+def listar_actosLit():
+    conexion = obtener_conexion()
+    try:
+        with conexion.cursor() as cursor:
+            cursor.execute('''
+                SELECT * from actoliturgico 
+            ''')
+            valores = cursor.fetchall()
+        return valores
+    except Exception as e:  
+        raise("Error en la consulta")
+    finally:
+        conexion.close()  

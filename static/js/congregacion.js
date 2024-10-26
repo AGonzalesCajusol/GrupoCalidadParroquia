@@ -32,7 +32,7 @@ function abirC() {
     const submitBtn = document.getElementById('submitBtn');
     const formCongregacion = document.getElementById('formCongregacion'); // Obtener el formulario
 
-    modalTitle.textContent = 'Agregar Congregacion';
+    modalTitle.textContent = 'Agregar Congregación';
     submitBtn.textContent = 'Guardar';
 
     // Cambiar el action del formulario para que apunte a la ruta de inserción
@@ -74,7 +74,7 @@ function abrirModalVerC(id, nombre) {
     const modalTitle = document.getElementById('ModalCongregacionLabel');
     const submitBtn = document.getElementById('submitBtn');
 
-    modalTitle.textContent = 'Ver Congregacion';
+    modalTitle.textContent = 'Ver Congregación';
     submitBtn.style.display = 'none'; // Ocultar el botón de Guardar
 
     document.getElementById('congregacionId').value = id;
