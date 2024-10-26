@@ -130,20 +130,3 @@ function darBajaTipoRecaudacion(id, estado) {
     formRecaudacion.submit();
 }
 
-// Esperar a que la página esté completamente cargada
-document.addEventListener("DOMContentLoaded", function() {
-    // Seleccionar todos los elementos de alerta
-    const alertElements = document.querySelectorAll('.alert-dismissible');
-    
-    // Iterar sobre cada alerta y configurar un temporizador
-    alertElements.forEach(alert => {
-        setTimeout(() => {
-            // Iniciar el desvanecimiento ajustando la opacidad y el tiempo de transición
-            alert.style.transition = "opacity 0.5s ease-out";
-            alert.style.opacity = "0";  // Reducir la opacidad a 0
-
-            // Eliminar el elemento después de la animación
-            setTimeout(() => alert.remove(), 500);
-        }, 3000);  // Espera 3 segundos antes de iniciar el desvanecimiento
-    });
-});
