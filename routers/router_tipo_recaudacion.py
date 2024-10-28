@@ -24,12 +24,35 @@ def registrar_rutas(app):
     # Ruta para insertar un nuevo tipo de recaudación
     @app.route("/insertar_tipo_recaudacion", methods=["POST"])
     def procesar_insertar_tipo_recaudacion():
-        nombre_recaudacion = request.form["nombre_recaudacion"]
-        tipo = request.form["tipo"]
-        estado = request.form.get("estado", default="1")
-        insertar_tipo_recaudacion(nombre_recaudacion, tipo, estado)
-        flash("El tipo de recaudación fue agregado exitosamente")
-        return redirect(url_for("gestionar_tipo_recaudacion"))
+        try:
+            nombre_recaudacion = request.form["nombre_recaudacion"]
+            tipo = request.form["tipo"]
+            estado = int(request.form.get("estado", 1))  # Asegurarse de convertir 'estado' a un entero
+
+            insertar_tipo_recaudacion(nombre_recaudacion, tipo, estado)
+            tipos_recaudacion = obtener_tipos_recaudacion()
+
+            # Preparar la respuesta JSON
+            tipos_recaudacion_data = [
+                {
+                    "id": tipo[0],
+                    "nombre": tipo[1],
+                    "tipo": "Monetario" if tipo[2] == 1 else "No Monetario",
+                    "estado": "Activo" if tipo[3] == 1 else "Inactivo"
+                }
+                for tipo in tipos_recaudacion
+            ]
+
+            return jsonify({
+                "success": True,
+                "message": "El tipo de recaudación fue agregado exitosamente.",
+                "tipos_recaudacion": tipos_recaudacion_data
+            })
+        except Exception as e:
+            return jsonify({
+                "success": False,
+                "message": f"Error al insertar tipo de recaudación: {str(e)}"
+            }), 400
 
     # Ruta para mostrar el formulario de edición de un tipo de recaudación
     @app.route("/editar_tipo_recaudacion/<int:id>", methods=["GET"])
@@ -41,26 +64,30 @@ def registrar_rutas(app):
     @app.route("/actualizar_tipo_recaudacion", methods=["POST"])
     def procesar_actualizar_tipo_recaudacion():
         try:
-            # Captura los datos del formulario
             id = request.form["id"]
             nombre_recaudacion = request.form["nombre_recaudacion"]
             tipo = request.form["tipo"]
-            estado = request.form.get('estado') == 'on' 
+            estado = request.form.get("estado", "0") == "on"
+
             actualizar_tipo_recaudacion(nombre_recaudacion, tipo, estado, id)
-            flash("El tipo de recaudación fue actualizado exitosamente", "success")
-            return redirect(url_for("gestionar_tipo_recaudacion"))
+            
+            # Obtener los tipos de recaudación actualizados
+            tipos_recaudacion = obtener_tipos_recaudacion()
+            tipos_recaudacion_data = [
+                {
+                    "id": tipo[0],
+                    "nombre": tipo[1],
+                    "tipo": "Monetario" if tipo[2] == 1 else "No Monetario",
+                    "estado": "Activo" if tipo[3] == 1 else "Inactivo"
+                }
+                for tipo in tipos_recaudacion
+            ]
+            
+            # Devolver la respuesta en JSON con los datos actualizados
+            return jsonify({"success": True, "tipos_recaudacion": tipos_recaudacion_data, "message": "El tipo de recaudación fue actualizado exitosamente"}), 200
 
         except Exception as e:
-            # En caso de error, captura el mensaje de error y muestra al usuario
-            error_message = str(e)
-            flash(f"Hubo un error al actualizar el tipo de recaudación: {error_message}", "danger")
-
-            # Usar 'traceback' para registrar el error en el log
-            traceback.print_exc()
-
-            # Redirigir a la página de gestión de tipo de recaudación
-            return redirect(url_for("gestionar_tipo_recaudacion"))
-
+            return jsonify({"success": False, "message": f"Error al actualizar: {str(e)}"}), 400
     # Ruta para eliminar un tipo de recaudación
     @app.route("/eliminar_tipo_recaudacion", methods=["POST"])
     def procesar_eliminar_tipo_recaudacion():
