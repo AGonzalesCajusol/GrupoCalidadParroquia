@@ -88,7 +88,29 @@ def registrar_rutas(app):
     # Ruta para dar de baja un tipo de recaudación
     @app.route("/dar_baja_tipo_recaudacion", methods=["POST"])
     def procesar_dar_baja_tipo_recaudacion():
-        id = request.form.get('id')  # Captura el ID desde el formulario
-        dar_baja_tipo_recaudacion(id)  # Cambia el estado del tipo de recaudación a inactivo
-        flash("El tipo de recaudación fue dado de baja exitosamente")
-        return redirect(url_for("gestionar_tipo_recaudacion"))
+        try:
+            id = request.form.get('id')
+            dar_baja_tipo_recaudacion(id)
+            
+            # Obtener los tipos de recaudación actualizados
+            tipos_recaudacion = obtener_tipos_recaudacion()
+            tipos_recaudacion_data = [
+                {
+                    "id": tipo[0],
+                    "nombre": tipo[1],
+                    "tipo": "Monetario" if tipo[2] == 1 else "No Monetario",
+                    "estado": "Activo" if tipo[3] == 1 else "Inactivo"
+                }
+                for tipo in tipos_recaudacion
+            ]
+            
+            # Enviar respuesta JSON con el mensaje de éxito
+            message = "El tipo de recaudación fue dado de baja exitosamente"
+            return jsonify({"success": True, "tipos_recaudacion": tipos_recaudacion_data, "message": message})
+        
+        except Exception as e:
+            # Enviar respuesta JSON con el mensaje de error
+            message = f"Hubo un error al dar de baja el tipo de recaudación: {str(e)}"
+            return jsonify({"success": False, "message": message}), 500
+
+

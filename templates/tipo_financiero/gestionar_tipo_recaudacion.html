@@ -33,11 +33,12 @@
                         <i class="fas fa-edit"></i>
                     </button>
 
-                    <button type="button" class="btn btn-secondary btn-sm" title="Dar de baja"
-                        onclick="darBajaTipoRecaudacion('{{ tipo[0] }}', '{{ tipo[3] }}')"
-                        {% if tipo[3] == 0 %} disabled {% endif %}>
-                        <i class="fas fa-ban"></i> <!-- Ícono de FontAwesome -->
+                    <button class="btn btn-secondary btn-sm" title="Dar de baja"
+                    onclick="darBajaTipoRecaudacion('{{ tipo[0] }}', '{{ tipo[3] }}')"
+                    {% if tipo[3] == 0 %} disabled {% endif %}>
+                    <i class="fas fa-ban"></i> <!-- Ícono de FontAwesome -->
                     </button>
+                
                     <form id="form-eliminar-{{ tipo[0] }}" style="display:inline-block;" title="Eliminar"
                      onsubmit="eliminarTipoRecaudacion(event, '{{ tipo[0] }}')">
                     <input type="hidden" name="id" value="{{ tipo[0] }}">
