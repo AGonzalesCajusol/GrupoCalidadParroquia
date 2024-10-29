@@ -33,7 +33,7 @@ def raiz():
 #ruta_envio
 
 
-# Registrar las rutas definidas en router_main.py
+# Registrar las rutas definidas en router_main.pyw
 routers.router_main.registrar_rutas(app)
 
 # Registrar las rutas definidas en router_tipo_ministro.py
