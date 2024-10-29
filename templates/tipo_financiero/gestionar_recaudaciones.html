@@ -39,7 +39,8 @@
                             <i class="fas fa-edit"></i>
                         </button>
                         <button class="btn btn-secondary btn-sm" title="Dar de baja"
-                            onclick="darBajaRecaudacion('{{ recaudacion[0] }}')">
+                            onclick="darBajaRecaudacion('{{ recaudacion[0] }}')"
+                            {% if recaudacion[5] == 0 %} disabled {% endif %}>
                             <i class="fas fa-ban"></i>
                         </button>
 
