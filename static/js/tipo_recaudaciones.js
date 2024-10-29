@@ -245,12 +245,12 @@ function actualizarTabla(tiposRecaudacion) {
     table.page(currentPage).draw(false);
 }
 document.getElementById('formRecaudacion').addEventListener('submit', function(event) {
-    event.preventDefault(); // Prevenir el envío tradicional
+    event.preventDefault(); // Prevenir el envío tradicional del formulario
 
     const form = event.target;
     const formData = new FormData(form);
 
-    // Ajustar el valor de 'estado' para que sea un número
+    // Ajustar el valor de 'estado' para que sea un número (1 o 0)
     const estadoCheckbox = document.getElementById('estado');
     formData.set('estado', estadoCheckbox.checked ? '1' : '0');
 
@@ -271,25 +271,23 @@ document.getElementById('formRecaudacion').addEventListener('submit', function(e
         if (data.success) {
             actualizarTabla(data.tipos_recaudacion); // Actualizar la tabla con los datos devueltos
             mostrarAlerta(data.message, "success"); // Mostrar mensaje de éxito
-    
-            // Cerrar el modal después de actualizar si la respuesta es exitosa
-            const modalElement = document.getElementById('modalRecaudacion');
-            if (modalElement) {
-                const modalRecaudacion = bootstrap.Modal.getOrCreateInstance(modalElement);
-                modalRecaudacion.hide();
-            } else {
-                console.error('No se encontró el elemento modalRecaudacion');
-            }
         } else {
             mostrarAlerta(data.message, "danger"); // Mostrar mensaje de error
         }
     })
     .catch(error => {
         console.error("Error:", error);
-        mostrarAlerta("Ocurrió un error al intentar actualizar el tipo de recaudación.", "danger");
+        mostrarAlerta("Ocurrió un error al intentar realizar la operación.", "danger");
     })
     .finally(() => {
         submitBtn.disabled = false; // Rehabilitar el botón después de la respuesta
+
+        // Cerrar el modal después de cualquier resultado (éxito o error)
+        const modalElement = document.getElementById('modalRecaudacion');
+        if (modalElement) {
+            const modalRecaudacion = bootstrap.Modal.getOrCreateInstance(modalElement);
+            modalRecaudacion.hide();
+        }
     });
 });
 function mostrarMensaje(mensaje, tipo) {
