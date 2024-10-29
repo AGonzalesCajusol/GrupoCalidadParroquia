@@ -1,5 +1,5 @@
 {% extends "index.html" %}
-{% block title %}Gestión de Tipos de Recaudación{% endblock %}
+{% block title %}Gestión de tipos de recaudación{% endblock %}
 {% block cuerpo %}
 
 <div class="container mt-4">
@@ -9,7 +9,7 @@
         <thead class="table-light">
             <tr class="text-center">
                 <th style="vertical-align: middle; text-align: center;">ID</th>
-                <th style="vertical-align: middle; text-align: center;">Nombre de Recaudación</th>
+                <th style="vertical-align: middle; text-align: center;">Nombre de recaudación</th>
                 <th style="vertical-align: middle; text-align: center;">Tipo</th>
                 <th style="vertical-align: middle; text-align: center;">Estado</th>
                 <th style="vertical-align: middle; text-align: center; width: 200px;">Acciones</th>
@@ -20,7 +20,7 @@
             <tr>
                 <td class="text-center border">{{ tipo[0] }}</td> <!-- ID del tipo de recaudación -->
                 <td>{{ tipo[1] }}</td> <!-- Nombre del tipo de recaudación -->
-                <td>{{ 'Monetario' if tipo[2] == 1 else 'No Monetario' }}</td> <!-- Tipo -->
+                <td>{{ 'Monetario' if tipo[2] == 1 else 'No monetario' }}</td> <!-- Tipo -->
                 <td>{{ 'Activo' if tipo[3] == 1 else 'Inactivo' }}</td> <!-- Estado -->
                 <td class="text-center border">
                     <button class="btn btn-primary btn-sm" title="Ver"
