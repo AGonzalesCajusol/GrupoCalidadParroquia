@@ -1,11 +1,42 @@
 from bd import obtener_conexion
 
-def insertar_sede(nombre_sede,direccion,creacion,telefono,correo,monto,congregacion,diosesis):
+def insertar_sede(nombre_sede, direccion, creacion, telefono, correo, monto, congregacion, diosis):
     conexion = obtener_conexion()
-    with conexion.cursor() as cursor:
-        cursor.execute("INSERT INTO sede(nombre_sede,direccion,creacion,telefono,correo,monto,id_congregacion,id_diosesis) VALUES (%s,%s,%s,%s,%s,%s,%s,%s)", (nombre_sede,direccion,creacion,telefono,correo,monto,congregacion,diosesis))  
-    conexion.commit()
-    conexion.close()
+    try:
+        with conexion.cursor() as cursor:
+            # Insertar en la tabla sede (dejando que el estado tome su valor por defecto)
+            cursor.execute('''
+                INSERT INTO sede(nombre_sede, direccion, creacion, telefono, correo, monto, id_congregacion, id_diosesis) 
+                VALUES (%s, %s, %s, %s, %s, %s, %s, %s)
+            ''', (nombre_sede, direccion, creacion, telefono, correo, monto, congregacion, diosis))
+            
+            id_sede = cursor.lastrowid  # Obtener el id de la sede recién insertada
+
+        conexion.commit()
+        return id_sede  # Retornar el id de la sede
+    except Exception as e:
+        print(f"Error: {e}")
+        conexion.rollback()
+        return None
+    finally:
+        conexion.close()
+
+def insertar_sede_acto_liturgico(id_sede, id_actoliturgico, estado_acto):
+    conexion = obtener_conexion()
+    try:
+        with conexion.cursor() as cursor:
+            # Insertar en la tabla sede_acto_liturgico
+            cursor.execute('''
+                INSERT INTO sede_acto_liturgico (id_sede, id_actoliturgico, estadoActoL) 
+                VALUES (%s, %s, %s)
+            ''', (id_sede, id_actoliturgico, int(estado_acto)))  # Convertir el estado a entero (1 o 0)
+
+        conexion.commit()
+    except Exception as e:
+        print(f"Error: {e}")
+        conexion.rollback()
+    finally:
+        conexion.close()
 
 def obtener_sede():
     conexion = obtener_conexion()
@@ -26,11 +57,21 @@ def obtener_sedeparacuenta():
 def obtener_sede_por_id(id):
     conexion = obtener_conexion()
     sede = None
-    with conexion.cursor() as cursor:
-        cursor.execute("SELECT id_sede,nombre_sede,direccion,creacion,telefono,correo,monto,estado,id_congregacion,id_diosesis FROM sede WHERE id_sede = %s", (id,))
-        sede = cursor.fetchone()
-    conexion.close()
-    return sede
+    actos_liturgicos = []  # Lista para almacenar los actos litúrgicos
+    try:
+        with conexion.cursor() as cursor:
+            # Obtener los datos de la sede
+            cursor.execute("SELECT id_sede, nombre_sede, direccion, creacion, telefono, correo, monto, estado, id_congregacion, id_diosesis FROM sede WHERE id_sede = %s", (id,))
+            sede = cursor.fetchone()
+
+            # Obtener los actos litúrgicos asociados a la sede
+            cursor.execute("SELECT id_actoliturgico FROM sede_acto_liturgico WHERE id_sede = %s", (id,))
+            actos_liturgicos = cursor.fetchall()
+
+    finally:
+        conexion.close()
+
+    return sede, [acto[0] for acto in actos_liturgicos]  # Devuelve la sede y los IDs de los actos litúrgicos
 
 def actualizar_sede(nombre_sede,direccion,creacion,telefono,correo,monto,estado,congregacion,diosesis, id):
     conexion = obtener_conexion()
@@ -78,5 +119,18 @@ def obtener_sedes_charla():
     except Exception as e:
         print(f"Error al obtener sedes: {e}")
         return []
+    finally:
+        conexion.close()
+
+
+def eliminar_sede_acto_liturgico(id_sede):
+    conexion = obtener_conexion()
+    try:
+        with conexion.cursor() as cursor:
+            cursor.execute("DELETE FROM sede_acto_liturgico WHERE id_sede = %s", (id_sede,))
+        conexion.commit()
+    except Exception as e:
+        print(f"Error: {e}")
+        conexion.rollback()
     finally:
         conexion.close()

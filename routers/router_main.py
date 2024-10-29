@@ -23,14 +23,13 @@ def registrar_rutas(app):
 
         if valor == 1:
             #Falta actualizar tokeeeen
-            dn, nom, tk, tp = cmin.retornar_datos_ministro(dni)
+            dn, nom, tk, tp, sd = cmin.retornar_datos_ministro(dni)
             response = make_response(redirect(url_for('inicio')))   
             response.set_cookie('dni', dn)
             response.set_cookie('nombre', nom)
             response.set_cookie('token', tk)
             response.set_cookie('tipo',tp)
-            print(request.cookies.get('tipo'))
-
+            response.set_cookie('sede',sd)
             return response
         elif valor == 2:
             #actualizar token del feligres y extraer nombre

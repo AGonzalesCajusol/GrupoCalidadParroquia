@@ -138,11 +138,185 @@ def registrar_rutas(app):
     def eliminaracto_requisitos(id):
         resultado = cal.eliminaracto_requisitos(id)
         return jsonify({'estado': resultado})
-        
-
     
+    @app.route("/gestionar_requisitosactos", methods=["GET"])
+    def gestionar_requisitosactos():
+        actos = cal.listar_actosLit()
+        return render_template('/actos_liturgicos/gestionar_requisitosactoliturgico.html', actos=actos)
+    
+    @app.route("/gestionar_actos", methods=["GET"])
+    def gestionar_actos():
+        return render_template('/actos_liturgicos/gestionar_liturgicoacto.html')
+    
+    @app.route("/registraractoliturgico1", methods=["POST"])
+    def registraractoliturgico1():
+        try:
+            acto = request.form.get('nombreLiturgico')
+            tipo = request.form.get('tipo')
+            monto = request.form.get('montoFijo')
+            estado = request.form.get('estado')
+            if tipo == 'on':
+                tipo = 'S'
+            else:
+                tipo = 'N'
 
+            if estado == 'on':
+                estado = 'A'
+            else:
+                estado = 'I'
+
+            st = cal.insertar_acto(acto, tipo, monto, estado)    
+
+            if st is not None:
+                return jsonify({'estado': 'Incorrecto'}), 400
+            return jsonify({'estado': 'Correcto'})  # Respuesta exitosa
+        except Exception as e:
+            print(f"Error al registrar el acto: {e}")
+            return jsonify({'estado': 'Error', 'mensaje': str(e)}), 500
+
+    @app.route("/Apilistaactos", methods=["GET"])
+    def Apilistaactos():
+        actos = cal.listar_actosLit()
+        lista_actos = []
+        for acto in actos:
+            tipo = 'Sacramento' if acto[3] == 'S'  else 'No sacramento'
+
+            if acto[4] == 'A':
+                estado = 'Activo'
+            else:
+                estado='Inactivo'
+
+            
+
+            lista_actos.append({
+                'id': acto[0],
+                'nombre_acto': acto[1],
+                'monto': acto[2],
+                'sacramento' : tipo,
+                'estado': estado
+            })
+        return jsonify(lista_actos)
+
+    @app.route('/eliminar_acto/<int:id>', methods=["GET"])
+    def eliminar_acto(id):
+        if cal.eliminar_acto(id):
+            return jsonify({'estado': 'Correcto'})
+        else:
+            return jsonify({'estado': 'Incorrecto'})
         
+    @app.route('/darbaja_acto/<int:id>', methods=["GET"])
+    def darbaja_acto(id):
+        try:
+            if cal.darbaja_acto(id):
+                return jsonify({'estado': 'Correcto'}), 200  # Respuesta exitosa
+            else:
+                return jsonify({'estado': 'Incorrecto'}), 404  # No se encontró el acto
+        except Exception as e:
+            return jsonify({'estado': 'Error', 'mensaje': str(e)}), 500  # Error del servidor
         
 
+    @app.route("/modificaracto1", methods=["POST"])
+    def modificaracto1():
+        try:
+            id = request.form.get('id_f')
+            acto = request.form.get('nombreLiturgico')
+            tipo = request.form.get('tipo')
+            monto = request.form.get('montoFijo')
+            estado = request.form.get('estado')
+
+            tipo = 'S' if tipo == 'on' else 'N'
+            estado = 'A' if estado == 'on' else 'I'
+
+            st = cal.modificar_acto(id, acto, tipo, monto, estado)
+
+            if not st:
+                return jsonify({'estado': 'Incorrecto'}), 400
+            return jsonify({'estado': 'Correcto'})
+        except Exception as e:
+            print(f"Error al registrar el acto: {e}")
+            return jsonify({'estado': 'Error', 'mensaje': str(e)}), 500
+
+    @app.route("/Apilistarrequisitos", methods=["GET"])
+    def Apilistarrequisitos():
+        actos = cal.listar_requisitosLit()
+        lista_actos = []
+        for acto in actos:
+            if acto[9] == 'A':
+                estado = "Activo"
+            else:
+                estado = "Inactivo"
+            lista_actos.append({
+                'id': acto[0],
+                'nombre_acto': acto[1],
+                'id_requisito': acto[5],
+                'nombre_requisito': acto[6],
+                'tipo' : acto[8],
+                'estado': estado,
+                'maximo':acto[10],
+                'minimo':acto[11]
+            })
+        return jsonify(lista_actos)
+
+    @app.route("/registrarrequisito", methods=["POST"])
+    def registrarrequisito():
+        try:
+            acto = request.form.get('nombreLiturgico')
+            requisito = request.form.get('nombrerequisito')
+            tipo = request.form.get('opciones')
+            estado = request.form.get('estado')
+            maximo = request.form.get('maxim')
+            minimo = request.form.get('minim')
+
+            # Manejo del estado
+            estado = 'A' if estado == 'on' else 'I'
+
+            # Insertar requisito
+            st = cal.insertar_requisito(acto, requisito, tipo, estado, maximo, minimo)
+            print(st)
+
+            if st == 'error':  # Cambiado de 'if st is not None' a 'if not st'
+                return jsonify({'estado': 'Incorrecto'}), 400
+            return jsonify({'estado': 'Correcto'})  # Respuesta exitosa
+        except Exception as e:
+            print(f"Error al registrar el requisito: {e}")
+            return jsonify({'estado': 'Error', 'mensaje': str(e)}), 500
+
+    @app.route('/darbaja_requisito/<int:id>/<int:id_requi>', methods=["GET"])
+    def darbaja_requisito(id,id_requi):
+        try:
+            if cal.darbaja_requisito(id, id_requi):
+                return jsonify({'estado': 'Correcto'}), 200  # Respuesta exitosa
+            else:
+                return jsonify({'estado': 'Incorrecto'}), 404  # No se encontró el acto
+        except Exception as e:
+            return jsonify({'estado': 'Error', 'mensaje': str(e)}), 500  # Error del servidor
         
+    @app.route('/eliminar_requisito/<int:id_actoliturgico>/<int:id_requisito>', methods=["GET"])
+    def eliminar_requisito(id_actoliturgico, id_requisito):
+        try:
+            if cal.eliminar_requisito(id_actoliturgico, id_requisito):
+                return jsonify({'estado': 'Correcto'}), 200  # Respuesta exitosa
+            else:
+                return jsonify({'estado': 'Incorrecto'}), 404  # No se encontró el acto o hubo un error
+        except Exception as e:
+            return jsonify({'estado': 'Error', 'mensaje': str(e)}), 500  # Error del servidor
+
+    @app.route("/modificar_requisito", methods=["POST"])
+    def modificar_requisito():
+        try:
+            id_requisito = request.form.get('id_r')
+            requisito = request.form.get('nombrerequisito')
+            tipo = request.form.get('opciones')
+            estado = request.form.get('estado')
+            maximo = request.form.get('maxim')
+            minimo = request.form.get('minim')
+
+            estado = 'A' if estado == 'on' else 'I'
+
+            st = cal.modificar_requisito(id_requisito, requisito, tipo, estado, maximo, minimo)
+
+            if not st:
+                return jsonify({'estado': 'Incorrecto'}), 400
+            return jsonify({'estado': 'Correcto'})  # Respuesta exitosa
+        except Exception as e:
+            return jsonify({'estado': 'Error', 'mensaje': str(e)}), 500

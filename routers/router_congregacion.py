@@ -4,7 +4,8 @@ from controladores.controlador_congregacion import (
     obtener_congregacion,
     obtener_congregacion_por_id,
     actualizar_congregacion,
-    eliminar_congregacion  
+    eliminar_congregacion,
+    darBaja_congregacion
 )
 
 def registrar_rutas(app):
@@ -38,7 +39,8 @@ def registrar_rutas(app):
     def procesar_actualizar_congregacion():
         id = request.form["id"]  # Captura el ID desde el formulario
         nombre = request.form["nombre_congregacion"]  # Captura el nombre actualizado
-        actualizar_congregacion(nombre, id)  # Llama a la función que actualiza en la base de datos
+        estado = request.form.get('estado') == 'on' 
+        actualizar_congregacion(nombre,estado, id)  # Llama a la función que actualiza en la base de datos
         flash("La congregación fue actualizada exitosamente")
         return redirect(url_for("gestionar_congregacion"))
 
@@ -50,3 +52,11 @@ def registrar_rutas(app):
         eliminar_congregacion(id)  # Llama a la función que elimina en la base de datos
         flash("La congregación fue eliminada exitosamente")
         return redirect(url_for("gestionar_congregacion"))
+
+    @app.route("/darBaja_congregacion", methods=["POST"])
+    def procesar_darBaja_congregacion():
+        id = request.form.get('id')  
+        darBaja_congregacion(id)  
+        flash("La congregacion fue dada de baja exitosamente")
+        return redirect(url_for("gestionar_congregacion"))
+    

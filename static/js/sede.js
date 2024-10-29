@@ -15,7 +15,6 @@ $(document).ready(function () {
 });
 
 
-
 // Validación para Nombre de la Sede
 document.getElementById('nombre_sede').addEventListener('input', function () {
     const nombreSede = this.value.trim();  // Elimina espacios en blanco al inicio y al final
@@ -116,7 +115,6 @@ document.getElementById('id_diosesis').addEventListener('change', function () {
 
 
 // abrir los modales de agregar y editar
-
 function abir() {
     var modalSede = new bootstrap.Modal(document.getElementById('modalSede'));
 
@@ -142,13 +140,17 @@ function abir() {
     const estadoCheckbox = document.getElementById('estado');
     estadoCheckbox.checked = true;
 
+    const actosCheckboxes = document.querySelectorAll('[id^="estado-"]');
+    actosCheckboxes.forEach(checkbox => {
+        checkbox.checked = true;
+    });
+
     document.getElementById('estado').setAttribute('disabled', true);
     document.getElementById('id_congregacion').value = '';
     document.getElementById('id_diosesis').value = '';
 
     modalSede.show();
 }
-
 
 
 function abrirModalEditar(id, nombre, direccion, creacion, telefono, correo, monto, estado, id_congregacion, id_diosesis) {
@@ -189,6 +191,34 @@ function abrirModalEditar(id, nombre, direccion, creacion, telefono, correo, mon
         seleccionarOpcionPorTexto(selectDiosesis, id_diosesis);
     }
 
+    // Limpiar todos los checkboxes de los actos litúrgicos
+    const actosCheckboxes = document.querySelectorAll('[id^="estado-"]');
+    actosCheckboxes.forEach(checkbox => {
+        checkbox.checked = false;  // Desmarcar todos inicialmente
+        checkbox.disabled = false;  // Habilitar todos los checkboxes para edición
+    });
+
+    // Obtener los actos litúrgicos seleccionados desde el servidor mediante AJAX
+    $.ajax({
+        url: '/obtener_actos_por_sede',  // Usar la ruta para obtener los actos por sede
+        type: 'GET',
+        data: { id_sede: id },  // Enviar el ID de la sede para obtener los actos litúrgicos asignados
+        success: function (response) {
+            const actosSeleccionados = response.actos;  // Suponiendo que el servidor devuelve una lista de IDs de actos
+
+            // Marcar los checkboxes correspondientes a los actos litúrgicos seleccionados
+            actosSeleccionados.forEach(function (actoId) {
+                const checkbox = document.getElementById('estado-' + actoId);
+                if (checkbox) {
+                    checkbox.checked = true;  // Marcar los checkboxes asociados a la sede
+                }
+            });
+        },
+        error: function (xhr, status, error) {
+            console.error("Error al obtener los actos litúrgicos: " + error);
+        }
+    });
+
     modalSede.show();
 }
 
@@ -204,14 +234,15 @@ function seleccionarOpcionPorTexto(selectElement, texto) {
 }
 
 
-function abrirModalVer(id, nombre, direccion, creacion, telefono, correo, monto,estado, id_congregacion, id_diosesis) {
+function abrirModalVer(id, nombre, direccion, creacion, telefono, correo, monto, estado, id_congregacion, id_diosesis) {
     var modalSede = new bootstrap.Modal(document.getElementById('modalSede'));
 
     const modalTitle = document.getElementById('modalSedeLabel');
     const submitBtn = document.getElementById('submitBtn'); // Botón de submit
-    
+
     modalTitle.textContent = 'Ver Sede';
     submitBtn.style.display = 'none'; // Ocultar el botón de Guardar
+
 
     // Llenar los campos con los datos existentes
     document.getElementById('sedeId').value = id;
@@ -228,6 +259,7 @@ function abrirModalVer(id, nombre, direccion, creacion, telefono, correo, monto,
     let selectCongregacion = document.getElementById('id_congregacion');
     let selectDiosesis = document.getElementById('id_diosesis');
 
+
     // Asignar la congregación y la diócesis basándose en el nombre (texto) mostrado en las opciones
     if (selectCongregacion) {
         seleccionarOpcionPorTexto(selectCongregacion, id_congregacion);
@@ -237,7 +269,32 @@ function abrirModalVer(id, nombre, direccion, creacion, telefono, correo, monto,
         seleccionarOpcionPorTexto(selectDiosesis, id_diosesis);
     }
 
-    // Bloquear los campos para solo permitir ver los datos usando 'disabled' para el estilo gris
+    // Limpiar todos los checkboxes de los actos litúrgicos y deshabilitarlos
+    const actosCheckboxes = document.querySelectorAll('[id^="estado-"]');
+    actosCheckboxes.forEach(checkbox => {
+        checkbox.checked = false;  
+        checkbox.disabled = true;  
+    });
+
+    // Obtener los actos litúrgicos seleccionados desde el servidor mediante AJAX (usando jQuery para simplicidad)
+    $.ajax({
+        url: '/obtener_actos_por_sede', // Define una nueva ruta en Flask para obtener los actos
+        type: 'GET',
+        data: { id_sede: id }, // Enviar el ID de la sede para obtener los actos
+        success: function (response) {
+            const actosSeleccionados = response.actos;  // Suponiendo que el servidor devuelve una lista de IDs de actos
+
+            // Marcar los checkboxes correspondientes a los actos litúrgicos seleccionados
+            actosSeleccionados.forEach(function (actoId) {
+                const checkbox = document.getElementById('estado-' + actoId);
+                if (checkbox) {
+                    checkbox.checked = true;
+                }
+            });
+        }
+    });
+
+    // Bloquear los campos para solo permitir ver los datos usando 'disabled'
     document.getElementById('nombre_sede').setAttribute('disabled', true);
     document.getElementById('direccion').setAttribute('disabled', true);
     document.getElementById('creacion').setAttribute('disabled', true);
@@ -245,14 +302,10 @@ function abrirModalVer(id, nombre, direccion, creacion, telefono, correo, monto,
     document.getElementById('correo').setAttribute('disabled', true);
     document.getElementById('monto').setAttribute('disabled', true);
     document.getElementById('estado').setAttribute('disabled', true);
-
-    // Bloquear los selects
     selectCongregacion.setAttribute('disabled', true);
     selectDiosesis.setAttribute('disabled', true);
 
-    // Al cerrar el modal, restablecer los campos
     document.getElementById('modalSede').addEventListener('hidden.bs.modal', function () {
-        // Eliminar el atributo 'disabled' de los campos
         document.getElementById('nombre_sede').removeAttribute('disabled');
         document.getElementById('direccion').removeAttribute('disabled');
         document.getElementById('creacion').removeAttribute('disabled');
@@ -263,28 +316,16 @@ function abrirModalVer(id, nombre, direccion, creacion, telefono, correo, monto,
         selectCongregacion.removeAttribute('disabled');
         selectDiosesis.removeAttribute('disabled');
 
-        // Volver a mostrar el botón de Guardar si es necesario en otros contextos
-        submitBtn.style.display = 'block'; 
+        actosCheckboxes.forEach(checkbox => {
+            checkbox.removeAttribute('disabled');
+        });
+
+        submitBtn.style.display = 'block';
     });
 
-    // Mostrar el modal
     modalSede.show();
 }
 
-// function darBajaSede(id,estado) {
-    
-//     const formSede = document.getElementById('formSede'); 
-
-//     formSede.setAttribute('action', darBajaSedeURL);
-
-//     document.getElementById('sedeId').value = id;
-//     const estadoCheckbox = document.getElementById('estado');
-//     estadoCheckbox.checked = (estado === false || estado === 'false' || estado === '0');
-    
-//     alert('Estado de la sede cambiado exitosamente a Inactivo');
-
-//     formSede.submit();
-// }
 
 function darBajaSede(id, estado) {
     // Comprobar si la sede ya está inactiva
@@ -293,7 +334,7 @@ function darBajaSede(id, estado) {
         return; // Salir de la función
     }
 
-    const formSede = document.getElementById('formSede'); 
+    const formSede = document.getElementById('formSede');
 
     formSede.setAttribute('action', darBajaSedeURL);
 
@@ -305,8 +346,3 @@ function darBajaSede(id, estado) {
 
     formSede.submit();
 }
-
-
-
-
-

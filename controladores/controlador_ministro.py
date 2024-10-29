@@ -121,9 +121,10 @@ def retornar_datos_ministro(num_doc):
     try:
         with conexion.cursor() as cursor:
             cursor.execute('''
-                SELECT mn.numero_documento, mn.nombre_ministro, mn.token, c.cargo 
+                SELECT mn.numero_documento, mn.nombre_ministro, mn.token, c.cargo, sd.nombre_sede
                 FROM ministro AS mn 
-                INNER JOIN cargo AS c ON c.id_cargo = mn.id_cargo
+                INNER JOIN cargo AS c ON c.id_cargo = mn.id_cargo left join sede as sd
+                on sd.id_sede = mn.id_sede
                 WHERE mn.numero_documento = %s
             ''', (num_doc,))
             return cursor.fetchone()

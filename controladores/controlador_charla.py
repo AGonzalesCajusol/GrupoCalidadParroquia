@@ -32,3 +32,51 @@ def registrar_programacion_en_bloque(id_charla, programaciones):
     finally:
         cursor.close()
         conexion.close()
+
+
+def obtener_actoliturgico():
+    conexion = obtener_conexion()
+    with conexion.cursor() as cursor:
+        cursor.execute("SELECT * from actoliturgico order by 1 asc")
+        sede = cursor.fetchall()
+    conexion.close()
+    return sede    
+
+
+def obtener_actoliturgico_por_id(id_acto):
+    conexion = obtener_conexion()
+    with conexion.cursor() as cursor:
+        cursor.execute("SELECT * from actoliturgico where id_actoliturgico=%s",(id_acto,))
+        sede = cursor.fetchall()
+    conexion.close()
+    return sede    
+
+
+def obtener_id_actoliturgico_nombre(acto):
+    conexion = obtener_conexion()
+    with conexion.cursor() as cursor:
+        cursor.execute("SELECT id_actoliturgico from actoliturgico where nombre_liturgia =%s", (acto,))
+        sede = cursor.fetchall()
+    conexion.close()
+    return sede    
+
+
+def charlas_acto(id_acto):
+    conexion = obtener_conexion()
+    with conexion.cursor() as cursor:
+        cursor.execute('''
+            select pr.id_programacion, tm.descripcion, pr.fecha , pr.hora_inicio, pr.hora_fin from programacion_charlas as pr inner join tema as tm
+            on pr.id_tema = tm.id_tema
+            where pr.id_charla = (select id_charla from charlas
+            inner join actoliturgico as al1
+            on charlas.id_actoliturgico = al1.id_actoliturgico
+            where current_date < charlas.fecha_inicio and al1.id_actoliturgico = %s
+            order by charlas.fecha_inicio asc
+            limit 1)
+                ''', (id_acto,))
+        charlas = cursor.fetchall()
+    conexion.close()
+    return charlas 
+
+
+
