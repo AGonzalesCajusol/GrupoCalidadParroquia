@@ -70,7 +70,7 @@ def registrar_rutas(app):
             estado = request.form.get("estado", "0") == "on"
 
             actualizar_tipo_recaudacion(nombre_recaudacion, tipo, estado, id)
-            
+            print (estado)
             # Obtener los tipos de recaudación actualizados
             tipos_recaudacion = obtener_tipos_recaudacion()
             tipos_recaudacion_data = [
