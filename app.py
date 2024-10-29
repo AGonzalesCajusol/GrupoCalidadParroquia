@@ -76,7 +76,6 @@ routers.router_charla.registrar_rutas(app)
 #charlka nueva
 routers.router_charlas.registrar_rutas(app)
 
-routers.router_programaciones.registrar_rutas(app)
 
 
 if __name__ == '__main__':
