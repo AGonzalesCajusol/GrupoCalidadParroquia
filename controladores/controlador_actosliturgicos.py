@@ -192,7 +192,6 @@ def eliminaracto_requisitos(id):
         return False
     finally:
         conexion.close()
-
 def obtener_acto():
     conexion = obtener_conexion()
     with conexion.cursor() as cursor:
@@ -214,3 +213,216 @@ def listar_actosLit():
         raise("Error en la consulta")
     finally:
         conexion.close()  
+
+def insertar_acto(acto,tipo,monto,estado):
+    conexion = obtener_conexion()
+    try:
+        with conexion.cursor() as cursor:
+            cursor.execute('''SELECT * FROM actoliturgico WHERE nombre_liturgia = %s''', (acto,))
+            resultado = cursor.fetchone()
+
+            if resultado:
+                return 'duplicado'
+            
+            cursor.execute('''
+                insert into actoliturgico(nombre_liturgia, monto,es_sacramento,estado ) values (%s,%s,%s,%s)
+            ''', (acto, monto, tipo, estado))
+            conexion.commit()
+    except Exception as e:
+        conexion.rollback() 
+        return 'duplicado'
+    finally:
+        conexion.close()  
+
+def eliminar_acto(id):
+    conexion = obtener_conexion()
+    try:
+        with conexion.cursor() as cursor:
+            cursor.execute('''SELECT * FROM actoliturgico WHERE id_actoliturgico = %s''', (id,))
+            
+            if cursor.rowcount > 0:
+                cursor.execute('''DELETE FROM actoliturgico WHERE id_actoliturgico = %s''', (id,))
+                conexion.commit()
+                return True
+            
+            return False
+
+    except Exception as e:
+        conexion.rollback()
+        print(f'Error al eliminar acto: {e}')
+        return False
+
+    finally:
+        conexion.close()
+
+def darbaja_acto(id):
+    conexion = obtener_conexion()
+    try:
+        with conexion.cursor() as cursor:
+            cursor.execute('''Update actoliturgico  SET estado= 'I' WHERE id_actoliturgico = %s ''', (id,))
+            conexion.commit()
+            return True
+    except Exception as e:
+        conexion.rollback()
+        print(f'Error al eliminar acto: {e}')
+        return False
+
+    finally:
+        conexion.close()
+
+def modificar_acto(id_actoliturgico, acto, tipo, monto, estado):
+    conexion = obtener_conexion()
+    try:
+        with conexion.cursor() as cursor:
+            cursor.execute('''
+                UPDATE actoliturgico
+                SET nombre_liturgia = %s,
+                    monto = %s,
+                    es_sacramento = %s,
+                    estado = %s
+                WHERE id_actoliturgico = %s
+            ''', (acto, monto, tipo, estado, id_actoliturgico))
+            conexion.commit()
+            return True
+    except Exception as e:
+        conexion.rollback() 
+        return False
+    finally:
+        conexion.close()
+
+def listar_requisitosLit():
+    conexion = obtener_conexion()
+    try:
+        with conexion.cursor() as cursor:
+            cursor.execute('''
+                select * from actoliturgico as   al left join  requisito as rq 
+                on rq.id_actoliturgico = al.id_actoliturgico order by al.id_actoliturgico asc
+            ''')
+            valores = cursor.fetchall()
+        return valores
+    except Exception as e:  
+        raise("Error en la consulta")
+    finally:
+        conexion.close()  
+
+def insertar_requisito(acto, requisito, tipo, estado, maximo, minimo):
+    conexion = obtener_conexion()
+    try:
+        with conexion.cursor() as cursor:
+            print(f"Acto: {acto}, Requisito: {requisito}")
+            cursor.execute('''
+                SELECT * FROM requisito WHERE id_actoliturgico = %s AND nombre_requisito = %s
+            ''', (acto, requisito))
+            resultado = cursor.fetchone()
+
+            if resultado:
+                return 'duplicado'
+
+            cursor.execute('''
+                INSERT INTO requisito (nombre_requisito, id_actoliturgico, tipo, estado, maximo, minimo) 
+                VALUES (%s, %s, %s, %s, %s, %s)
+            ''', (requisito, acto, tipo, estado, maximo, minimo))
+            conexion.commit()
+            return True
+    except Exception as e:
+        print(f"Error al insertar requisito: {e}")
+        conexion.rollback() 
+        return 'error'
+    finally:
+        conexion.close()
+
+def darbaja_requisito(id_acto, id_requisito):
+    conexion = obtener_conexion()
+    try:
+        with conexion.cursor() as cursor:
+            cursor.execute('''update requisito set estado = 'I' where id_requisito = %s and id_actoliturgico = %s''', (id_requisito,id_acto,))
+            conexion.commit()
+            return True
+    except Exception as e:
+        conexion.rollback()
+        print(f'Error al eliminar acto: {e}')
+        return False
+
+    finally:
+        conexion.close()
+
+def eliminar_requisito(id_actoliturgico, id_requisito):
+    conexion = obtener_conexion()
+    try:
+        with conexion.cursor() as cursor:
+            # Consultar cuántas filas están asociadas con el requisito
+            cursor.execute('''
+                SELECT COUNT(*) FROM actoliturgico AS al
+                INNER JOIN requisito AS req ON al.id_actoliturgico = req.id_actoliturgico
+                INNER JOIN aprobacionrequisitos AS ar ON ar.id_requisito = req.id_requisito
+                WHERE al.id_actoliturgico = %s AND ar.id_requisito = %s
+            ''', (id_actoliturgico, id_requisito))
+
+            count = cursor.fetchone()[0]
+
+            # Si hay más de una fila, no proceder con la eliminación
+            if count > 1:
+                return False
+
+            # Si hay exactamente una fila, proceder a eliminar
+            cursor.execute('''
+                DELETE req FROM requisito AS req
+                WHERE req.id_actoliturgico = %s AND req.id_requisito = %s
+            ''', (id_actoliturgico, id_requisito))
+
+            conexion.commit()
+            return True
+    except Exception as e:
+        conexion.rollback()
+        print(f'Error al eliminar requisito: {e}')
+        return False
+    finally:
+        conexion.close()
+
+def modificar_requisito(id_requisito, requisito, tipo, estado, maximo, minimo):
+    conexion = obtener_conexion()
+    try:
+        with conexion.cursor() as cursor:
+            cursor.execute('''
+                UPDATE requisito 
+                SET nombre_requisito = %s, tipo = %s, estado = %s, maximo = %s, minimo = %s 
+                WHERE id_requisito = %s
+            ''', (requisito, tipo, estado, maximo, minimo, id_requisito))
+            conexion.commit()
+            return True
+    except Exception:
+        conexion.rollback()
+        return False
+    finally:
+        conexion.close()
+
+def listar_requisitos(id_actoliturgico):
+
+    conexion = obtener_conexion()
+    try:
+        with conexion.cursor() as cursor:
+            cursor.execute('''
+                select * from requisito where id_actoliturgico = %s
+            ''',(id_actoliturgico))
+            valores = cursor.fetchall()
+        return valores
+    except Exception as e:  
+        raise("Error en la consulta")
+    finally:
+        conexion.close()
+
+def monto_acto(id_acto):
+    conexion = obtener_conexion()
+    try:
+        with conexion.cursor() as cursor:
+            cursor.execute('''
+                SELECT al.monto FROM actoliturgico AS al WHERE id_actoliturgico = %s
+            ''', (id_acto,))
+            resultado = cursor.fetchone()
+            monto = resultado[0] if resultado else 0  # Devuelve 0 si no se encuentra el acto
+        return monto
+    except Exception as e:  
+        print(f"Error al obtener el monto del acto: {e}")
+        return 0  # Retorna 0 en caso de excepción
+    finally:
+        conexion.close()
