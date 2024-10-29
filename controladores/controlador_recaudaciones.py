@@ -46,7 +46,7 @@ def obtener_recaudaciones():
         conexion.close()
 
 
-        
+
 def obtener_recaudacion_por_id(id_recaudacion):
     conexion = obtener_conexion()
     try:
@@ -87,7 +87,7 @@ def actualizar_recaudacion(monto, observacion, id_sede, id_tipo_recaudacion, est
         with conexion.cursor() as cursor:
             cursor.execute("""
                 UPDATE recaudacion
-                SET fecha = NOW(), hora = NOW(), monto = %s, observacion = %s, estado = %s, id_sede = %s, id_tipo_recaudacion = %s
+                SET monto = %s, observacion = %s, estado = %s, id_sede = %s, id_tipo_recaudacion = %s
                 WHERE id_recaudacion = %s
             """, (monto, observacion, estado, id_sede, id_tipo_recaudacion, id_recaudacion))
         conexion.commit()
@@ -109,8 +109,9 @@ def eliminar_recaudacion(id_recaudacion):
         conexion.rollback()
     finally:
         conexion.close()
+
 def obtener_tipos_recaudacion():
-    conexion = obtener_conexion()  # Asumiendo que tienes una función para obtener la conexión
+    conexion = obtener_conexion()
     try:
         with conexion.cursor() as cursor:
             cursor.execute("SELECT id_tipo_recaudacion, nombre_recaudacion FROM tipo_recaudacion")
@@ -121,12 +122,13 @@ def obtener_tipos_recaudacion():
         return []
     finally:
         conexion.close()
+
 def obtener_id_sede_por_nombre(nombre_sede):
     conexion = obtener_conexion()
     try:
         with conexion.cursor() as cursor:
             cursor.execute("SELECT id_sede FROM sede WHERE nombre_sede = %s", (nombre_sede,))
-            id_sede = cursor.fetchone()[0]  # Devuelve el primer resultado
+            id_sede = cursor.fetchone()[0]
         return id_sede
     except Exception as e:
         print(f"Error al obtener ID de la sede: {e}")
@@ -154,8 +156,7 @@ def obtener_recaudaciones_por_año(año):
     finally:
         conexion.close()
 
-# Obtener recaudaciones por año Exportar###
-def obtener_recaudaciones_por_año(año):
+def obtener_recaudaciones_exportar_por_año(año):
     conexion = obtener_conexion()
     with conexion.cursor() as cursor:
         cursor.execute("""
@@ -193,8 +194,9 @@ def obtener_rango_de_años():
             FROM recaudacion;
         """)
         rango_años = cursor.fetchone()
-        
-    # Verifica que el rango de años sea válido
+ 
+ 
+       
     if rango_años:
         año_minimo, año_maximo = rango_años
         return list(range(año_minimo, año_maximo + 1))
