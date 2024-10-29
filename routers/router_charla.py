@@ -12,8 +12,7 @@ def registrar_rutas(app):
         acto = contro.listar_sacramentos()
         id_actoliturgico = request.args.get('id_actoliturgico')
         fecha_inicio = request.args.get('fecha_inicio')
-        id_charla = request.args.get('id_charla')  # Obtener el nuevo parámetro
-        print(id_actoliturgico,id_charla,fecha_inicio)
+        id_charla = request.args.get('id_charla')
         return render_template("charlas/charlas.html", acto=acto, id_actoliturgico=id_actoliturgico, fecha_inicio=fecha_inicio, id_charla=id_charla)
 
     

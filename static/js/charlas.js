@@ -10,33 +10,24 @@ $(document).ready(function () {
 
 var modal = new bootstrap.Modal(document.getElementById('myModal11'));
 
-document.addEventListener("DOMContentLoaded", function () {
+window.addEventListener("load", function () {
     const urlParams = new URLSearchParams(window.location.search);
     const idActo = urlParams.get('id_actoliturgico');
     const fechaInicio = urlParams.get('fecha_inicio');
-    const idCharla = urlParams.get('id_charla'); // Capturar el nuevo parámetro id_charla
-    idActoGlobal = urlParams.get('id_actoliturgico');
-    idCharlaGlobal = urlParams.get('id_charla');
+    const idCharla = urlParams.get('id_charla');
 
     console.log('ID del acto litúrgico recibido:', idActo);
     console.log('Fecha de inicio recibida:', fechaInicio);
-    console.log('ID de charla recibido:', idCharla); // Imprimir para verificar
+    console.log('ID de charla recibido:', idCharla);
 
     if (idActo && fechaInicio && idCharla) {
-        mostrarTemas(idActo, idCharla); // Pasar idCharla a mostrarTemash
+        mostrarTemas(idActo, idCharla);
     } else {
         console.error('ID de acto, charla o fecha de inicio no encontrada en la URL.');
     }
-
-    console.log('ID del acto litúrgico recibido:', idActoGlobal);
-    console.log('ID de charla recibido:', idCharlaGlobal);
-
-    if (idActoGlobal && idCharlaGlobal) {
-        mostrarTemas(idActoGlobal, idCharlaGlobal);
-    } else {
-        console.error('ID de acto o charla no encontrada en la URL.');
-    }
 });
+
+
 
 function mostrarTemas(idActo, idCharla) {
     const formulario = document.getElementById('formulario_temas_sacramento');
