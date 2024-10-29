@@ -64,14 +64,18 @@ def registrar_rutas(app):
     @app.route("/actualizar_tipo_recaudacion", methods=["POST"])
     def procesar_actualizar_tipo_recaudacion():
         try:
+            # Obtener datos del formulario
             id = request.form["id"]
             nombre_recaudacion = request.form["nombre_recaudacion"]
             tipo = request.form["tipo"]
-            estado = request.form.get("estado", "0") == "on"
+            
+            # Convertir el estado a entero (1 o 0) para guardar correctamente
+            estado = 1 if request.form.get("estado") == "1" else 0
 
+            # Llamar a la función que actualiza el tipo de recaudación en la base de datos
             actualizar_tipo_recaudacion(nombre_recaudacion, tipo, estado, id)
             
-            # Obtener los tipos de recaudación actualizados
+            # Obtener los tipos de recaudación actualizados para enviar en la respuesta
             tipos_recaudacion = obtener_tipos_recaudacion()
             tipos_recaudacion_data = [
                 {
@@ -83,10 +87,11 @@ def registrar_rutas(app):
                 for tipo in tipos_recaudacion
             ]
             
-            # Devolver la respuesta en JSON con los datos actualizados
+            # Responder con los datos actualizados en formato JSON
             return jsonify({"success": True, "tipos_recaudacion": tipos_recaudacion_data, "message": "El tipo de recaudación fue actualizado exitosamente"}), 200
 
         except Exception as e:
+            # En caso de error, devolver un mensaje de error en JSON
             return jsonify({"success": False, "message": f"Error al actualizar: {str(e)}"}), 400
     # Ruta para eliminar un tipo de recaudación
     @app.route("/eliminar_tipo_recaudacion", methods=["POST"])

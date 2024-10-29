@@ -1,15 +1,15 @@
 {% extends "index.html" %}
-{% block title %}Gestión de Tipos de Recaudación{% endblock %}
+{% block title %}Gestión de tipos de recaudación{% endblock %}
 {% block cuerpo %}
 
 <div class="container mt-4">
-    <h1 class="titulo-gestion">Gestión de Tipos de Recaudación</h1>
+    <h1 class="titulo-gestion">Gestión de tipos de recaudación</h1>
 
     <table id="tipoRecaudacionTable" class="table table-hover table-striped">
         <thead class="table-light">
             <tr class="text-center">
                 <th style="vertical-align: middle; text-align: center;">ID</th>
-                <th style="vertical-align: middle; text-align: center;">Nombre de Recaudación</th>
+                <th style="vertical-align: middle; text-align: center;">Nombre de recaudación</th>
                 <th style="vertical-align: middle; text-align: center;">Tipo</th>
                 <th style="vertical-align: middle; text-align: center;">Estado</th>
                 <th style="vertical-align: middle; text-align: center; width: 200px;">Acciones</th>
@@ -20,18 +20,18 @@
             <tr>
                 <td class="text-center border">{{ tipo[0] }}</td> <!-- ID del tipo de recaudación -->
                 <td>{{ tipo[1] }}</td> <!-- Nombre del tipo de recaudación -->
-                <td>{{ 'Monetario' if tipo[2] == 1 else 'No Monetario' }}</td> <!-- Tipo -->
+                <td>{{ 'Monetario' if tipo[2] == 1 else 'No monetario' }}</td> <!-- Tipo -->
                 <td>{{ 'Activo' if tipo[3] == 1 else 'Inactivo' }}</td> <!-- Estado -->
                 <td class="text-center border">
                     <button class="btn btn-primary btn-sm" title="Ver"
-                        onclick="abrirModalVer('{{ tipo[0] }}', '{{ tipo[1] }}', '{{ tipo[2] }}', '{{ tipo[3] }}')">
-                        <i class="fas fa-eye"></i>
-                    </button>
-
-                    <button class="btn btn-warning btn-sm" title="Editar"
-                        onclick="abrirModalEditar('{{ tipo[0] }}', '{{ tipo[1] }}', '{{ tipo[2] }}', '{{ tipo[3] }}')">
-                        <i class="fas fa-edit"></i>
-                    </button>
+                    onclick="abrirModalTipoRecaudacion('ver', '{{ tipo[0] }}', '{{ tipo[1] }}', '{{ tipo[2] }}', '{{ tipo[3] }}')">
+                    <i class="fas fa-eye"></i>
+                </button>
+                
+                <button class="btn btn-warning btn-sm" title="Editar"
+                    onclick="abrirModalTipoRecaudacion('editar', '{{ tipo[0] }}', '{{ tipo[1] }}', '{{ tipo[2] }}', '{{ tipo[3] }}')">
+                    <i class="fas fa-edit"></i>
+                </button>
 
                     <button class="btn btn-secondary btn-sm" title="Dar de baja"
                     onclick="darBajaTipoRecaudacion('{{ tipo[0] }}', '{{ tipo[3] }}')"
@@ -63,19 +63,19 @@
             <form id="formRecaudacion" action="{{ url_for('procesar_insertar_tipo_recaudacion') }}" method="POST">
                 <input type="hidden" id="tipoRecaudacionId" name="id">
                 <div class="modal-header">
-                    <h5 class="modal-title" id="modalRecaudacionLabel">Agregar Tipo de Recaudación</h5>
+                    <h5 class="modal-title" id="modalRecaudacionLabel">Agregar tipo de recaudación</h5>
                     <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
                 </div>
                 <div class="modal-body">
                     <div class="mb-3">
-                        <label for="nombre_recaudacion" class="form-label">Nombre de la Recaudación</label>
+                        <label for="nombre_recaudacion" class="form-label">Nombre de la recaudación</label>
                         <input type="text" class="form-control" id="nombre_recaudacion" name="nombre_recaudacion" required>
                     </div>
                     <div class="mb-3">
                         <label for="tipo" class="form-label">Tipo</label>
                         <select class="form-select" id="tipo" name="tipo" required>
                             <option value="1">Monetario</option>
-                            <option value="0">No Monetario</option>
+                            <option value="0">No monetario</option>
                         </select>
                     </div>
                     <div class="mb-3">

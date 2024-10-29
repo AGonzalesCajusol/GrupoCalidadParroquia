@@ -8,7 +8,7 @@ $(document).ready(function () {
         },
         initComplete: function () {
             // Insertar el botón "Agregar tipo de recaudación" dentro del div y alinearlo a la derecha
-            $("div.button-section").html('<button type="button" class="btn btn-success btn-lg custom-btn ml-3 btn-agregar-tipo" data-bs-toggle="modal" data-bs-target="#agregarModal" onclick="abrirModalAgregar()"><i class="bi bi-plus-circle"></i> Agregar Tipo de Recaudación </button>');
+            $("div.button-section").html('<button type="button" class="btn btn-success btn-lg custom-btn ml-3 btn-agregar-tipo" onclick="abrirModalTipoRecaudacion(\'agregar\')"><i class="bi bi-plus-circle"></i> Agregar tipo de recaudación </button>');
         }
     });
 });
@@ -23,87 +23,70 @@ document.getElementById('nombre_recaudacion').addEventListener('input', function
     }
 });
 
-// Abrir el modal para agregar un nuevo tipo de recaudación
-function abrirModalAgregar() {
-    var modalRecaudacion = new bootstrap.Modal(document.getElementById('modalRecaudacion'));
-
+function abrirModalTipoRecaudacion(accion, id = '', nombre = '', tipo = '1', estado = true) {
+    // Obtener el modal y sus elementos
+    const modalRecaudacion = new bootstrap.Modal(document.getElementById('modalRecaudacion'));
     const modalTitle = document.getElementById('modalRecaudacionLabel');
     const submitBtn = document.getElementById('submitBtn');
     const formRecaudacion = document.getElementById('formRecaudacion');
 
-    modalTitle.textContent = 'Agregar Tipo de Recaudación';
-    submitBtn.textContent = 'Guardar';
-    submitBtn.style.display = 'block'; // Asegurar que el botón esté visible
+    // Limpiar y configurar el modal según la acción
+    if (accion === 'agregar') {
+        modalTitle.textContent = 'Agregar Tipo de Recaudación';
+        submitBtn.textContent = 'Guardar';
+        submitBtn.style.display = 'block';
+        formRecaudacion.setAttribute('action', insertarTipoRecaudacionURL);
+        
+        // Asegurarse de que el ID esté vacío para que la base de datos lo genere
+        document.getElementById('tipoRecaudacionId').value = '';
+        formRecaudacion.reset(); // Limpiar otros campos del formulario
+        document.getElementById('nombre_recaudacion').value = '';
+        document.getElementById('tipo').value = '1'; // Valor predeterminado "Monetario" en agregar
+        document.getElementById('estado').checked = true;
 
-    formRecaudacion.setAttribute('action', insertarTipoRecaudacionURL);
+        // Configurar campos: habilitar para entrada
+        document.getElementById('nombre_recaudacion').removeAttribute('disabled');
+        document.getElementById('tipo').removeAttribute('disabled');
+        document.getElementById('estado').setAttribute('disabled', true); // Estado fijo en activo
 
-    // Limpiar los campos del modal
-    formRecaudacion.reset();
-    document.getElementById('tipoRecaudacionId').value = '';
-    document.getElementById('tipo').value = '1';
-    document.getElementById('estado').checked = true;
+    } else if (accion === 'ver') {
+        modalTitle.textContent = 'Ver Tipo de Recaudación';
+        submitBtn.style.display = 'none'; // Ocultar botón de guardar
 
-    document.getElementById('nombre_recaudacion').removeAttribute('disabled');
-    document.getElementById('tipo').removeAttribute('disabled');
-    document.getElementById('estado').setAttribute('disabled', true); // Estado siempre "Activo" al crear
+        // Cargar datos en los campos
+        document.getElementById('tipoRecaudacionId').value = id;
+        document.getElementById('nombre_recaudacion').value = nombre;
+        document.getElementById('tipo').value = tipo === '1' ? '1' : '0'; // Verificar y asignar tipo correctamente
+        document.getElementById('estado').checked = (estado === 'Activo' || estado === true || estado === '1');
 
-    modalRecaudacion.show();
-}
-function abrirModalVer(id, nombre, tipo, estado) {
-    console.log(`ID: ${id}, Nombre: ${nombre}, Tipo: ${tipo}, Estado: ${estado}`);
+        // Configurar campos: deshabilitar para vista solo lectura
+        document.getElementById('nombre_recaudacion').setAttribute('disabled', true);
+        document.getElementById('tipo').setAttribute('disabled', true);
+        document.getElementById('estado').setAttribute('disabled', true);
 
-    var modalRecaudacion = new bootstrap.Modal(document.getElementById('modalRecaudacion'));
+    } else if (accion === 'editar') {
+        modalTitle.textContent = 'Editar Tipo de Recaudación';
+        submitBtn.textContent = 'Guardar cambios';
+        submitBtn.style.display = 'block';
+        formRecaudacion.setAttribute('action', actualizarTipoRecaudacionURL);
 
-    const modalTitle = document.getElementById('modalRecaudacionLabel');
-    const submitBtn = document.getElementById('submitBtn');
+        // Cargar datos en los campos
+        document.getElementById('tipoRecaudacionId').value = id;
+        document.getElementById('nombre_recaudacion').value = nombre;
+        
+        // Aquí nos aseguramos de que el tipo esté correctamente seleccionado
+        document.getElementById('tipo').value = tipo === '1' ? '1' : '0';
+        
+        // Asignar el estado (activo/inactivo)
+        document.getElementById('estado').checked = (estado === 'Activo' || estado === true || estado === '1');
 
-    modalTitle.textContent = 'Ver Tipo de Recaudación';
-    submitBtn.style.display = 'none'; // Ocultar el botón de Guardar
+        // Configurar campos: habilitar para edición
+        document.getElementById('nombre_recaudacion').removeAttribute('disabled');
+        document.getElementById('tipo').removeAttribute('disabled');
+        document.getElementById('estado').removeAttribute('disabled');
+    }
 
-    // Llenar los campos del modal
-    document.getElementById('tipoRecaudacionId').value = id;
-    document.getElementById('nombre_recaudacion').value = nombre;
-
-    // Seleccionar la opción correcta en el select
-    const selectTipo = document.getElementById('tipo');
-    selectTipo.value = tipo == '1' ? '1' : '0';
-
-    // Asignar el estado (checkbox)
-    const estadoCheckbox = document.getElementById('estado');
-    estadoCheckbox.checked = (estado === 'Activo' || estado === true || estado === 'true' || estado === '1');
-
-    // Deshabilitar los campos para vista
-    document.getElementById('nombre_recaudacion').setAttribute('disabled', true);
-    selectTipo.setAttribute('disabled', true);
-    estadoCheckbox.setAttribute('disabled', true);
-
-    // Mostrar el modal
-    modalRecaudacion.show();
-}
-
-// Función para abrir el modal para editar un tipo de recaudación
-function abrirModalEditar(id, nombre, tipo, estado) {
-    var modalRecaudacion = new bootstrap.Modal(document.getElementById('modalRecaudacion'));
-
-    const modalTitle = document.getElementById('modalRecaudacionLabel');
-    const submitBtn = document.getElementById('submitBtn');
-    const formRecaudacion = document.getElementById('formRecaudacion');
-
-    modalTitle.textContent = 'Editar Tipo de Recaudación';
-    submitBtn.textContent = 'Guardar cambios';
-    submitBtn.style.display = 'block';
-
-    formRecaudacion.setAttribute('action', actualizarTipoRecaudacionURL);
-    document.getElementById('tipoRecaudacionId').value = id;
-    document.getElementById('nombre_recaudacion').value = nombre;
-    document.getElementById('tipo').value = tipo === '1' ? '1' : '0';
-    document.getElementById('estado').checked = (estado === 'Activo' || estado === true || estado === '1');
-
-    // Asegurar que los campos estén habilitados para la edición
-    document.getElementById('nombre_recaudacion').removeAttribute('disabled');
-    document.getElementById('tipo').removeAttribute('disabled');
-    document.getElementById('estado').removeAttribute('disabled'); // Habilitar para edición
-
+    // Mostrar el modal configurado
     modalRecaudacion.show();
 }
 document.getElementById('formRecaudacion').addEventListener('submit', function(event) {
@@ -111,10 +94,14 @@ document.getElementById('formRecaudacion').addEventListener('submit', function(e
 
     const form = event.target;
     const formData = new FormData(form);
+
+    // Convertir el valor de 'estado' a '1' o '0'
+    const estadoCheckbox = document.getElementById('estado');
+    formData.set('estado', estadoCheckbox.checked ? '1' : '0');
+
     const actionUrl = form.getAttribute('action');
     const submitBtn = document.getElementById('submitBtn');
-
-    submitBtn.disabled = true; // Deshabilitar el botón para evitar múltiples envíos
+    submitBtn.disabled = true;
 
     fetch(actionUrl, {
         method: 'POST',
@@ -126,73 +113,28 @@ document.getElementById('formRecaudacion').addEventListener('submit', function(e
     .then(response => response.json())
     .then(data => {
         if (data.success) {
-            // Actualizar la tabla con los datos devueltos
             actualizarTabla(data.tipos_recaudacion);
-            mostrarAlerta(data.message, "success"); // Mostrar mensaje de éxito
+            mostrarMensaje(data.message, "success");
 
-            // Cerrar el modal después de actualizar
             const modalRecaudacion = bootstrap.Modal.getInstance(document.getElementById('modalRecaudacion'));
             if (modalRecaudacion) {
                 modalRecaudacion.hide();
             }
         } else {
-            mostrarAlerta(data.message, "danger"); // Mostrar mensaje de error
+            mostrarMensaje(data.message, "danger");
         }
     })
     .catch(error => {
         console.error("Error:", error);
-        mostrarAlerta("Ocurrió un error al intentar realizar la operación.", "danger");
+        mostrarMensaje("Ocurrió un error al intentar realizar la operación.", "danger");
     })
     .finally(() => {
-        submitBtn.disabled = false; // Rehabilitar el botón después de la respuesta
+        submitBtn.disabled = false;
     });
 });
-function eliminarTipoRecaudacion(event, id) {
-    event.preventDefault();
-
-    const button = event.target.querySelector('button[type="submit"]');
-    if (button) {
-        button.disabled = true; // Desactivar el botón para evitar múltiples clics
-    }
-
-    if (confirm("¿Estás seguro de que deseas eliminar este tipo de recaudación?")) {
-        fetch("/eliminar_tipo_recaudacion", {
-            method: "POST",
-            headers: {
-                "Content-Type": "application/x-www-form-urlencoded",
-            },
-            body: `id=${encodeURIComponent(id)}`
-        })
-        .then(response => response.json())
-        .then(data => {
-            if (button) {
-                button.disabled = false; // Rehabilitar el botón después de la respuesta
-            }
-
-            if (data.success) {
-                actualizarTabla(data.tipos_recaudacion);
-                mostrarAlerta(data.message, "success"); // Mostrar mensaje de éxito
-            } else {
-                mostrarAlerta(data.message, "danger"); // Mostrar mensaje de error
-            }
-        })
-        .catch(error => {
-            console.error("Error:", error);
-            if (button) {
-                button.disabled = false;
-            }
-            mostrarAlerta("Ocurrió un error al intentar eliminar el tipo de recaudación.", "danger");
-        });
-    } else {
-        if (button) {
-            button.disabled = false; // Rehabilitar el botón si se cancela la confirmación
-        }
-    }
-}
 // Función para actualizar la tabla con los nuevos datos, manteniendo el formato original y la paginación
 function actualizarTabla(tiposRecaudacion) {
     const tbody = document.querySelector('#tipoRecaudacionTable tbody');
-
     const table = $('#tipoRecaudacionTable').DataTable();
     const currentPage = table.page();
 
@@ -203,7 +145,7 @@ function actualizarTabla(tiposRecaudacion) {
     tiposRecaudacion.forEach(tipo => {
         const row = document.createElement('tr');
 
-        // Crear las celdas con el mismo estilo de alineación y formato que el HTML original
+        // Crear las celdas y botones con eventos
         row.innerHTML = `
             <td class="text-center border">${tipo.id}</td>
             <td>${tipo.nombre}</td>
@@ -211,11 +153,11 @@ function actualizarTabla(tiposRecaudacion) {
             <td>${tipo.estado}</td>
             <td class="text-center border">
                 <button class="btn btn-primary btn-sm" title="Ver"
-                    onclick="abrirModalVer('${tipo.id}', '${tipo.nombre}', '${tipo.tipo}', '${tipo.estado}')">
+                    onclick="abrirModalTipoRecaudacion('ver', '${tipo.id}', '${tipo.nombre}', '${tipo.tipo}', '${tipo.estado}')">
                     <i class="fas fa-eye"></i>
                 </button>
                 <button class="btn btn-warning btn-sm" title="Editar"
-                    onclick="abrirModalEditar('${tipo.id}', '${tipo.nombre}', '${tipo.tipo}', '${tipo.estado}')">
+                    onclick="abrirModalTipoRecaudacion('editar', '${tipo.id}', '${tipo.nombre}', '${tipo.tipo}', '${tipo.estado}')">
                     <i class="fas fa-edit"></i>
                 </button>
                 <button class="btn btn-secondary btn-sm" title="Dar de baja"
@@ -236,7 +178,7 @@ function actualizarTabla(tiposRecaudacion) {
         tbody.appendChild(row);
     });
 
-    // Limpiar la tabla de DataTables y volver a agregar las filas
+    // Actualizar DataTable sin perder los eventos
     table.clear();
     table.rows.add($(tbody).find('tr'));
     table.draw(false);
@@ -290,17 +232,28 @@ document.getElementById('formRecaudacion').addEventListener('submit', function(e
         }
     });
 });
+
 function mostrarMensaje(mensaje, tipo) {
+    // Crear contenedor de alerta
     const alertContainer = document.createElement("div");
-    alertContainer.className = `alert alert-${tipo} alert-dismissible fade show position-fixed bottom-0 start-0 m-3`;
+    alertContainer.className = `alert alert-${tipo} alert-dismissible fade show position-fixed`;
     alertContainer.role = "alert";
-    alertContainer.style.zIndex = "1050"; // Asegurar que el mensaje esté sobre otros elementos
+    alertContainer.style.cssText = `
+        bottom: 20px; 
+        right: 20px; 
+        min-width: 250px; 
+        max-width: 300px; 
+        padding: 0.5rem 1rem;
+        font-size: 0.9rem;
+        z-index: 1050;
+        box-shadow: 0px 0px 10px rgba(0,0,0,0.1);
+    `;
     alertContainer.innerHTML = `
         ${mensaje}
         <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
     `;
 
-    // Agregar la alerta al body para que se muestre en la esquina inferior izquierda
+    // Agregar la alerta al body para que se muestre en la esquina inferior derecha
     document.body.appendChild(alertContainer);
 
     // Desaparecer la alerta después de 3 segundos
@@ -310,10 +263,9 @@ function mostrarMensaje(mensaje, tipo) {
         setTimeout(() => alertContainer.remove(), 500);
     }, 3000);
 }
-
 function darBajaTipoRecaudacion(id, estado) {
     if (estado === false || estado === 'false' || estado === '0') {
-        mostrarAlerta('El tipo de recaudación ya está dado de baja.', 'warning');
+        mostrarMensaje('El tipo de recaudación ya está dado de baja.', 'warning');
         return;
     }
 
@@ -332,15 +284,16 @@ function darBajaTipoRecaudacion(id, estado) {
         .then(data => {
             if (data.success) {
                 actualizarTabla(data.tipos_recaudacion);
-                mostrarAlerta(data.message, "success");
+                mostrarMensaje(data.message, "success"); // Mensaje de éxito
                 table.page(currentPage).draw(false);
             } else {
-                mostrarAlerta(data.message, "danger");
+                mostrarMensaje(data.message, "danger"); // Mensaje de error
             }
         })
         .catch(error => {
             console.error("Error:", error);
-            mostrarAlerta("Ocurrió un error al intentar dar de baja el tipo de recaudación.", "danger");
+            mostrarMensaje("Ocurrió un error al intentar dar de baja el tipo de recaudación.", "danger");
         });
     }
 }
+
