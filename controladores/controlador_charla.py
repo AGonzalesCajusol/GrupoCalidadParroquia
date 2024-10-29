@@ -2,108 +2,33 @@ from flask import jsonify
 from bd import obtener_conexion
 
 
-
-# Obtener las charlas dentro de un rango de fechas
-def obtener_charlas(inicio , fin):
+def registrar_programacion_en_bloque(id_charla, programaciones):
+    if not id_charla or not programaciones:
+        return {"success": False, "error": "Datos incompletos"}
     conexion = obtener_conexion()
-    try:
-        with conexion.cursor() as cursor:
-            query = """
-                select c.id_charla,c.fecha,c.hora_inicio,c.hora_fin,m.nombre_ministro,al.nombre_liturgia, t.descripcion, c.estado from charlas c 
-                    inner join ministro m on m.id_ministro= c.id_ministro 
-                    inner join tema t on t.id_tema= c.id_tema 
-                    inner join actoliturgico al on al.id_actoliturgico=c.id_actoliturgico
-                    where c.fecha BETWEEN %s AND %s
-            """
-            cursor.execute(query, (inicio, fin))
-            charlas = cursor.fetchall()
-        return jsonify(charlas)  # Devolver las charlas en formato JSON
-    except Exception as e:
-        print(f"Error al obtener charlas: {e}")
-        return jsonify(success=False, message="Error al obtener charlas"), 500
-    finally:
-        conexion.close()
-
-# Insertar una nueva charla
-def insertar_charla(fecha, hora_inicio, hora_fin, acto_liturgico, tema, ministro, sede):
-    conexion = obtener_conexion()
-    try:
-        with conexion.cursor() as cursor:
-            query = """
-                INSERT INTO charlas (fecha, hora_inicio, hora_fin, id_sac_liturgico, id_tema, id_ministro, id_sede)
-                VALUES (%s, %s, %s, %s, %s, %s, %s)
-            """
-            cursor.execute(query, (fecha, hora_inicio, hora_fin, acto_liturgico, tema, ministro, sede))
+    cursor = conexion.cursor()
+    try:        
+        for programacion in programaciones:
+            tema = programacion.get('tema')
+            fecha = programacion.get('fecha')
+            hora_inicio = programacion.get('hora_inicio')
+            hora_fin = programacion.get('hora_fin')
+            estado = programacion.get('estado')
+            ministro = programacion.get('ministro')
+            sede = programacion.get('sede')
+            if None in [tema, fecha, hora_inicio, hora_fin, estado, ministro, sede]:
+                return {"success": False, "error": "Faltan campos obligatorios en la programación"}
+            cursor.execute("""
+                INSERT INTO programacion_charlas (id_charla, tema, fecha, hora_inicio, hora_fin, estado, ministro, sede)
+                VALUES (%s, %s, %s, %s, %s, %s, %s, %s)
+            """, (id_charla, tema, fecha, hora_inicio, hora_fin, estado, ministro, sede))
         conexion.commit()
-        return jsonify(success=True)
+        return {"success": True, "message": "Programaciones registradas con éxito"}
     except Exception as e:
-        print(f"Error al insertar charla: {e}")
         conexion.rollback()
-        return jsonify(success=False, message="Error al insertar charla"), 500
+        print(f"Error al registrar las programaciones en bloque: {e}")
+        return {"success": False, "error": "Error al registrar las programaciones"}
+
     finally:
+        cursor.close()
         conexion.close()
-
-# Actualizar una charla existente
-def actualizar_charla(id_charla, fecha, hora_inicio, hora_fin, acto_liturgico, tema, ministro, sede):
-    conexion = obtener_conexion()
-    try:
-        with conexion.cursor() as cursor:
-            query = """
-                UPDATE charlas 
-                SET fecha = %s, hora_inicio = %s, hora_fin = %s, id_sac_liturgico = %s, id_tema = %s, id_ministro = %s, id_sede = %s
-                WHERE id_charla = %s
-            """
-            cursor.execute(query, (fecha, hora_inicio, hora_fin, acto_liturgico, tema, ministro, sede, id_charla))
-        conexion.commit()
-        return jsonify(success=True)
-    except Exception as e:
-        print(f"Error al actualizar charla: {e}")
-        conexion.rollback()
-        return jsonify(success=False, message="Error al actualizar charla"), 500
-    finally:
-        conexion.close()
-
-# Eliminar una charla
-def eliminar_charla(id_charla):
-    conexion = obtener_conexion()
-    try:
-        with conexion.cursor() as cursor:
-            cursor.execute("DELETE FROM charlas WHERE id_charla = %s", (id_charla,))
-        conexion.commit()
-        return jsonify(success=True)
-    except Exception as e:
-        print(f"Error al eliminar charla: {e}")
-        conexion.rollback()
-        return jsonify(success=False, message="Error al eliminar charla"), 500
-    finally:
-        conexion.close()
-
-
-def obtener_actoliturgico():
-    conexion = obtener_conexion()
-    with conexion.cursor() as cursor:
-        cursor.execute("SELECT * from actoliturgico order by 1 asc")
-        sede = cursor.fetchall()
-    conexion.close()
-    return sede    
-
-
-def obtener_actoliturgico_por_id(id_acto):
-    conexion = obtener_conexion()
-    with conexion.cursor() as cursor:
-        cursor.execute("SELECT * from actoliturgico where id_actoliturgico=%s",(id_acto,))
-        sede = cursor.fetchall()
-    conexion.close()
-    return sede    
-
-
-def obtener_id_actoliturgico_nombre(acto):
-    conexion = obtener_conexion()
-    with conexion.cursor() as cursor:
-        cursor.execute("SELECT id_actoliturgico from actoliturgico where nombre_liturgia =%s", (acto,))
-        sede = cursor.fetchall()
-    conexion.close()
-    return sede    
-
-
-

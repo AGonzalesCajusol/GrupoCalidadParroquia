@@ -133,7 +133,7 @@ def listar_nombres_actos():
     try:
         with conexion.cursor() as cursor:
             cursor.execute('''
-                SELECT nombre_liturgia from actoliturgico 
+                SELECT id_actoliturgico, nombre_liturgia from actoliturgico 
             ''')
             valores = cursor.fetchall()
         return valores
@@ -200,3 +200,14 @@ def obtener_acto():
         sede = cursor.fetchall()
     conexion.close()
     return sede
+
+def listar_sacramentos():
+    conexion = obtener_conexion()
+    try:
+        with conexion.cursor() as cursor:
+            # Consulta para obtener los actos litúrgicos que son sacramentos
+            cursor.execute("SELECT id_actoliturgico ,nombre_liturgia FROM actoliturgico WHERE es_sacramento = 'S'")
+            sacramentos = cursor.fetchall()
+            return sacramentos
+    finally:
+        conexion.close()

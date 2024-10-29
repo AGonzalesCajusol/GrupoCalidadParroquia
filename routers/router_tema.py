@@ -1,4 +1,4 @@
-from flask import render_template, request, redirect, url_for, flash
+from flask import render_template, request, redirect, url_for, flash, jsonify
 from controladores.controlador_tema import (
     insertar_tema,
     obtener_temas,
@@ -27,9 +27,13 @@ def registrar_rutas(app):
     def procesar_insertar_tema():
         descripcion = request.form["descripcion"]
         id_actoliturgico = request.form["id_actoliturgico"]
-        insertar_tema(descripcion, id_actoliturgico)
-        flash("El tema fue agregado exitosamente")
-        return redirect(url_for("gestionar_tema"))
+        try:
+            insertar_tema(descripcion, id_actoliturgico)
+            # Enviar una respuesta JSON con éxito y los datos del nuevo tema si es necesario
+            return jsonify({"success": True, "message": "El tema fue agregado exitosamente"})
+        except Exception as e:
+            return jsonify({"success": False, "message": str(e)})
+
 
     # Ruta para mostrar el formulario de edición de un tema
     @app.route("/editar_tema/<int:id>", methods=["GET"])

@@ -360,6 +360,12 @@ table.dataTable tbody td {
     font-size: 18px;
 }
 
+#id_actoliturgico_programacion {
+    width: 300px;
+    height: 40px;
+    font-size: 15px;
+}
+
 #calendar {
     min-height: 600px;
     /* Establecer una altura mínima para el calendario */
@@ -446,7 +452,7 @@ table.dataTable tbody td {
 /* Reducir el tamaño del botón y el campo de búsqueda */
 .custom-btn {
     font-size: 14px;
-    padding: 4px 8px;
+    padding: 4px 8px;    
     /* Reducir el padding del botón */
 }
 
@@ -482,3 +488,4 @@ table.dataTable tbody td {
     border-color: #218838;
     /* Ajuste del color del borde */
 }
+

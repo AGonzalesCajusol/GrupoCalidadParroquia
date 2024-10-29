@@ -1,80 +1,180 @@
 {% extends "index.html" %}
-{% block title %}Gestión de Celebraciones{% endblock %}
+{% block title %}Gestión de charlas{% endblock %}
 {% block cuerpo %}
 <style>
-#table_mini_filter {
-    display: none !important;
-}
+    #table_mini_filter {
+        display: none !important;
+    }
 
+    /* Tamaño de fuente general de la tabla y ajuste de celdas */
+    table,
+    table input[type="date"],
+    table input[type="time"],
+    table input[type="text"],
+    table button {
+        font-size: 13px;
+    }
+
+    /* Centrar la cabecera (th) de la primera columna en #table_mini */
+    th {
+        text-align: center;
+    }
+
+    /* Alinear a la izquierda solo el contenido (td) de la primera columna en #table_mini */
+    #table td:nth-child(1) {
+        text-align: left;
+    }
+
+    /* Especificaciones de ancho por columna */
+    th:nth-child(1),
+    td:nth-child(1) {
+        width: 200px;
+    }
+
+    /* Tema */
+    th:nth-child(2),
+    td:nth-child(2) {
+        width: 60px;
+    }
+
+    /* Fecha */
+    th:nth-child(3),
+    td:nth-child(3),
+    th:nth-child(4),
+    td:nth-child(4) {
+        width: 90px;
+    }
+
+    /* Hora Inicio/Fin */
+    th:nth-child(5),
+    td:nth-child(5) {
+        width: 100px;
+    }
+
+    /* Estado */
+    th:nth-child(6),
+    td:nth-child(6),
+    th:nth-child(7),
+    td:nth-child(7) {
+        width: 80px;
+    }
+
+    /* Ministro y Sede */
+
+    /* Ajustes para inputs y botones dentro de la tabla */
+    table input[type="text"] {
+        height: 25px;
+        width: 80px;
+        box-sizing: border-box;
+    }
+
+    table button {
+        padding: 3px;
+        height: 30px;
+        width: 30px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+    }
+
+    /* Ajustes para botón primario */
+    .table .btn-primary {
+        padding: 0;
+        border-radius: 4px;
+        width: 28px;
+        height: 28px;
+        font-size: 10px;
+    }
+
+
+    #table_mini th:nth-child(1),
+    #table_mini td:nth-child(1) {
+        width: 50px;
+    }
+
+    /* Tema */
+    #table_mini th:nth-child(2),
+    #table_mini td:nth-child(2) {
+        width: 300px;
+    }
+
+    /* Tema */
+    #table_mini th:nth-child(3),
+    #table_mini td:nth-child(3) {
+        width: 100px;
+    }
+
+    /* Tema */
+    #table_mini th:nth-child(4),
+    #table_mini td:nth-child(4) {
+        width: 50px;
+    }
+
+    /* Tema */
+    /* Centrar la cabecera (th) de la primera columna en #table_mini */
+    #table_mini th {
+        text-align: center;
+    }
+
+    /* Alinear a la izquierda solo el contenido (td) de la primera columna en #table_mini */
+    #table_mini td:nth-child(2) {
+        text-align: left;
+    }
 </style>
 <div>
+    <h1 class="titulo-gestion">Gestión de programación de charlas</h1>
     <div class="row">
-        <div class="col-4 d-inline-flex">
-            <select name="sacramentos" id="sacramentos" class="form-select w-100 ">
-                <option value="">Selecciona un sacramento</option>
-                <option value="matrimonio">Matrimonio</option>
-                <option value="bautizo">Bautizo</option>
-                <option value="primera_comunion">Primera Comunión</option>
-                <option value="confirmacion">Confirmación</option>
-            </select>
-            <button class="btn btn-primary" onclick="mostrar_frm()">Seleccionar</button>
+        <div class="d-flex justify-content-between align-items-center mb-3">
+            <button type="button" class="btn btn-success btn-lg custom-btn ml-3"
+                onclick="window.location.href = '/gestionar_charlas'">
+                <i class="bi bi-arrow-left"></i> Retornar
+            </button>
+            <button class="btn btn-success btn-lg custom-btn ml-3" onclick="registrarProgramacion()"><i
+                    class="bi bi-plus-lg"></i>Registrar programación</button>
         </div>
-        <div class="col-8 text-end d-inline">
-            <button class="btn btn-success">Registrar programación </button>
-        </div>
-    </div>
-    <div class="mt-4" id="formulario_programa">
 
     </div>
 
-<div>
+    <div id="formulario_temas_sacramento">
+    </div>
 
     <div>
         <table>
 
         </table>
     </div>
-
-<!-- Modal -->
-<div class="modal fade " id="myModal11" tabindex="-1" aria-labelledby="myModalLabel" aria-hidden="true">
-    <div class="modal-dialog modal-dialog-centered">
-        <div class="modal-content">
-            <div class="modal-header">
-                <h5 class="modal-title" id="myModalLabel">Ministros</h5>
-                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Cerrar"></button>
-            </div>
-            <div class="modal-body">
-                <div>
-                    <input type="text" id="searchInput" placeholder="Buscar..." class="form-control mb-3">
+    <div>
+        <!-- Modal para seleccionar Ministros -->
+        <div class="modal fade" id="myModal11" tabindex="-1" aria-labelledby="myModalLabel" aria-hidden="true">
+            <div class="modal-dialog modal-dialog-centered">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h5 class="modal-title" id="myModalLabel">Ministros</h5>
+                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Cerrar"></button>
+                    </div>
+                    <div class="modal-body">
+                        <div>
+                            <input type="text" id="searchInput" placeholder="Buscar..." class="form-control mb-3">
+                        </div>
+                        <table class="mt-2 table" id="table_mini">
+                            <thead>
+                                <tr>
+                                    <th>dni</th>
+                                    <th>nombre</th>
+                                    <th>Sede</th>
+                                    <th></th>
+                                </tr>
+                            </thead>
+                            <tbody id="cuerpo_ministros">
+                                <!-- Los datos de los ministros se cargarán aquí -->
+                            </tbody>
+                        </table>
+                    </div>
                 </div>
-                <table class="mt-2 table" id="table_mini">
-                    <thead>
-                        <tr>
-                            <th>
-                                dni
-                            </th>
-                            <th>
-                                nombre
-                            </th>
-                            <th>
-                               Sede
-                            </th>
-                            <th>
-                               
-                            </th>
-                        </tr>
-                    </thead>
-                    <tbody id="cuerpo_ministros">
-
-                    </tbody>
-                </table>
             </div>
-
         </div>
+
     </div>
-</div>
 
-
-</div>
-<script src="{{ url_for('static', filename = '/js/charlas.js')}}"></script>
-{% endblock %}
+    <script src="{{ url_for('static', filename = '/js/charlas.js')}}"></script>
+    {% endblock %}

@@ -1,10 +1,12 @@
 from flask import Flask, render_template, request, redirect, url_for
 import routers.router_actosliturgicos
 import routers.router_celebracion
+import routers.router_charlas
 import routers.router_diocesis
 import routers.router_feligres
 import routers.router_main  # Importa las rutas generales
 import routers.router_ministro
+import routers.router_programaciones
 import routers.router_secretaria
 import routers.router_recaudaciones
 import routers.router_tema
@@ -71,6 +73,11 @@ routers.router_tema.registrar_rutas(app)
 routers.router_celebracion.registrar_rutas(app)
 
 routers.router_charla.registrar_rutas(app)
+
+#charlka nueva
+routers.router_charlas.registrar_rutas(app)
+
+routers.router_programaciones.registrar_rutas(app)
 
 
 if __name__ == '__main__':

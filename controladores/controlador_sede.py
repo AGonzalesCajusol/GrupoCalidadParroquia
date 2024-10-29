@@ -63,3 +63,20 @@ def obtener_id_sede_por_nombre(nombre):
                 id_sede = resultado[0]
         conexion.close()
         return id_sede
+
+# charlaaaa
+def obtener_sedes_charla(): 
+    conexion = obtener_conexion()
+    try:
+        with conexion.cursor() as cursor:
+            cursor.execute("""
+                SELECT s.id_sede, s.nombre_sede, s.direccion, s.telefono, s.correo 
+                FROM sede s
+            """)
+            sedes = cursor.fetchall()
+        return sedes
+    except Exception as e:
+        print(f"Error al obtener sedes: {e}")
+        return []
+    finally:
+        conexion.close()
