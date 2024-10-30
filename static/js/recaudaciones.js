@@ -50,12 +50,11 @@ function abrirModalRecaudacion(accion, id = '', fecha = '', hora = '', monto = '
 
     // Configurar el tipo de recaudación en el combobox
     const tipoRecaudacionSelect = document.getElementById('id_tipo_recaudacion');
-    tipoRecaudacionSelect.value = tipoRecaudacion || '';
 
     // Configurar los campos de acuerdo a la acción
     if (accion === 'ver') {
         // Configuración para "Ver"
-        document.getElementById('monto').setAttribute('readonly', true);
+        document.getElementById('monto').setAttribute('readonly', true);    
         document.getElementById('observacion').setAttribute('readonly', true);
         document.getElementById('estado').setAttribute('disabled', true);
         tipoRecaudacionSelect.setAttribute('disabled', true);
@@ -76,6 +75,7 @@ function abrirModalRecaudacion(accion, id = '', fecha = '', hora = '', monto = '
         document.getElementById('observacion').removeAttribute('readonly');
         document.getElementById('estado').removeAttribute('disabled');
         tipoRecaudacionSelect.removeAttribute('disabled');
+
 
         // Ocultar los campos de fecha y hora en modo editar y agregar
         document.getElementById('fechaContainer').style.display = 'none';
@@ -283,8 +283,8 @@ function actualizarTabla(recaudaciones) {
             <td class="text-center">${recaudacion.id}</td>
             <td>${recaudacion.sede}</td>
             <td>${recaudacion.tipo_recaudacion}</td>
-            <td>${recaudacion.observacion}</td>  <!-- Mostrar observación en lugar de descripción -->
-            <td>${recaudacion.estado}</td>  <!-- Mostrar estado en lugar de fecha -->
+            <td>${recaudacion.observacion}</td>
+            <td>${recaudacion.estado}</td>
             <td>${recaudacion.monto}</td>
             <td class="text-center">
                 <button class="btn btn-primary btn-sm" title="Ver"
@@ -296,7 +296,7 @@ function actualizarTabla(recaudaciones) {
                     <i class="fas fa-edit"></i>
                 </button>
                 <button class="btn btn-secondary btn-sm" title="Dar de baja"
-                    onclick="darBajaRecaudacion('${recaudacion.id}')">
+                    onclick="darBajaRecaudacion('${recaudacion.id}')" ${recaudacion.estado === 'Inactivo' ? 'disabled' : ''}>
                     <i class="fas fa-ban"></i>
                 </button>
                 <button class="btn btn-danger btn-sm" title="Eliminar"
@@ -316,6 +316,7 @@ function actualizarTabla(recaudaciones) {
     // Restaurar la página a la que el usuario estaba antes de la actualización
     table.page(currentPage).draw(false);
 }
+
 // Función para limpiar los campos del modal
 function limpiarModal() {
     document.getElementById('recaudacionId').value = '';

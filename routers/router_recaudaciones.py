@@ -37,8 +37,11 @@ def registrar_rutas(app):
             id_recaudacion = request.form["id"]
             monto = request.form["monto"]
             observacion = request.form["observacion"]
-            id_tipo_recaudacion = request.form["id_tipo_recaudacion"]
+            nombre_tipo_recaudacion = request.form["id_tipo_recaudacion"]
             estado = request.form.get("estado", "1") == "1"
+            
+            id_tipo_recaudacion = obtener_id_tipoR_por_nombre(nombre_tipo_recaudacion)
+            
             
             # Obtén el nombre de la sede desde las cookies
             nombre_sede = request.cookies.get("sede")
@@ -49,6 +52,7 @@ def registrar_rutas(app):
 
             # Obtén el ID de la sede usando el nombre
             id_sede = obtener_id_sede_por_nombre(nombre_sede)
+            
             print(f"ID de la sede obtenida: {id_sede}")  # Verificar que se obtiene el ID correcto
             if not id_sede:
                 return jsonify(success=False, message="La sede especificada no se encuentra en la base de datos.")

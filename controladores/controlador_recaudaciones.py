@@ -191,6 +191,25 @@ def obtener_id_sede_por_nombre(nombre_sede):
         return None
     finally:
         conexion.close
+        
+def obtener_id_tipoR_por_nombre(nombre_recaudacion):
+    conexion = obtener_conexion()
+    try:
+        with conexion.cursor() as cursor:
+            # Ejecuta la consulta para obtener el ID en base al nombre de la sede
+            cursor.execute("SELECT id_tipo_recaudacion FROM tipo_recaudacion WHERE nombre_recaudacion = %s", (nombre_recaudacion,))
+            resultado = cursor.fetchone()
+            if resultado:
+                return resultado[0]  # Devuelve el id_sede
+            else:
+                return None  # Retorna None si no encuentra el nombre de la sede
+    except Exception as e:
+        print(f"Error al obtener el ID del tipo recaudacion: {e}")
+        return None
+    finally:
+        conexion.close
+
+
 
 
 # Obtener recaudaciones por año Exportar###
