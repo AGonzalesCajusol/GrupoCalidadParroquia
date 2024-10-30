@@ -1,4 +1,5 @@
 from flask import jsonify, render_template, request, redirect, url_for, flash,send_file
+import traceback
 from controladores.controlador_recaudaciones import *
 from io import * 
 from reportlab.lib.pagesizes import *  # Importa todo relacionado con tamaños de página
@@ -11,8 +12,6 @@ from reportlab.lib.styles import getSampleStyleSheet
 from controladores.controlador_recaudaciones import (
     insertar_recaudacion,
     obtener_recaudaciones,
-    obtener_recaudacion_por_id,
-    actualizar_recaudacion,
     dar_baja_recaudacion,
     eliminar_recaudacion,
     obtener_tipos_recaudacion,
@@ -25,100 +24,176 @@ def registrar_rutas(app):
     @app.route("/gestionar_recaudaciones", methods=["GET"])
     def gestionar_recaudaciones():
         recaudaciones = obtener_recaudaciones()
-        id_sede_central = obtener_id_sede_por_nombre("Sede Central")  # Obtén el ID de "Sede Central"
         tipos = obtener_tipos_recaudacion()  # Obtén los tipos de recaudación
         años = obtener_rango_de_años()  # Obtenemos el rango de años disponibles en la BD
         return render_template("tipo_financiero/gestionar_recaudaciones.html", recaudaciones=recaudaciones, tipos=tipos, años=años)
 
 
-
-    # Ruta para mostrar el formulario de registro de una nueva recaudación
-    @app.route("/registrar_recaudacion", methods=["GET"])
-    def formulario_registrar_recaudacion():
-        return render_template("recaudaciones/registrar_recaudaciones.html")
-
-    # Ruta para mostrar el formulario de edición de una recaudación
-    @app.route("/editar_recaudacion/<int:id>", methods=["GET"])
-    def formulario_editar_recaudacion(id):
-        recaudacion = obtener_recaudacion_por_id(id)
-        return render_template("recaudaciones/editar_recaudaciones.html", recaudacion=recaudacion)
-
     # Procesar la actualización de una recaudación
     @app.route("/procesar_actualizar_recaudacion", methods=["POST"])
     def procesar_actualizar_recaudacion():
         try:
+            # Obtén los datos del formulario
             id_recaudacion = request.form["id"]
             monto = request.form["monto"]
             observacion = request.form["observacion"]
             id_tipo_recaudacion = request.form["id_tipo_recaudacion"]
-
-            # Aquí puedes obtener el ID de la sede por nombre o pasar directamente si ya lo tienes en el formulario
-            nombre_sede = "Sede Central"  # Nombre de la sede que estás mostrando
-            id_sede = obtener_id_sede_por_nombre(nombre_sede)
-
-            if not id_sede:
-                return jsonify(success=False, message="No se pudo obtener el ID de la sede")
-
-            # Llamamos a la función para actualizar la recaudación
-            success = actualizar_recaudacion(id_recaudacion, monto, observacion, id_sede, id_tipo_recaudacion)
+            estado = request.form.get("estado", "1") == "1"
             
+            # Obtén el nombre de la sede desde las cookies
+            nombre_sede = request.cookies.get("sede")
+            print(f"Nombre de la sede obtenido: {nombre_sede}")  # Verificar el valor obtenido
+
+            if not nombre_sede:
+                return jsonify(success=False, message="No se pudo obtener el nombre de la sede del usuario.")
+
+            # Obtén el ID de la sede usando el nombre
+            id_sede = obtener_id_sede_por_nombre(nombre_sede)
+            print(f"ID de la sede obtenida: {id_sede}")  # Verificar que se obtiene el ID correcto
+            if not id_sede:
+                return jsonify(success=False, message="La sede especificada no se encuentra en la base de datos.")
+
+            # Llama a la función que procesa la actualización
+            success = actualizar_recaudacion(id_recaudacion, monto, observacion, id_tipo_recaudacion, estado, id_sede)
+            print(f"Resultado de la actualización: {success}")  # Verificar si la actualización fue exitosa
             if success:
-                return jsonify(success=True)
+                # Recupera las recaudaciones actualizadas
+                recaudaciones = obtener_recaudaciones()
+                recaudaciones_data = [
+                    {
+                        "id": rec[0],
+                        "monto": rec[3],
+                        "observacion": rec[4],
+                        "estado": "Activo" if rec[5] else "Inactivo",
+                        "sede": rec[6],
+                        "tipo_recaudacion": rec[7]
+                    }
+                    for rec in recaudaciones
+                ]
+
+                return jsonify(success=True, recaudaciones=recaudaciones_data, message="Recaudación actualizada exitosamente")
             else:
                 return jsonify(success=False, message="Error al actualizar la recaudación")
-        except Exception as e:
-            return jsonify(success=False, message=str(e))
 
-    # Procesar la inserción de una recaudación
+        except Exception as e:
+            print("Error:", e)
+            return jsonify(success=False, message="Error al actualizar la recaudación"), 400
+
     @app.route("/insertar_recaudacion", methods=["POST"])
     def procesar_insertar_recaudacion():
         try:
+            # Obtener los datos del formulario
             monto = request.form["monto"]
             observacion = request.form["observacion"]
-            nombre_sede = "Sede Central"  # Puedes cambiar esto por cualquier sede que quieras obtener
             id_tipo_recaudacion = request.form["id_tipo_recaudacion"]
             
+            # Obtener el nombre de la sede desde las cookies
+            nombre_sede = request.cookies.get("sede")
 
-            # Obtener el ID de la sede por su nombre
-            id_sede = obtener_id_sede_por_nombre(nombre_sede)
-            id_tipo_recaudacion = obtener_recaudacion_por_id(id_tipo_recaudacion)
-
-
-            # Verificar si se obtuvo un ID válido para la sede
-            if not id_sede:
-                return jsonify(success=False, message="No se pudo obtener el ID de la sede")
-
-            # Llamamos a la función para insertar la recaudación
-            success = insertar_recaudacion(monto, observacion, id_sede, id_tipo_recaudacion)
-        
-            if success:
-                flash("Recaudación agregada exitosamente", "success")
-                return redirect(url_for("gestionar_recaudaciones"))  # Redirige a la página principal
-            else:
-                flash("Error al agregar la recaudación", "danger")
+            if not nombre_sede:
+                flash("No se pudo obtener el nombre de la sede del usuario.", "error")
                 return redirect(url_for("gestionar_recaudaciones"))
+
+            # Obtener el ID de la sede a partir del nombre
+            id_sede = obtener_id_sede_por_nombre(nombre_sede)
+            if not id_sede:
+                flash("La sede especificada no se encuentra en la base de datos.", "error")
+                return redirect(url_for("gestionar_recaudaciones"))
+
+            # Insertar la recaudación en la base de datos
+            insertar_recaudacion(monto, observacion, id_sede, id_tipo_recaudacion)
+            
+            # Obtener las recaudaciones actualizadas después de la inserción
+            recaudaciones = obtener_recaudaciones()
+            recaudaciones_data = [
+                {
+                    "id": rec[0],
+                    "fecha": rec[1].strftime('%Y-%m-%d'),
+                    "hora": f"{rec[2].seconds // 3600:02}:{(rec[2].seconds % 3600) // 60:02}",  # Formato "HH:MM"
+                    "monto": rec[3],
+                    "observacion": rec[4],
+                    "estado": "Activo" if rec[5] else "Inactivo",
+                    "sede": rec[6],
+                    "tipo_recaudacion": rec[7]
+                }
+                for rec in recaudaciones
+            ]
+
+            # Devuelve la respuesta con los datos actualizados
+            return jsonify({
+                "success": True,
+                "message": "Recaudación agregada exitosamente.",
+                "recaudaciones": recaudaciones_data
+            })
         except Exception as e:
-            flash(f"Error: {str(e)}", "danger")
-            return redirect(url_for("gestionar_recaudaciones"))
+            traceback.print_exc()
+            return jsonify(success=False, message=f"Error al insertar recaudación: {str(e)}"), 400
 
-    # procesar dar de baja
-    @app.route("/dar_baja_recaudacion", methods=["POST"])
-    def procesar_dar_baja_recaudacion():
-        id = request.form.get('id')
-        dar_baja_recaudacion(id)
-        flash("La recaudación fue dada de baja exitosamente")
-        return redirect(url_for("gestionar_recaudaciones"))
 
-    # Procesar la eliminación de una recaudación
     @app.route("/eliminar_recaudacion", methods=["POST"])
     def procesar_eliminar_recaudacion():
-        data = request.get_json()
         try:
-            eliminar_recaudacion(data['id'])
-            return jsonify(success=True)
-        except Exception as e:
-            return jsonify(success=False, message=str(e))
+            # Obtener el ID de la recaudación a eliminar
+            data = request.get_json()
+            id_recaudacion = data["id"]
+            
+            # Eliminar la recaudación
+            eliminar_recaudacion(id_recaudacion)
+            
+            # Obtener las recaudaciones actualizadas
+            recaudaciones = obtener_recaudaciones()
+            recaudaciones_data = [
+                {
+                    "id": rec[0],
+                    "fecha": rec[1].strftime('%Y-%m-%d'),
+                    "hora": f"{rec[2].seconds // 3600:02}:{(rec[2].seconds % 3600) // 60:02}",
+                    "monto": rec[3],
+                    "observacion": rec[4],
+                    "estado": "Activo" if rec[5] else "Inactivo",
+                    "sede": rec[6],
+                    "tipo_recaudacion": rec[7]
+                }
+                for rec in recaudaciones
+            ]
 
+            return jsonify(success=True, recaudaciones=recaudaciones_data, message="Recaudación eliminada exitosamente")
+        except Exception as e:
+            traceback.print_exc()
+            return jsonify(success=False, message=f"Error al eliminar recaudación: {str(e)}"), 400
+
+    # Cambia el nombre de la función para evitar conflicto con la función de base de datos
+    @app.route('/obtener_id_sede_por_nombre/<sede_nombre>', methods=['GET'])
+    def obtener_id_sede_por_nombre_route(sede_nombre):
+        id_sede = obtener_id_sede_por_nombre(sede_nombre)  # Esta es la función de la base de datos
+        if id_sede:
+            return jsonify({"id": id_sede})
+        else:
+            return jsonify({"error": "Sede no encontrada"}), 404
+
+    # Ruta para dar de baja una recaudación
+    @app.route("/dar_baja_recaudacion", methods=["POST"])
+    def procesar_dar_baja_recaudacion():
+        try:
+            id_recaudacion = request.json.get("id")  # Usamos request.json en lugar de request.form
+            dar_baja_recaudacion(id_recaudacion)
+
+            recaudaciones = obtener_recaudaciones()
+            recaudaciones_data = [
+                {
+                    "id": rec[0],
+                    "sede": rec[6],
+                    "tipo_recaudacion": rec[7],
+                    "observacion": rec[4],
+                    "estado": "Activo" if rec[5] else "Inactivo",  # Cambiar estado a "Activo"/"Inactivo"
+                    "monto": rec[3]
+                }
+                for rec in recaudaciones
+            ]
+
+            return jsonify(success=True, recaudaciones=recaudaciones_data, message="Recaudación dada de baja exitosamente")
+
+        except Exception as e:
+            return jsonify(success=False, message=f"Error al dar de baja: {str(e)}"), 400
 ###Exportar##
     @app.route('/obtener_recaudaciones_por_anio', methods=['POST'])
     def obtener_recaudaciones_por_anio():

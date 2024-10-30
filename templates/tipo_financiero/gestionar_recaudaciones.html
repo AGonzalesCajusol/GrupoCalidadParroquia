@@ -9,13 +9,15 @@
         <!-- DataTable para la gestión de recaudaciones -->
         <table id="recaudacionesTable" class="table table-hover table-striped">
             <thead>
-                <th style="vertical-align: middle; text-align: center;">ID</th>
-                <th style="vertical-align: middle; text-align: center;">Sede</th>
-                <th style="vertical-align: middle; text-align: center;">Tipo</th>
-                <th style="vertical-align: middle; text-align: center;">Descripción</th> <!-- Observación -->
-                <th style="vertical-align: middle; text-align: center;">Fecha</th>
-                <th style="vertical-align: middle; text-align: center;">Monto</th>
-                <th style="vertical-align: middle; text-align: center; width: 200px;">Acciones</th>
+                <tr class="text-center">
+                    <th style="vertical-align: middle; text-align: center;">ID</th>
+                    <th style="vertical-align: middle; text-align: center;">Sede</th>
+                    <th style="vertical-align: middle; text-align: center;">Tipo</th>
+                    <th style="vertical-align: middle; text-align: center;">Observaciones</th> <!-- Cambiado a Observaciones -->
+                    <th style="vertical-align: middle; text-align: center;">Estado</th> <!-- Cambiado a Estado -->
+                    <th style="vertical-align: middle; text-align: center;">Monto</th>
+                    <th style="vertical-align: middle; text-align: center; width: 200px;">Acciones</th>
+                </tr>
             </thead>
             <tbody>
                 {% for recaudacion in recaudaciones %}
@@ -23,21 +25,23 @@
                     <td class="text-center">{{ recaudacion[0] }}</td> <!-- ID de la recaudación -->
                     <td>{{ recaudacion[6] }}</td> <!-- Nombre de la sede -->
                     <td>{{ recaudacion[7] }}</td> <!-- Tipo de recaudación -->
-                    <td>{{ recaudacion[4] }}</td> <!-- Observación (Descripción) -->
-                    <td>{{ recaudacion[1] }}</td> <!-- Fecha -->
+                    <td>{{ recaudacion[4] }}</td> <!-- Observación -->
+                    <td>{{ 'Activo' if recaudacion[5] else 'Inactivo' }}</td> <!-- Estado (Activo/Inactivo) -->
                     <td>{{ recaudacion[3] }}</td> <!-- Monto -->
                     <td class="text-center">
                         <!-- Botón para ver detalles -->
                         <button class="btn btn-primary btn-sm" title="Ver"
-                            onclick="openModal('view', '{{ recaudacion[0] }}', '{{ recaudacion[1] }}', '{{ recaudacion[2] }}', '{{ recaudacion[3] }}', '{{ recaudacion[4] }}', '{{ recaudacion[5] }}', '{{ recaudacion[6] }}', '{{ recaudacion[7] }}')">
+                            onclick="abrirModalRecaudacion('ver', '{{ recaudacion[0] }}', '{{ recaudacion[1] }}', '{{ recaudacion[2] }}', '{{ recaudacion[3] }}', '{{ recaudacion[4] }}', '{{ recaudacion[5] }}', '{{ recaudacion[6] }}', '{{ recaudacion[7] }}')">
                             <i class="fas fa-eye"></i>
                         </button>
 
                         <!-- Botón para editar -->
                         <button class="btn btn-warning btn-sm" title="Editar"
-                            onclick="openModal('edit', '{{ recaudacion[0] }}', '{{ recaudacion[1] }}', '{{ recaudacion[2] }}', '{{ recaudacion[3] }}', '{{ recaudacion[4] }}', '{{ recaudacion[5] }}', '{{ recaudacion[6] }}', '{{ recaudacion[7] }}')">
+                            onclick="abrirModalRecaudacion('editar', '{{ recaudacion[0] }}', '{{ recaudacion[1] }}', '{{ recaudacion[2] }}', '{{ recaudacion[3] }}', '{{ recaudacion[4] }}', '{{ recaudacion[5] }}', '{{ recaudacion[6] }}', '{{ recaudacion[7] }}')">
                             <i class="fas fa-edit"></i>
                         </button>
+
+                        <!-- Botón para dar de baja -->
                         <button class="btn btn-secondary btn-sm" title="Dar de baja"
                             onclick="darBajaRecaudacion('{{ recaudacion[0] }}')">
                             <i class="fas fa-ban"></i>
@@ -62,32 +66,34 @@
         <div class="modal-content">
             <form id="recaudacionForm" action="" method="POST">
                 <input type="hidden" id="recaudacionId" name="id">
-
-                <!-- Campo oculto para registrar el ID de la sede -->
-                <input type="hidden" id="id_sede" name="id_sede" value="{{ id_sede_central }}">
-
+                <!-- Campo oculto para el ID de la sede -->
+                <input type="hidden" id="sede_id" name="sede_id" value="{{ request.cookies.get('sede') }}">
+                
                 <div class="modal-header">
                     <h5 class="modal-title" id="recaudacionModalLabel">Detalles de Recaudación</h5>
                     <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
                 </div>
+                
                 <div class="modal-body">
-                    <!-- Campo para mostrar el nombre de la sede (completamente ineditable con disabled) -->
+                    <!-- Campo de solo lectura para mostrar el nombre de la sede -->
                     <div class="mb-3">
-                        <label for="sede" class="form-label">Sede</label>
-                        <input type="text" class="form-control" id="sede" value="Sede Central" disabled>
+                        <label for="sede_nombre" class="form-label">Sede</label>
+                        <input type="text" class="form-control" id="sede_nombre" readonly>
                     </div>
 
                     <div class="mb-3">
                         <label for="monto" class="form-label">Monto</label>
                         <input type="text" class="form-control" id="monto" name="monto" required>
                     </div>
+                    
                     <div class="mb-3">
                         <label for="observacion" class="form-label">Observación</label>
                         <input type="text" class="form-control" id="observacion" name="observacion" required>
                     </div>
+                    
                     <div class="mb-3">
                         <label for="estado" class="form-label">Estado</label>
-                        <input type="checkbox" class="form-check-input" id="estado" name="estado" checked>
+                        <input type="checkbox" class="form-check-input" id="estado" name="estado">
                         <label class="form-check-label" for="estado">Activo</label>
                     </div>
                     
@@ -95,23 +101,25 @@
                         <label for="id_tipo_recaudacion" class="form-label">Tipo de Recaudación</label>
                         <select class="form-select" id="id_tipo_recaudacion" name="id_tipo_recaudacion" required>
                             {% for tipo in tipos %}
-                            <option value="{{ tipo[1] }}">{{ tipo[1] }}</option>
+                            <option value="{{ tipo[0] }}">{{ tipo[1] }}</option>
                             {% endfor %}
                         </select>
                     </div>
-                    
-                    <div class="mb-3" id="fecha_container">
+
+                    <div class="mb-3" id="fechaContainer" style="display: none;">
                         <label for="fecha" class="form-label">Fecha</label>
                         <input type="text" class="form-control" id="fecha" name="fecha" readonly>
                     </div>
-                    <div class="mb-3" id="hora_container">
+                    
+                    <div class="mb-3" id="horaContainer" style="display: none;">
                         <label for="hora" class="form-label">Hora</label>
                         <input type="text" class="form-control" id="hora" name="hora" readonly>
                     </div>
                 </div>
+                
                 <div class="modal-footer">
                     <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cerrar</button>
-                    <button type="submit" class="btn btn-primary" id="saveChanges">Guardar</button>
+                    <button type="submit" class="btn btn-primary" id="submitBtn">Guardar</button>
                 </div>
             </form>
         </div>
@@ -120,7 +128,7 @@
 
 <script src="/static/js/recaudaciones.js"></script>
 
-<script type="text/javascript">
+<script>
     const urlInsertarRecaudacion = "{{ url_for('procesar_insertar_recaudacion') }}";
     const urlActualizarRecaudacion = "{{ url_for('procesar_actualizar_recaudacion') }}";
 </script>
