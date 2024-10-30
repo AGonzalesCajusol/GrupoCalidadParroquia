@@ -1,3 +1,4 @@
+from datetime import datetime
 from flask import request, redirect, url_for, render_template, flash
 from bd import obtener_conexion
 
@@ -5,10 +6,21 @@ from bd import obtener_conexion
 def listar_egresos():
     conexion = obtener_conexion()
     with conexion.cursor() as cursor:
-        cursor.execute("SELECT * FROM egresos")
+        # Obtener egresos con el nombre de la sede
+        cursor.execute("""
+            SELECT e.id_egreso, s.nombre_sede AS nombre_sede, e.monto, e.descripcion, e.fecha, e.hora
+            FROM egresos e
+            JOIN sedes s ON e.id_sede = s.id_sede
+        """)
         egresos = cursor.fetchall()
+
+        # Obtener la lista de sedes para el formulario
+        cursor.execute("SELECT id_sede, nombre_sede FROM sedes")
+        sedes = cursor.fetchall()
+
     conexion.close()
-    return render_template('egresos/gestionar_egresos.html', egresos=egresos)
+    return render_template('egresos/gestionar_egresos.html', egresos=egresos, sedes=sedes)
+
 
 # Controlador para agregar un nuevo egreso
 def agregar_egreso():
@@ -16,8 +28,10 @@ def agregar_egreso():
         id_sede = request.form['id_sede']
         monto = request.form['monto']
         descripcion = request.form['descripcion']
-        fecha = request.form['fecha']
-        hora = request.form['hora']
+        
+        # Obtener la fecha y la hora actuales automáticamente
+        fecha = datetime.now().strftime('%Y-%m-%d')
+        hora = datetime.now().strftime('%H:%M:%S')
 
         conexion = obtener_conexion()
         with conexion.cursor() as cursor:
@@ -30,7 +44,7 @@ def agregar_egreso():
 
         flash('Egreso registrado correctamente')
         return redirect(url_for('listar_egresos'))
-
+    
 # Controlador para actualizar un egreso existente
 def actualizar_egreso():
     if request.method == 'POST':
