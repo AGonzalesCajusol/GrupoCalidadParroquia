@@ -45,6 +45,20 @@ def registrar_rutas(app):
         flash("Egreso registrado correctamente")
         return redirect(url_for('gestionar_egresos'))
 
+    def obtener_sede_usuario(user_id):
+        conexion = obtener_conexion()
+        with conexion.cursor() as cursor:
+            cursor.execute("""
+                SELECT s.id_sede, s.nombre_sede 
+                FROM sede s 
+                JOIN cuenta c ON s.id_sede = c.id_sede 
+                WHERE c.id = %s
+            """, (user_id,))
+            sede = cursor.fetchone()
+        conexion.close()
+        return sede
+
+
     # Ruta para modificar un egreso
     @app.route('/actualizar_egreso', methods=['POST'])
     def actualizar_egreso():
@@ -85,6 +99,14 @@ def registrar_rutas(app):
             flash(f"Ocurrió un error al actualizar el egreso: {str(e)}", "error")
             return redirect(url_for('gestionar_egresos'))
 
+    def mostrar_formulario_agregar():
+        user_id = request.cookies.get('user_id')  # O utiliza 'session' si estás utilizando sesiones
+        sede = obtener_sede_usuario(user_id) if user_id else None
+
+        # Obtenemos todas las sedes para la lista desplegable si es necesario
+        #sedes = obtener_todas_las_sedes()
+
+        return render_template('egresos/gestionar_egresos.html', sede=sede, sedes=sedes)
 
 
     # Ruta para eliminar un egreso

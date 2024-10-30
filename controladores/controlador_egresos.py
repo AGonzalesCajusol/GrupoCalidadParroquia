@@ -68,6 +68,22 @@ def actualizar_egreso():
         flash('Egreso actualizado correctamente')
         return redirect(url_for('listar_egresos'))
 
+def obtener_id_sede_por_nombre(nombre_sede):
+    conexion = obtener_conexion()
+    try:
+        with conexion.cursor() as cursor:
+            # Ejecuta la consulta para obtener el ID en base al nombre de la sede
+            cursor.execute("SELECT id_sede FROM sede WHERE nombre_sede = %s", (nombre_sede,))
+            resultado = cursor.fetchone()
+            if resultado:
+                return resultado[0]  # Devuelve el id_sede
+            else:
+                return None  # Retorna None si no encuentra el nombre de la sede
+    except Exception as e:
+        print(f"Error al obtener el ID de la sede: {e}")
+        return None
+    finally:
+        conexion.close
 # Controlador para eliminar un egreso
 def eliminar_egreso():
     if request.method == 'POST':
