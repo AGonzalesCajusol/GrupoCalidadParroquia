@@ -1,22 +1,25 @@
-from flask import jsonify, render_template, request, redirect, url_for, flash,send_file
+from flask import jsonify, render_template, request, redirect, url_for, flash, send_file
 import traceback
-from controladores.controlador_recaudaciones import *
-from io import * 
-from reportlab.lib.pagesizes import *  # Importa todo relacionado con tamaños de página
-from reportlab.lib import colors  # Importa solo colors
-from reportlab.platypus import *  # Importa todas las herramientas de ReportLab para tablas y plantillas
-from reportlab.lib.units import *  # Importa todas las unidades de medida, como inch
-import csv  # Este lo dejamos como está, ya que no tiene tantas funciones y no es necesario usar *
+from io import BytesIO, StringIO
+from reportlab.lib.pagesizes import letter
+from reportlab.lib import colors
+from reportlab.platypus import SimpleDocTemplate, Table, TableStyle, Paragraph, Spacer
+from reportlab.lib.units import inch
 from reportlab.lib.styles import getSampleStyleSheet
+import csv
+import os
+import re
 
 from controladores.controlador_recaudaciones import (
     insertar_recaudacion,
     obtener_recaudaciones,
-    dar_baja_recaudacion,
-    eliminar_recaudacion,
+    obtener_rango_de_años,
     obtener_tipos_recaudacion,
     obtener_id_sede_por_nombre,
-    obtener_recaudaciones_por_año
+    obtener_recaudaciones_por_año,
+    obtener_id_tipoR_por_nombre,
+    actualizar_recaudacion,
+    eliminar_recaudacion
 )
 
 def registrar_rutas(app):
@@ -38,28 +41,26 @@ def registrar_rutas(app):
             monto = request.form["monto"]
             observacion = request.form["observacion"]
             nombre_tipo_recaudacion = request.form["id_tipo_recaudacion"]
-            estado = request.form.get("estado", "1") == "1"
+
             
             id_tipo_recaudacion = obtener_id_tipoR_por_nombre(nombre_tipo_recaudacion)
-            
+
             
             # Obtén el nombre de la sede desde las cookies
             nombre_sede = request.cookies.get("sede")
-            print(f"Nombre de la sede obtenido: {nombre_sede}")  # Verificar el valor obtenido
+
 
             if not nombre_sede:
                 return jsonify(success=False, message="No se pudo obtener el nombre de la sede del usuario.")
 
             # Obtén el ID de la sede usando el nombre
             id_sede = obtener_id_sede_por_nombre(nombre_sede)
-            
-            print(f"ID de la sede obtenida: {id_sede}")  # Verificar que se obtiene el ID correcto
+
             if not id_sede:
                 return jsonify(success=False, message="La sede especificada no se encuentra en la base de datos.")
 
             # Llama a la función que procesa la actualización
-            success = actualizar_recaudacion(id_recaudacion, monto, observacion, id_tipo_recaudacion, estado, id_sede)
-            print(f"Resultado de la actualización: {success}")  # Verificar si la actualización fue exitosa
+            success = actualizar_recaudacion(monto, observacion, id_tipo_recaudacion, id_recaudacion, id_sede)
             if success:
                 # Recupera las recaudaciones actualizadas
                 recaudaciones = obtener_recaudaciones()
@@ -68,9 +69,8 @@ def registrar_rutas(app):
                         "id": rec[0],
                         "monto": rec[3],
                         "observacion": rec[4],
-                        "estado": "Activo" if rec[5] else "Inactivo",
-                        "sede": rec[6],
-                        "tipo_recaudacion": rec[7]
+                        "sede": rec[5],
+                        "tipo_recaudacion": rec[6]
                     }
                     for rec in recaudaciones
                 ]
@@ -113,12 +113,11 @@ def registrar_rutas(app):
                 {
                     "id": rec[0],
                     "fecha": rec[1].strftime('%Y-%m-%d'),
-                    "hora": f"{rec[2].seconds // 3600:02}:{(rec[2].seconds % 3600) // 60:02}",  # Formato "HH:MM"
+                    "hora": rec[2].strftime('%H:%M'),
                     "monto": rec[3],
                     "observacion": rec[4],
-                    "estado": "Activo" if rec[5] else "Inactivo",
-                    "sede": rec[6],
-                    "tipo_recaudacion": rec[7]
+                    "sede": rec[5],
+                    "tipo_recaudacion": rec[6]
                 }
                 for rec in recaudaciones
             ]
@@ -150,12 +149,11 @@ def registrar_rutas(app):
                 {
                     "id": rec[0],
                     "fecha": rec[1].strftime('%Y-%m-%d'),
-                    "hora": f"{rec[2].seconds // 3600:02}:{(rec[2].seconds % 3600) // 60:02}",
+                    "hora": rec[2].strftime('%H:%M'),
                     "monto": rec[3],
                     "observacion": rec[4],
-                    "estado": "Activo" if rec[5] else "Inactivo",
-                    "sede": rec[6],
-                    "tipo_recaudacion": rec[7]
+                    "sede": rec[5],
+                    "tipo_recaudacion": rec[6]
                 }
                 for rec in recaudaciones
             ]
@@ -165,72 +163,7 @@ def registrar_rutas(app):
             traceback.print_exc()
             return jsonify(success=False, message=f"Error al eliminar recaudación: {str(e)}"), 400
 
-    # Cambia el nombre de la función para evitar conflicto con la función de base de datos
-    @app.route('/obtener_id_sede_por_nombre/<sede_nombre>', methods=['GET'])
-    def obtener_id_sede_por_nombre_route(sede_nombre):
-        id_sede = obtener_id_sede_por_nombre(sede_nombre)  # Esta es la función de la base de datos
-        if id_sede:
-            return jsonify({"id": id_sede})
-        else:
-            return jsonify({"error": "Sede no encontrada"}), 404
-
-    # Ruta para dar de baja una recaudación
-    @app.route("/dar_baja_recaudacion", methods=["POST"])
-    def procesar_dar_baja_recaudacion():
-        try:
-            id_recaudacion = request.json.get("id")  # Usamos request.json en lugar de request.form
-            dar_baja_recaudacion(id_recaudacion)
-
-            recaudaciones = obtener_recaudaciones()
-            recaudaciones_data = [
-                {
-                    "id": rec[0],
-                    "sede": rec[6],
-                    "tipo_recaudacion": rec[7],
-                    "observacion": rec[4],
-                    "estado": "Activo" if rec[5] else "Inactivo",  # Cambiar estado a "Activo"/"Inactivo"
-                    "monto": rec[3]
-                }
-                for rec in recaudaciones
-            ]
-
-            return jsonify(success=True, recaudaciones=recaudaciones_data, message="Recaudación dada de baja exitosamente")
-
-        except Exception as e:
-            return jsonify(success=False, message=f"Error al dar de baja: {str(e)}"), 400
-###Exportar##
-    @app.route('/obtener_recaudaciones_por_anio', methods=['POST'])
-    def obtener_recaudaciones_por_anio():
-        try:
-            # Obtener el dato JSON enviado por el cliente
-            data = request.get_json()
-            año = data.get('año')
-
-            if not año:
-                return jsonify({'error': 'Año no proporcionado'}), 400
-
-            # Llamar a la función para obtener las recaudaciones por año
-            recaudaciones = obtener_recaudaciones_por_año(año)
-
-            # Procesar las recaudaciones y devolver el JSON correcto
-            recaudaciones_json = []
-            for rec in recaudaciones:
-                recaudaciones_json.append({
-                    'id': rec[0],
-                    'fecha': rec[1].strftime('%Y-%m-%d'),
-                    'monto': rec[2],
-                    'observacion': rec[3],
-                    'sede': rec[4],
-                    'tipo_recaudacion': rec[5],
-                    'tipo': rec[6]
-                })
-
-            return jsonify({'recaudaciones': recaudaciones_json})
-
-        except Exception as e:
-            print(f"Error: {e}")
-            return jsonify({'error': 'Error al obtener las recaudaciones'}), 500
-
+    # Ruta para exportar recaudaciones en CSV
     @app.route('/exportar_recaudaciones_csv', methods=['POST'])
     def exportar_recaudaciones_csv():
         try:
@@ -262,57 +195,12 @@ def registrar_rutas(app):
             print(f"Error al exportar recaudaciones en CSV: {e}")
             return redirect(url_for('exportar_recaudaciones'))
 
-    @app.route('/generar_pdf_previsualizacion', methods=['POST'])
-    def generar_pdf_previsualizacion():
-        año = request.form['año']
-        recaudaciones = obtener_recaudaciones_por_año(año)
-        sede = "Sede Central"  # Puedes cambiar esta parte si el valor es dinámico
-
-        # Genera el PDF y guárdalo temporalmente en una ruta accesible
-        output = BytesIO()
-        pdf = SimpleDocTemplate(output, pagesize=letter, rightMargin=30, leftMargin=30, topMargin=30, bottomMargin=18)
-
-        styles = getSampleStyleSheet()
-        title = Paragraph(f"Recaudaciones de la Sede Central del año {año}", styles['Title'])
-        subtitulo = Paragraph(f"Exportación recaudación del año {año} - {sede}", styles['Heading2'])
-
-        data = [['ID', 'Sede', 'Tipo', 'Descripción', 'Fecha', 'Monto']]
-        for rec in recaudaciones:
-            fecha_formateada = rec[1].strftime('%d-%m-%Y')
-            data.append([rec[0], rec[4], rec[5], rec[3], fecha_formateada, rec[2]])
-
-        colWidths = [0.6 * inch, 1.5 * inch, 1.5 * inch, 1.8 * inch, 1 * inch, 1 * inch]
-        table = Table(data, colWidths=colWidths, repeatRows=1)
-
-        style = TableStyle([
-            ('BACKGROUND', (0, 0), (-1, 0), colors.HexColor("#f5f5dc")),
-            ('TEXTCOLOR', (0, 0), (-1, 0), colors.HexColor("#274e77")),
-            ('ALIGN', (0, 0), (-1, -1), 'CENTER'),
-            ('FONTNAME', (0, 0), (-1, 0), 'Helvetica-Bold'),
-            ('FONTSIZE', (0, 0), (-1, 0), 12),
-            ('BOTTOMPADDING', (0, 0), (-1, 0), 12),
-            ('BACKGROUND', (0, 1), (-1, -1), colors.white),
-            ('TEXTCOLOR', (0, 1), (-1, -1), colors.black),
-            ('GRID', (0, 0), (-1, -1), 0.5, colors.black),
-            ('ALIGN', (3, 1), (3, -1), 'LEFT'),
-            ('ALIGN', (2, 1), (2, -1), 'LEFT')
-        ])
-        table.setStyle(style)
-
-        elements = [title, Spacer(1, 12), subtitulo, Spacer(1, 12), table]
-        pdf.build(elements)
-
-        # Guardar el PDF en un archivo temporal en la carpeta estática
-        with open("static/preview_recaudaciones.pdf", "wb") as f:
-            f.write(output.getvalue())
-
-        return jsonify({"success": True, "preview_url": "/static/preview_recaudaciones.pdf"})
-
+    # Ruta para exportar recaudaciones en PDF
     @app.route('/exportar_recaudaciones_pdf', methods=['POST'])
     def exportar_recaudaciones_pdf():
         año = request.form['año']
         recaudaciones = obtener_recaudaciones_por_año(año)
-        sede = "Sede Central"  # Si la sede es fija, si es variable puedes ajustarlo
+        sede = "Sede Central"  # Puedes cambiar esta parte si el valor es dinámico
 
         # Crear un archivo PDF en memoria
         output = BytesIO()
@@ -330,7 +218,7 @@ def registrar_rutas(app):
 
         # Añadir las filas de las recaudaciones en el orden solicitado
         for rec in recaudaciones:
-            # Convertir la fecha al formato día-mes-año
+
             fecha_formateada = rec[1].strftime('%d-%m-%Y')
             data.append([rec[0], rec[4], rec[5], rec[3], fecha_formateada, rec[2]])
 
@@ -338,40 +226,31 @@ def registrar_rutas(app):
         colWidths = [0.6 * inch, 1.5 * inch, 1.5 * inch, 1.8 * inch, 1 * inch, 1 * inch]
 
         # Crear la tabla con los datos y los anchos de columna personalizados
-        table = Table(data, colWidths=colWidths, repeatRows=1)  # repeatRows=1 para que el encabezado se repita en cada página
+        table = Table(data, colWidths=colWidths, repeatRows=1)
 
-        # Aplicar estilo a la tabla con colores personalizados: cabecera beige, letras azules
+        # Aplicar estilo a la tabla con colores personalizados
         style = TableStyle([
-            ('BACKGROUND', (0, 0), (-1, 0), colors.HexColor("#f5f5dc")),  # Fondo beige para la cabecera
-            ('TEXTCOLOR', (0, 0), (-1, 0), colors.HexColor("#274e77")),  # Texto azul en la cabecera
-            ('ALIGN', (0, 0), (-1, -1), 'CENTER'),  # Alinear todo al centro inicialmente
+            ('BACKGROUND', (0, 0), (-1, 0), colors.HexColor("#f5f5dc")),
+            ('TEXTCOLOR', (0, 0), (-1, 0), colors.HexColor("#274e77")),
+            ('ALIGN', (0, 0), (-1, -1), 'CENTER'),
             ('FONTNAME', (0, 0), (-1, 0), 'Helvetica-Bold'),
             ('FONTSIZE', (0, 0), (-1, 0), 12),
             ('BOTTOMPADDING', (0, 0), (-1, 0), 12),
-            ('BACKGROUND', (0, 1), (-1, -1), colors.white),  # Fondo blanco para las celdas de datos
-            ('TEXTCOLOR', (0, 1), (-1, -1), colors.black),  # Texto negro para el contenido de las celdas
-            ('GRID', (0, 0), (-1, -1), 0.5, colors.black),  # Bordes de la tabla en negro
-
-            # Alinear a la izquierda las columnas de "Descripción" y "Tipo de Recaudación"
-            ('ALIGN', (3, 1), (3, -1), 'LEFT'),  # Alinear la columna de "Descripción" a la izquierda
-            ('ALIGN', (2, 1), (2, -1), 'LEFT')   # Alinear la columna de "Tipo de Recaudación" a la izquierda
+            ('BACKGROUND', (0, 1), (-1, -1), colors.white),
+            ('TEXTCOLOR', (0, 1), (-1, -1), colors.black),
+            ('GRID', (0, 0), (-1, -1), 0.5, colors.black),
+            ('ALIGN', (3, 1), (3, -1), 'LEFT'),
+            ('ALIGN', (2, 1), (2, -1), 'LEFT')
         ])
         table.setStyle(style)
 
-        # Construir el PDF
+
         elements = [title, Spacer(1, 12), subtitulo, Spacer(1, 12), table]
-        pdf.build(elements, onFirstPage=_add_page_number, onLaterPages=_add_page_number)
+        pdf.build(elements)
 
         # Preparar el archivo PDF para la descarga
         output.seek(0)
         return send_file(output, mimetype='application/pdf', as_attachment=True, download_name=f'recaudaciones_{año}.pdf')
-
-
-def _add_page_number(canvas, doc):
-    """Agregar números de página en el pie del PDF"""
-    page_num = canvas.getPageNumber()
-    text = f"Página {page_num}"
-    canvas.drawRightString(200 * mm, 15 * mm, text)
 
 
 

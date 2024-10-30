@@ -14,20 +14,18 @@
                     <th style="vertical-align: middle; text-align: center;">Sede</th>
                     <th style="vertical-align: middle; text-align: center;">Tipo</th>
                     <th style="vertical-align: middle; text-align: center;">Observaciones</th> <!-- Cambiado a Observaciones -->
-                    <th style="vertical-align: middle; text-align: center;">Estado</th> <!-- Cambiado a Estado -->
-                    <th style="vertical-align: middle; text-align: center;">Monto</th>
-                    <th style="vertical-align: middle; text-align: center; width: 200px;">Acciones</th>
+                    <th style="vertical-align: middle; text-align: center;width: 100px">Monto</th>
+                    <th style="vertical-align: middle; text-align: center; width: 100px;">Acciones</th>
                 </tr>
             </thead>
             <tbody>
                 {% for recaudacion in recaudaciones %}
                 <tr>
                     <td class="text-center">{{ recaudacion[0] }}</td> <!-- ID de la recaudación -->
-                    <td>{{ recaudacion[6] }}</td> <!-- Nombre de la sede -->
-                    <td>{{ recaudacion[7] }}</td> <!-- Tipo de recaudación -->
-                    <td>{{ recaudacion[4] }}</td> <!-- Observación -->
-                    <td>{{ 'Activo' if recaudacion[5] else 'Inactivo' }}</td> <!-- Estado (Activo/Inactivo) -->
-                    <td>{{ recaudacion[3] }}</td> <!-- Monto -->
+                    <td>{{ recaudacion[5] }}</td> <!-- Nombre de la sede -->
+                    <td>{{ recaudacion[6] }}</td> <!-- Tipo de recaudación -->
+                    <td>{{ recaudacion[4] }}</td> <!-- Observación -->  
+                    <td style="vertical-align: middle; text-align: center; padding-left: 45px;">{{ recaudacion[3] }}</td> <!-- Monto -->
                     <td class="text-center">
                         <!-- Botón para ver detalles -->
                         <button class="btn btn-primary btn-sm" title="Ver"
@@ -41,17 +39,7 @@
                             <i class="fas fa-edit"></i>
                         </button>
 
-                        <!-- Botón para dar de baja -->
-                        <button class="btn btn-secondary btn-sm" title="Dar de baja"
-                            onclick="darBajaRecaudacion('{{ recaudacion[0] }}')">
-                            <i class="fas fa-ban"></i>
-                        </button>
-
-                        <!-- Botón para eliminar -->
-                        <button type="button" class="btn btn-danger btn-sm" title="Eliminar"
-                            onclick="eliminarRecaudacion('{{ recaudacion[0] }}')">
-                            <i class="fas fa-trash-alt"></i>
-                        </button>
+                        
                     </td>
                 </tr>
                 {% endfor %}
@@ -91,11 +79,7 @@
                         <input type="text" class="form-control" id="observacion" name="observacion" required>
                     </div>
                     
-                    <div class="mb-3">
-                        <label for="estado" class="form-label">Estado</label>
-                        <input type="checkbox" class="form-check-input" id="estado" name="estado">
-                        <label class="form-check-label" for="estado">Activo</label>
-                    </div>
+                    
                     
                     <div class="mb-3">
                         <label for="id_tipo_recaudacion" class="form-label">Tipo de Recaudación</label>

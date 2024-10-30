@@ -21,7 +21,7 @@
                 <td class="text-center border">{{ tipo[0] }}</td> <!-- ID del tipo de recaudación -->
                 <td>{{ tipo[1] }}</td> <!-- Nombre del tipo de recaudación -->
                 <td>{{ 'Monetario' if tipo[2] == 1 else 'No monetario' }}</td> <!-- Tipo -->
-                <td>{{ 'Activo' if tipo[3] == 1 else 'Inactivo' }}</td> <!-- Estado -->
+                <td style="vertical-align: middle; text-align: center">{{ 'Activo' if tipo[3] == 1 else 'Inactivo' }}</td> <!-- Estado -->
                 <td class="text-center border">
                     <button class="btn btn-primary btn-sm" title="Ver"
                     onclick="abrirModalTipoRecaudacion('ver', '{{ tipo[0] }}', '{{ tipo[1] }}', '{{ tipo[2] }}', '{{ tipo[3] }}')">

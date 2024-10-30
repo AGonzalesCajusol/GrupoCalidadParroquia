@@ -24,7 +24,7 @@ document.getElementById('monto').addEventListener('input', function () {
         this.setCustomValidity('');
     }
 });
-function abrirModalRecaudacion(accion, id = '', fecha = '', hora = '', monto = '', observacion = '', estado = true, tipoRecaudacion = '') {
+function abrirModalRecaudacion(accion, id = '', fecha = '', hora = '', monto = '', observacion = '', tipoRecaudacion = '') {
     const modalElement = document.getElementById('recaudacionModal');
     if (!modalElement) {
         console.error("No se encontró el modal con el ID 'recaudacionModal'");
@@ -38,7 +38,6 @@ function abrirModalRecaudacion(accion, id = '', fecha = '', hora = '', monto = '
     document.getElementById('recaudacionId').value = id || '';
     document.getElementById('monto').value = monto || '';
     document.getElementById('observacion').value = observacion || '';
-    document.getElementById('estado').checked = estado === "1" || estado === true;
 
     // Obtener el nombre de la sede desde la cookie y mostrarlo en el campo de solo lectura
     const sedeNombre = getCookie('sede');  // Obtener el nombre de la sede desde la cookie
@@ -56,7 +55,6 @@ function abrirModalRecaudacion(accion, id = '', fecha = '', hora = '', monto = '
         // Configuración para "Ver"
         document.getElementById('monto').setAttribute('readonly', true);    
         document.getElementById('observacion').setAttribute('readonly', true);
-        document.getElementById('estado').setAttribute('disabled', true);
         tipoRecaudacionSelect.setAttribute('disabled', true);
 
         // Mostrar campos de fecha y hora en modo ver
@@ -73,7 +71,6 @@ function abrirModalRecaudacion(accion, id = '', fecha = '', hora = '', monto = '
         // Configuración para "Agregar" y "Editar"
         document.getElementById('monto').removeAttribute('readonly');
         document.getElementById('observacion').removeAttribute('readonly');
-        document.getElementById('estado').removeAttribute('disabled');
         tipoRecaudacionSelect.removeAttribute('disabled');
 
 
@@ -115,9 +112,7 @@ document.getElementById('recaudacionForm').addEventListener('submit', function(e
     const form = event.target;
     const formData = new FormData(form);
 
-    // Convertir el valor de 'estado' a '1' o '0'
-    const estadoCheckbox = document.getElementById('estado');
-    formData.set('estado', estadoCheckbox.checked ? '1' : '0');
+    
 
     const actionUrl = form.getAttribute('action');
     const submitBtn = document.getElementById('submitBtn');
@@ -284,24 +279,15 @@ function actualizarTabla(recaudaciones) {
             <td>${recaudacion.sede}</td>
             <td>${recaudacion.tipo_recaudacion}</td>
             <td>${recaudacion.observacion}</td>
-            <td>${recaudacion.estado}</td>
             <td>${recaudacion.monto}</td>
             <td class="text-center">
                 <button class="btn btn-primary btn-sm" title="Ver"
-                    onclick="abrirModalRecaudacion('ver', '${recaudacion.id}', '${recaudacion.estado}', '', '${recaudacion.monto}', '${recaudacion.observacion}', '${recaudacion.estado}', '${recaudacion.sede}', '${recaudacion.tipo_recaudacion}')">
+                    onclick="abrirModalRecaudacion('ver', '${recaudacion.id}', '${recaudacion.monto}', '${recaudacion.observacion}', '${recaudacion.sede}', '${recaudacion.tipo_recaudacion}')">
                     <i class="fas fa-eye"></i>
                 </button>
                 <button class="btn btn-warning btn-sm" title="Editar"
-                    onclick="abrirModalRecaudacion('editar', '${recaudacion.id}', '${recaudacion.estado}', '', '${recaudacion.monto}', '${recaudacion.observacion}', '${recaudacion.estado}', '${recaudacion.sede}', '${recaudacion.tipo_recaudacion}')">
+                    onclick="abrirModalRecaudacion('editar', '${recaudacion.id}', '${recaudacion.monto}', '${recaudacion.observacion}', '${recaudacion.sede}', '${recaudacion.tipo_recaudacion}')">
                     <i class="fas fa-edit"></i>
-                </button>
-                <button class="btn btn-secondary btn-sm" title="Dar de baja"
-                    onclick="darBajaRecaudacion('${recaudacion.id}')" ${recaudacion.estado === 'Inactivo' ? 'disabled' : ''}>
-                    <i class="fas fa-ban"></i>
-                </button>
-                <button class="btn btn-danger btn-sm" title="Eliminar"
-                    onclick="eliminarRecaudacion('${recaudacion.id}')">
-                    <i class="fas fa-trash-alt"></i>
                 </button>
             </td>
         `;

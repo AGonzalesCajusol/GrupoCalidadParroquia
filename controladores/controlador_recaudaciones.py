@@ -2,7 +2,7 @@ from flask import request, redirect, url_for, render_template, flash
 from bd import obtener_conexion
 from datetime import datetime
 
-def insertar_recaudacion(monto, observacion, id_sede, id_tipo_recaudacion, estado=True):
+def insertar_recaudacion(monto, observacion, id_sede, id_tipo_recaudacion):
     conexion = obtener_conexion()
     try:
         with conexion.cursor() as cursor:
@@ -16,7 +16,7 @@ def insertar_recaudacion(monto, observacion, id_sede, id_tipo_recaudacion, estad
             cursor.execute("""
                 INSERT INTO recaudacion (id_recaudacion, fecha, hora, monto, observacion, estado, id_sede, id_tipo_recaudacion)
                 VALUES (%s, %s, %s, %s, %s, %s, %s, %s)
-            """, (siguiente_id, fecha_actual, hora_actual, monto, observacion, estado, id_sede, id_tipo_recaudacion))
+            """, (siguiente_id, fecha_actual, hora_actual, monto, observacion, id_sede, id_tipo_recaudacion))
 
         conexion.commit()
         return siguiente_id
@@ -32,7 +32,7 @@ def obtener_recaudaciones():
     try:
         with conexion.cursor() as cursor:
             cursor.execute("""
-                SELECT r.id_recaudacion, r.fecha, r.hora, r.monto, r.observacion, r.estado, s.nombre_sede, tr.nombre_recaudacion
+                SELECT r.id_recaudacion, r.fecha, r.hora, r.monto, r.observacion, s.nombre_sede, tr.nombre_recaudacion
                 FROM recaudacion r
                 JOIN sede s ON r.id_sede = s.id_sede
                 JOIN tipo_recaudacion tr ON r.id_tipo_recaudacion = tr.id_tipo_recaudacion
@@ -81,16 +81,16 @@ def dar_baja_recaudacion(id_recaudacion):
         conexion.close()
 
 
-def actualizar_recaudacion(monto, observacion, id_tipo_recaudacion, estado, id_recaudacion, id_sede):
+def actualizar_recaudacion(monto, observacion, id_tipo_recaudacion, id_recaudacion, id_sede):
     conexion = obtener_conexion()
     try:
         with conexion.cursor() as cursor:
             # Actualización sin modificar la fecha y hora, y con sede inmutable
             cursor.execute("""
                 UPDATE recaudacion
-                SET monto = %s, observacion = %s, estado = %s, id_tipo_recaudacion = %s
+                SET monto = %s, observacion = %s, id_tipo_recaudacion = %s
                 WHERE id_recaudacion = %s AND id_sede = %s
-            """, (monto, observacion, estado, id_tipo_recaudacion, id_recaudacion, id_sede))
+            """, (monto, observacion, id_tipo_recaudacion, id_recaudacion, id_sede))
         conexion.commit()
         return True
     except Exception as e:
@@ -161,7 +161,7 @@ def obtener_recaudaciones_por_año(año):
     try:
         with conexion.cursor() as cursor:
             cursor.execute("""
-                SELECT r.id_recaudacion, r.fecha, r.monto, r.observacion, s.nombre_sede, tr.nombre_recaudacion, r.estado
+                SELECT r.id_recaudacion, r.fecha, r.monto, r.observacion, s.nombre_sede, tr.nombre_recaudacion
                 FROM recaudacion r
                 JOIN sede s ON r.id_sede = s.id_sede
                 JOIN tipo_recaudacion tr ON r.id_tipo_recaudacion = tr.id_tipo_recaudacion

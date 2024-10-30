@@ -14,7 +14,7 @@ import routers.router_sede
 import routers.router_tipo_ministro # Importa las rutas relacionadas con tipos de ministro
 import routers.router_congregacion  # Importa las rutas relacionadas con
 import routers.router_cargo
-import routers.router_egresos
+import routers.router_egresos   
 import routers.router_programacion
 
 app = Flask(__name__)
