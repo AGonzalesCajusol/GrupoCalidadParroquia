@@ -1,6 +1,6 @@
 from flask import render_template, redirect, jsonify, request
 from bd import obtener_conexion 
-import controladores.controlador_charla as cncha
+import controladores.controlador_programacion as cncha
 import controladores.controlador_ministro as cmin
 import controladores.controlador_actosliturgicos as contro
 import controladores.controlador_tema as tema
@@ -13,7 +13,7 @@ def registrar_rutas(app):
         id_actoliturgico = request.args.get('id_actoliturgico')
         fecha_inicio = request.args.get('fecha_inicio')
         id_charla = request.args.get('id_charla')
-        return render_template("charlas/charlas.html", acto=acto, id_actoliturgico=id_actoliturgico, fecha_inicio=fecha_inicio, id_charla=id_charla)
+        return render_template("charlas/programacion.html", acto=acto, id_actoliturgico=id_actoliturgico, fecha_inicio=fecha_inicio, id_charla=id_charla)
 
     
     @app.route("/ministros_registro", methods=["GET"])

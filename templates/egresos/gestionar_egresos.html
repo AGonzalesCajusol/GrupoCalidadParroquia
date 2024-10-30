@@ -32,7 +32,7 @@
         <thead>
             <tr>
                 <th class="text-center">ID Egreso</th>
-                <th class="text-center">ID Sede</th>
+                <th class="text-center">Nombre Sede</th>
                 <th class="text-center">Monto</th>
                 <th class="text-center">Descripción</th>
                 <th class="text-center">Fecha</th>
@@ -83,8 +83,12 @@
                 </div>
                 <div class="modal-body">
                     <div class="mb-3">
-                        <label for="id_sede" class="form-label">ID Sede</label>
-                        <input type="number" class="form-control" name="id_sede" required>
+                        <label for="id_sede" class="form-label">Sede</label>
+                        <select class="form-select" id="agregarSede" name="id_sede" required>
+                            {% for sede in sedes %}
+                            <option value="{{ sede[0] }}">{{ sede[1] }}</option>
+                            {% endfor %}
+                        </select>
                     </div>
                     <div class="mb-3">
                         <label for="monto" class="form-label">Monto</label>
@@ -93,14 +97,6 @@
                     <div class="mb-3">
                         <label for="descripcion" class="form-label">Descripción</label>
                         <input type="text" class="form-control" name="descripcion" required>
-                    </div>
-                    <div class="mb-3">
-                        <label for="fecha" class="form-label">Fecha</label>
-                        <input type="date" class="form-control" name="fecha" required>
-                    </div>
-                    <div class="mb-3">
-                        <label for="hora" class="form-label">Hora</label>
-                        <input type="time" class="form-control" name="hora" required>
                     </div>
                 </div>
                 <div class="modal-footer">
@@ -111,6 +107,7 @@
         </div>
     </div>
 </div>
+
 
 <!-- Modal para ver -->
 <div class="modal fade" id="verModal" tabindex="-1" aria-labelledby="verModalLabel" aria-hidden="true">
@@ -126,7 +123,7 @@
                     <input type="text" class="form-control" id="verId" disabled>
                 </div>
                 <div class="mb-3">
-                    <label class="form-label">ID Sede</label>
+                    <label class="form-label">Nombre Sede</label>
                     <input type="text" class="form-control" id="verSede" disabled>
                 </div>
                 <div class="mb-3">
@@ -166,8 +163,12 @@
                 </div>
                 <div class="modal-body">
                     <div class="mb-3">
-                        <label for="id_sede" class="form-label">ID Sede</label>
-                        <input type="number" class="form-control" id="editarSede" name="id_sede" required>
+                        <label for="id_sede" class="form-label">Sede</label>
+                        <select class="form-select" id="editarSede" name="id_sede" required>
+                            {% for sede in sedes %}
+                            <option value="{{ sede[0] }}" {% if sede[1] == nombre_sede %}selected{% endif %}>{{ sede[1] }}</option>
+                            {% endfor %}
+                        </select>
                     </div>
                     <div class="mb-3">
                         <label for="monto" class="form-label">Monto</label>
@@ -179,11 +180,11 @@
                     </div>
                     <div class="mb-3">
                         <label for="fecha" class="form-label">Fecha</label>
-                        <input type="date" class="form-control" id="editarFecha" name="fecha" required>
+                        <input type="date" class="form-control" id="editarFecha" name="fecha" disabled> <!-- Campo deshabilitado -->
                     </div>
                     <div class="mb-3">
                         <label for="hora" class="form-label">Hora</label>
-                        <input type="time" class="form-control" id="editarHora" name="hora" required>
+                        <input type="time" class="form-control" id="editarHora" name="hora" disabled> <!-- Campo deshabilitado -->
                     </div>
                 </div>
                 <div class="modal-footer">
@@ -194,6 +195,7 @@
         </div>
     </div>
 </div>
+
 
 <!-- Modal de confirmación para eliminar -->
 <div class="modal fade" id="confirmarEliminarModal" tabindex="-1" aria-labelledby="confirmarEliminarLabel" aria-hidden="true">
@@ -231,35 +233,58 @@
         "info": false // Desactiva la información de la tabla (opcional)
     });
 
+    // Función para establecer la fecha y la hora actual en los campos del formulario de agregar
+    document.getElementById('agregarModal').addEventListener('show.bs.modal', function (event) {
+        var now = new Date();
+        
+        // Formatear fecha como YYYY-MM-DD
+        var today = now.toISOString().split('T')[0];
+        document.getElementById('fecha').value = today;
+        
+        // Formatear hora como HH:MM (hora actual)
+        var hours = now.getHours().toString().padStart(2, '0');
+        var minutes = now.getMinutes().toString().padStart(2, '0');
+        document.getElementById('hora').value = `${hours}:${minutes}`;
+    });
+    
     // Filtrar la tabla cuando se escriba en el campo de búsqueda
     $('#recaudacionesTable_filter input[type="search"]').on('keyup', function() {
         table.column(3).search(this.value).draw(); // Busca en la columna de descripción (índice 3)
     });
-});
+    });
 
 
-    function abrirModalVer(id, sede, monto, descripcion, fecha, hora) {
-    document.getElementById("verId").value = id;
-    document.getElementById("verSede").value = sede;
-    document.getElementById("verMonto").value = monto;
-    document.getElementById("verDescripcion").value = descripcion;
-    document.getElementById("verFecha").value = fecha;
-    document.getElementById("verHora").value = hora;
-    var verModal = new bootstrap.Modal(document.getElementById('verModal'));
-    verModal.show();
+    function abrirModalVer(id, nombreSede, monto, descripcion, fecha, hora) {
+        document.getElementById("verId").value = id;
+        document.getElementById("verSede").value = nombreSede; // Aquí se asigna el nombre de la sede
+        document.getElementById("verMonto").value = monto;
+        document.getElementById("verDescripcion").value = descripcion;
+        document.getElementById("verFecha").value = fecha;
+        document.getElementById("verHora").value = hora;
+        var verModal = new bootstrap.Modal(document.getElementById('verModal'));
+        verModal.show();
     }
 
 
-    function abrirModalEditar(id, sede, monto, descripcion, fecha, hora) {
-        document.getElementById("editarId").value = id;
-        document.getElementById("editarSede").value = sede;
-        document.getElementById("editarMonto").value = monto;
-        document.getElementById("editarDescripcion").value = descripcion;
-        document.getElementById("editarFecha").value = fecha;
-        document.getElementById("editarHora").value = hora;
-        var editarModal = new bootstrap.Modal(document.getElementById('editarModal'));
-        editarModal.show();
+
+    function abrirModalEditar(id, nombreSede, monto, descripcion, fecha, hora) {
+    document.getElementById("editarId").value = id;
+    var select = document.getElementById("editarSede");
+    for (var i = 0; i < select.options.length; i++) {
+        if (select.options[i].text === nombreSede) {
+            select.selectedIndex = i;
+            break;
+        }
     }
+    document.getElementById("editarMonto").value = monto;
+    document.getElementById("editarDescripcion").value = descripcion;
+    document.getElementById("editarFecha").value = fecha;
+    document.getElementById("editarHora").value = hora;
+    var editarModal = new bootstrap.Modal(document.getElementById('editarModal'));
+    editarModal.show();
+    }
+
+
 
     function abrirModalEliminar(id) {
     document.getElementById("eliminarId").value = id;

@@ -14,10 +14,15 @@ def registrar_rutas(app):
     def gestionar_egresos():
         conexion = obtener_conexion()
         with conexion.cursor() as cursor:
-            cursor.execute("SELECT * FROM egreso")
+            cursor.execute("""
+                SELECT e.id_egreso, s.nombre_sede AS nombre_sede, e.monto, e.descripcion, e.fecha, e.hora
+                FROM egreso e
+                JOIN sede s ON e.id_sede = s.id_sede
+            """)
             egresos = cursor.fetchall()
         conexion.close()
         return render_template('egresos/gestionar_egresos.html', egresos=egresos)
+
 
     # Ruta para agregar un egreso
     @app.route('/insertar_egreso', methods=['POST'])
