@@ -232,7 +232,33 @@ document.getElementById('formRecaudacion').addEventListener('submit', function(e
         }
     });
 });
+function eliminarTipoRecaudacion(event, id) {
+    event.preventDefault(); // Prevenir el envío tradicional del formulario
 
+    // Confirmar eliminación
+    if (confirm("¿Estás seguro de que deseas eliminar este tipo de recaudación?")) {
+        fetch("/eliminar_tipo_recaudacion", {
+            method: "POST",
+            headers: {
+                "Content-Type": "application/x-www-form-urlencoded",
+            },
+            body: `id=${encodeURIComponent(id)}`
+        })
+        .then(response => response.json())
+        .then(data => {
+            if (data.success) {
+                actualizarTabla(data.tipos_recaudacion); // Actualizar la tabla con los datos devueltos
+                mostrarMensaje(data.message, "success"); // Mostrar mensaje de éxito
+            } else {
+                mostrarMensaje(data.message, "danger"); // Mostrar mensaje de error
+            }
+        })
+        .catch(error => {
+            console.error("Error:", error);
+            mostrarMensaje("Ocurrió un error al intentar eliminar el tipo de recaudación.", "danger");
+        });
+    }
+}
 function mostrarMensaje(mensaje, tipo) {
     // Crear contenedor de alerta
     const alertContainer = document.createElement("div");

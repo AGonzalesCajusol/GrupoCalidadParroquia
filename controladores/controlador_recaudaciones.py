@@ -81,22 +81,40 @@ def dar_baja_recaudacion(id_recaudacion):
         conexion.close()
 
 
-def actualizar_recaudacion(monto, observacion, id_sede, id_tipo_recaudacion, estado, id_recaudacion):
+def actualizar_recaudacion(monto, observacion, id_tipo_recaudacion, estado, id_recaudacion, id_sede):
     conexion = obtener_conexion()
     try:
         with conexion.cursor() as cursor:
+            # Actualización sin modificar la fecha y hora, y con sede inmutable
             cursor.execute("""
                 UPDATE recaudacion
-                SET fecha = NOW(), hora = NOW(), monto = %s, observacion = %s, estado = %s, id_sede = %s, id_tipo_recaudacion = %s
-                WHERE id_recaudacion = %s
-            """, (monto, observacion, estado, id_sede, id_tipo_recaudacion, id_recaudacion))
+                SET monto = %s, observacion = %s, estado = %s, id_tipo_recaudacion = %s
+                WHERE id_recaudacion = %s AND id_sede = %s
+            """, (monto, observacion, estado, id_tipo_recaudacion, id_recaudacion, id_sede))
         conexion.commit()
+        return True
     except Exception as e:
         print(f"Error al actualizar recaudación: {e}")
         conexion.rollback()
+        return False
     finally:
         conexion.close()
 
+def obtener_nombre_sede(id_sede):
+    conexion = obtener_conexion()
+    try:
+        with conexion.cursor() as cursor:
+            cursor.execute("SELECT nombre_sede FROM sede WHERE id_sede = %s", (id_sede,))
+            result = cursor.fetchone()
+            if result:
+                return result[0]  # Devuelve el nombre de la sede
+            else:
+                return None
+    except Exception as e:
+        print(f"Error al obtener nombre de la sede: {e}")
+        return None
+    finally:
+        conexion.close()
 
 def eliminar_recaudacion(id_recaudacion):
     conexion = obtener_conexion()
@@ -121,19 +139,22 @@ def obtener_tipos_recaudacion():
         return []
     finally:
         conexion.close()
-def obtener_id_sede_por_nombre(nombre_sede):
+        
+def obtener_nombre_sede(sede_id):
     conexion = obtener_conexion()
     try:
         with conexion.cursor() as cursor:
-            cursor.execute("SELECT id_sede FROM sede WHERE nombre_sede = %s", (nombre_sede,))
-            id_sede = cursor.fetchone()[0]  # Devuelve el primer resultado
-        return id_sede
+            cursor.execute("SELECT nombre_sede FROM sede WHERE id_sede = %s", (sede_id,))
+            resultado = cursor.fetchone()
+            if resultado:
+                return resultado[0]  # Retorna solo el nombre de la sede
+            else:
+                return None  # Retorna None si no encuentra la sede
     except Exception as e:
-        print(f"Error al obtener ID de la sede: {e}")
+        print(f"Error al obtener el nombre de la sede: {e}")
         return None
     finally:
         conexion.close()
-
 
 def obtener_recaudaciones_por_año(año):
     conexion = obtener_conexion()
@@ -153,6 +174,24 @@ def obtener_recaudaciones_por_año(año):
         return []
     finally:
         conexion.close()
+        
+def obtener_id_sede_por_nombre(nombre_sede):
+    conexion = obtener_conexion()
+    try:
+        with conexion.cursor() as cursor:
+            # Ejecuta la consulta para obtener el ID en base al nombre de la sede
+            cursor.execute("SELECT id_sede FROM sede WHERE nombre_sede = %s", (nombre_sede,))
+            resultado = cursor.fetchone()
+            if resultado:
+                return resultado[0]  # Devuelve el id_sede
+            else:
+                return None  # Retorna None si no encuentra el nombre de la sede
+    except Exception as e:
+        print(f"Error al obtener el ID de la sede: {e}")
+        return None
+    finally:
+        conexion.close
+
 
 # Obtener recaudaciones por año Exportar###
 def obtener_recaudaciones_por_año(año):
