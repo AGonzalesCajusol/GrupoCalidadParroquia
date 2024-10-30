@@ -33,34 +33,6 @@ def registrar_programacion_en_bloque(id_charla, programaciones):
         cursor.close()
         conexion.close()
 
-
-def obtener_actoliturgico():
-    conexion = obtener_conexion()
-    with conexion.cursor() as cursor:
-        cursor.execute("SELECT * from actoliturgico order by 1 asc")
-        sede = cursor.fetchall()
-    conexion.close()
-    return sede    
-
-
-def obtener_actoliturgico_por_id(id_acto):
-    conexion = obtener_conexion()
-    with conexion.cursor() as cursor:
-        cursor.execute("SELECT * from actoliturgico where id_actoliturgico=%s",(id_acto,))
-        sede = cursor.fetchall()
-    conexion.close()
-    return sede    
-
-
-def obtener_id_actoliturgico_nombre(acto):
-    conexion = obtener_conexion()
-    with conexion.cursor() as cursor:
-        cursor.execute("SELECT id_actoliturgico from actoliturgico where nombre_liturgia =%s", (acto,))
-        sede = cursor.fetchall()
-    conexion.close()
-    return sede    
-
-
 def charlas_acto(id_acto):
     conexion = obtener_conexion()
     with conexion.cursor() as cursor:
