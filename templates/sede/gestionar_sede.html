@@ -123,7 +123,7 @@
                         </select>
                     </div>
                     <div class="mb-3">
-                        <label for="id_diosesis">Diosesis</label>
+                        <label for="id_diosesis">Diocesis</label>
                         <select class="form-select" id="id_diosesis" name="id_diosesis" required>
                             {% for dioss in diosesis %}
                             <option value="{{ dioss[0] }}">{{ dioss[1] }}</option>
@@ -135,7 +135,7 @@
                         <input type="number" class="form-control" id="monto_traslado" name="monto_traslado" required>
                     </div>
                     <div>
-                        <h6>Actos liturgicos</h6>
+                        <h6>Actos litúrgicos</h6>
                         {% for acto in actoliturgico %}
                         <div class="mb-3">
                             <input type="checkbox" class="form-check-input" id="estado-{{ acto[0] }}"
