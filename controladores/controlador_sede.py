@@ -1,14 +1,14 @@
 from bd import obtener_conexion
 
-def insertar_sede(nombre_sede, direccion, creacion, telefono, correo, monto, congregacion, diosis):
+def insertar_sede(nombre_sede, direccion, creacion, telefono, correo, monto, congregacion, diosis, monto_traslado):
     conexion = obtener_conexion()
     try:
         with conexion.cursor() as cursor:
             # Insertar en la tabla sede (dejando que el estado tome su valor por defecto)
             cursor.execute('''
-                INSERT INTO sede(nombre_sede, direccion, creacion, telefono, correo, monto, id_congregacion, id_diosesis) 
-                VALUES (%s, %s, %s, %s, %s, %s, %s, %s)
-            ''', (nombre_sede, direccion, creacion, telefono, correo, monto, congregacion, diosis))
+                INSERT INTO sede(nombre_sede, direccion, creacion, telefono, correo, monto, id_congregacion, id_diosesis, monto_traslado) 
+                VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s)
+            ''', (nombre_sede, direccion, creacion, telefono, correo, monto, congregacion, diosis, monto_traslado))
             
             id_sede = cursor.lastrowid  # Obtener el id de la sede recién insertada
 
@@ -41,7 +41,7 @@ def insertar_sede_acto_liturgico(id_sede, id_actoliturgico, estado_acto):
 def obtener_sede():
     conexion = obtener_conexion()
     with conexion.cursor() as cursor:
-        cursor.execute("SELECT sd.id_sede,sd.nombre_sede,sd.direccion,sd.creacion,sd.telefono,sd.correo,sd.monto,sd.estado,co.nombre_congregacion,ds.nombre_diosesis FROM sede sd inner join congregacion co on sd.id_congregacion = co.id_congregacion inner join diosesis ds on sd.id_diosesis= ds.id_diosesis order by 1 asc")
+        cursor.execute("SELECT sd.id_sede,sd.nombre_sede,sd.direccion,sd.creacion,sd.telefono,sd.correo,sd.monto,sd.estado,co.nombre_congregacion,ds.nombre_diosesis,sd.monto_traslado FROM sede sd inner join congregacion co on sd.id_congregacion = co.id_congregacion inner join diosesis ds on sd.id_diosesis= ds.id_diosesis order by 1 asc")
         sede = cursor.fetchall()
     conexion.close()
     return sede
@@ -61,7 +61,7 @@ def obtener_sede_por_id(id):
     try:
         with conexion.cursor() as cursor:
             # Obtener los datos de la sede
-            cursor.execute("SELECT id_sede, nombre_sede, direccion, creacion, telefono, correo, monto, estado, id_congregacion, id_diosesis FROM sede WHERE id_sede = %s", (id,))
+            cursor.execute("SELECT id_sede, nombre_sede, direccion, creacion, telefono, correo, monto, estado, id_congregacion, id_diosesis, monto_traslado FROM sede WHERE id_sede = %s", (id,))
             sede = cursor.fetchone()
 
             # Obtener los actos litúrgicos asociados a la sede
@@ -73,10 +73,10 @@ def obtener_sede_por_id(id):
 
     return sede, [acto[0] for acto in actos_liturgicos]  # Devuelve la sede y los IDs de los actos litúrgicos
 
-def actualizar_sede(nombre_sede,direccion,creacion,telefono,correo,monto,estado,congregacion,diosesis, id):
+def actualizar_sede(nombre_sede,direccion,creacion,telefono,correo,monto,estado,congregacion,diosesis,monto_traslado, id):
     conexion = obtener_conexion()
     with conexion.cursor() as cursor:
-        cursor.execute("UPDATE sede SET nombre_sede = %s, direccion = %s,  creacion = %s, telefono = %s, correo = %s, monto = %s, estado = %s, id_congregacion = %s, id_diosesis = %s WHERE id_sede = %s", (nombre_sede,direccion,creacion,telefono,correo,monto,estado,congregacion,diosesis, id))
+        cursor.execute("UPDATE sede SET nombre_sede = %s, direccion = %s,  creacion = %s, telefono = %s, correo = %s, monto = %s, estado = %s, id_congregacion = %s, id_diosesis = %s, monto_traslado = %s WHERE id_sede = %s", (nombre_sede,direccion,creacion,telefono,correo,monto,estado,congregacion,diosesis,monto_traslado, id))
     conexion.commit()
     conexion.close()
 

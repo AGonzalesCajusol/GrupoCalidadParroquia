@@ -18,6 +18,7 @@
                 <th style="vertical-align: middle; text-align: center;">Estado</th>
                 <!-- <th style="vertical-align: middle; text-align: center;">Congregacion</th>
                 <th style="vertical-align: middle; text-align: center;">Diócesis</th> -->
+                <!-- <th style="vertical-align: middle; text-align: center;">Monto traslado</th> -->
 
                 <th style="vertical-align: middle; text-align: center; width: 200px;">Acciones</th>
             </tr>
@@ -36,20 +37,22 @@
                 <td>{{ 'Activo' if sed[7] == 1 else 'Inactivo' }}</td>
                 <!-- <td>{{ sed[8] }}</td>  id congregación -->
                 <!-- <td>{{ sed[9] }}</td> id diosesis-->
-                
+                <!-- <td>{{ sed[10] }}</td> monto_traslado -->
+
                 <td class="text-center border">
                     <button class="btn btn-primary btn-sm" title="Ver"
-                        onclick="abrirModalVer('{{ sed[0] }}', '{{ sed[1] }}', '{{ sed[2] }}', '{{ sed[3] }}', '{{ sed[4] }}', '{{ sed[5] }}', '{{ sed[6] }}', '{{ sed[7] }}', '{{ sed[8] }}','{{ sed[9] }}')">
+                        onclick="abrirModalVer('{{ sed[0] }}', '{{ sed[1] }}', '{{ sed[2] }}', '{{ sed[3] }}', '{{ sed[4] }}', '{{ sed[5] }}', '{{ sed[6] }}', '{{ sed[7] }}', '{{ sed[8] }}','{{ sed[9] }}','{{ sed[10] }}')">
                         <i class="fas fa-eye"></i>
                     </button>
 
                     <button class="btn btn-warning btn-sm" title="Editar"
-                        onclick="abrirModalEditar('{{ sed[0] }}', '{{ sed[1] }}', '{{ sed[2] }}', '{{ sed[3] }}', '{{ sed[4] }}', '{{ sed[5] }}', '{{ sed[6] }}', '{{ sed[7] }}', '{{ sed[8] }}', '{{ sed[9] }}')">
+                        onclick="abrirModalEditar('{{ sed[0] }}', '{{ sed[1] }}', '{{ sed[2] }}', '{{ sed[3] }}', '{{ sed[4] }}', '{{ sed[5] }}', '{{ sed[6] }}', '{{ sed[7] }}', '{{ sed[8] }}', '{{ sed[9] }}','{{ sed[10] }}')">
                         <i class="fas fa-edit"></i>
                     </button>
 
                     <button type="button" class="btn btn-secondary btn-sm" title="Dar de baja"
-                        onclick="darBajaSede('{{ sed[0] }}')">
+                        onclick="darBajaSede('{{ sed[0] }}','{{ sed[7] }}')"
+                        {% if sed[7] == 0 %} disabled {% endif %}>
                         <i class="fas fa-ban"></i>
                     </button>
 
@@ -113,9 +116,9 @@
                         <label for="id_congregacion">Congregación</label>
                         <select class="form-select" id="id_congregacion" name="id_congregacion" required>
                             {% for congre in congregacion %}
-                                {% if congre[2] == 1 %}
-                                    <option value="{{ congre[0] }}">{{ congre[1] }}</option>
-                                {% endif %}
+                            {% if congre[2] == 1 %}
+                            <option value="{{ congre[0] }}">{{ congre[1] }}</option>
+                            {% endif %}
                             {% endfor %}
                         </select>
                     </div>
@@ -126,6 +129,10 @@
                             <option value="{{ dioss[0] }}">{{ dioss[1] }}</option>
                             {% endfor %}
                         </select>
+                    </div>
+                    <div class="mb-3">
+                        <label for="monto_traslado" class="form-label">Monto traslado</label>
+                        <input type="number" class="form-control" id="monto_traslado" name="monto_traslado" required>
                     </div>
                     <div>
                         <h6>Actos liturgicos</h6>

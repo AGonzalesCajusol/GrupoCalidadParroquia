@@ -110,22 +110,24 @@ function abrirModalVerC(id, nombre, estado) {
     modalCongreg.show();
 }
 
+
 function darBajaCongre(id, estado) {
     // Comprobar si la sede ya está inactiva
     if (estado === false || estado === 'false' || estado === '0') {
         alert('La Congregación ya está dada de baja.');
+        // Deshabilitar el botón de "Dar de baja"
+        const button = document.querySelector(`button[onclick="darBajaCongre('${id}', '${estado}')"]`);
+        if (button) {
+            button.setAttribute('disabled', 'disabled');
+        }
         return; // Salir de la función
     }
 
+    // Proceder con dar de baja si el estado es activo
     const formCongregacion = document.getElementById('formCongregacion');
-
     formCongregacion.setAttribute('action', darBajaCongreURL);
-
     document.getElementById('congregacionId').value = id;
-    const estadoCheckbox = document.getElementById('estado');
-    estadoCheckbox.checked = true; // Marcamos como inactivo
 
-    alert('Estado de la sede cambiado exitosamente a Inactivo');
-
+    alert('Estado de la congregación cambiado exitosamente a Inactivo');
     formCongregacion.submit();
 }
