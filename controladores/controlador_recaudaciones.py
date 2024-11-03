@@ -132,11 +132,13 @@ def eliminar_recaudacion(id_recaudacion):
         conexion.rollback()
     finally:
         conexion.close()
+        
 def obtener_tipos_recaudacion():
-    conexion = obtener_conexion()  # Asumiendo que tienes una función para obtener la conexión
+    conexion = obtener_conexion()
     try:
         with conexion.cursor() as cursor:
-            cursor.execute("SELECT id_tipo_recaudacion, nombre_recaudacion FROM tipo_recaudacion")
+            # Solo selecciona los tipos de recaudación donde estado = 1
+            cursor.execute("SELECT id_tipo_recaudacion, nombre_recaudacion FROM tipo_recaudacion WHERE estado = 1")
             tipos_recaudacion = cursor.fetchall()
         return tipos_recaudacion
     except Exception as e:
@@ -144,6 +146,7 @@ def obtener_tipos_recaudacion():
         return []
     finally:
         conexion.close()
+
         
 def obtener_nombre_sede(sede_id):
     conexion = obtener_conexion()

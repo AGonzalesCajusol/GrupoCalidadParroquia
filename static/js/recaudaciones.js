@@ -7,21 +7,26 @@ $(document).ready(function () {
             search: "Buscar:"
         },
         initComplete: function () {
-            $("div.button-section").html('<button type="button" class="btn btn-success btn-lg custom-btn ml-3 btn-agregar-recaudacion" data-bs-toggle="modal" onclick="abrirModalRecaudacion(\'add\')"><i class="bi bi-person-plus"></i> Agregar Recaudación</button>');
-            $("div.button-section").append('<button type="button" class="btn btn-success btn-lg custom-btn ml-3" data-bs-toggle="modal" data-bs-target="#exportModal"><i class="bi bi-file-earmark-arrow-down"></i> Exportar Recaudaciones</button>');
+            $("div.button-section").html('<button type="button" class="btn btn-success btn-lg custom-btn ml-3 btn-agregar-recaudacion" data-bs-toggle="modal" onclick="abrirModalRecaudacion(\'add\')"><i class="bi bi-person-plus"></i> Agregar recaudación</button>');
+            $("div.button-section").append('<button type="button" class="btn btn-success btn-lg custom-btn ml-3" data-bs-toggle="modal" data-bs-target="#exportModal"><i class="bi bi-file-earmark-arrow-down"></i> Exportar recaudaciones</button>');
         }
     });
 });
 
-// Validación para el monto de recaudación
+
 document.getElementById('monto').addEventListener('input', function () {
     const montoValue = this.value.trim();
-    if (montoValue === '' || isNaN(montoValue)) {
-        this.setCustomValidity('El monto debe ser un número válido y no puede estar vacío.');
+    
+    // Expresión regular para verificar que el valor sea un número positivo o negativo con decimales permitidos
+    const isNumber = /^[+-]?(\d+(\.\d{0,2})?|\.\d{1,2})$/;
+
+    if (montoValue === '' || !isNumber.test(montoValue)) {
+        this.setCustomValidity('El monto debe ser un número válido con hasta dos decimales.');
     } else {
         this.setCustomValidity('');
     }
 });
+
 
 function abrirModalRecaudacion(type, id = null, fecha = '', hora = '', monto = '', observacion = '', sede_nombre = '', tipo_recaudacion = '') {
     let modalTitle = '';
