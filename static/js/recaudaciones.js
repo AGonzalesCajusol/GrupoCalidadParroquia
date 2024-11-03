@@ -48,17 +48,27 @@ $('#recaudacionModal').on('shown.bs.modal', function () {
 
 
 document.getElementById('monto').addEventListener('input', function () {
-    const montoValue = this.value.trim();
-    
-    // Expresión regular para verificar que el valor sea un número positivo o negativo con decimales permitidos
-    const isNumber = /^[+-]?(\d+(\.\d{0,2})?|\.\d{1,2})$/;
+    const valoracionInput = this.value;
 
-    if (montoValue === '' || !isNumber.test(montoValue)) {
-        this.setCustomValidity('El monto debe ser un número válido con hasta dos decimales.');
-    } else {
-        this.setCustomValidity('');
+    // Expresión regular que permite solo números positivos con hasta dos decimales
+    const isValid = /^[0-9]*\.?[0-9]{0,2}$/.test(valoracionInput);
+    
+    if (!isValid) {
+        this.value = valoracionInput.slice(0, -1);  // Elimina el último carácter ingresado si es inválido
     }
 });
+
+document.getElementById('observacion').addEventListener('input', function () {
+    const observacionInput = this.value;
+
+    // Expresión regular que permite solo letras y espacios
+    const isValid = /^[a-zA-Z\s]*$/.test(observacionInput);
+    
+    if (!isValid) {
+        this.value = observacionInput.slice(0, -1);  // Elimina el último carácter ingresado si es inválido
+    }
+});
+
 
 
 function abrirModalRecaudacion(type, id = null, fecha = '', hora = '', monto = '', observacion = '', sede_nombre = '', tipo_recaudacion = '') {
