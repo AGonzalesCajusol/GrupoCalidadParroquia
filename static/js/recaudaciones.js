@@ -93,6 +93,12 @@ function abrirModalRecaudacion(type, id = null, fecha = '', hora = '', monto = '
         document.getElementById('observacion').value = observacion;
 
         if (type === 'view') {
+            // Convertir la fecha de YYYY-MM-DD a DD-MM-YYYY
+            if (fecha) {
+                const [year, month, day] = fecha.split('-');
+                fecha = `${day}-${month}-${year}`;
+            }
+            
             document.getElementById('fecha').value = fecha;
             document.getElementById('hora').value = hora;
             document.getElementById('fechaContainer').style.display = 'block';
@@ -103,13 +109,10 @@ function abrirModalRecaudacion(type, id = null, fecha = '', hora = '', monto = '
         }
 
         // Seleccionar el tipo de recaudación en base al texto
+        
         const tipoSelect = document.getElementById('id_tipo_recaudacion');
-        for (let i = 0; i < tipoSelect.options.length; i++) {
-            if (tipoSelect.options[i].text === tipo_recaudacion) {
-                tipoSelect.selectedIndex = i;
-                break;
-            }
-        }
+        tipoSelect.value =tipo_recaudacion;
+        
     }
 
     document.getElementById('recaudacionModalLabel').innerText = modalTitle;
