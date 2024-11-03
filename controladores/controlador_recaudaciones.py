@@ -2,22 +2,28 @@ from flask import request, redirect, url_for, render_template, flash
 from bd import obtener_conexion
 from datetime import datetime
 
+from datetime import datetime
+from bd import obtener_conexion
+
 def insertar_recaudacion(monto, observacion, id_sede, id_tipo_recaudacion):
     conexion = obtener_conexion()
     try:
         with conexion.cursor() as cursor:
+            # Obtener el siguiente ID de recaudación
             cursor.execute("SELECT COALESCE(MAX(id_recaudacion) + 1, 1) as siguiente_id FROM recaudacion")
             siguiente_id = cursor.fetchone()[0]
 
+            # Establecer la fecha y hora actuales
             fecha_actual = datetime.now().strftime('%Y-%m-%d')
             hora_actual = datetime.now().strftime('%H:%M:%S')
 
-            # Inserción de la nueva recaudación
+            # Inserción de la nueva recaudación (sin el campo 'estado')
             cursor.execute("""
-                INSERT INTO recaudacion (id_recaudacion, fecha, hora, monto, observacion, estado, id_sede, id_tipo_recaudacion)
-                VALUES (%s, %s, %s, %s, %s, %s, %s, %s)
+                INSERT INTO recaudacion (id_recaudacion, fecha, hora, monto, observacion, id_sede, id_tipo_recaudacion)
+                VALUES (%s, %s, %s, %s, %s, %s, %s)
             """, (siguiente_id, fecha_actual, hora_actual, monto, observacion, id_sede, id_tipo_recaudacion))
 
+        # Confirmar los cambios en la base de datos
         conexion.commit()
         return siguiente_id
     except Exception as e:
@@ -26,7 +32,6 @@ def insertar_recaudacion(monto, observacion, id_sede, id_tipo_recaudacion):
         return None
     finally:
         conexion.close()
-
 def obtener_recaudaciones():
     conexion = obtener_conexion()
     try:

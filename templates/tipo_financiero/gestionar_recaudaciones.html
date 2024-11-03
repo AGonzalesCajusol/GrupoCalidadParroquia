@@ -28,14 +28,14 @@
                     <td style="vertical-align: middle; text-align: center; padding-left: 45px;">{{ recaudacion[3] }}</td> <!-- Monto -->
                     <td class="text-center">
                         <!-- Botón para ver detalles -->
-                        <button class="btn btn-primary btn-sm" title="Ver"
-                            onclick="abrirModalRecaudacion('ver', '{{ recaudacion[0] }}', '{{ recaudacion[1] }}', '{{ recaudacion[2] }}', '{{ recaudacion[3] }}', '{{ recaudacion[4] }}', '{{ recaudacion[5] }}', '{{ recaudacion[6] }}', '{{ recaudacion[7] }}')">
+                        <button class="btn btn-primary btn-sm" title="view"
+                            onclick="abrirModalRecaudacion('view', '{{ recaudacion[0] }}', '{{ recaudacion[1] }}', '{{ recaudacion[2] }}', '{{ recaudacion[3] }}', '{{ recaudacion[4] }}', '{{ recaudacion[5] }}', '{{ recaudacion[6] }}', '{{ recaudacion[7] }}')">
                             <i class="fas fa-eye"></i>
                         </button>
 
                         <!-- Botón para editar -->
-                        <button class="btn btn-warning btn-sm" title="Editar"
-                            onclick="abrirModalRecaudacion('editar', '{{ recaudacion[0] }}', '{{ recaudacion[1] }}', '{{ recaudacion[2] }}', '{{ recaudacion[3] }}', '{{ recaudacion[4] }}', '{{ recaudacion[5] }}', '{{ recaudacion[6] }}', '{{ recaudacion[7] }}')">
+                        <button class="btn btn-warning btn-sm" title="edit"
+                            onclick="abrirModalRecaudacion('edit', '{{ recaudacion[0] }}', '{{ recaudacion[1] }}', '{{ recaudacion[2] }}', '{{ recaudacion[3] }}', '{{ recaudacion[4] }}', '{{ recaudacion[5] }}', '{{ recaudacion[6] }}', '{{ recaudacion[7] }}')">
                             <i class="fas fa-edit"></i>
                         </button>
 
@@ -52,7 +52,7 @@
 <div class="modal fade" id="recaudacionModal" tabindex="-1" aria-labelledby="recaudacionModalLabel" aria-hidden="true">
     <div class="modal-dialog">
         <div class="modal-content">
-            <form id="recaudacionForm" action="" method="POST">
+            <form id="recaudacionForm" action="{{ url_for('procesar_insertar_recaudacion') }}" method="POST">
                 <input type="hidden" id="recaudacionId" name="id">
                 <!-- Campo oculto para el ID de la sede -->
                 <input type="hidden" id="sede_id" name="sede_id" value="{{ request.cookies.get('sede') }}">
@@ -66,9 +66,9 @@
                     <!-- Campo de solo lectura para mostrar el nombre de la sede -->
                     <div class="mb-3">
                         <label for="sede_nombre" class="form-label">Sede</label>
-                        <input type="text" class="form-control" id="sede_nombre" readonly>
+                        <input type="text" class="form-control" id="sede_nombre" name="sede_nombre" readonly disabled tabindex="-1">
                     </div>
-
+                                    
                     <div class="mb-3">
                         <label for="monto" class="form-label">Monto</label>
                         <input type="text" class="form-control" id="monto" name="monto" required>
@@ -110,11 +110,23 @@
     </div>
 </div>
 
+<div class="container mt-3" id="mensaje-container">
+    {% with messages = get_flashed_messages(with_categories=True) %}
+      {% if messages %}
+        {% for category, message in messages %}
+          <div class="alert alert-{{ category }} alert-dismissible fade show" role="alert">
+            {{ message }}
+            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+          </div>
+        {% endfor %}
+      {% endif %}
+    {% endwith %}
+</div>
 <script src="/static/js/recaudaciones.js"></script>
-
-<script>
+<script type="text/javascript">
     const urlInsertarRecaudacion = "{{ url_for('procesar_insertar_recaudacion') }}";
     const urlActualizarRecaudacion = "{{ url_for('procesar_actualizar_recaudacion') }}";
 </script>
+
 
 {% endblock %}

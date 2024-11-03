@@ -260,7 +260,6 @@ function eliminarTipoRecaudacion(event, id) {
     }
 }
 function mostrarMensaje(mensaje, tipo) {
-    // Crear contenedor de alerta
     const alertContainer = document.createElement("div");
     alertContainer.className = `alert alert-${tipo} alert-dismissible fade show position-fixed`;
     alertContainer.role = "alert";
