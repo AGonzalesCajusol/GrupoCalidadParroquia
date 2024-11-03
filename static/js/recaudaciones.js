@@ -138,7 +138,7 @@ function abrirModalRecaudacion(type, id = null, fecha = '', hora = '', monto = '
 
 $('#recaudacionForm').on('submit', function(event) {
     event.preventDefault();
-    const formData = $(this).serialize();
+    const formData = new FormData(this);  // Cambiar a FormData para manejar los datos del formulario
     const formAction = $(this).attr('action');
     console.log("Datos enviados:", formData);
 
@@ -146,23 +146,31 @@ $('#recaudacionForm').on('submit', function(event) {
     $('#submitBtn').prop('disabled', true);
 
     // Realizar la solicitud de inserción o actualización
-    $.post(formAction, formData)
-        .done(function(response) {
-            if (response.success) {
-                actualizarTabla(response.recaudaciones); // Actualizar la tabla
-                $('#recaudacionModal').modal('hide'); // Cerrar el modal
-                mostrarMensaje(response.message, 'success'); // Mostrar mensaje de éxito
-            } else {
-                mostrarMensaje(response.message, 'danger'); // Mostrar mensaje de error
-            }
-        })
-        .fail(function() {
-            mostrarMensaje("Error en la operación.", 'danger');
-        })
-        .always(function() {
-            $('#submitBtn').prop('disabled', false);
-        });
+    fetch(formAction, {
+        method: 'POST',
+        body: formData,
+        headers: {
+            'X-Requested-With': 'fetch'  // Opcional: indica que la solicitud se hizo con fetch
+        }
+    })
+    .then(response => response.json())
+    .then(data => {
+        if (data.success) {
+            actualizarTabla(data.recaudaciones);
+            $('#recaudacionModal').modal('hide');
+            mostrarMensaje(data.message, 'success');
+        } else {
+            mostrarMensaje(data.message, 'danger');
+        }
+    })
+    .catch(() => {
+        mostrarMensaje("Error en la operación.", 'danger');
+    })
+    .finally(() => {
+        $('#submitBtn').prop('disabled', false);
+    });
 });
+
 
 // Función para mostrar el mensaje en la estructura de Bootstrap
 function mostrarMensaje(mensaje, tipo) {
@@ -192,12 +200,18 @@ function actualizarTabla(recaudaciones) {
 
     // Generar filas con el diseño HTML específico y añadirlas
     recaudaciones.forEach(recaudacion => {
-        const row = $(`
+        // Asegúrate de que `fecha` esté definida en `recaudacion`
+        const fechaFormatted = recaudacion.fecha 
+            ? new Date(recaudacion.fecha).toLocaleDateString('es-ES') 
+            : 'Fecha no disponible';
+
+        const row = $(` 
             <tr class="text-center">
                 <td style="vertical-align: middle; text-align: center;">${recaudacion.id}</td>
                 <td>${recaudacion.sede}</td>
                 <td>${recaudacion.tipo_recaudacion}</td>
                 <td>${recaudacion.observacion}</td>
+                <td>${fechaFormatted}</td>
                 <td style="vertical-align: middle; text-align: center; width: 100px;">${recaudacion.monto}</td>
                 <td class="text-center" style="vertical-align: middle; text-align: center; width: 100px;">
                     <button class="btn btn-primary btn-sm" title="Ver" onclick="abrirModalRecaudacion('view', '${recaudacion.id}', '${recaudacion.fecha}', '${recaudacion.hora}', '${recaudacion.monto}', '${recaudacion.observacion}', '${recaudacion.sede}', '${recaudacion.tipo_recaudacion}')">
