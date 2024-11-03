@@ -68,7 +68,15 @@
                         <label for="sede_nombre" class="form-label">Sede</label>
                         <input type="text" class="form-control" id="sede_nombre" name="sede_nombre" readonly disabled tabindex="-1">
                     </div>
-                                    
+
+                    <div class="mb-3">
+                        <label for="id_tipo_recaudacion" class="form-label">Tipo de recaudación</label>
+                        <select class="form-select" id="id_tipo_recaudacion" name="id_tipo_recaudacion" required>
+                            {% for tipo in tipos %}
+                                <option value="{{ tipo[1] }}">{{ tipo[1] }}</option> <!-- `tipo[1]` es el nombre -->
+                            {% endfor %}
+                        </select>                                                                       
+                    </div>                              
                     <div class="mb-3">
                         <label for="monto" class="form-label">Monto</label>
                         <input type="text" class="form-control" id="monto" name="monto" required>
@@ -78,18 +86,6 @@
                         <label for="observacion" class="form-label">Observación</label>
                         <input type="text" class="form-control" id="observacion" name="observacion" required>
                     </div>
-                    
-                    
-                    
-                    <div class="mb-3">
-                        <label for="id_tipo_recaudacion" class="form-label">Tipo de Recaudación</label>
-                        <select class="form-select" id="id_tipo_recaudacion" name="id_tipo_recaudacion" required>
-                            {% for tipo in tipos %}
-                            <option value="{{ tipo[1] }}">{{ tipo[1] }}</option>
-                            {% endfor %}
-                        </select>
-                    </div>
-
                     <div class="mb-3" id="fechaContainer" style="display: none;">
                         <label for="fecha" class="form-label">Fecha</label>
                         <input type="text" class="form-control" id="fecha" name="fecha" readonly>

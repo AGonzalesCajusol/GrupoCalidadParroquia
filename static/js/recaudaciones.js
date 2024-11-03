@@ -13,6 +13,39 @@ $(document).ready(function () {
     });
 });
 
+$(document).ready(function () {
+    // Cambiar el label de "Monto" a "Valoración" según el tipo de recaudación
+    $('#id_tipo_recaudacion').on('change', function () {
+        const selectedType = $(this).find("option:selected").text().toLowerCase();
+        const montoLabel = $('label[for="monto"]');
+
+        // Verificar si el tipo seleccionado es "No Monetario"
+        if (selectedType.includes("no monetario") || selectedType.includes("intercambio") || selectedType.includes("donación")) { 
+            montoLabel.text('Valoración');
+        } else {
+            montoLabel.text('Monto');
+        }
+    });
+
+    // Trigger para ejecutar el cambio de label cuando el modal se abre con el tipo ya seleccionado
+    $('#id_tipo_recaudacion').trigger('change');
+});
+
+$('#recaudacionModal').on('shown.bs.modal', function () {
+    const nombreRecaudacionInput = document.getElementById('nombre_recaudacion');
+    if (nombreRecaudacionInput) {
+        nombreRecaudacionInput.addEventListener('input', function () {
+            const nombreRecaudacion = this.value.trim();
+            if (nombreRecaudacion === '') {
+                this.setCustomValidity('El nombre de la recaudación no puede estar vacío ni contener solo espacios en blanco.');
+            } else {
+                this.setCustomValidity('');
+            }
+        });
+    }
+});
+
+
 
 document.getElementById('monto').addEventListener('input', function () {
     const montoValue = this.value.trim();
@@ -33,53 +66,50 @@ function abrirModalRecaudacion(type, id = null, fecha = '', hora = '', monto = '
     let formAction = '';
     let isReadOnly = false;
 
-    // Ocultar los campos de fecha y hora por defecto
     document.getElementById('fechaContainer').style.display = 'none';
     document.getElementById('horaContainer').style.display = 'none';
 
     if (type === 'add') {
         modalTitle = 'Agregar recaudación';
         formAction = '/insertar_recaudacion';
-        limpiarModal(); // Limpia todos los campos
-    } else if (type === 'edit') {
-        modalTitle = 'Editar recaudación';
-        formAction = '/procesar_actualizar_recaudacion';
-        isReadOnly = false;
-        document.getElementById('recaudacionId').value = id;
-        document.getElementById('monto').value = monto;
-        document.getElementById('observacion').value = observacion;
-        document.getElementById('id_tipo_recaudacion').value = tipo_recaudacion;
-        
-        // Limpiar campos de fecha y hora en modo de edición
-        document.getElementById('fecha').value = '';
-        document.getElementById('hora').value = '';
-    } else if (type === 'view') {
-        modalTitle = 'Ver recaudación';
-        formAction = '';
-        isReadOnly = true;
-        document.getElementById('recaudacionId').value = id;
-        document.getElementById('monto').value = monto;
-        document.getElementById('observacion').value = observacion;
-        document.getElementById('id_tipo_recaudacion').value = tipo_recaudacion;
-        document.getElementById('fecha').value = fecha;
-        document.getElementById('hora').value = hora;
+        limpiarModal();
+    } else if (type === 'edit' || type === 'view') {
+        modalTitle = type === 'edit' ? 'Editar recaudación' : 'Ver recaudación';
+        formAction = type === 'edit' ? '/procesar_actualizar_recaudacion' : '';
+        isReadOnly = type === 'view';
 
-        // Mostrar los campos de fecha y hora solo en modo de visualización
-        document.getElementById('fechaContainer').style.display = 'block';
-        document.getElementById('horaContainer').style.display = 'block';
+        document.getElementById('recaudacionId').value = id;
+        document.getElementById('monto').value = monto;
+        document.getElementById('observacion').value = observacion;
+
+        if (type === 'view') {
+            document.getElementById('fecha').value = fecha;
+            document.getElementById('hora').value = hora;
+            document.getElementById('fechaContainer').style.display = 'block';
+            document.getElementById('horaContainer').style.display = 'block';
+        } else {
+            document.getElementById('fecha').value = '';
+            document.getElementById('hora').value = '';
+        }
+
+        // Seleccionar el tipo de recaudación en base al texto
+        const tipoSelect = document.getElementById('id_tipo_recaudacion');
+        for (let i = 0; i < tipoSelect.options.length; i++) {
+            if (tipoSelect.options[i].text === tipo_recaudacion) {
+                tipoSelect.selectedIndex = i;
+                break;
+            }
+        }
     }
 
-    // Configurar el título y la acción del formulario en el modal
     document.getElementById('recaudacionModalLabel').innerText = modalTitle;
     document.getElementById('recaudacionForm').action = formAction;
 
-    // Asignar el valor de la cookie "sede" al campo de sede y configurarlo como no editable
     const sedeInput = document.getElementById('sede_nombre');
     sedeInput.value = getCookie('sede').replace(/^"|"$/g, '');
     sedeInput.readOnly = true;
     sedeInput.disabled = true;
 
-    // Configurar campos en modo de solo lectura según el tipo de acción
     document.querySelectorAll('#recaudacionForm input, #recaudacionForm select').forEach(function (input) {
         if (input.id !== 'sede_nombre') {
             input.readOnly = isReadOnly;
@@ -87,10 +117,8 @@ function abrirModalRecaudacion(type, id = null, fecha = '', hora = '', monto = '
         }
     });
 
-    // Mostrar el botón de guardar solo si no está en modo "Ver"
     document.getElementById('submitBtn').style.display = isReadOnly ? 'none' : 'block';
 
-    // Mostrar el modal
     const recaudacionModal = new bootstrap.Modal(document.getElementById('recaudacionModal'));
     recaudacionModal.show();
 }
@@ -99,6 +127,7 @@ $('#recaudacionForm').on('submit', function(event) {
     event.preventDefault();
     const formData = $(this).serialize();
     const formAction = $(this).attr('action');
+    console.log("Datos enviados:", formData);
 
     // Deshabilitar el botón para evitar múltiples envíos
     $('#submitBtn').prop('disabled', true);
@@ -179,16 +208,16 @@ function actualizarTabla(recaudaciones) {
 // Función para limpiar los campos del modal
 function limpiarModal() {
     const recaudacionId = document.getElementById('recaudacionId');
+    const tipoRecaudacion = document.getElementById('id_tipo_recaudacion');
     const monto = document.getElementById('monto');
     const observacion = document.getElementById('observacion');
-    const tipoRecaudacion = document.getElementById('id_tipo_recaudacion');
     const fechaContainer = document.getElementById('fechaContainer');
     const horaContainer = document.getElementById('horaContainer');
 
     if (recaudacionId) recaudacionId.value = '';
+    if (tipoRecaudacion) tipoRecaudacion.value = '';
     if (monto) monto.value = '';
     if (observacion) observacion.value = '';
-    if (tipoRecaudacion) tipoRecaudacion.value = '';
     if (fechaContainer) fechaContainer.style.display = 'none';
     if (horaContainer) horaContainer.style.display = 'none';
 }
