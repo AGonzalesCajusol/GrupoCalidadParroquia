@@ -255,13 +255,26 @@ def obtener_rango_de_años():
     conexion = obtener_conexion()
     with conexion.cursor() as cursor:
         cursor.execute("""
-            SELECT MIN(YEAR(fecha)) as año_minimo, MAX(YEAR(fecha)) as año_maximo
-            FROM recaudacion;
+            SELECT DISTINCT YEAR(fecha) as año
+            FROM recaudacion
+            ORDER BY año DESC;
         """)
-        rango_años = cursor.fetchone()
+        rango_años = cursor.fetchall()
+    
+    # Convertimos la lista de tuplas en una lista simple de años
+    return rango_años
+
+# def obtener_rango_de_años():
+#     conexion = obtener_conexion()
+#     with conexion.cursor() as cursor:
+#         cursor.execute("""
+#             SELECT MIN(YEAR(fecha)) as año_minimo, MAX(YEAR(fecha)) as año_maximo
+#             FROM recaudacion;
+#         """)
+#         rango_años = cursor.fetchone()
         
-    # Verifica que el rango de años sea válido
-    if rango_años:
-        año_minimo, año_maximo = rango_años
-        return list(range(año_minimo, año_maximo + 1))
-    return []
+#     # Verifica que el rango de años sea válido
+#     if rango_años:
+#         año_minimo, año_maximo = rango_años
+#         return list(range(año_minimo, año_maximo + 1))
+#     return []

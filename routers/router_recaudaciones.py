@@ -127,4 +127,16 @@ def registrar_rutas(app):
             traceback.print_exc()
             return jsonify(success=False, message=f"Error al insertar recaudación: {str(e)}"), 400
 
-
+    @app.route("/apiaños", methods=["GET"])
+    def apiaños():
+        try:
+            años = obtener_rango_de_años()  # Asegúrate de que esta función retorne una lista de años
+            lista_años = []
+            for an in años:
+                    lista_años.append ({
+                        'año':an	
+                    })
+            return jsonify({'data':lista_años})
+        except Exception as e:
+            print(f"Error al obtener años: {e}")
+            return jsonify({"error": "Error al obtener los años"}), 500
