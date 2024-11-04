@@ -1,4 +1,4 @@
-$(document).ready(function () {
+/* $(document).ready(function () {
     // Inicializar DataTable
     var table = $('#recaudacionesTable').DataTable({
         pageLength: 8,
@@ -9,10 +9,53 @@ $(document).ready(function () {
         initComplete: function () {
             $("div.button-section").html('<button type="button" class="btn btn-success btn-lg custom-btn ml-3 btn-agregar-recaudacion" data-bs-toggle="modal" onclick="abrirModalRecaudacion(\'add\')"><i class="bi bi-person-plus"></i> Agregar recaudación</button>');
             $("div.button-section").append('<button type="button" class="btn btn-success btn-lg custom-btn ml-3" data-bs-toggle="modal" data-bs-target="#exportModal"><i class="bi bi-file-earmark-arrow-down"></i> Exportar recaudaciones</button>');
+         // Agregar el selector de año junto al campo de búsqueda
+         $("div.dataTables_filter").addClass("d-flex align-items-center"); // Para alinear ambos elementos
+         $("div.dataTables_filter").prepend(`
+             <div class="d-flex align-items-center me-3">
+                 <label for="filtroAño" class="me-2">Año:</label>
+                 <select id="filtroAño" class="form-select" style="width: auto;" onchange="filtrarPorAño()">
+                     <option value="">Todos</option>
+                     {% for año in años %}
+                         <option value="{{ año }}">{{ año }}</option>
+                     {% endfor %}
+                 </select>
+             </div>
+         `);
         }
     });
 });
+ */
+$(document).ready(function () {
+    // Inicializar DataTable
+    var table = $('#recaudacionesTable').DataTable({
+        pageLength: 8,
+        dom: '<"d-flex justify-content-between align-items-center mb-3"<"d-flex"f><"d-flex justify-content-end button-section">>rt<"bottom"p>',
+        language: {
+            search: "Buscar:"
+        },
+        initComplete: function () {
+            // Agregar botones para agregar y exportar recaudaciones
+            $("div.button-section").html('<button type="button" class="btn btn-success btn-lg custom-btn ml-3 btn-agregar-recaudacion" data-bs-toggle="modal" onclick="abrirModalRecaudacion(\'add\')"><i class="bi bi-person-plus"></i> Agregar recaudación</button>');
+            $("div.button-section").append('<button type="button" class="btn btn-success btn-lg custom-btn ml-3" data-bs-toggle="modal" data-bs-target="#exportModal"><i class="bi bi-file-earmark-arrow-down"></i> Exportar recaudaciones</button>');
 
+            // Agregar el selector de año después del campo de búsqueda
+            $("div.dataTables_filter").addClass("d-flex align-items-center"); // Para alinear ambos elementos
+            $("div.dataTables_filter").append(`
+                <div class="d-flex align-items-center ms-3">
+                    <label for="filtroAño" class="me-2">Año:</label>
+                    <select id="filtroAño" class="form-select" style="width: auto;" onchange="filtrarPorAño()">
+                        <option value="">Todos</option>
+                        {% for año in años %}
+                            <option value="{{ año }}">{{ año }}</option>
+                        {% endfor %}
+                    </select>
+                </div>
+            `);
+        }
+    });
+});
+S
 $(document).ready(function () {
     // Cambiar el label de "Monto" a "Valoración" según el tipo de recaudación
     $('#id_tipo_recaudacion').on('change', function () {
@@ -44,7 +87,17 @@ $('#recaudacionModal').on('shown.bs.modal', function () {
         });
     }
 });
+// filtro por año en el combo 
+function filtrarPorAño() {
+    const añoSeleccionado = $('#filtroAño').val();
+    const tabla = $('#recaudacionesTable').DataTable();
 
+    if (añoSeleccionado) {
+        tabla.column(4).search('^' + añoSeleccionado, true, false).draw();
+    } else {
+        tabla.column(4).search('').draw();  // Limpiar el filtro si no hay año seleccionado
+    }
+}
 
 
 document.getElementById('monto').addEventListener('input', function () {
