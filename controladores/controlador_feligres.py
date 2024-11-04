@@ -125,7 +125,7 @@ def iniciosesion(dni, contraseña):
                 SELECT
                     CASE 
                         WHEN EXISTS (SELECT 1 FROM ministro WHERE contraseña = %s AND numero_documento = %s) THEN 1
-                        WHEN EXISTS (SELECT 1 FROM feligres AS fe INNER JOIN cuenta AS cu ON fe.id_feligres = cu.id_feligres WHERE dni = %s AND contraseña = %s) THEN 2
+                        WHEN EXISTS (SELECT 1 FROM cuenta WHERE dni = %s AND contraseña = %s) THEN 2
                         ELSE 0
                     END AS resultado;
             """, (contraseña, dni, dni, contraseña))
