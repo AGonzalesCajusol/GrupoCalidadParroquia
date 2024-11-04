@@ -123,16 +123,21 @@ function filtrarPorAño() {
 }
 
 function exportarTablaPDF() {
-    // Obtener todas las filas del DataTable (sin paginación)
+    // Obtener la instancia de DataTable de la tabla original
     const table = $('#recaudacionesTable').DataTable();
-    table.page.len(-1).draw();  // Mostrar todas las filas temporalmente
 
-    // Clonar la tabla original sin las clases de DataTables
+    // Cambiar temporalmente la longitud de página a "All" para mostrar todas las filas
+    table.page.len(-1).draw();
+
+    // Crear una copia de la tabla original después de mostrar todas las filas
     const tablaOriginal = document.getElementById('recaudacionesTable');
     const tablaClonada = tablaOriginal.cloneNode(true);
 
-    // Eliminar la columna de "Acciones" y las clases de DataTables
-    const encabezadoAcciones = tablaClonada.querySelectorAll("th")[6]; // Índice de la columna "Acciones"
+    // Restaurar la paginación original después de clonar la tabla
+    table.page.len(8).draw(); // Cambia "8" a la cantidad de filas que prefieras mostrar por página
+
+    // Eliminar la columna de "Acciones" y las clases de DataTables en el encabezado de la copia
+    const encabezadoAcciones = tablaClonada.querySelectorAll("th")[6];  // Índice de la columna "Acciones"
     if (encabezadoAcciones) encabezadoAcciones.parentNode.removeChild(encabezadoAcciones);
 
     const encabezados = tablaClonada.querySelectorAll("th");
@@ -142,7 +147,7 @@ function exportarTablaPDF() {
 
     const filas = tablaClonada.querySelectorAll("tbody tr");
     filas.forEach(fila => {
-        const celdaAcciones = fila.querySelectorAll("td")[6]; // Índice de la columna "Acciones"
+        const celdaAcciones = fila.querySelectorAll("td")[6];  // Índice de la columna "Acciones"
         if (celdaAcciones) {
             celdaAcciones.parentNode.removeChild(celdaAcciones);
         }
@@ -151,35 +156,34 @@ function exportarTablaPDF() {
     // Crear un contenedor temporal para el PDF
     const contenedorPDF = document.createElement("div");
 
-    // Estilo para el contenedor y agregar título
+    // Estilo del contenedor y título
     contenedorPDF.style.fontFamily = 'Arial, sans-serif';
     contenedorPDF.style.textAlign = 'center';
 
     const titulo = document.createElement("h2");
-    titulo.innerText = "Gestión de Recaudaciones";
+    titulo.innerText = "Informe de Recaudaciones";
     contenedorPDF.appendChild(titulo);
 
-    // Añadir la tabla clonada al contenedor y aplicar estilos
+    // Agregar la tabla clonada al contenedor y aplicar estilos de diseño limpio
     contenedorPDF.appendChild(tablaClonada);
     tablaClonada.style.borderCollapse = 'collapse';
     tablaClonada.style.width = '100%';
     tablaClonada.querySelectorAll('th, td').forEach(cell => {
         cell.style.border = '1px solid #ddd';
         cell.style.padding = '8px';
+        cell.style.textAlign = 'center';
     });
 
     // Exportar a PDF usando html2pdf
     html2pdf().from(contenedorPDF).set({
         margin: 1,
-        filename: 'Recaudaciones.pdf',
+        filename: 'Informe_Recaudaciones.pdf',
         image: { type: 'jpeg', quality: 1 },
         html2canvas: { scale: 2 },
         jsPDF: { unit: 'cm', format: 'a4', orientation: 'portrait' }
     }).save();
-
-    // Restaurar la configuración de paginación original de la tabla
-    table.page.len(8).draw();  // Restablece la paginación
 }
+
 
 
 
