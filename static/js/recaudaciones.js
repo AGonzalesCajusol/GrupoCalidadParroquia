@@ -9,18 +9,30 @@
         initComplete: function () {
             $("div.button-section").html('<button type="button" class="btn btn-success btn-lg custom-btn ml-3 btn-agregar-recaudacion" data-bs-toggle="modal" onclick="abrirModalRecaudacion(\'add\')"><i class="bi bi-person-plus"></i> Agregar recaudación</button>');
             $("div.button-section").append('<button type="button" class="btn btn-success btn-lg custom-btn ml-3" data-bs-toggle="modal" data-bs-target="#exportModal"><i class="bi bi-file-earmark-arrow-down"></i> Exportar recaudaciones</button>');
-         // Agregar el selector de año junto al campo de búsqueda
-         $("div.dataTables_filter").addClass("d-flex align-items-center"); // Para alinear ambos elementos
-         $("div.dataTables_filter").prepend(`
-             <div class="d-flex align-items-center me-3">
-                 <label for="filtroAño" class="me-2">Año:</label>
-                 <select id="filtroAño" class="form-select" style="width: auto;" onchange="filtrarPorAño()">
-                     <option value="">Todos</option>
-                     {% for año in años %}
-                         <option value="{{ año }}">{{ año }}</option>
-                     {% endfor %}
-                 </select>
-             </div>
+         let opciones = '<option value="">Todos</option>';
+
+            fetch("/apiaños")
+                .then(response => response.json())
+                .then(response => { 
+                    // Generar las opciones directamente en la variable opciones
+                    response.data.forEach(element => {
+                        opciones += `<option value="${element.año}">${element.año}</option>`;
+                    });
+
+                    // Insertar el selector de año en el DOM después de que opciones esté lleno
+                    $("div.dataTables_filter").addClass("d-flex align-items-center"); // Para alinear ambos elementos
+                    $("div.dataTables_filter").append(`
+                        <div class="d-flex align-items-center ms-2">
+                            <label for="filtroAño" class="me-2">Año:</label>
+                            <select id="filtroAño" class="form-select" style="width: auto;" onchange="filtrarPorAño()">
+                                ${opciones}
+                            </select>
+                        </div>
+                    `);
+                })
+                .catch(error => {
+                    console.error("Error al cargar los años:", error);
+                });
          `);
         }
     });
@@ -37,7 +49,7 @@ $(document).ready(function () {
         initComplete: function () {
             // Agregar botones para agregar y exportar recaudaciones
             $("div.button-section").html('<button type="button" class="btn btn-success btn-lg custom-btn ml-3 btn-agregar-recaudacion" data-bs-toggle="modal" onclick="abrirModalRecaudacion(\'add\')"><i class="bi bi-person-plus"></i> Agregar recaudación</button>');
-            $("div.button-section").append('<button type="button" class="btn btn-success btn-lg custom-btn ml-3" data-bs-toggle="modal" data-bs-target="#exportModal"><i class="bi bi-file-earmark-arrow-down"></i> Exportar recaudaciones</button>');
+            $("div.button-section").append('<button type="button" onclick= "exportarTablaPDF()" class="btn btn-success btn-lg custom-btn ml-3" data-bs-toggle="modal" data-bs-target="#exportModal"><i class="bi bi-file-earmark-arrow-down"></i> Exportar recaudaciones</button>');
             let opciones = '<option value="">Todos</option>';
 
             fetch("/apiaños")
@@ -108,6 +120,20 @@ function filtrarPorAño() {
     } else {
         tabla.column(4).search('').draw();  // Limpiar el filtro
     }
+}
+
+function exportarTablaPDF() {
+    const tabla = document.getElementById('recaudacionesTable');
+    const tabla2 = tabla.cloneNode(true); // Clona la tabla existente
+    tabla2.id = 'miTablaClonada';
+
+    html2pdf(tabla2, {
+        margin: 1,
+        filename: 'Recaudaciones.pdf',
+        image: { type: 'jpeg', quality: 1 },
+        html2canvas: { scale: 2 },
+        jsPDF: { unit: 'cm', format: 'a4', orientation: 'portrait' }
+    });
 }
 
 
