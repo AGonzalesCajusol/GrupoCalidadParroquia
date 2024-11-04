@@ -123,65 +123,68 @@ function filtrarPorAño() {
 }
 
 function exportarTablaPDF() {
-    // Obtener la instancia de DataTable de la tabla original
+    const { jsPDF } = window.jspdf;
+    const doc = new jsPDF();
+
+    // Título del informe
+    doc.setFontSize(18);
+    doc.text("Informe de Recaudaciones", 14, 20);
+
+    // Obtener solo las filas visibles en la tabla (las filtradas)
     const table = $('#recaudacionesTable').DataTable();
-
-    // Cambiar temporalmente la longitud de página a "All" para mostrar todas las filas
-    table.page.len(-1).draw();
-
-    // Crear una copia de la tabla original después de mostrar todas las filas
-    const tablaOriginal = document.getElementById('recaudacionesTable');
-    const tablaClonada = tablaOriginal.cloneNode(true);
-
-    // Restaurar la paginación original después de clonar la tabla
-    table.page.len(8).draw(); // Cambia "8" a la cantidad de filas que prefieras mostrar por página
-
-    // Eliminar la columna de "Acciones" y las clases de DataTables en el encabezado de la copia
-    const encabezadoAcciones = tablaClonada.querySelectorAll("th")[6];  // Índice de la columna "Acciones"
-    if (encabezadoAcciones) encabezadoAcciones.parentNode.removeChild(encabezadoAcciones);
-
-    const encabezados = tablaClonada.querySelectorAll("th");
-    encabezados.forEach((th) => {
-        th.classList.remove('sorting', 'sorting_asc', 'sorting_desc');
+    const datos = [];
+    table.rows({ search: 'applied' }).every(function () {
+        const data = this.data();
+        datos.push([
+            data[0], // ID
+            data[1], // Sede
+            data[2], // Tipo
+            data[3], // Observaciones
+            data[4], // Fecha
+            data[5]  // Monto
+        ]);
     });
 
-    const filas = tablaClonada.querySelectorAll("tbody tr");
-    filas.forEach(fila => {
-        const celdaAcciones = fila.querySelectorAll("td")[6];  // Índice de la columna "Acciones"
-        if (celdaAcciones) {
-            celdaAcciones.parentNode.removeChild(celdaAcciones);
+    // Configuración de la tabla en el PDF
+    doc.autoTable({
+        head: [['ID', 'Sede', 'Tipo', 'Observaciones', 'Fecha', 'Monto']],
+        body: datos,
+        startY: 30,
+        styles: {
+            fontSize: 10,
+            cellPadding: 3,
+            valign: 'middle',
+            halign: 'center', // Alinear el texto al centro
+        },
+        headStyles: {
+            fillColor: [167, 192, 221], // Color de encabezado
+            textColor: 255, // Texto en blanco
+            fontSize: 11,
+            fontStyle: 'bold',
+        },
+        bodyStyles: {
+            textColor: [0, 0, 0],
+        },
+        alternateRowStyles: {
+            fillColor: [240, 248, 255], // Alternar color de fondo de las filas
+        },
+        columnStyles: {
+            0: { cellWidth: 15 },   // ID
+            1: { cellWidth: 30 },   // Sede
+            2: { cellWidth: 40 },   // Tipo
+            3: { cellWidth: 50 },   // Observaciones
+            4: { cellWidth: 25 },   // Fecha
+            5: { cellWidth: 20 },   // Monto
+        },
+        didDrawPage: function (data) {
+            // Encabezado de página
+            doc.setFontSize(10);
+            doc.text("Página " + doc.internal.getCurrentPageInfo().pageNumber, 180, 10);
         }
     });
 
-    // Crear un contenedor temporal para el PDF
-    const contenedorPDF = document.createElement("div");
-
-    // Estilo del contenedor y título
-    contenedorPDF.style.fontFamily = 'Arial, sans-serif';
-    contenedorPDF.style.textAlign = 'center';
-
-    const titulo = document.createElement("h2");
-    titulo.innerText = "Informe de Recaudaciones";
-    contenedorPDF.appendChild(titulo);
-
-    // Agregar la tabla clonada al contenedor y aplicar estilos de diseño limpio
-    contenedorPDF.appendChild(tablaClonada);
-    tablaClonada.style.borderCollapse = 'collapse';
-    tablaClonada.style.width = '100%';
-    tablaClonada.querySelectorAll('th, td').forEach(cell => {
-        cell.style.border = '1px solid #ddd';
-        cell.style.padding = '8px';
-        cell.style.textAlign = 'center';
-    });
-
-    // Exportar a PDF usando html2pdf
-    html2pdf().from(contenedorPDF).set({
-        margin: 1,
-        filename: 'Informe_Recaudaciones.pdf',
-        image: { type: 'jpeg', quality: 1 },
-        html2canvas: { scale: 2 },
-        jsPDF: { unit: 'cm', format: 'a4', orientation: 'portrait' }
-    }).save();
+    // Guardar el PDF
+    doc.save("Informe_Recaudaciones.pdf");
 }
 
 
