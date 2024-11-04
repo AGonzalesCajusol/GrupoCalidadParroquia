@@ -122,7 +122,7 @@ function abir() {
     const submitBtn = document.getElementById('submitBtn');
     const formSede = document.getElementById('formSede'); // Obtener el formulario
 
-    modalTitle.textContent = 'Agregar Sede';
+    modalTitle.textContent = 'Agregar sede';
     submitBtn.textContent = 'Guardar';
 
     // Cambiar el action del formulario para que apunte a la ruta de inserción
@@ -161,7 +161,7 @@ function abrirModalEditar(id, nombre, direccion, creacion, telefono, correo, mon
     const submitBtn = document.getElementById('submitBtn');
     const formSede = document.getElementById('formSede'); // Obtener el formulario
 
-    modalTitle.textContent = 'Editar Sede';
+    modalTitle.textContent = 'Editar sede';
     submitBtn.textContent = 'Guardar cambios';
 
     // Cambia el evento de envío para usar AJAX

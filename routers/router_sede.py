@@ -139,7 +139,6 @@ def registrar_rutas(app):
                 } for s in sedes
             ]})
 
-
         except Exception as e:
             error_message = str(e)
             print(f"Error al actualizar la sede: {error_message}")

@@ -2,10 +2,19 @@ from bd import obtener_conexion
 
 def insertar_congregacion(nombre):
     conexion = obtener_conexion()
-    with conexion.cursor() as cursor:
-        cursor.execute("INSERT INTO congregacion(nombre_congregacion) VALUES (%s)", (nombre,))
-    conexion.commit()
-    conexion.close()
+    try:
+        with conexion.cursor() as cursor:
+            cursor.execute('''
+                           INSERT INTO congregacion(nombre_congregacion) 
+                           VALUES (%s)
+                           ''', (nombre,))
+        conexion.commit()
+    except Exception as e:
+        print(f"Error: {e}")
+        conexion.rollback()
+        return None
+    finally:
+        conexion.close()
 
 def obtener_congregacion():
     conexion = obtener_conexion()

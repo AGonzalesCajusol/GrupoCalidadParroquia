@@ -2,22 +2,28 @@ from flask import request, redirect, url_for, render_template, flash
 from bd import obtener_conexion
 from datetime import datetime
 
+from datetime import datetime
+from bd import obtener_conexion
+
 def insertar_recaudacion(monto, observacion, id_sede, id_tipo_recaudacion):
     conexion = obtener_conexion()
     try:
         with conexion.cursor() as cursor:
+            # Obtener el siguiente ID de recaudación
             cursor.execute("SELECT COALESCE(MAX(id_recaudacion) + 1, 1) as siguiente_id FROM recaudacion")
             siguiente_id = cursor.fetchone()[0]
 
+            # Establecer la fecha y hora actuales
             fecha_actual = datetime.now().strftime('%Y-%m-%d')
             hora_actual = datetime.now().strftime('%H:%M:%S')
 
-            # Inserción de la nueva recaudación
+            # Inserción de la nueva recaudación (sin el campo 'estado')
             cursor.execute("""
-                INSERT INTO recaudacion (id_recaudacion, fecha, hora, monto, observacion, estado, id_sede, id_tipo_recaudacion)
-                VALUES (%s, %s, %s, %s, %s, %s, %s, %s)
+                INSERT INTO recaudacion (id_recaudacion, fecha, hora, monto, observacion, id_sede, id_tipo_recaudacion)
+                VALUES (%s, %s, %s, %s, %s, %s, %s)
             """, (siguiente_id, fecha_actual, hora_actual, monto, observacion, id_sede, id_tipo_recaudacion))
 
+        # Confirmar los cambios en la base de datos
         conexion.commit()
         return siguiente_id
     except Exception as e:
@@ -26,7 +32,6 @@ def insertar_recaudacion(monto, observacion, id_sede, id_tipo_recaudacion):
         return None
     finally:
         conexion.close()
-
 def obtener_recaudaciones():
     conexion = obtener_conexion()
     try:
@@ -127,11 +132,13 @@ def eliminar_recaudacion(id_recaudacion):
         conexion.rollback()
     finally:
         conexion.close()
+        
 def obtener_tipos_recaudacion():
-    conexion = obtener_conexion()  # Asumiendo que tienes una función para obtener la conexión
+    conexion = obtener_conexion()
     try:
         with conexion.cursor() as cursor:
-            cursor.execute("SELECT id_tipo_recaudacion, nombre_recaudacion FROM tipo_recaudacion")
+            # Solo selecciona los tipos de recaudación donde estado = 1
+            cursor.execute("SELECT id_tipo_recaudacion, nombre_recaudacion FROM tipo_recaudacion WHERE estado = 1")
             tipos_recaudacion = cursor.fetchall()
         return tipos_recaudacion
     except Exception as e:
@@ -139,6 +146,7 @@ def obtener_tipos_recaudacion():
         return []
     finally:
         conexion.close()
+
         
 def obtener_nombre_sede(sede_id):
     conexion = obtener_conexion()
@@ -247,13 +255,26 @@ def obtener_rango_de_años():
     conexion = obtener_conexion()
     with conexion.cursor() as cursor:
         cursor.execute("""
-            SELECT MIN(YEAR(fecha)) as año_minimo, MAX(YEAR(fecha)) as año_maximo
-            FROM recaudacion;
+            SELECT DISTINCT YEAR(fecha) as año
+            FROM recaudacion
+            ORDER BY año DESC;
         """)
-        rango_años = cursor.fetchone()
+        rango_años = cursor.fetchall()
+    
+    # Convertimos la lista de tuplas en una lista simple de años
+    return rango_años
+
+# def obtener_rango_de_años():
+#     conexion = obtener_conexion()
+#     with conexion.cursor() as cursor:
+#         cursor.execute("""
+#             SELECT MIN(YEAR(fecha)) as año_minimo, MAX(YEAR(fecha)) as año_maximo
+#             FROM recaudacion;
+#         """)
+#         rango_años = cursor.fetchone()
         
-    # Verifica que el rango de años sea válido
-    if rango_años:
-        año_minimo, año_maximo = rango_años
-        return list(range(año_minimo, año_maximo + 1))
-    return []
+#     # Verifica que el rango de años sea válido
+#     if rango_años:
+#         año_minimo, año_maximo = rango_años
+#         return list(range(año_minimo, año_maximo + 1))
+#     return []

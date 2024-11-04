@@ -51,19 +51,39 @@ function abirC() {
 }
 
 
-
 function abrirModalEditarC(id, nombre, estado) {
     var modalCongreg = new bootstrap.Modal(document.getElementById('modalCongregacion'));
 
     const modalTitle = document.getElementById('ModalCongregacionLabel');
     const submitBtn = document.getElementById('submitBtn');
-    const formCongregacion = document.getElementById('formCongregacion'); // Obtener el formulario
+    const formCongregacion = document.getElementById('formCongregacion');
 
     modalTitle.textContent = 'Editar Congregación';
     submitBtn.textContent = 'Guardar cambios';
 
-    // Cambiar el action del formulario para que apunte a la ruta de actualización
-    formCongregacion.setAttribute('action', actualizarCongreURL);
+    // Cambia el evento de envío para usar AJAX en lugar del envío tradicional
+    formCongregacion.onsubmit = function(event) {
+        event.preventDefault();  // Previene el envío tradicional
+
+        const formData = new FormData(formCongregacion);
+
+        fetch(actualizarCongreURL, {
+            method: 'POST',
+            body: formData,
+        })
+        .then(response => response.json())
+        .then(data => {
+            if (data.success) {
+                actualizarTablaCongregacion(data.congregacion); // Actualiza la tabla con los nuevos datos
+                modalCongreg.hide(); // Cierra el modal
+            } else {
+                console.error("Error al actualizar la congregación:", data.message);
+            }
+        })
+        .catch(error => {
+            console.error("Error en la solicitud de actualización:", error);
+        });
+    };
 
     // Llenar los campos con los datos existentes
     document.getElementById('congregacionId').value = id;
@@ -98,36 +118,90 @@ function abrirModalVerC(id, nombre, estado) {
 
     // Al cerrar el modal, restablecer los campos
     document.getElementById('modalCongregacion').addEventListener('hidden.bs.modal', function () {
-        // Eliminar el atributo 'disabled' de los campos
         document.getElementById('nombre_congregacion').removeAttribute('disabled');
         document.getElementById('estado').removeAttribute('disabled');
 
-        // Volver a mostrar el botón de Guardar si es necesario en otros contextos
         submitBtn.style.display = 'block';
     });
 
-    // Mostrar el modal
     modalCongreg.show();
 }
 
 
 function darBajaCongre(id, estado) {
-    // Comprobar si la sede ya está inactiva
-    if (estado === false || estado === 'false' || estado === '0') {
-        alert('La Congregación ya está dada de baja.');
-        // Deshabilitar el botón de "Dar de baja"
-        const button = document.querySelector(`button[onclick="darBajaCongre('${id}', '${estado}')"]`);
-        if (button) {
-            button.setAttribute('disabled', 'disabled');
-        }
-        return; // Salir de la función
+    if (estado === '0' || estado === false || estado === 'false') {
+        return;
     }
 
-    // Proceder con dar de baja si el estado es activo
-    const formCongregacion = document.getElementById('formCongregacion');
-    formCongregacion.setAttribute('action', darBajaCongreURL);
-    document.getElementById('congregacionId').value = id;
+    if (confirm("¿Estás seguro de que deseas dar de baja esta congregación?")) {
+        const table = $('#sedeTable').DataTable();
+        const currentPage = table.page();
 
-    alert('Estado de la congregación cambiado exitosamente a Inactivo');
-    formCongregacion.submit();
+        fetch(darBajaCongreURL, {
+            method: "POST",
+            headers: {
+                "Content-Type": "application/x-www-form-urlencoded",
+            },
+            body: `id=${encodeURIComponent(id)}`
+        })
+        .then(response => response.json())
+        .then(data => {
+            console.log("Data recibida del servidor:", data); // Verificar datos recibidos
+            if (data.success) {
+                actualizarTablaCongregacion(data.congregacion);  // Llamada para actualizar la tabla
+                table.page(currentPage).draw(false); // Mantener la misma página de paginación
+            } else {
+                console.error("Error:", data.message); // Mensaje de error en consola
+            }
+        })
+        .catch(error => {
+            console.error("Error en la solicitud:", error);
+        });
+    }
+}
+
+function actualizarTablaCongregacion(congregacion) {
+    const tbody = document.querySelector('#sedeTable tbody');
+    const table = $('#sedeTable').DataTable();
+    const currentPage = table.page();
+
+    tbody.innerHTML = ''; // Limpiar la tabla
+
+    // Crear filas con los datos actualizados
+    congregacion.forEach(Congre => {
+        const row = document.createElement('tr');
+        row.innerHTML = `
+            <td class="text-center border">${Congre.id}</td>
+            <td>${Congre.nombre_congregacion}</td>
+            <td>${Congre.estado == '1' ? 'Activo' : 'Inactivo'}</td>
+            <td class="text-center border">
+                <button class="btn btn-primary btn-sm" title="Ver"
+                    onclick="abrirModalVerC('${Congre.id}','${Congre.nombre_congregacion}','${Congre.estado}')">
+                    <i class="fas fa-eye"></i>
+                </button>
+                <button class="btn btn-warning btn-sm" title="Editar"
+                    onclick="abrirModalEditarC('${Congre.id}','${Congre.nombre_congregacion}','${Congre.estado}')">
+                    <i class="fas fa-edit"></i>
+                </button>
+                <button class="btn btn-secondary btn-sm" title="Dar de baja"
+                    onclick="darBajaCongre('${Congre.id}', '${Congre.estado}')"
+                    ${Congre.estado == "0" ? 'disabled' : ''}>
+                    <i class="fas fa-ban"></i>
+                </button>
+                <form style="display:inline-block;" onsubmit="eliminarCongre(event, '${Congre.id}')">
+                    <button type="submit" class="btn btn-danger btn-sm"
+                            onclick="return confirm('¿Estás seguro de que deseas eliminar esta congregación?');">
+                        <i class="fas fa-trash-alt"></i>
+                    </button>
+                </form>
+            </td>
+        `;
+
+        tbody.appendChild(row);
+    });
+
+    table.clear();
+    table.rows.add($(tbody).find('tr'));
+    table.draw(false);
+    table.page(currentPage).draw(false);
 }

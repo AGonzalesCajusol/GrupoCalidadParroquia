@@ -20,7 +20,7 @@
                 <tr>
                     <td class="text-center border">{{ congre[0] }}</td> <!-- ID del congregacion -->
                     <td>{{ congre[1] }}</td> <!-- Nombre de la congregacion -->
-                    <td>{{ 'Activo' if congre[2] == 1 else 'Inactivo' }}</td>
+                    <td style="vertical-align: middle; text-align: center">{{ 'Activo' if congre[2] == 1 else 'Inactivo' }}</td>
 
                     <td class="text-center border">
 
@@ -35,7 +35,7 @@
                         </button>
 
                         <button type="button" class="btn btn-secondary btn-sm" title="Dar de baja"
-                            onclick="darBajaCongre('{{ congre[0] }}')"
+                            onclick="darBajaCongre('{{ congre[0] }}','{{ congre[2] }}')"
                             {% if congre[2] == 0 %} disabled {% endif %}>
                             <i class="fas fa-ban"></i>
                     </button>

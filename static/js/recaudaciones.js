@@ -1,3 +1,43 @@
+/* $(document).ready(function () {
+    // Inicializar DataTable
+    var table = $('#recaudacionesTable').DataTable({
+        pageLength: 8,
+        dom: '<"d-flex justify-content-between align-items-center mb-3"<"d-flex"f><"d-flex justify-content-end button-section">>rt<"bottom"p>',
+        language: {
+            search: "Buscar:"
+        },
+        initComplete: function () {
+            $("div.button-section").html('<button type="button" class="btn btn-success btn-lg custom-btn ml-3 btn-agregar-recaudacion" data-bs-toggle="modal" onclick="abrirModalRecaudacion(\'add\')"><i class="bi bi-person-plus"></i> Agregar recaudación</button>');
+            $("div.button-section").append('<button type="button" class="btn btn-success btn-lg custom-btn ml-3" data-bs-toggle="modal" data-bs-target="#exportModal"><i class="bi bi-file-earmark-arrow-down"></i> Exportar recaudaciones</button>');
+         let opciones = '<option value="">Todos</option>';
+
+            fetch("/apiaños")
+                .then(response => response.json())
+                .then(response => { 
+                    // Generar las opciones directamente en la variable opciones
+                    response.data.forEach(element => {
+                        opciones += `<option value="${element.año}">${element.año}</option>`;
+                    });
+
+                    // Insertar el selector de año en el DOM después de que opciones esté lleno
+                    $("div.dataTables_filter").addClass("d-flex align-items-center"); // Para alinear ambos elementos
+                    $("div.dataTables_filter").append(`
+                        <div class="d-flex align-items-center ms-2">
+                            <label for="filtroAño" class="me-2">Año:</label>
+                            <select id="filtroAño" class="form-select" style="width: auto;" onchange="filtrarPorAño()">
+                                ${opciones}
+                            </select>
+                        </div>
+                    `);
+                })
+                .catch(error => {
+                    console.error("Error al cargar los años:", error);
+                });
+         `);
+        }
+    });
+});
+ */
 $(document).ready(function () {
     // Inicializar DataTable
     var table = $('#recaudacionesTable').DataTable({
@@ -7,309 +47,360 @@ $(document).ready(function () {
             search: "Buscar:"
         },
         initComplete: function () {
-            // Botones para agregar y exportar recaudaciones
-            $("div.button-section").html('<button type="button" class="btn btn-success btn-lg custom-btn ml-3 btn-agregar-recaudacion" data-bs-toggle="modal" onclick="abrirModalRecaudacion(\'agregar\')"><i class="bi bi-person-plus"></i> Agregar Recaudación</button>');
-            $("div.button-section").append('<button type="button" class="btn btn-success btn-lg custom-btn ml-3" data-bs-toggle="modal" data-bs-target="#exportModal"><i class="bi bi-file-earmark-arrow-down"></i> Exportar Recaudaciones</button>');
+            // Agregar botones para agregar y exportar recaudaciones
+            $("div.button-section").html('<button type="button" class="btn btn-success btn-lg custom-btn ml-3 btn-agregar-recaudacion" data-bs-toggle="modal" onclick="abrirModalRecaudacion(\'add\')"><i class="bi bi-person-plus"></i> Agregar recaudación</button>');
+            $("div.button-section").append('<button type="button" onclick= "exportarTablaPDF()" class="btn btn-success btn-lg custom-btn ml-3" data-bs-toggle="modal" data-bs-target="#exportModal"><i class="bi bi-file-earmark-arrow-down"></i> Exportar recaudaciones</button>');
+            let opciones = '<option value="">Todos</option>';
+
+            fetch("/apiaños")
+                .then(response => response.json())
+                .then(response => { 
+                    // Generar las opciones directamente en la variable opciones
+                    response.data.forEach(element => {
+                        opciones += `<option value="${element.año}">${element.año}</option>`;
+                    });
+
+                    // Insertar el selector de año en el DOM después de que opciones esté lleno
+                    $("div.dataTables_filter").addClass("d-flex align-items-center"); // Para alinear ambos elementos
+                    $("div.dataTables_filter").append(`
+                        <div class="d-flex align-items-center ms-2">
+                            <label for="filtroAño" class="me-2">Año:</label>
+                            <select id="filtroAño" class="form-select" style="width: auto;" onchange="filtrarPorAño()">
+                                ${opciones}
+                            </select>
+                        </div>
+                    `);
+                })
+                .catch(error => {
+                    console.error("Error al cargar los años:", error);
+                });
         }
     });
 });
 
+$(document).ready(function () {
+    // Cambiar el label de "Monto" a "Valoración" según el tipo de recaudación
+    $('#id_tipo_recaudacion').on('change', function () {
+        const selectedType = $(this).find("option:selected").text().toLowerCase();
+        const montoLabel = $('label[for="monto"]');
 
-// Validación para el monto de recaudación
-document.getElementById('monto').addEventListener('input', function () {
-    const montoValue = this.value.trim();
-    if (montoValue === '' || isNaN(montoValue)) {
-        this.setCustomValidity('El monto debe ser un número válido y no puede estar vacío.');
-    } else {
-        this.setCustomValidity('');
+        // Verificar si el tipo seleccionado es "No Monetario"
+        if (selectedType.includes("no monetario") || selectedType.includes("intercambio") || selectedType.includes("donación")) { 
+            montoLabel.text('Valoración');
+        } else {
+            montoLabel.text('Monto');
+        }
+    });
+
+    // Trigger para ejecutar el cambio de label cuando el modal se abre con el tipo ya seleccionado
+    $('#id_tipo_recaudacion').trigger('change');
+});
+
+$('#recaudacionModal').on('shown.bs.modal', function () {
+    const nombreRecaudacionInput = document.getElementById('nombre_recaudacion');
+    if (nombreRecaudacionInput) {
+        nombreRecaudacionInput.addEventListener('input', function () {
+            const nombreRecaudacion = this.value.trim();
+            if (nombreRecaudacion === '') {
+                this.setCustomValidity('El nombre de la recaudación no puede estar vacío ni contener solo espacios en blanco.');
+            } else {
+                this.setCustomValidity('');
+            }
+        });
     }
 });
-function abrirModalRecaudacion(accion, id = '', fecha = '', hora = '', monto = '', observacion = '', tipoRecaudacion = '') {
-    const modalElement = document.getElementById('recaudacionModal');
-    if (!modalElement) {
-        console.error("No se encontró el modal con el ID 'recaudacionModal'");
-        return;
-    }
+// filtro por año en el combo 
+function filtrarPorAño() {
+    const añoSeleccionado = $('#filtroAño').val();
+    const tabla = $('#recaudacionesTable').DataTable();
 
-    const modal = new bootstrap.Modal(modalElement);
-
-    // Restablecer el formulario y valores previos
-    document.getElementById('recaudacionForm').reset();
-    document.getElementById('recaudacionId').value = id || '';
-    document.getElementById('monto').value = monto || '';
-    document.getElementById('observacion').value = observacion || '';
-
-    // Obtener el nombre de la sede desde la cookie y mostrarlo en el campo de solo lectura
-    const sedeNombre = getCookie('sede');  // Obtener el nombre de la sede desde la cookie
-    document.getElementById('sede_nombre').value = sedeNombre || 'Sede no encontrada';
-    
-    // Obtener el ID de la sede y configurarlo en el campo oculto
-    const sedeIdField = document.getElementById('sede_id');
-    sedeIdField.value = id || ''; // Establece el ID en caso de edición; en agregar se deja vacío.
-
-    // Configurar el tipo de recaudación en el combobox
-    const tipoRecaudacionSelect = document.getElementById('id_tipo_recaudacion');
-
-    // Configurar los campos de acuerdo a la acción
-    if (accion === 'ver') {
-        // Configuración para "Ver"
-        document.getElementById('monto').setAttribute('readonly', true);    
-        document.getElementById('observacion').setAttribute('readonly', true);
-        tipoRecaudacionSelect.setAttribute('disabled', true);
-
-        // Mostrar campos de fecha y hora en modo ver
-        document.getElementById('fechaContainer').style.display = 'block';
-        document.getElementById('horaContainer').style.display = 'block';
-        document.getElementById('fecha').value = fecha;
-        document.getElementById('hora').value = hora;
-
-        // Configurar el título y el botón del modal
-        document.getElementById('recaudacionModalLabel').innerText = 'Ver Recaudación';
-        document.getElementById('recaudacionForm').action = ''; // No necesita acción en modo ver
-        document.querySelector('#recaudacionForm button[type="submit"]').style.display = 'none'; // Ocultar botón de guardar
+    if (añoSeleccionado) {
+        // Ajusta el filtro para buscar el año en cualquier parte de la cadena de la fecha
+        tabla.column(4).search(añoSeleccionado, true, false).draw();
     } else {
-        // Configuración para "Agregar" y "Editar"
-        document.getElementById('monto').removeAttribute('readonly');
-        document.getElementById('observacion').removeAttribute('readonly');
-        tipoRecaudacionSelect.removeAttribute('disabled');
-
-
-        // Ocultar los campos de fecha y hora en modo editar y agregar
-        document.getElementById('fechaContainer').style.display = 'none';
-        document.getElementById('horaContainer').style.display = 'none';
-
-        // Configurar el título y el botón del modal
-        if (accion === 'editar') {
-            document.getElementById('recaudacionModalLabel').innerText = 'Editar Recaudación';
-            document.getElementById('recaudacionForm').action = '/procesar_actualizar_recaudacion';
-            document.querySelector('#recaudacionForm button[type="submit"]').style.display = 'block';
-            document.querySelector('#recaudacionForm button[type="submit"]').innerText = 'Guardar cambios';
-        } else if (accion === 'agregar') {
-            document.getElementById('recaudacionModalLabel').innerText = 'Agregar Recaudación';
-            document.getElementById('recaudacionForm').action = '/insertar_recaudacion';
-            document.querySelector('#recaudacionForm button[type="submit"]').style.display = 'block';
-            document.querySelector('#recaudacionForm button[type="submit"]').innerText = 'Guardar';
-        }
+        tabla.column(4).search('').draw();  // Limpiar el filtro
     }
-
-    // Mostrar el modal configurado
-    modal.show();
-}
-function getCookie(name) {
-    const cookies = document.cookie.split(';');
-    for (let i = 0; i < cookies.length; i++) {
-        const cookie = cookies[i].trim();
-        if (cookie.startsWith(name + '=')) {
-            return cookie.substring(name.length + 1);
-        }
-    }
-    return null;
 }
 
-document.getElementById('recaudacionForm').addEventListener('submit', function(event) {
-    event.preventDefault();
+function exportarTablaPDF() {
+    const { jsPDF } = window.jspdf;
+    const doc = new jsPDF();
 
-    const form = event.target;
-    const formData = new FormData(form);
+    // Título del informe
+    doc.setFontSize(18);
+    doc.text("Informe de Recaudaciones", 14, 20);
 
+    // Obtener solo las filas visibles en la tabla (las filtradas)
+    const table = $('#recaudacionesTable').DataTable();
+    const datos = [];
+    table.rows({ search: 'applied' }).every(function () {
+        const data = this.data();
+        datos.push([
+            data[0], // ID
+            data[1], // Sede
+            data[2], // Tipo
+            data[3], // Observaciones
+            data[4], // Fecha
+            data[5]  // Monto
+        ]);
+    });
+
+    // Configuración de la tabla en el PDF
+    doc.autoTable({
+        head: [['ID', 'Sede', 'Tipo', 'Observaciones', 'Fecha', 'Monto']],
+        body: datos,
+        startY: 30,
+        styles: {
+            fontSize: 10,
+            cellPadding: 3,
+            valign: 'middle',
+            halign: 'center', // Alinear el texto al centro
+        },
+        headStyles: {
+            fillColor: [167, 192, 221], // Color de encabezado
+            textColor: 255, // Texto en blanco
+            fontSize: 11,
+            fontStyle: 'bold',
+        },
+        bodyStyles: {
+            textColor: [0, 0, 0],
+        },
+        alternateRowStyles: {
+            fillColor: [240, 248, 255], // Alternar color de fondo de las filas
+        },
+        columnStyles: {
+            0: { cellWidth: 15 },   // ID
+            1: { cellWidth: 30 },   // Sede
+            2: { cellWidth: 40 },   // Tipo
+            3: { cellWidth: 50 },   // Observaciones
+            4: { cellWidth: 25 },   // Fecha
+            5: { cellWidth: 20 },   // Monto
+        },
+        didDrawPage: function (data) {
+            // Encabezado de página
+            doc.setFontSize(10);
+            doc.text("Página " + doc.internal.getCurrentPageInfo().pageNumber, 180, 10);
+        }
+    });
+
+    // Guardar el PDF
+    doc.save("Informe_Recaudaciones.pdf");
+}
+
+
+
+
+
+document.getElementById('monto').addEventListener('input', function () {
+    const valoracionInput = this.value;
+
+    // Expresión regular que permite solo números positivos con hasta dos decimales
+    const isValid = /^[0-9]*\.?[0-9]{0,2}$/.test(valoracionInput);
     
+    if (!isValid) {
+        this.value = valoracionInput.slice(0, -1);  // Elimina el último carácter ingresado si es inválido
+    }
+});
 
-    const actionUrl = form.getAttribute('action');
-    const submitBtn = document.getElementById('submitBtn');
-    submitBtn.disabled = true;
+document.getElementById('observacion').addEventListener('input', function () {
+    const observacionInput = this.value;
 
-    fetch(actionUrl, {
+    // Expresión regular que permite solo letras y espacios
+    const isValid = /^[a-zA-Z\s]*$/.test(observacionInput);
+    
+    if (!isValid) {
+        this.value = observacionInput.slice(0, -1);  // Elimina el último carácter ingresado si es inválido
+    }
+});
+
+
+
+function abrirModalRecaudacion(type, id = null, fecha = '', hora = '', monto = '', observacion = '', sede_nombre = '', tipo_recaudacion = '') {
+    let modalTitle = '';
+    let formAction = '';
+    let isReadOnly = false;
+
+    document.getElementById('fechaContainer').style.display = 'none';
+    document.getElementById('horaContainer').style.display = 'none';
+
+    if (type === 'add') {
+        modalTitle = 'Agregar recaudación';
+        formAction = '/insertar_recaudacion';
+        limpiarModal();
+    } else if (type === 'edit' || type === 'view') {
+        modalTitle = type === 'edit' ? 'Editar recaudación' : 'Ver recaudación';
+        formAction = type === 'edit' ? '/procesar_actualizar_recaudacion' : '';
+        isReadOnly = type === 'view';
+
+        document.getElementById('recaudacionId').value = id;
+        document.getElementById('monto').value = monto;
+        document.getElementById('observacion').value = observacion;
+
+        if (type === 'view') {
+            // Convertir la fecha de YYYY-MM-DD a DD-MM-YYYY
+            if (fecha) {
+                const [year, month, day] = fecha.split('-');
+                fecha = `${day}-${month}-${year}`;
+            }
+            
+            document.getElementById('fecha').value = fecha;
+            document.getElementById('hora').value = hora;
+            document.getElementById('fechaContainer').style.display = 'block';
+            document.getElementById('horaContainer').style.display = 'block';
+        } else {
+            document.getElementById('fecha').value = '';
+            document.getElementById('hora').value = '';
+        }
+
+        // Seleccionar el tipo de recaudación en base al texto
+        
+        const tipoSelect = document.getElementById('id_tipo_recaudacion');
+        tipoSelect.value =tipo_recaudacion;
+        
+    }
+
+    document.getElementById('recaudacionModalLabel').innerText = modalTitle;
+    document.getElementById('recaudacionForm').action = formAction;
+
+    const sedeInput = document.getElementById('sede_nombre');
+    sedeInput.value = getCookie('sede').replace(/^"|"$/g, '');
+    sedeInput.readOnly = true;
+    sedeInput.disabled = true;
+
+    document.querySelectorAll('#recaudacionForm input, #recaudacionForm select').forEach(function (input) {
+        if (input.id !== 'sede_nombre') {
+            input.readOnly = isReadOnly;
+            input.disabled = isReadOnly;
+        }
+    });
+
+    document.getElementById('submitBtn').style.display = isReadOnly ? 'none' : 'block';
+
+    const recaudacionModal = new bootstrap.Modal(document.getElementById('recaudacionModal'));
+    recaudacionModal.show();
+}
+
+$('#recaudacionForm').on('submit', function(event) {
+    event.preventDefault();
+    const formData = new FormData(this);  // Cambiar a FormData para manejar los datos del formulario
+    const formAction = $(this).attr('action');
+    console.log("Datos enviados:", formData);
+
+    // Deshabilitar el botón para evitar múltiples envíos
+    $('#submitBtn').prop('disabled', true);
+
+    // Realizar la solicitud de inserción o actualización
+    fetch(formAction, {
         method: 'POST',
-        body: new URLSearchParams(formData),
+        body: formData,
         headers: {
-            "Content-Type": "application/x-www-form-urlencoded",
+            'X-Requested-With': 'fetch'  // Opcional: indica que la solicitud se hizo con fetch
         }
     })
     .then(response => response.json())
     .then(data => {
         if (data.success) {
-            // Actualizar la tabla con los datos devueltos
             actualizarTabla(data.recaudaciones);
-
-            // Cerrar el modal automáticamente
-            const modalElement = document.getElementById('recaudacionModal');
-            const modalInstance = bootstrap.Modal.getInstance(modalElement);
-            if (modalInstance) {
-                modalInstance.hide();
-            }
+            $('#recaudacionModal').modal('hide');
+            mostrarMensaje(data.message, 'success');
         } else {
-            // Mostrar mensaje de error si no fue exitoso
-            mostrarMensaje(data.message, "danger");
+            mostrarMensaje(data.message, 'danger');
         }
     })
-    .catch(error => {
-        console.error("Error:", error);
-        mostrarMensaje("Ocurrió un error al intentar realizar la operación.", "danger");
+    .catch(() => {
+        mostrarMensaje("Error en la operación.", 'danger');
     })
     .finally(() => {
-        submitBtn.disabled = false;
+        $('#submitBtn').prop('disabled', false);
     });
 });
-function mostrarMensaje(mensaje, tipo) {
-    const alertContainer = document.createElement("div");
-    alertContainer.className = `alert alert-${tipo} alert-dismissible fade show position-fixed`;
-    alertContainer.role = "alert";
-    alertContainer.style.cssText = `
-        bottom: 20px; 
-        right: 20px; 
-        min-width: 250px; 
-        max-width: 300px; 
-        padding: 0.5rem 1rem;
-        font-size: 0.9rem;
-        z-index: 1050;
-        box-shadow: 0px 0px 10px rgba(0,0,0,0.1);
-    `;
-    alertContainer.innerHTML = `
-        ${mensaje}
-        <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
-    `;
-    document.body.appendChild(alertContainer);
 
-    setTimeout(() => {
-        alertContainer.classList.remove("show");
-        alertContainer.style.opacity = "0";
-        setTimeout(() => alertContainer.remove(), 500);
+
+// Función para mostrar el mensaje en la estructura de Bootstrap
+function mostrarMensaje(mensaje, tipo) {
+    // Crear la alerta HTML
+    const alerta = $(`
+        <div class="alert alert-${tipo} alert-dismissible fade show" role="alert">
+            ${mensaje}
+            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+        </div>
+    `);
+
+    // Agregar la alerta al contenedor de mensajes
+    $('.container.mt-3').append(alerta);
+
+    // Hacer que desaparezca después de 3 segundos
+    setTimeout(function() {
+        alerta.fadeOut(500, function() { $(this).remove(); });
     }, 3000);
 }
-// Función para cargar el ID de la sede basado en el nombre de la cookie
-function cargarIdSede(sedeNombre, callback) {
-    fetch(`/obtener_id_sede_por_nombre/${sedeNombre}`)
-        .then(response => response.json())
-        .then(data => {
-            if (data.id) {
-                callback(data.id); // Pasa el ID al callback
-            } else {
-                console.error("No se encontró el ID de la sede para el nombre:", sedeNombre);
-                callback(null);
-            }
-        })
-        .catch(error => {
-            console.error("Error al obtener el ID de la sede:", error);
-            callback(null);
-        });
-}
-// Función para dar de baja una recaudación
-function darBajaRecaudacion(id) {
-    if (confirm('¿Estás seguro de que deseas dar de baja esta recaudación?')) {
-        fetch('/dar_baja_recaudacion', {
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/json'
-            },
-            body: JSON.stringify({ id: id })
-        })
-        .then(response => response.json())
-        .then(data => {
-            if (data.success) {
-                actualizarTabla(data.recaudaciones); // Actualizar la tabla con los datos devueltos
-                mostrarMensaje(data.message, "success"); // Mostrar mensaje de éxito
-            } else {
-                mostrarMensaje(data.message, "danger"); // Mostrar mensaje de error
-            }
-        })
-        .catch(error => {
-            console.error("Error:", error);
-            mostrarMensaje("Ocurrió un error al intentar dar de baja la recaudación.", "danger");
-        });
-    }
-}
-function eliminarRecaudacion(id) {
-    if (confirm('¿Estás seguro de que deseas eliminar esta recaudación?')) {
-        fetch('/eliminar_recaudacion', {
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/json'
-            },
-            body: JSON.stringify({ id: id })
-        })
-        .then(response => response.json())
-        .then(data => {
-            if (data.success) {
-                actualizarTabla(data.recaudaciones); // Actualizar la tabla con los datos devueltos
-                mostrarMensaje(data.message, "success"); // Mostrar mensaje de éxito
-            } else {
-                mostrarMensaje(data.message, "danger"); // Mostrar mensaje de error
-            }
-        })
-        .catch(error => {
-            console.error("Error:", error);
-            mostrarMensaje("Ocurrió un error al intentar eliminar la recaudación.", "danger");
-        });
-    }
-}
 
-fetch(urlInsertarRecaudacion, {
-    method: 'POST',
-    body: new URLSearchParams(new FormData(document.getElementById('recaudacionForm'))),
-    headers: {
-        "Content-Type": "application/x-www-form-urlencoded",
-    }
-})
-.then(response => response.json())
-.then(data => {
-    if (data.success) {
-        actualizarTablaRecaudaciones(data.recaudaciones); // Actualizar tabla con los nuevos datos
-        mostrarMensaje(data.message, "success"); // Mostrar mensaje de éxito
-        const modalRecaudacion = bootstrap.Modal.getInstance(document.getElementById('recaudacionModal'));
-        modalRecaudacion.hide(); // Cerrar modal
-    } else {
-        mostrarMensaje(data.message, "danger"); // Mostrar mensaje de error
-    }
-})
-.catch(error => console.error("Error:", error));
 
 function actualizarTabla(recaudaciones) {
-    const tbody = document.querySelector('#recaudacionesTable tbody');
     const table = $('#recaudacionesTable').DataTable();
-    const currentPage = table.page();
 
-    // Limpiar el contenido actual del tbody
-    tbody.innerHTML = '';
+    // Limpiar el contenido actual del DataTable
+    table.clear();
 
-    // Recorrer los datos de recaudaciones y crear las filas
+    // Generar filas con el diseño HTML específico y añadirlas
     recaudaciones.forEach(recaudacion => {
-        const row = document.createElement('tr');
-        row.innerHTML = `
-            <td class="text-center">${recaudacion.id}</td>
-            <td>${recaudacion.sede}</td>
-            <td>${recaudacion.tipo_recaudacion}</td>
-            <td>${recaudacion.observacion}</td>
-            <td>${recaudacion.monto}</td>
-            <td class="text-center">
-                <button class="btn btn-primary btn-sm" title="Ver"
-                    onclick="abrirModalRecaudacion('ver', '${recaudacion.id}', '${recaudacion.monto}', '${recaudacion.observacion}', '${recaudacion.sede}', '${recaudacion.tipo_recaudacion}')">
-                    <i class="fas fa-eye"></i>
-                </button>
-                <button class="btn btn-warning btn-sm" title="Editar"
-                    onclick="abrirModalRecaudacion('editar', '${recaudacion.id}', '${recaudacion.monto}', '${recaudacion.observacion}', '${recaudacion.sede}', '${recaudacion.tipo_recaudacion}')">
-                    <i class="fas fa-edit"></i>
-                </button>
-            </td>
-        `;
-        tbody.appendChild(row);
+        // Asegúrate de que `fecha` esté definida en `recaudacion`
+        const fechaFormatted = recaudacion.fecha 
+            ? new Date(recaudacion.fecha).toLocaleDateString('es-ES') 
+            : 'Fecha no disponible';
+
+        const row = $(` 
+            <tr class="text-center">
+                <td style="vertical-align: middle; text-align: center;">${recaudacion.id}</td>
+                <td>${recaudacion.sede}</td>
+                <td>${recaudacion.tipo_recaudacion}</td>
+                <td>${recaudacion.observacion}</td>
+                <td>${fechaFormatted}</td>
+                <td style="vertical-align: middle; text-align: center; width: 100px;">${recaudacion.monto}</td>
+                <td class="text-center" style="vertical-align: middle; text-align: center; width: 100px;">
+                    <button class="btn btn-primary btn-sm" title="Ver" onclick="abrirModalRecaudacion('view', '${recaudacion.id}', '${recaudacion.fecha}', '${recaudacion.hora}', '${recaudacion.monto}', '${recaudacion.observacion}', '${recaudacion.sede}', '${recaudacion.tipo_recaudacion}')">
+                        <i class="fas fa-eye"></i>
+                    </button>
+                    <button class="btn btn-warning btn-sm" title="Editar" onclick="abrirModalRecaudacion('edit', '${recaudacion.id}', '${recaudacion.fecha}', '${recaudacion.hora}', '${recaudacion.monto}', '${recaudacion.observacion}', '${recaudacion.sede}', '${recaudacion.tipo_recaudacion}')">
+                        <i class="fas fa-edit"></i>
+                    </button>
+                </td>
+            </tr>
+        `);
+
+        // Añadir la fila generada al DataTable
+        table.row.add(row[0]);
     });
 
-    // Actualizar DataTable sin perder los eventos
-    table.clear();
-    table.rows.add($(tbody).find('tr'));
+    // Dibujar la tabla con los nuevos datos y mantener la configuración
     table.draw(false);
-
-    // Restaurar la página a la que el usuario estaba antes de la actualización
-    table.page(currentPage).draw(false);
 }
 
 // Función para limpiar los campos del modal
 function limpiarModal() {
-    document.getElementById('recaudacionId').value = '';
-    document.getElementById('monto').value = '';
-    document.getElementById('observacion').value = '';
-    document.getElementById('id_tipo_recaudacion').value = '';
-    document.getElementById('tipo_recaudacion_text').value = ''; 
-    document.getElementById('fecha').value = '';
-    document.getElementById('hora').value = '';
+    const recaudacionId = document.getElementById('recaudacionId');
+    const tipoRecaudacion = document.getElementById('id_tipo_recaudacion');
+    const monto = document.getElementById('monto');
+    const observacion = document.getElementById('observacion');
+    const fechaContainer = document.getElementById('fechaContainer');
+    const horaContainer = document.getElementById('horaContainer');
+
+    if (recaudacionId) recaudacionId.value = '';
+    if (tipoRecaudacion) tipoRecaudacion.value = '';
+    if (monto) monto.value = '';
+    if (observacion) observacion.value = '';
+    if (fechaContainer) fechaContainer.style.display = 'none';
+    if (horaContainer) horaContainer.style.display = 'none';
+}
+
+// Función para obtener una cookie por su nombre
+function getCookie(name) {
+    const cookies = document.cookie.split(';');
+    for (let i = 0; i < cookies.length; i++) {
+        const cookie = cookies[i].trim();
+        if (cookie.startsWith(name + '=')) {
+            return decodeURIComponent(cookie.substring(name.length + 1));
+        }
+    }
+    return null;
 }
