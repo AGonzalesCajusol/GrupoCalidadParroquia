@@ -73,7 +73,6 @@ function abrirModalVer(id, estado, fecha_inicio, acto) {
     document.getElementById('charlaId').value = id;
     document.getElementById('estado').value = estado;
     document.getElementById('fecha_inicio').value = fecha_inicio;
-    document.getElementById('id_actoliturgico').value = acto;
 
     // Bloquear los campos para solo permitir ver los datos usando 'disabled' para el estilo gris
     document.getElementById('estado').setAttribute('disabled', true);

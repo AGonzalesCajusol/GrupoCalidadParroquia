@@ -1,60 +1,74 @@
 from flask import render_template, request, redirect, url_for, flash, jsonify
 from controladores.controlador_tema import (
-    insertar_tema,
-    obtener_temas,
-    obtener_tema_por_id,
-    actualizar_tema,
-    eliminar_tema
+        obtener_todos_los_temas,
+        insertar_tema,
+        obtener_tema_por_id,
+        actualizar_tema,
+        eliminar_tema_por_id
 )
-
-import controladores.controlador_actosliturgicos  as acto 
+import controladores.controlador_actosliturgicos as acto
 
 def registrar_rutas(app):
-    # Ruta para gestionar temas
+    
     @app.route("/gestionar_tema", methods=["GET"])
-    def gestionar_tema():
-        temas = obtener_temas()
-        actos = acto.obtener_acto()
-        return render_template("tema/gestionar_tema.html", temas=temas, actos = actos)
+    def gestionar_tema():        
+        actos = acto.listar_nombres_actos()
+        return render_template("tema/gestionar_tema.html", actos=actos)
 
-    # Ruta para mostrar el formulario de registro de un nuevo tema
-    @app.route("/registrar_tema", methods=["GET"])
-    def formulario_registrar_tema():
-        return render_template("tema/registrar_tema.html")
-
-    # Ruta para insertar un nuevo tema
+    @app.route("/api/obtener_temas", methods=["GET"])
+    def obtener_temas_endpoint():
+        try:
+            temas = obtener_todos_los_temas()
+            
+            return jsonify({"success": True, "temas": temas}), 200
+        except Exception as e:
+            return jsonify({"success": False, "message": str(e)}), 500
+    
     @app.route("/insertar_tema", methods=["POST"])
     def procesar_insertar_tema():
-        descripcion = request.form["descripcion"]
-        id_actoliturgico = request.form["id_actoliturgico"]
-        try:
-            insertar_tema(descripcion, id_actoliturgico)
-            # Enviar una respuesta JSON con éxito y los datos del nuevo tema si es necesario
-            return jsonify({"success": True, "message": "El tema fue agregado exitosamente"})
-        except Exception as e:
-            return jsonify({"success": False, "message": str(e)})
+            descripcion = request.form.get("descripcion")
+            id_actoliturgico = request.form.get("id_actoliturgico")
+            dias_semana = request.form.get("dias_semana")
+            hora_inicio = request.form.get("hora_inicio")
+            duracion = request.form.get("duracion")
+            orden = request.form.get("orden")
 
+            try:
+                exito = insertar_tema(descripcion, id_actoliturgico, dias_semana, hora_inicio, duracion, orden)
+                if exito:
+                    return jsonify({"success": True, "message": "El tema fue agregado exitosamente"})
+                else:
+                    return jsonify({"success": False, "message": "No se pudo agregar el tema"}), 500
+            except Exception as e:
+                return jsonify({"success": False, "message": str(e)}), 500
 
-    # Ruta para mostrar el formulario de edición de un tema
-    @app.route("/editar_tema/<int:id>", methods=["GET"])
-    def formulario_editar_tema(id):
-        tema = obtener_tema_por_id(id)
-        return render_template("tema/editar_tema.html", tema=tema)
+    @app.route("/api/obtener_tema/<int:id_tema>", methods=["GET"])
+    def obtener_tema(id_tema):
+        tema = obtener_tema_por_id(id_tema)
+        if tema:
+            return jsonify({"success": True, "tema": tema})
+        else:
+            return jsonify({"success": False, "message": "Tema no encontrado"}), 404
 
-    # Ruta para manejar la actualización de un tema
     @app.route("/actualizar_tema", methods=["POST"])
     def procesar_actualizar_tema():
-        id_tema = request.form["id"]
-        descripcion = request.form["descripcion"]
-        id_actoliturgico = request.form["id_actoliturgico"]
-        actualizar_tema(descripcion, id_actoliturgico, id_tema)
-        flash("El tema fue actualizado exitosamente")
-        return redirect(url_for("gestionar_tema"))
+        id_tema = request.form.get("id_tema")
+        descripcion = request.form.get("descripcion")
+        id_actoliturgico = request.form.get("id_actoliturgico")
+        dias_semana = request.form.get("dias_semana")
+        hora_inicio = request.form.get("hora_inicio")
+        duracion = request.form.get("duracion")
+        orden = request.form.get("orden")
 
-    # Ruta para eliminar un tema
+        if actualizar_tema(id_tema, descripcion, id_actoliturgico, dias_semana, hora_inicio, duracion, orden):
+            return jsonify({"success": True, "message": "Tema actualizado exitosamente"})
+        else:
+            return jsonify({"success": False, "message": "No se pudo actualizar el tema"}), 500
+
     @app.route("/eliminar_tema", methods=["POST"])
     def procesar_eliminar_tema():
-        id_tema = request.form["id"]
-        eliminar_tema(id_tema)
-        flash("El tema fue eliminado exitosamente")
-        return redirect(url_for("gestionar_tema"))
+        id_tema = request.form.get("id_tema")
+        if eliminar_tema_por_id(id_tema):
+            return jsonify({"success": True, "message": "Tema eliminado exitosamente"})
+        else:
+            return jsonify({"success": False, "message": "No se pudo eliminar el tema"}), 500    
