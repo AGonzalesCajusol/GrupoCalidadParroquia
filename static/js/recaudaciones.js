@@ -123,18 +123,60 @@ function filtrarPorAño() {
 }
 
 function exportarTablaPDF() {
-    const tabla = document.getElementById('recaudacionesTable');
-    const tabla2 = tabla.cloneNode(true); // Clona la tabla existente
-    tabla2.id = 'miTablaClonada';
+    // Crear una copia de la tabla original
+    const tablaOriginal = document.getElementById('recaudacionesTable');
+    const tablaClonada = tablaOriginal.cloneNode(true);
 
-    html2pdf(tabla2, {
+    // Eliminar la columna de "Acciones" y las flechas de ordenación de DataTables en el encabezado
+    const encabezadoAcciones = tablaClonada.querySelectorAll("th")[6];  // Índice de la columna "Acciones"
+    encabezadoAcciones.parentNode.removeChild(encabezadoAcciones);
+
+    const encabezados = tablaClonada.querySelectorAll("th");
+    encabezados.forEach((th) => {
+        th.classList.remove('sorting', 'sorting_asc', 'sorting_desc');  // Remueve clases de DataTables
+    });
+
+    const filas = tablaClonada.querySelectorAll("tbody tr");
+    filas.forEach(fila => {
+        const celdaAcciones = fila.querySelectorAll("td")[6];  // Índice de la columna "Acciones"
+        if (celdaAcciones) {
+            celdaAcciones.parentNode.removeChild(celdaAcciones);
+        }
+    });
+
+    // Crear un contenedor temporal para el PDF
+    const contenedorPDF = document.createElement("div");
+
+    // Estilizar el contenedor como en el diseño deseado
+    contenedorPDF.style.fontFamily = 'Arial, sans-serif';
+    contenedorPDF.style.textAlign = 'center';
+
+    // Agregar un título al contenedor
+    const titulo = document.createElement("h2");
+    titulo.innerText = "Informe de recaudaciones: ";
+    contenedorPDF.appendChild(titulo);
+
+    // Agregar la tabla clonada al contenedor
+    contenedorPDF.appendChild(tablaClonada);
+
+    // Aplicar estilos para un diseño más limpio en la exportación
+    tablaClonada.style.borderCollapse = 'collapse';
+    tablaClonada.style.width = '100%';
+    tablaClonada.querySelectorAll('th, td').forEach(cell => {
+        cell.style.border = '1px solid #ddd';
+        cell.style.padding = '8px';
+    });
+
+    // Exportar a PDF usando html2pdf
+    html2pdf().from(contenedorPDF).set({
         margin: 1,
-        filename: 'Recaudaciones.pdf',
+        filename: 'Gestionar Recaudaciones.pdf',
         image: { type: 'jpeg', quality: 1 },
         html2canvas: { scale: 2 },
         jsPDF: { unit: 'cm', format: 'a4', orientation: 'portrait' }
-    });
+    }).save();
 }
+
 
 
 document.getElementById('monto').addEventListener('input', function () {
