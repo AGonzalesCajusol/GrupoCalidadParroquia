@@ -39,7 +39,7 @@ function abrirModalTipoRecaudacion(accion, id = '', nombre = '', tipo = '1', est
 
     // Limpiar y configurar el modal según la acción
     if (accion === 'agregar') {
-        modalTitle.textContent = 'Agregar Tipo de Recaudación';
+        modalTitle.textContent = 'Agregar tipo de recaudación';
         submitBtn.textContent = 'Guardar';
         submitBtn.style.display = 'block';
         formRecaudacion.setAttribute('action', insertarTipoRecaudacionURL);
