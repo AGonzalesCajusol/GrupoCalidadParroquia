@@ -78,7 +78,7 @@ function eliminarTipoMinistro(id) {
 // Función para dar de baja el tipo de ministro (cambiar estado a inactivo)
 function darDeBajaTipoMinistro(id) {
     if (confirm("¿Estás seguro de que deseas dar de baja este tipo de ministro?")) {
-        fetch('/procesar_actualizar_tipo_ministro', {
+        fetch('/procesar_dar_baja', {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json'

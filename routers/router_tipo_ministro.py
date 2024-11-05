@@ -1,10 +1,5 @@
 from flask import render_template, request, jsonify
-from controladores.controlador_tipo_ministro import (
-    obtener_tipos_ministro,
-    insertar_tipo_ministro,
-    actualizar_tipo_ministro,
-    eliminar_tipo_ministro
-)
+from controladores.controlador_tipo_ministro import *
 
 def registrar_rutas(app):
     # Ruta para la página principal de gestión de tipos de ministros
@@ -39,6 +34,23 @@ def registrar_rutas(app):
             return jsonify(success=True)
         except Exception as e:
             return jsonify(success=False, message="Error al actualizar el tipo de ministro: " + str(e))
+
+
+
+    @app.route("/procesar_dar_baja", methods=["POST"])
+    def procesar_dar_baja():
+            try:
+                data = request.json
+                id = data.get("id")
+                estado = data.get("estado", 0)  # Estado del tipo de ministro (1: activo, 0: inactivo)
+                dar_baja_tipo_ministro(id,estado)
+                return jsonify(success=True)
+            except Exception as e:
+                return jsonify(success=False, message="Error al actualizar el tipo de ministro: " + str(e))
+
+
+
+
 
     # Ruta para eliminar un tipo de ministro
     @app.route("/eliminar_tipo_ministro", methods=["POST"])
