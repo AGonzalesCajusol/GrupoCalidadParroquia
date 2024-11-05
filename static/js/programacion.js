@@ -1,306 +1,516 @@
 $(document).ready(function () {
-    var table = $('#temasTable').DataTable({
+    $('#temasTable').DataTable({
         pageLength: 8,
         dom: '<"d-flex justify-content-between align-items-center mb-3"<"d-flex"f><"d-flex justify-content-end button-section">>rt<"bottom"p>',
-        language: {
-            search: "Buscar:"
-        }
+        language: { search: "Buscar:" }
     });
 });
 
-var modal = new bootstrap.Modal(document.getElementById('myModal11'));
-
-window.addEventListener("load", function () {
-    const urlParams = new URLSearchParams(window.location.search);
-    const idActo = urlParams.get('id_actoliturgico');
-    const fechaInicio = urlParams.get('fecha_inicio');
-    const idCharla = urlParams.get('id_charla');
-
-    console.log('ID del acto litúrgico recibido:', idActo);
-    console.log('Fecha de inicio recibida:', fechaInicio);
-    console.log('ID de charla recibido:', idCharla);
-
-    if (idActo && fechaInicio && idCharla) {
-        mostrarTemas(idActo, idCharla);
-    } else {
-        console.error('ID de acto, charla o fecha de inicio no encontrada en la URL.');
-    }
-});
-
-
-
-function mostrarTemas(idActo, idCharla) {
-    const formulario = document.getElementById('formulario_temas_sacramento');
-    formulario.innerHTML = '';
-
-    if (idActo && idCharla) {
-        console.log('ID de acto que se envía:', idActo);
-        console.log('ID de charla que se envía:', idCharla);
-
-        fetch(`/obtener_programacion_por_acto?acto=${idActo}&charla=${idCharla}`)
-            .then(response => response.json())
-            .then(programaciones => {
-                console.log('Programaciones recibidas:', programaciones);
-                if (Array.isArray(programaciones) && programaciones.length > 0) {
-                    let tableHTML = '<table class="table table-striped table-bordered"><thead><tr><th>Tema</th><th>Fecha</th><th>Hora Inicio</th><th>Hora Fin</th><th>Estado</th><th>Ministro</th><th>Sede</th></tr></thead><tbody>';
-
-                    programaciones.forEach((programacion, index) => {
-                        if (programacion && programacion.length >= 8) {  // Asegura que tenga al menos 8 elementos
-                            const temaIndex = index + 1;
-                            const estadoTexto = programacion[5] === 'R' ? 'Realizado' : 'Pendiente';
-                            const nombreMinistro = programacion[6] || 'Sin asignar';
-                            
-                            tableHTML += `
-                                <tr data-id_programacion="${programacion[0]}">
-                                    <td><label>${programacion[1]}</label></td>
-                                    <td><input type="date" class="form-control" name="fecha${temaIndex}" value="${programacion[2] || ''}" required></td>
-                                    <td><input type="time" class="form-control" id="hora_inicio${temaIndex}" name="hora_inicio${temaIndex}" value="${programacion[3] || ''}" onchange="hora_fin('hora_inicio${temaIndex}', 'hora_fin${temaIndex}')" required></td>
-                                    <td><input type="time" class="form-control" id="hora_fin${temaIndex}" name="hora_fin${temaIndex}" value="${programacion[4] || ''}" required></td>
-                                    <td><input type="checkbox" name="estado${temaIndex}" ${programacion[5] === 'R' ? 'checked' : ''}>&nbsp; (${estadoTexto})</td>
-                                    <td>
-                                        <div class="d-inline-flex">
-                                            <input type="number" id="idministro${temaIndex}" hidden>
-                                            <input type="text" class="form-control" id="ministro${temaIndex}" name="ministro${temaIndex}" value="${nombreMinistro}" placeholder="Ministro">
-                                            <button class="btn btn-primary" onclick="abrir_modal('ministro${temaIndex}', 'idministro${temaIndex}')">
-                                                <i class="bi bi-plus-circle-fill"></i>
-                                            </button>
-                                        </div>
-                                    </td>
-                                    <td><input type="text" class="form-control" name="sede${temaIndex}" value="${programacion[7] || ''}" placeholder="Ingresar sede"></td>
-                                </tr>`;
-                        } else {
-                            console.error('Error: `programacion` no tiene la estructura esperada:', programacion);
-                        }
-                    });
-                    
-
-                    tableHTML += '</tbody></table>';
-                    formulario.innerHTML = tableHTML;
-                } else {
-                    console.log("Ejecutando generarFilasRegistro porque no hay programaciones");
-                    generarFilasRegistro(idActo);
-                }
-            })
-            .catch(error => {
-                console.error('Error al obtener las programaciones:', error);
-                formulario.innerHTML = '<p>Error al cargar las programaciones.</p>';
-            });
-    } else {
-        formulario.innerHTML = '<p>Seleccione un acto litúrgico para ver las programaciones.</p>';
-    }
-}
-
-function abrir_modal(ministro_f, id_ministro_f) {
-    var cuerpo_tabla = document.getElementById('cuerpo_ministros');
-    $('#table_mini').DataTable().destroy(); // Destruir la tabla existente
-    cuerpo_tabla.innerHTML = '';
-
-    fetch('ministros_registro')
-        .then(response => response.json())
-        .then(ministros => {
-            ministros.forEach(ministro => {
-                var tr = document.createElement('tr');
-                var td1 = document.createElement('td');
-                var td2 = document.createElement('td');
-                var td3 = document.createElement('td');
-                var tdButton = document.createElement('td'); // Celda para el botón
-                var bt1 = document.createElement('button');
-
-                tdButton.addEventListener('click', function () {
-                    asignar(ministro.numero_doc, ministro.nombre_ministro, id_ministro_f, ministro_f);
-                });
-
-                // Configura el contenido de las celdas
-                td1.textContent = ministro.numero_doc;
-                td2.textContent = ministro.nombre_ministro;
-                td3.textContent = ministro.sede;
-
-                bt1.classList.add('btn', 'btn-primary', 'btn-sm');
-                bt1.innerHTML = '<i class="bi bi-check2-circle"></i>'; // Añade el ícono como HTML
-                tdButton.appendChild(bt1);
-
-                tr.appendChild(td1);
-                tr.appendChild(td2);
-                tr.appendChild(td3);
-                tr.appendChild(tdButton);
-                cuerpo_tabla.appendChild(tr);
-            });
-
-            var table = $('#table_mini').DataTable({
-                paging: false,
-                ordering: false,
-                info: false
-            });
-
-            $('#searchInput').keyup(function () {
-                table.search(this.value).draw();
-            });
-
-        })
-        .catch(error => {
-            console.error('Error al cargar los ministros:', error);
-        });
-
-    modal.show();
-}
-
-function asignar(numero_doc, nombre_ministro, id_ministro_f, ministro_f) {
-    document.getElementById(id_ministro_f).value = numero_doc;
-    document.getElementById(ministro_f).value = nombre_ministro;
-    modal.hide();
-}
-
-
-
-function asignar(numero_doc, nombre_ministro, id_ministro_f, ministro_f) {
-    document.getElementById(id_ministro_f).value = numero_doc;
-    document.getElementById(ministro_f).value = nombre_ministro;
-    modal.hide();
-}
-
-function hora_fin(hora_inicio, hora_fin) {
-    var h_inicio = document.getElementById(hora_inicio).value;
-    var [horas, minutos] = h_inicio.split(':').map(Number);
-
-    var fecha = new Date();
-    fecha.setHours(horas);
-    fecha.setMinutes(minutos);
-
-    fecha.setHours(fecha.getHours() + 2);
-
-    var nueva_hora = String(fecha.getHours()).padStart(2, '0');
-    var nuevos_minutos = String(fecha.getMinutes()).padStart(2, '0');
-
-    document.getElementById(hora_fin).value = `${nueva_hora}:${nuevos_minutos}`;
-}
-
-function registrarProgramacion() {
-
-    console.log('ya se registro')
-
-}
-
-function generarFilasRegistro(idActo) {
-    fetch(`/obtener_temas_por_acto?acto=${idActo}`)
+function mostrarTemas(idCharla) {
+    console.log("Cargando temas para la charla:", idCharla);
+    fetch(`/obtener_programacion_por_charla?id_charla=${idCharla}`)
         .then(response => response.json())
         .then(data => {
-            console.log("Temas recibidos en generarFilasRegistro:", data.temas);
-            const temas = data.temas;
+            const formulario = document.getElementById("formulario_temas_sacramento");
 
-            if (Array.isArray(temas) && temas.length > 0) {
-                let tableHTML = `
-                    <table class="table table-striped table-bordered">
-                        <thead>
-                            <tr>
-                                <th>Tema</th>
-                                <th>Fecha</th>
-                                <th>Hora Inicio</th>
-                                <th>Hora Fin</th>
-                                <th>Estado</th>
-                                <th>Ministro</th>
-                                <th>Sede</th>
-                            </tr>
-                        </thead>
-                        <tbody>
-                `;
+            if (!formulario) {
+                console.error("No se encontró el elemento con id 'formulario_temas_sacramento'");
+                return;
+            }
 
-                temas.forEach((tema, index) => {
-                    const temaIndex = index + 1;
-                    const estadoTexto = tema[5] === 'R' ? 'Realizado' : 'Pendiente';
-                    const nombreMinistro = tema[6] || ' ';
-                    const nombreSede = tema.sede || ''; // Asegura que 'nombreSede' sea un string vacío si no está definido
+            if (data && data.success) {
+                console.log("Datos de programación recibidos:", data.programacion);
+                const programacion = data.programacion;
 
-                    tableHTML += `
-                        <tr>
-                            <td>${tema.descripcion}</td>
-                            <td><input type="date" class="form-control" name="fecha${temaIndex}" required></td>
-                            <td><input type="time" class="form-control" name="hora_inicio${temaIndex}" required></td>
-                            <td><input type="time" class="form-control" name="hora_fin${temaIndex}" required></td>
-                            <td>
-                                <input type="checkbox" name="estado${temaIndex}" ${tema[5] === 'R' ? 'checked' : ''}>
-                                &nbsp; (${estadoTexto})
-                            </td>
-                            <td>
-                                <div class="d-inline-flex">
-                                    <input type="number" id="idministro${temaIndex}" hidden>
-                                    <input type="text" class="form-control" id="ministro${temaIndex}" name="ministro${temaIndex}" value="${nombreMinistro}" placeholder="Ministro">
-                                    <button class="btn btn-primary" onclick="abrir_modal('ministro${temaIndex}', 'idministro${temaIndex}')">
-                                        <i class="bi bi-plus-circle-fill"></i>
-                                    </button>
-                                </div>
-                            </td>
-                            <td><input type="text" class="form-control" name="sede${temaIndex}" value="${nombreSede}" placeholder="Ingresar sede"></td>
-                        </tr>
-                    `;
+                if (programacion.length === 0) {
+                    formulario.innerHTML = "<p>No hay temas programados para esta charla.</p>";
+                    return;
+                }
+
+                let tableHTML = `<table class="table table-striped table-bordered">
+                                        <thead>
+                                            <tr>
+                                                <th>Tema</th>
+                                                <th>Fecha</th>
+                                                <th>Hora Inicio</th>
+                                                <th>Hora Fin</th>
+                                                <th>Estado</th>
+                                                <th>Ministro</th>
+                                                <th>Sede</th>
+                                                <th>Acciones</th>
+                                            </tr>
+                                        </thead>
+                                        <tbody>`;
+
+
+                programacion.forEach(prog => {
+                    const formatHora = (hora) => {
+                        const [h, m] = hora.split(":");
+                        return `${h.padStart(2, "0")}:${m.padStart(2, "0")}`;
+                    };
+
+                    const horaInicio = prog.hora_inicio ? formatHora(prog.hora_inicio) : "";
+                    const horaFin = prog.hora_fin ? formatHora(prog.hora_fin) : "";
+
+                    tableHTML += `<tr data-id_programacion="${prog.id_programacion}">
+                                        <td>${prog.tema}</td>
+                                        <td><input type="date" class="form-control" value="${prog.fecha}" readonly></td>
+                                        <td><input type="time" class="form-control" value="${horaInicio}" readonly></td>
+                                        <td><input type="time" class="form-control" value="${horaFin}" readonly></td>
+                                        <td>${prog.estado}</td>
+                                        <td>${prog.ministro}</td>
+                                        <td>${prog.sede}</td> 
+                                        <td>   
+                                            <button class="btn btn-primary btn-sm" title="Ver"
+                                                onclick="abrirModalVer('${prog.id_programacion}', '${prog.tema}', '${prog.fecha}', '${horaInicio}', '${horaFin}', '${prog.estado}', '${prog.ministro}', '${prog.sede}')">
+                                                <i class="fas fa-eye"></i>
+                                            </button>
+
+                                            <button class="btn btn-warning btn-sm" title="Editar"
+                                                onclick="abrirModalEditar('${prog.id_programacion}', '${prog.tema}', '${prog.fecha}', '${horaInicio}', '${horaFin}', '${prog.estado}', '${prog.ministro}', '${prog.sede}')">
+                                                <i class="fas fa-edit"></i>
+                                            </button>
+                                            <button class="btn btn-secondary btn-sm" title="Dar de Baja"
+                                                onclick="darDeBajaProgramacion('${prog.id_programacion}')">
+                                                <i class="fas fa-ban"></i>
+                                            </button>
+                                            <button class="btn btn-danger btn-sm" title="Eliminar"
+                                                onclick="eliminarProgramacion('${prog.id_programacion}')">
+                                                <i class="fas fa-trash-alt"></i>
+                                            </button>
+                                        </td> 
+                                    </tr>`;
                 });
-                
-                tableHTML += '</tbody></table>';
-                document.getElementById('formulario_temas_sacramento').innerHTML = tableHTML;
+
+                tableHTML += `</tbody></table>`;
+                formulario.innerHTML = tableHTML;
             } else {
-                document.getElementById('formulario_temas_sacramento').innerHTML = '<p>No hay temas disponibles para este acto litúrgico.</p>';
+                console.error("Error al obtener la programación:", data ? data.error : "Respuesta no válida");
+                formulario.innerHTML = "<p>Error al cargar la programación.</p>";
             }
         })
         .catch(error => {
-            console.error('Error al obtener los temas:', error);
-            document.getElementById('formulario_temas_sacramento').innerHTML = '<p>Error al cargar los temas.</p>';
+            console.error("Error en la solicitud de programación:", error);
+            const formulario = document.getElementById("formulario_temas_sacramento");
+            if (formulario) {
+                formulario.innerHTML = "<p>Error al cargar la programación.</p>";
+            }
         });
 }
 
+window.addEventListener("load", function () {
+    const urlParams = new URLSearchParams(window.location.search);
+    const idActo = urlParams.get("id_actoliturgico");
+    const fechaInicio = urlParams.get("fecha_inicio");
+    const idCharla = urlParams.get("id_charla");
 
-function registrarProgramacionEnBloque() {
-    const temasFilas = document.querySelectorAll('#formulario_temas_sacramento tbody tr');
-    let programaciones = [];
-
-    // Validación de cada fila
-    for (let i = 0; i < temasFilas.length; i++) {
-        const fila = temasFilas[i];
-        const fecha = fila.querySelector(`input[name="fecha${i + 1}"]`).value;
-        const horaInicio = fila.querySelector(`input[name="hora_inicio${i + 1}"]`).value;
-        const horaFin = fila.querySelector(`input[name="hora_fin${i + 1}"]`).value;
-        const ministro = fila.querySelector(`input[name="ministro${i + 1}"]`).value;
-        const sede = fila.querySelector(`input[name="sede${i + 1}"]`).value;
-
-        // Validar que todos los campos estén completos
-        if (!fecha || !horaInicio || !horaFin || !ministro || !sede) {
-            alert(`Por favor, complete todos los campos para el tema ${i + 1}`);
-            return;
-        }
-
-        // Agregar la programación al arreglo si todos los campos están completos
-        programaciones.push({
-            tema: fila.querySelector('label').innerText,  // Obtener el nombre del tema
-            fecha: fecha,
-            hora_inicio: horaInicio,
-            hora_fin: horaFin,
-            estado: 'Pendiente',
-            ministro: ministro,
-            sede: sede
-        });
+    if (idActo && fechaInicio && idCharla) {
+        enviarDNIAlBackend(idActo, fechaInicio, idCharla);
+    } else {
+        console.error("Faltan parámetros necesarios en la URL.");
     }
+});
 
-    // Enviar los datos en bloque al servidor si la validación es exitosa
-    fetch('/registrar_programacion_en_bloque', {
-        method: 'POST',
-        headers: {
-            'Content-Type': 'application/json'
-        },
+function generarProgramacionAutomatica(idActo, fechaInicio, idCharla, idMinistro, idSede) {
+    console.log("Enviando:", { id_actoliturgico: idActo, fecha_inicio: fechaInicio, id_charla: idCharla, id_ministro: idMinistro, id_sede: idSede });
+
+    fetch("/generar_programacion_automatica", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
-            id_charla: idCharlaGlobal,  // Usa las variables globales
-            id_actoliturgico: idActoGlobal,
-            programaciones: programaciones
+            id_actoliturgico: idActo,
+            fecha_inicio: fechaInicio,
+            id_charla: idCharla,
+            id_ministro: idMinistro,
+            id_sede: idSede
         })
     })
         .then(response => response.json())
         .then(data => {
             if (data.success) {
-                alert('Programación registrada con éxito');
-                mostrarTemas(idActoGlobal, idCharlaGlobal);  // Recargar los temas para mostrar los datos registrados
+                mostrarTemas(idCharla);
             } else {
-                alert('Error al registrar la programación');
+                console.error("Error al generar la programación:", data.error);
             }
         })
         .catch(error => {
-            console.error('Error al registrar la programación en bloque:', error);
-            alert('Hubo un error al intentar registrar la programación');
+            console.error("Error en la solicitud de generación automática:", error);
         });
 }
+
+function registrarProgramacionEnBloque() {
+    const idCharla = new URLSearchParams(window.location.search).get("id_charla");
+    const filas = document.querySelectorAll("#formulario_temas_sacramento tbody tr");
+    const programaciones = [];
+
+    filas.forEach(fila => {
+        const idProgramacion = fila.getAttribute("data-id_programacion");
+        const fecha = fila.querySelector("input[type='date']").value;
+        const horaInicio = fila.querySelector("input[name^='hora_inicio']").value;
+        const horaFin = fila.querySelector("input[name^='hora_fin']").value;
+        const estado = fila.querySelector("select[name^='estado']").value;
+        const ministro = fila.querySelector("input[name^='ministro']").value;
+        const sede = fila.querySelector("input[name^='sede']").value;
+
+        programaciones.push({
+            id_programacion: idProgramacion,
+            fecha: fecha,
+            hora_inicio: horaInicio,
+            hora_fin: horaFin,
+            estado: estado,
+            ministro: ministro,
+            sede: sede
+        });
+    });
+
+    fetch("/registrar_programacion", {
+        method: "POST",
+        headers: {
+            "Content-Type": "application/json",
+        },
+        body: JSON.stringify({ id_charla: idCharla, programaciones: programaciones }),
+    })
+        .then(response => response.json())
+        .then(data => {
+            if (data.success) {
+                alert("Programación registrada con éxito");
+                location.reload(); // Recargar la página para ver los cambios
+            } else {
+                alert("Error al registrar la programación: " + data.error);
+            }
+        })
+        .catch(error => console.error("Error al registrar la programación:", error));
+}
+
+function obtenerDNI() {
+    const nombreCookie = "dni";
+    const cookies = document.cookie.split("; ");
+    for (let cookie of cookies) {
+        const [nombre, valor] = cookie.split("=");
+        if (nombre === nombreCookie) {
+            return valor;
+        }
+    }
+    return null;
+}
+
+const dni = obtenerDNI();
+console.log("dni obtenido:", dni);
+
+function enviarDNIAlBackend(idActo, fechaInicio, idCharla) {
+    const dni = obtenerDNI();
+    if (!dni) {
+        console.error("No se encontró el DNI en las cookies.");
+        return;
+    }
+
+    fetch("/obtener_ids_por_dni", {
+        method: "POST",
+        headers: {
+            "Content-Type": "application/json"
+        },
+        body: JSON.stringify({ dni: dni })
+    })
+        .then(response => response.json())
+        .then(data => {
+            if (data.success) {
+                const idMinistro = data.id_ministro;
+                const idSede = data.id_sede;
+                console.log("ID del Ministro:", idMinistro);
+                console.log("ID de la Sede:", idSede);
+                // Llamar a generarProgramacionAutomatica con los ID obtenidos
+                generarProgramacionAutomatica(idActo, fechaInicio, idCharla, idMinistro, idSede);
+            } else {
+                console.error("Error al obtener los IDs:", data.error);
+            }
+        })
+        .catch(error => {
+            console.error("Error en la solicitud al backend:", error);
+        });
+}
+
+function abrirModalVer(idProgramacion, tema, fecha, horaInicio, horaFin, estado, ministro, sede) {    
+    const modalTitle = 'Ver Detalles de la Programación';
+
+    document.getElementById('modalTitle').innerText = modalTitle;
+    document.getElementById('modalTema').value = tema;
+    document.getElementById('modalFecha').value = fecha;
+    document.getElementById('modalHoraInicio').value = horaInicio;
+    document.getElementById('modalHoraFin').value = horaFin;    
+    document.getElementById('modalMinistro').value = ministro;
+    document.getElementById('modalSede').value = sede;
+    const estadoSelect = document.getElementById('modalEstado');
+
+    // Convertir el valor completo a su abreviación correspondiente
+    let estadoAbreviado;
+    if (estado === 'Pendiente') estadoAbreviado = 'P';
+    else if (estado === 'Realizado') estadoAbreviado = 'R';
+    else if (estado === 'Inactivo') estadoAbreviado = 'I';
+
+    console.log("Valor de estado abreviado:", estadoAbreviado);
+
+    estadoSelect.value = estadoAbreviado;
+
+    document.querySelectorAll('#modalVerForm input, #modalVerForm select').forEach(input => input.disabled = true);
+    document.getElementById('btnGuardarCambios').style.display = 'none';
+    document.getElementById('btnSeleccionMinistro').disabled = true;
+    document.getElementById('btnSeleccionSede').disabled = true;
+    const modalVer = new bootstrap.Modal(document.getElementById('modalVer'));
+    modalVer.show();
+}
+
+function abrirModalEditar(idProgramacion, tema, fecha, horaInicio, horaFin, estado, ministro, sede) {
+    const modalTitle = 'Editar Programación';
+    document.getElementById('modalTitle').innerText = modalTitle;
+    document.getElementById('modalTema').value = tema;
+    document.getElementById('modalFecha').value = fecha;
+    document.getElementById('modalHoraInicio').value = horaInicio;
+    document.getElementById('modalHoraFin').value = horaFin;    
+    document.getElementById('modalMinistro').value = ministro;
+    document.getElementById('modalSede').value = sede;
+    
+    const estadoSelect = document.getElementById('modalEstado');
+
+    // Convertir el valor completo a su abreviación correspondiente
+    let estadoAbreviado;
+    if (estado === 'Pendiente') estadoAbreviado = 'P';
+    else if (estado === 'Realizado') estadoAbreviado = 'R';
+    else if (estado === 'Inactivo') estadoAbreviado = 'I';
+
+    console.log("Valor de estado abreviado:", estadoAbreviado);
+
+    // Asigna el valor abreviado al select
+    estadoSelect.value = estadoAbreviado;
+    document.getElementById('btnSeleccionMinistro').disabled = false;
+    document.getElementById('btnSeleccionSede').disabled = false;
+    document.querySelectorAll('#modalVerForm input').forEach(input => {
+        input.disabled = false;
+    });
+
+    document.getElementById('modalVerForm').setAttribute('data-id_programacion', idProgramacion);
+    document.getElementById('btnGuardarCambios').style.display = 'block';
+    const modalEditar = new bootstrap.Modal(document.getElementById('modalVer'));
+    modalEditar.show();
+}
+
+function guardarCambiosEdicion() {
+    const idProgramacion = document.getElementById('modalVerForm').getAttribute('data-id_programacion');
+    const tema = document.getElementById('modalTema').value;
+    const fecha = document.getElementById('modalFecha').value;
+    const horaInicio = document.getElementById('modalHoraInicio').value;
+    const horaFin = document.getElementById('modalHoraFin').value;
+    const estado = document.getElementById('modalEstado').value;
+    const ministro = document.getElementById('modalMinistro').value;
+    const sede = document.getElementById('modalSede').value;
+
+    fetch("/actualizar_programacion", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+            id_programacion: idProgramacion,
+            tema: tema,
+            fecha: fecha,
+            hora_inicio: horaInicio,
+            hora_fin: horaFin,
+            estado: estado,
+            ministro: ministro,
+            sede: sede
+        })
+    })
+    .then(response => response.json())
+    .then(data => {
+        if (data.success) {
+            alert("Programación actualizada con éxito");
+            location.reload(); // Recargar para reflejar los cambios
+        } else {
+            alert("Error al actualizar la programación: " + data.error);
+        }
+    })
+    .catch(error => console.error("Error al guardar la edición:", error));
+}
+
+let paginaActualMinistro = 1;
+const resultadosPorPagina = 10;
+
+let paginaActualSede = 1;
+const resultadosPorPaginaSede = 10;
+
+
+function abrirModalSeleccionMinistro() {
+    const modalMinistro = new bootstrap.Modal(document.getElementById('modalSeleccionMinistro'));
+    modalMinistro.show();
+    
+    cargarListaMinistros();
+}
+
+function abrirModalSeleccionSede() {
+    const modalSede = new bootstrap.Modal(document.getElementById('modalSeleccionSede'));
+    modalSede.show();
+
+    cargarListaSedes();
+}
+
+function seleccionarMinistro(nombreMinistro) {
+    document.getElementById('modalMinistro').value = nombreMinistro;
+    const modalMinistro = bootstrap.Modal.getInstance(document.getElementById('modalSeleccionMinistro'));
+    modalMinistro.hide();
+}
+
+function seleccionarSede(nombreSede) {
+    document.getElementById('modalSede').value = nombreSede;
+    const modalSede = bootstrap.Modal.getInstance(document.getElementById('modalSeleccionSede'));
+    modalSede.hide();
+}
+
+function cargarListaMinistros() {
+    const terminoBusqueda = document.getElementById('buscarMinistro').value;
+    
+    fetch(`/obtener_ministros?busqueda=${terminoBusqueda}&pagina=${paginaActualMinistro}&limite=${resultadosPorPagina}`)
+        .then(response => response.json())
+        .then(data => {
+            const lista = document.getElementById('listaMinistros');
+            lista.innerHTML = '';
+            data.ministros.forEach(ministro => {
+                const row = document.createElement('tr');
+                row.innerHTML = `
+                    <td>${ministro.id_ministro}</td>
+                    <td>${ministro.nombre}</td>
+                    <td>${ministro.sede}</td>
+                `;
+                row.onclick = () => seleccionarMinistro(ministro.nombre);
+                lista.appendChild(row);
+            });
+
+            // Actualizar el número de página en la interfaz
+            document.getElementById('paginaActualMinistro').textContent = data.pagina;
+        });
+}
+
+function paginaAnterior(tipo) {
+    if (paginaActualMinistro > 1) {
+        paginaActualMinistro--;
+        cargarListaMinistros();
+    }
+}
+
+function paginaSiguiente(tipo) {
+    paginaActualMinistro++;
+    cargarListaMinistros();
+}
+
+function cargarListaSedes() {
+    const terminoBusqueda = document.getElementById('buscarSede').value;
+
+    fetch(`/obtener_sedes?busqueda=${terminoBusqueda}&pagina=${paginaActualSede}&limite=${resultadosPorPaginaSede}`)
+        .then(response => response.json())
+        .then(data => {
+            const lista = document.getElementById('listaSedes');
+            lista.innerHTML = '';
+            data.sedes.forEach(sede => {
+                const row = document.createElement('tr');
+                row.innerHTML = `
+                    <td>${sede.id_sede}</td>
+                    <td>${sede.nombre}</td>
+                    <td>${sede.direccion}</td>
+                `;
+                row.onclick = () => seleccionarSede(sede.nombre);
+                lista.appendChild(row);
+            });
+
+            // Actualizar el número de página en la interfaz
+            document.getElementById('paginaActualSede').textContent = data.pagina;
+        });
+}
+
+function paginaAnterior(tipo) {
+    if (tipo === 'sede' && paginaActualSede > 1) {
+        paginaActualSede--;
+        cargarListaSedes();
+    } else if (tipo === 'ministro' && paginaActualMinistro > 1) {
+        paginaActualMinistro--;
+        cargarListaMinistros();
+    }
+}
+
+function paginaSiguiente(tipo) {
+    if (tipo === 'sede') {
+        paginaActualSede++;
+        cargarListaSedes();
+    } else if (tipo === 'ministro') {
+        paginaActualMinistro++;
+        cargarListaMinistros();
+    }
+}
+
+function darDeBajaProgramacion(idProgramacion) {
+    if (confirm("¿Estás seguro de que deseas dar de baja esta programación?")) {
+        fetch("/dar_de_baja_programacion", {
+            method: "POST",
+            headers: {
+                "Content-Type": "application/json"
+            },
+            body: JSON.stringify({ id_programacion: idProgramacion })
+        })
+        .then(response => response.json())
+        .then(data => {
+            if (data.success) {
+                alert("La programación ha sido dada de baja con éxito.");
+                
+                // Actualizar el estado en la tabla a "Inactivo"
+                actualizarEstadoEnTabla(idProgramacion, "Inactivo");
+            } else {
+                alert("Error al dar de baja la programación: " + data.error);
+            }
+        })
+        .catch(error => console.error("Error al dar de baja la programación:", error));
+    }
+}
+
+function actualizarEstadoEnTabla(idProgramacion, nuevoEstado) {
+    // Buscar la fila de la tabla que tiene el atributo `data-id_programacion` igual a `idProgramacion`
+    const fila = document.querySelector(`tr[data-id_programacion="${idProgramacion}"]`);
+
+    if (fila) {
+        // Selecciona la celda de estado (ajusta el índice de acuerdo con la posición en tu tabla)
+        const celdaEstado = fila.querySelector("td:nth-child(5)"); // Suponiendo que el estado está en la columna 5
+        if (celdaEstado) {
+            celdaEstado.textContent = nuevoEstado;
+        }
+    }
+}
+
+
+
+const eliminarProgramacion = (idProgramacion) => {
+    if (confirm("¿Estás seguro de que deseas eliminar esta programación? Esta acción no se puede deshacer.")) {
+        fetch("/eliminar_programacion", {
+            method: "DELETE",
+            headers: {
+                "Content-Type": "application/json"
+            },
+            body: JSON.stringify({ id_programacion: idProgramacion })
+        })
+        .then(response => response.json())
+        .then(data => {
+            if (data.success) {
+                alert("La programación ha sido eliminada con éxito.");
+                
+                // Eliminar la fila de la tabla
+                eliminarFilaDeTabla(idProgramacion);
+            } else {
+                alert("Error al eliminar la programación: " + data.error);
+            }
+        })
+        .catch(error => console.error("Error al eliminar la programación:", error));
+    }
+};
+
+const eliminarFilaDeTabla = (idProgramacion) => {
+    // Buscar la fila de la tabla que tiene el atributo `data-id_programacion` igual a `idProgramacion`
+    const fila = document.querySelector(`tr[data-id_programacion="${idProgramacion}"]`);
+
+    // Eliminar la fila si existe
+    if (fila) {
+        fila.remove();
+    }
+};

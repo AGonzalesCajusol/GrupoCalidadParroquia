@@ -6,36 +6,39 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>{% block title %}Sistema de Gestión de Parroquias{% endblock %}</title>
     <link rel="shortcut icon" href="{{ url_for('static', filename='img/iconoiglesia.png') }}" type="image/x-icon" />
-
-    <link href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-icons/1.8.1/font/bootstrap-icons.min.css"
-        rel="stylesheet" />
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet"
         integrity="sha384-QWTKZyjpPEjISv5WaRU9OFeRpok6YctnYmDr5pNlyT2bRjXh0JMhjY6hW+ALEwIH" crossorigin="anonymous">
-    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"
-        integrity="sha384-YvpcrYf0tY3lHB60NNkmXc5s9fDVZLESaAA55NDzOxhy9GkcIdslK1eN7N6jIeHz"
-        crossorigin="anonymous"></script>
-        <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.9.2/html2pdf.bundle.min.js"></script>
+
+
 
     <link rel="stylesheet" href="static/css/inicio_sesion.css" />
     <link rel="stylesheet" href="static/css/styles.css" />
-    <link rel="stylesheet" href="static/css/defecto.css" />
+    <link rel="stylesheet" href="static/css/defecto.css" />        
+    <!-- DataTable -->    
+    <link rel="stylesheet" href="https://cdn.datatables.net/1.13.4/css/jquery.dataTables.min.css">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-icons/1.8.1/font/bootstrap-icons.min.css"
+        rel="stylesheet" />
+        <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"
+        integrity="sha384-YvpcrYf0tY3lHB60NNkmXc5s9fDVZLESaAA55NDzOxhy9GkcIdslK1eN7N6jIeHz"
+        crossorigin="anonymous"></script>
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/js/all.min.js"></script>
-    <!-- DataTable -->
-    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
-    <link rel="stylesheet" href="https://cdn.datatables.net/1.13.4/css/jquery.dataTables.min.css">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.9.2/html2pdf.bundle.min.js"></script>
     <script src="https://cdn.datatables.net/1.13.4/js/jquery.dataTables.min.js"></script>
 </head>
 <style>
-    #head_ind{
+    #head_ind {
         top: 0;
         border-bottom: 4px rgb(167, 192, 221) solid;
     }
-    #miTablaClonada .ocultar {
-    display: none; /* Oculta los elementos con la clase "ocultar" */
-    }
 
+    #miTablaClonada .ocultar {
+        display: none;
+        /* Oculta los elementos con la clase "ocultar" */
+    }
 </style>
+
 <body class="hidden">
     <div id="spinner" class="spinner-overlay ">
         <div class="spinner"></div>
@@ -45,8 +48,9 @@
         <header class="navbar navbar-expand-lg  shadow-sm w-100 position-fixed" id="head_ind">
             <div class="container-fluid">
                 <a class="navbar-brand me-2" href="#">
-                    <img src="/static/img/celebracion.avif" alt="Logo Iglesia" width="40" height="40" class="d-inline-block align-text-top">
-                    <a class="nav-link" href="#"><strong >{{ request.cookies.get('sede') }}</strong></a>
+                    <img src="/static/img/celebracion.avif" alt="Logo Iglesia" width="40" height="40"
+                        class="d-inline-block align-text-top">
+                    <a class="nav-link" href="#"><strong>{{ request.cookies.get('sede') }}</strong></a>
                     <input type="text" id="sede" value="{{ request.cookies.get('sede') }}" hidden>
                 </a>
                 <div class="collapse navbar-collapse justify-content-end ms-4" id="navbarNav">
@@ -65,22 +69,26 @@
                         </li>
                     </ul>
                     <div class="d-flex align-items-center mt-1">
-                        <button type="button" class="btn btn-link position-relative text-black me-4" >
+                        <button type="button" class="btn btn-link position-relative text-black me-4">
                             <i class="bi bi-bell"></i>
-                                <span class="position-absolute top-0 start-100 translate-middle badge rounded-pill bg-danger">
+                            <span
+                                class="position-absolute top-0 start-100 translate-middle badge rounded-pill bg-danger">
                                 3 <span class="visually-hidden">nuevas notificaciones</span>
                             </span>
                         </button>
                         {% if request.cookies.get('nombre') %}
-                            <a onclick="finalizar_sesion()"  class="text-decoration-none text-black btn"><span class="me-3"><i class="bi bi-door-closed-fill"></i><strong> Salir</strong></span></a>
-                            <span class="me-3">Bienvenido, <strong id="ministro">{{ request.cookies.get('nombre') }}</strong></span>
+                        <a onclick="finalizar_sesion()" class="text-decoration-none text-black btn"><span
+                                class="me-3"><i class="bi bi-door-closed-fill"></i><strong> Salir</strong></span></a>
+                        <span class="me-3">Bienvenido, <strong id="ministro">{{ request.cookies.get('nombre')
+                                }}</strong></span>
                         {% else %}
-                            <a href="{{ url_for('raiz') }}" class="text-decoration-none text-black btn"><span class="me-3">Bienvenido! Inicie Sesion</strong></span></a>
+                        <a href="{{ url_for('raiz') }}" class="text-decoration-none text-black btn"><span
+                                class="me-3">Bienvenido! Inicie Sesion</strong></span></a>
                         {% endif %}
                     </div>
                 </div>
-            </div>                    
-    
+            </div>
+
         </header>
         <div id="mySidenav" class="sidenav">
 
@@ -135,7 +143,7 @@
                 <a class="btn btn-primary  mb-2 mt-2" data-bs-toggle="collapse" href="#moduloCatequesis" role="button"
                     aria-expanded="false" aria-controls="moduloCatequesis">
                     <i class="bi bi-book"></i> Gestión de catequesis
-                </a>                
+                </a>
                 <div class="collapse ms-4 mt-2" id="moduloCatequesis">
                     <a href="{{ url_for('gestionar_actos') }}" class="btn btn-outline-primary mt-2">
                         <i class="bi bi-arrow-return-right"></i> Gestion Actos liturgicos
@@ -153,7 +161,7 @@
                     </a>
                     <a href="{{ url_for('gestionar_charlas') }}" class="btn btn-outline-primary mt-2">
                         <i class="bi bi-arrow-return-right"></i> Gestión de charlas
-                    </a>                    
+                    </a>
                 </div>
 
                 <!------------------------- Modulo de parroquial ------------------------>
@@ -197,7 +205,7 @@
             </div>
         </div>
         <div class="main-content mt-3 me-5" style="max-height: 400px;">
-        
+
             {% block cuerpo %}
 
             {% endblock %}
@@ -205,4 +213,5 @@
     </div>
 </body>
 <script src="{{ url_for('static', filename = '/js/defecto.js')}}"></script>
+
 </html>

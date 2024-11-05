@@ -134,3 +134,25 @@ def eliminar_sede_acto_liturgico(id_sede):
         conexion.rollback()
     finally:
         conexion.close()
+
+# anggelooo
+def obtener_todas_sedes(termino_busqueda="", limite=10, offset=0):
+    conexion = obtener_conexion()
+    try:
+        with conexion.cursor() as cursor:
+            cursor.execute("""
+                SELECT id_sede, nombre_sede, direccion
+                FROM sede
+                WHERE estado = 1 
+                  AND nombre_sede LIKE %s
+                LIMIT %s OFFSET %s
+            """, (f"%{termino_busqueda}%", limite, offset))
+            sedes = cursor.fetchall()
+            sedes_list = [{"id_sede": sede[0], "nombre": sede[1], "direccion": sede[2]} for sede in sedes]
+        return sedes_list
+    except Exception as e:
+        print(f"Error al obtener sedes: {e}")
+        return []
+    finally:
+        conexion.close()
+

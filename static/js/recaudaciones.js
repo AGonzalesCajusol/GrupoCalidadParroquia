@@ -1,4 +1,4 @@
-$(document).ready(function () {
+/* $(document).ready(function () {
     // Inicializar DataTable
     var table = $('#recaudacionesTable').DataTable({
         pageLength: 8,
@@ -9,6 +9,71 @@ $(document).ready(function () {
         initComplete: function () {
             $("div.button-section").html('<button type="button" class="btn btn-success btn-lg custom-btn ml-3 btn-agregar-recaudacion" data-bs-toggle="modal" onclick="abrirModalRecaudacion(\'add\')"><i class="bi bi-person-plus"></i> Agregar recaudación</button>');
             $("div.button-section").append('<button type="button" class="btn btn-success btn-lg custom-btn ml-3" data-bs-toggle="modal" data-bs-target="#exportModal"><i class="bi bi-file-earmark-arrow-down"></i> Exportar recaudaciones</button>');
+         let opciones = '<option value="">Todos</option>';
+
+            fetch("/apiaños")
+                .then(response => response.json())
+                .then(response => { 
+                    // Generar las opciones directamente en la variable opciones
+                    response.data.forEach(element => {
+                        opciones += `<option value="${element.año}">${element.año}</option>`;
+                    });
+
+                    // Insertar el selector de año en el DOM después de que opciones esté lleno
+                    $("div.dataTables_filter").addClass("d-flex align-items-center"); // Para alinear ambos elementos
+                    $("div.dataTables_filter").append(`
+                        <div class="d-flex align-items-center ms-2">
+                            <label for="filtroAño" class="me-2">Año:</label>
+                            <select id="filtroAño" class="form-select" style="width: auto;" onchange="filtrarPorAño()">
+                                ${opciones}
+                            </select>
+                        </div>
+                    `);
+                })
+                .catch(error => {
+                    console.error("Error al cargar los años:", error);
+                });
+         `);
+        }
+    });
+});
+ */
+$(document).ready(function () {
+    // Inicializar DataTable
+    var table = $('#recaudacionesTable').DataTable({
+        pageLength: 8,
+        dom: '<"d-flex justify-content-between align-items-center mb-3"<"d-flex"f><"d-flex justify-content-end button-section">>rt<"bottom"p>',
+        language: {
+            search: "Buscar:"
+        },
+        initComplete: function () {
+            // Agregar botones para agregar y exportar recaudaciones
+            $("div.button-section").html('<button type="button" class="btn btn-success btn-lg custom-btn ml-3 btn-agregar-recaudacion" data-bs-toggle="modal" onclick="abrirModalRecaudacion(\'add\')"><i class="bi bi-person-plus"></i> Agregar recaudación</button>');
+            $("div.button-section").append('<button type="button" onclick= "exportarTablaPDF()" class="btn btn-success btn-lg custom-btn ml-3" data-bs-toggle="modal" data-bs-target="#exportModal"><i class="bi bi-file-earmark-arrow-down"></i> Exportar recaudaciones</button>');
+            let opciones = '<option value="">Todos</option>';
+
+            fetch("/apiaños")
+                .then(response => response.json())
+                .then(response => { 
+                    // Generar las opciones directamente en la variable opciones
+                    response.data.forEach(element => {
+                        opciones += `<option value="${element.año}">${element.año}</option>`;
+                    });
+
+                    // Insertar el selector de año en el DOM después de que opciones esté lleno
+                    $("div.dataTables_filter").addClass("d-flex align-items-center"); // Para alinear ambos elementos
+                    $("div.dataTables_filter").append(`
+                        <div class="d-flex align-items-center ms-2">
+                            <label for="filtroAño" class="me-2">Año:</label>
+                            <select id="filtroAño" class="form-select" style="width: auto;" onchange="filtrarPorAño()">
+                                ${opciones}
+                            </select>
+                        </div>
+                    `);
+                })
+                .catch(error => {
+                    console.error("Error al cargar los años:", error);
+                });
         }
     });
 });
@@ -44,6 +109,85 @@ $('#recaudacionModal').on('shown.bs.modal', function () {
         });
     }
 });
+// filtro por año en el combo 
+function filtrarPorAño() {
+    const añoSeleccionado = $('#filtroAño').val();
+    const tabla = $('#recaudacionesTable').DataTable();
+
+    if (añoSeleccionado) {
+        // Ajusta el filtro para buscar el año en cualquier parte de la cadena de la fecha
+        tabla.column(4).search(añoSeleccionado, true, false).draw();
+    } else {
+        tabla.column(4).search('').draw();  // Limpiar el filtro
+    }
+}
+
+function exportarTablaPDF() {
+    const { jsPDF } = window.jspdf;
+    const doc = new jsPDF();
+
+    // Título del informe
+    doc.setFontSize(18);
+    doc.text("Informe de Recaudaciones", 14, 20);
+
+    // Obtener solo las filas visibles en la tabla (las filtradas)
+    const table = $('#recaudacionesTable').DataTable();
+    const datos = [];
+    table.rows({ search: 'applied' }).every(function () {
+        const data = this.data();
+        datos.push([
+            data[0], // ID
+            data[1], // Sede
+            data[2], // Tipo
+            data[3], // Observaciones
+            data[4], // Fecha
+            data[5]  // Monto
+        ]);
+    });
+
+    // Configuración de la tabla en el PDF
+    doc.autoTable({
+        head: [['ID', 'Sede', 'Tipo', 'Observaciones', 'Fecha', 'Monto']],
+        body: datos,
+        startY: 30,
+        styles: {
+            fontSize: 10,
+            cellPadding: 3,
+            valign: 'middle',
+            halign: 'center', // Alinear el texto al centro
+        },
+        headStyles: {
+            fillColor: [167, 192, 221], // Color de encabezado
+            textColor: 255, // Texto en blanco
+            fontSize: 11,
+            fontStyle: 'bold',
+        },
+        bodyStyles: {
+            textColor: [0, 0, 0],
+        },
+        alternateRowStyles: {
+            fillColor: [240, 248, 255], // Alternar color de fondo de las filas
+        },
+        columnStyles: {
+            0: { cellWidth: 15 },   // ID
+            1: { cellWidth: 30 },   // Sede
+            2: { cellWidth: 40 },   // Tipo
+            3: { cellWidth: 50 },   // Observaciones
+            4: { cellWidth: 25 },   // Fecha
+            5: { cellWidth: 20 },   // Monto
+        },
+        didDrawPage: function (data) {
+            // Encabezado de página
+            doc.setFontSize(10);
+            doc.text("Página " + doc.internal.getCurrentPageInfo().pageNumber, 180, 10);
+        }
+    });
+
+    // Guardar el PDF
+    doc.save("Informe_Recaudaciones.pdf");
+}
+
+
 
 
 

@@ -131,6 +131,24 @@ def retornar_datos_ministro(num_doc):
     finally:
         conexion.close()
 
-    
-        
-
+##anggelooo
+def obtener_todos_ministros(termino_busqueda="", limite=10, offset=0):
+    conexion = obtener_conexion()
+    try:
+        with conexion.cursor() as cursor:
+            cursor.execute("""
+                SELECT m.id_ministro, m.nombre_ministro, s.nombre_sede
+                FROM ministro m
+                LEFT JOIN sede s ON m.id_sede = s.id_sede
+                WHERE m.estado = 1 
+                  AND m.nombre_ministro LIKE %s
+                LIMIT %s OFFSET %s
+            """, (f"%{termino_busqueda}%", limite, offset))
+            ministros = cursor.fetchall()
+            ministros_list = [{"id_ministro": ministro[0], "nombre": ministro[1], "sede": ministro[2]} for ministro in ministros]
+        return ministros_list
+    except Exception as e:
+        print(f"Error al obtener ministros: {e}")
+        return []
+    finally:
+        conexion.close()
