@@ -62,7 +62,7 @@
                         {% endfor %}
                     </select>
 
-                    <button class="btn btn-primary " onclick="verificar()">
+                    <button class="btn btn-success " onclick="verificar()">
                         <i class="bi bi-plus-circle-fill me-2"></i>Nuevo
                     </button>
                 </div>
@@ -269,7 +269,19 @@
         </tbody>
     </table>
 </div>
+<!-- MODAL PARA MOSTRAR FOTO -->
+<div class="modal" tabindex="-1" id="myModal">
+    <div class="modal-dialog modal-dialog-centered modal-lg">
+        <div class="modal-content">
+            <div class="modal-body">
+                <img class="formulario_imagenes" src="" alt="" id="imagen_modal">
+            </div>
+        </div>
+    </div>
+</div>
+
 </main>
+
 
 <script src="/static/js/solicitudes.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>

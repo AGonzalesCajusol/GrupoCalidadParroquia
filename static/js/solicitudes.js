@@ -67,13 +67,16 @@ function verificar() {
 function visualizar(id_imagen) {
     const imagen_formulario = document.getElementById(id_imagen).files[0];
     const imagen_modal = document.getElementById('imagen_modal');
-    if (imagen_formulario.name.length > 0) {
-        var myModal = new bootstrap.Modal(document.getElementById('myModal'));
+
+    if (imagen_formulario && imagen_formulario.name.length > 0) {
         const objUrl = URL.createObjectURL(imagen_formulario);
         imagen_modal.src = objUrl;
+
+        var myModal = new bootstrap.Modal(document.getElementById('myModal'));
         myModal.show();
     }
 }
+
 function listar_formulario(id_acto) {
     const tbody = document.getElementById('datos_solicitud');
     var acto = document.getElementById('acto_seleccionado').value;
@@ -101,13 +104,13 @@ function listar_formulario(id_acto) {
                                     <i class="bi bi-calendar3"></i>
                                 </button>
                             `
-                            : (element.tipo !== 'Numerico'  && element.tipo !== 'Sede') 
+                            : (element.tipo == 'Imagen' ) 
                                 ? `
-                                    <button type="button" class="btn btn-primary btn-sm" title="Ver" onclick="visualizar(${element.id})">
+                                    <button type="button" class="btn btn-primary btn-sm" title="Ver" onclick="visualizar('${element.id_requisito}')">
                                         <i class="fas fa-eye"></i>
                                     </button>
                                 `
-                                : ''
+                                : ' '
                         }
                     </td>
                 `;
