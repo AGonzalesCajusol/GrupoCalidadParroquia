@@ -6,6 +6,7 @@ from controladores.controlador_tipo_recaudacion import (
     obtener_tipo_recaudacion_por_id,
     actualizar_tipo_recaudacion,
     dar_baja_tipo_recaudacion,
+    verificar_nombre_recaudacion_existe,
     eliminar_tipo_recaudacion
 )
 
@@ -21,18 +22,25 @@ def registrar_rutas(app):
     def formulario_registrar_tipo_recaudacion():
         return render_template("tipo_recaudacion/registrar_tipo_recaudacion.html")
 
-    # Ruta para insertar un nuevo tipo de recaudación
     @app.route("/insertar_tipo_recaudacion", methods=["POST"])
     def procesar_insertar_tipo_recaudacion():
         try:
-            nombre_recaudacion = request.form["nombre_recaudacion"]
+            nombre_recaudacion = request.form["nombre_recaudacion"].strip()
             tipo = request.form["tipo"]
             estado = int(request.form.get("estado", 1))  # Asegurarse de convertir 'estado' a un entero
 
+            # Verificar si el nombre de recaudación ya existe en la base de datos
+            if verificar_nombre_recaudacion_existe(nombre_recaudacion):
+                return jsonify({
+                    "success": False,
+                    "message": "Este nombre de recaudación ya existe. Por favor, elige otro nombre."
+                }), 400
+
+            # Insertar el nuevo tipo de recaudación si no existe
             insertar_tipo_recaudacion(nombre_recaudacion, tipo, estado)
             tipos_recaudacion = obtener_tipos_recaudacion()
 
-            # Preparar la respuesta JSON
+            # Preparar la respuesta JSON con los datos actualizados
             tipos_recaudacion_data = [
                 {
                     "id": tipo[0],
@@ -48,11 +56,13 @@ def registrar_rutas(app):
                 "message": "El tipo de recaudación fue agregado exitosamente.",
                 "tipos_recaudacion": tipos_recaudacion_data
             })
+
         except Exception as e:
             return jsonify({
                 "success": False,
                 "message": f"Error al insertar tipo de recaudación: {str(e)}"
             }), 400
+
 
     # Ruta para mostrar el formulario de edición de un tipo de recaudación
     @app.route("/editar_tipo_recaudacion/<int:id>", methods=["GET"])
