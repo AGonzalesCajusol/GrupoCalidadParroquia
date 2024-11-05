@@ -193,7 +193,7 @@ def obtener_feligres_por_dni(dni):
     try:
         with conexion.cursor() as cursor:
             cursor.execute("""
-                SELECT id_feligres, dni, apellidos, nombres, fecha_nacimiento, estado_civil, sexo, id_sede 
+                SELECT dni, apellidos, nombres, fecha_nacimiento, estado_civil, sexo, id_sede 
                 FROM feligres 
                 WHERE dni = %s
             """, (dni,))
