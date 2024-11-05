@@ -1,24 +1,28 @@
 from flask import render_template, request, redirect, url_for, flash
 from bd import obtener_conexion  # Asegúrate de que esta función esté correctamente definida
+from datetime import datetime
 
 from controladores.controlador_egresos import (
     listar_egresos,
     agregar_egreso,
     actualizar_egreso,
-    eliminar_egreso
+    eliminar_egreso,
+    obtener_id_sede_por_nombre
 )
 
 def registrar_rutas(app):
     # Ruta para gestionar los egresos
     @app.route('/gestionar_egresos', methods=['GET'])
     def gestionar_egresos():
+        sede_usuario = request.cookies.get('sede')
         conexion = obtener_conexion()
         with conexion.cursor() as cursor:
             cursor.execute("""
                 SELECT e.id_egreso, s.nombre_sede AS nombre_sede, e.monto, e.descripcion, e.fecha, e.hora
                 FROM egreso e
                 JOIN sede s ON e.id_sede = s.id_sede
-            """)
+                WHERE s.nombre_sede = %s
+            """,(sede_usuario))
             egresos = cursor.fetchall()
         conexion.close()
         return render_template('egresos/gestionar_egresos.html', egresos=egresos)
@@ -27,18 +31,22 @@ def registrar_rutas(app):
     # Ruta para agregar un egreso
     @app.route('/insertar_egreso', methods=['POST'])
     def insertar_egreso():
-        id_sede = request.form['id_sede']
+        id_sede = obtener_id_sede_por_nombre(request.cookies.get("sede"))
         monto = request.form['monto']
         descripcion = request.form['descripcion']
-        fecha = request.form['fecha']
-        hora = request.form['hora']
+        fecha_hora_actual = datetime.now()
+
+        # Formatear la fecha en "YYYY-MM-DD"
+        fecha_actual = fecha_hora_actual.strftime("%Y-%m-%d")
+        # Formatear la hora en "HH:MM:SS"
+        hora_actual = fecha_hora_actual.strftime("%H:%M:%S")
 
         conexion = obtener_conexion()
         with conexion.cursor() as cursor:
             cursor.execute("""
                 INSERT INTO egreso (id_sede, monto, descripcion, fecha, hora)
                 VALUES (%s, %s, %s, %s, %s)
-            """, (id_sede, monto, descripcion, fecha, hora))
+            """, (id_sede, monto, descripcion, fecha_actual, hora_actual))
         conexion.commit()
         conexion.close()
 
