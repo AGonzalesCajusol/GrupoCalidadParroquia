@@ -9,9 +9,9 @@
         <thead class="table-light">
             <tr class="text-center">
                 <th style="vertical-align: middle; text-align: center;">ID</th>
-                <th style="vertical-align: middle; text-align: center;">Nombre de Intención</th>
+                <th style="vertical-align: middle; text-align: center;">Nombre de intención</th>
                 <th style="vertical-align: middle; text-align: center;">Descripción</th>
-                <th style="vertical-align: middle; text-align: center;">Nombre Acto Litúrgico</th>
+                <th style="vertical-align: middle; text-align: center;">Nombre acto litúrgico</th>
                 <th style="vertical-align: middle; text-align: center; width: 200px;">Acciones</th>
             </tr>
         </thead>
@@ -55,12 +55,12 @@
             <form id="formIntencion" action="{{ url_for('procesar_insertar_intencion') }}" method="POST">
                 <input type="hidden" id="intencionId" name="id">
                 <div class="modal-header">
-                    <h5 class="modal-title" id="modalIntencionLabel">Agregar Intención</h5>
+                    <h5 class="modal-title" id="modalIntencionLabel">Agregar intención</h5>
                     <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
                 </div>
                 <div class="modal-body">
                     <div class="mb-3">
-                        <label for="nombre_intencion" class="form-label">Nombre de la Intención</label>
+                        <label for="nombre_intencion" class="form-label">Nombre de la intención</label>
                         <input type="text" class="form-control" id="nombre_intencion" name="nombre_intencion" required>
                     </div>
                     <div class="mb-3">
@@ -68,7 +68,7 @@
                         <input type="text" class="form-control" id="descripcion" name="descripcion" maxlength="60" required>
                     </div>
                     <div class="mb-3">
-                        <label for="id_actoliturgico" class="form-label">Acto Litúrgico</label>
+                        <label for="id_actoliturgico" class="form-label">Acto litúrgico</label>
                         <select class="form-select" id="id_actoliturgico" name="id_actoliturgico" required>
                             <!-- Opciones serán agregadas dinámicamente por JavaScript -->
                         </select>

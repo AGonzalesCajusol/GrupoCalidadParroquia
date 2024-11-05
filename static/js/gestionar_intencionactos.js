@@ -52,7 +52,7 @@ function abrirModalIntencion(accion, id = '', nombre = '', descripcion = '', idA
 
     // Configurar el modal en función de la acción
     if (accion === 'agregar') {
-        modalTitle.textContent = 'Agregar Intención';
+        modalTitle.textContent = 'Agregar intención';
         submitBtn.textContent = 'Guardar';
         submitBtn.style.display = 'block';
         formIntencion.setAttribute('action', insertarIntencionURL);
@@ -81,7 +81,7 @@ function abrirModalIntencion(accion, id = '', nombre = '', descripcion = '', idA
         selectActoLiturgico.setAttribute('disabled', true);
 
     } else if (accion === 'editar') {
-        modalTitle.textContent = 'Editar Intención';
+        modalTitle.textContent = 'Editar intención';
         submitBtn.textContent = 'Guardar cambios';
         submitBtn.style.display = 'block';
         formIntencion.setAttribute('action', actualizarIntencionURL);
