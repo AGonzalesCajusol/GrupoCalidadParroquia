@@ -46,20 +46,20 @@ function listar() {
                 tbody.appendChild(tr);  
             });
 
-            // Inicializar DataTable
             $('#tablas').DataTable({
-                paging: false,
-                ordering: true,
-                info: false,
-                searching: true,
-                lengthChange: false,
+                pageLength: 8,
+                dom: '<"d-flex justify-content-between align-items-center mb-3"<"d-flex"f><"d-flex justify-content-end button-section">>rt<"bottom"p>',
                 language: {
                     search: "Buscar:",
                     searchPlaceholder: "Filtrar registros..."
                 },
                 columnDefs: [
                     { orderable: false, targets: [5] }
-                ]
+                ],
+                initComplete: function () {
+                    // Insertar el botón "Agregar" dinámicamente
+                    $("div.button-section").html('<button type="button" class="btn btn-success btn-sm mr-2" onclick="abrir_modal(\'agregar\')"><i class="bi bi-plus-circle"></i> Agregar</button>');
+                }
             });
         })
         .catch(error => console.error('Error al listar actos:', error));
@@ -75,10 +75,10 @@ function abrir_modal(tipo){
     modal.show();
     form_elementos('habilitar');
     if(tipo == 'agregar'){
-        titulo.textContent = "Agregar requisitos al acto litúrgico";
+        titulo.textContent = "Agregar requisitos a un acto litúrgico";
         boton.textContent = "Agregar";
     }else if(tipo == 'ver'){
-        titulo.textContent = "";
+        titulo.textContent = "Ver requisito";
         boton.style.display = "none"; 
     }else if(tipo == 'modificar'){
         titulo.textContent = "Modificar requisito";

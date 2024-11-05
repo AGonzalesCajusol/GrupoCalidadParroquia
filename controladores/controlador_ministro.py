@@ -73,7 +73,12 @@ def obtener_ministros():
         with conexion.cursor() as cursor:
             cursor.execute("""
                SELECT m.id_ministro, m.nombre_ministro, m.numero_documento, m.fecha_nacimiento, m.fecha_ordenacion, m.fin_actividades, m.token, 
-                       tp.tipo_ministro, s.nombre_sede, c.cargo 
+                       tp.tipo_ministro, s.nombre_sede, c.cargo,  
+                           CASE 
+                                WHEN m.estado = 1 THEN 'Activo'
+                                WHEN m.estado = 0 THEN 'Inactivo'
+                                ELSE 'Desconocido'
+                            END AS estado
                 FROM ministro m 
                 INNER JOIN sede s ON s.id_sede = m.id_sede 
                 INNER JOIN tipo_ministro tp ON tp.id_tipoministro = m.tipoministro 
