@@ -154,7 +154,7 @@ function exportarTablaPDF() {
             fontSize: 10,
             cellPadding: 3,
             valign: 'middle',
-            halign: 'center', // Alinear el texto al centro
+            //halign: 'center', // Alinear el texto al centro
         },
         headStyles: {
             fillColor: [167, 192, 221], // Color de encabezado
@@ -169,12 +169,12 @@ function exportarTablaPDF() {
             fillColor: [240, 248, 255], // Alternar color de fondo de las filas
         },
         columnStyles: {
-            0: { cellWidth: 15 },   // ID
-            1: { cellWidth: 30 },   // Sede
-            2: { cellWidth: 40 },   // Tipo
-            3: { cellWidth: 50 },   // Observaciones
-            4: { cellWidth: 25 },   // Fecha
-            5: { cellWidth: 20 },   // Monto
+            0: { cellWidth: 15, halign: 'center' },   // ID
+            1: { cellWidth: 30, halign: 'center' },   // Sede
+            2: { cellWidth: 40, halign: 'left' },   // Tipo
+            3: { cellWidth: 50, halign: 'left' },   // Observaciones
+            4: { cellWidth: 25, halign: 'center' },   // Fecha
+            5: { cellWidth: 20, halign: 'right' },   // Monto
         },
         didDrawPage: function (data) {
             // Encabezado de página
