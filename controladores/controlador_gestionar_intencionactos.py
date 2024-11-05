@@ -1,40 +1,26 @@
+from flask import request, jsonify
 from bd import obtener_conexion
 
-# Función para obtener todos los actos litúrgicos
-def obtener_actos_liturgicos():
-    conexion = obtener_conexion()
-    try:
-        with conexion.cursor() as cursor:
-            cursor.execute("SELECT id_actoliturgico, nombre_liturgia FROM actoliturgico")
-            actos_liturgicos = cursor.fetchall()
-        return actos_liturgicos
-    except Exception as e:
-        print(f"Error al obtener actos litúrgicos: {e}")
-        return []
-    finally:
-        conexion.close()
+
 
 # Función para insertar una nueva intención
-def insertar_intencion(nombre, descripcion, id_actoliturgico):
+def insertar_intencion(nombre_intencion, descripcion, id_actoliturgico):
     conexion = obtener_conexion()
     try:
         with conexion.cursor() as cursor:
-            # Verificar si el nombre de la intención ya existe
-            cursor.execute("SELECT COUNT(*) FROM intencion WHERE nombre_intencion = %s", (nombre,))
-            if cursor.fetchone()[0] > 0:
-                return {"success": False, "message": "Esta intención ya existe. Por favor, elige otro nombre."}
-
-            # Si no existe, inserta la intención
+            # Insertar la nueva intención en la base de datos
             cursor.execute("""
                 INSERT INTO intencion (nombre_intencion, descripcion, id_actoliturgico)
                 VALUES (%s, %s, %s)
-            """, (nombre, descripcion, id_actoliturgico))
-            conexion.commit()
-            return {"success": True, "message": "Intención agregada exitosamente."}
+            """, (nombre_intencion, descripcion, id_actoliturgico))
+        
+        # Confirmar los cambios en la base de datos
+        conexion.commit()
+        return True
     except Exception as e:
+        print(f"Error al insertar intención: {e}")
         conexion.rollback()
-        print("Error:", e)
-        return {"success": False, "message": "Error al insertar la intención."}
+        return False
     finally:
         conexion.close()
 
@@ -69,13 +55,13 @@ def obtener_intencion_por_id(id_intencion):
             intencion = cursor.fetchone()
         return intencion
     except Exception as e:
-        print(f"Error al obtener intención por id: {e}")
+        print(f"Error al obtener intención por ID: {e}")
         return None
     finally:
         conexion.close()
 
 # Función para actualizar una intención
-def actualizar_intencion(nombre_intencion, descripcion, id_actoliturgico, id_intencion):
+def actualizar_intencion(id_intencion, nombre_intencion, descripcion, id_actoliturgico):
     conexion = obtener_conexion()
     try:
         with conexion.cursor() as cursor:
@@ -85,23 +71,39 @@ def actualizar_intencion(nombre_intencion, descripcion, id_actoliturgico, id_int
                 WHERE id_intencion = %s
             """, (nombre_intencion, descripcion, id_actoliturgico, id_intencion))
         conexion.commit()
+        return True
     except Exception as e:
         print(f"Error al actualizar intención: {e}")
         conexion.rollback()
+        return False
     finally:
         conexion.close()
 
-# Función para eliminar una intención
+# Función para eliminar una intención por su ID
 def eliminar_intencion(id_intencion):
     conexion = obtener_conexion()
     try:
         with conexion.cursor() as cursor:
             cursor.execute("DELETE FROM intencion WHERE id_intencion = %s", (id_intencion,))
         conexion.commit()
+        return True
     except Exception as e:
         print(f"Error al eliminar intención: {e}")
         conexion.rollback()
-        return f"Error al eliminar intención: {e}"
+        return False
     finally:
         conexion.close()
 
+# Función para obtener los actos litúrgicos (para el combo de selección)
+def obtener_actos_liturgicos():
+    conexion = obtener_conexion()
+    try:
+        with conexion.cursor() as cursor:
+            cursor.execute("SELECT id_actoliturgico, nombre_liturgia FROM actoliturgico WHERE estado = 'A'")
+            actos_liturgicos = cursor.fetchall()
+        return actos_liturgicos
+    except Exception as e:
+        print(f"Error al obtener actos litúrgicos: {e}")
+        return []
+    finally:
+        conexion.close()

@@ -48,35 +48,42 @@
     </table>
 </div>
 
-<!-- Modal para Agregar, Ver o Editar -->
-<div class="modal fade" id="modalIntencion" tabindex="-1" aria-labelledby="modalIntencionLabel" aria-hidden="true">
+
+<!-- Modal para Agregar/Ver/Editar Intención -->
+<div class="modal fade" id="intencionModal" tabindex="-1" aria-labelledby="intencionModalLabel" aria-hidden="true">
     <div class="modal-dialog">
         <div class="modal-content">
-            <form id="formIntencion" action="{{ url_for('procesar_insertar_intencion') }}" method="POST">
+            <form id="intencionForm" action="{{ url_for('procesar_insertar_intencion') }}" method="POST">
                 <input type="hidden" id="intencionId" name="id">
+
                 <div class="modal-header">
-                    <h5 class="modal-title" id="modalIntencionLabel">Agregar intención</h5>
+                    <h5 class="modal-title" id="intencionModalLabel">Detalles de Intención</h5>
                     <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
                 </div>
+                
                 <div class="modal-body">
                     <div class="mb-3">
-                        <label for="nombre_intencion" class="form-label">Nombre de la intención</label>
+                        <label for="id_actoliturgico" class="form-label">Acto Litúrgico</label>
+                        <select class="form-select" id="id_actoliturgico" name="id_actoliturgico" required>
+                            {% for acto in actos %}
+                                <option value="{{ acto[0] }}">{{ acto[1] }}</option> <!-- `acto[1]` es el nombre -->
+                            {% endfor %}
+                        </select>                                                                       
+                    </div>                              
+                    <div class="mb-3">
+                        <label for="nombre_intencion" class="form-label">Nombre de Intención</label>
                         <input type="text" class="form-control" id="nombre_intencion" name="nombre_intencion" required>
                     </div>
+                    
                     <div class="mb-3">
                         <label for="descripcion" class="form-label">Descripción</label>
-                        <input type="text" class="form-control" id="descripcion" name="descripcion" maxlength="60" required>
+                        <input type="text" class="form-control" id="descripcion" name="descripcion" required>
                     </div>
-                    <div class="mb-3">
-                        <label for="id_actoliturgico" class="form-label">Acto litúrgico</label>
-                        <select class="form-select" id="id_actoliturgico" name="id_actoliturgico" required>
-                            <!-- Opciones serán agregadas dinámicamente por JavaScript -->
-                        </select>
-                    </div>                    
                 </div>
+                
                 <div class="modal-footer">
                     <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cerrar</button>
-                    <button type="submit" class="btn btn-primary" id="submitBtn"></button>
+                    <button type="submit" class="btn btn-primary" id="submitBtn">Guardar</button>
                 </div>
             </form>
         </div>
