@@ -1,8 +1,12 @@
 from bd import obtener_conexion
 from hashlib import sha256
 
-
 def insertar_feligres(dni, apellidos, nombres, fecha_nacimiento, estado_civil, sexo, id_sede):
+    print(f"Recibido DNI: {dni}")  # Para verificar que el DNI se está recibiendo
+    if existe_feligres(dni):
+        print("El feligrés con este DNI ya existe.")
+        return {"success": False, "message": "El feligrés con este DNI ya existe"}
+
     conexion = obtener_conexion()
     try:
         with conexion.cursor() as cursor:
@@ -11,9 +15,11 @@ def insertar_feligres(dni, apellidos, nombres, fecha_nacimiento, estado_civil, s
                 VALUES (%s, %s, %s, %s, %s, %s, %s)
             """, (dni, apellidos, nombres, fecha_nacimiento, estado_civil, sexo, id_sede))
         conexion.commit()
+        return {"success": True, "message": "Feligrés insertado exitosamente"}
     except Exception as e:
         print(f"Error al insertar feligrés: {e}")
         conexion.rollback()
+        return {"success": False, "message": str(e)}
     finally:
         conexion.close()
 
@@ -22,7 +28,7 @@ def obtener_feligreses():
     try:
         with conexion.cursor() as cursor:
             cursor.execute("""
-                SELECT f.id_feligres, f.dni, f.apellidos, f.nombres, f.fecha_nacimiento, f.estado_civil, f.sexo, s.nombre_sede 
+                SELECT f.dni, f.apellidos, f.nombres, f.fecha_nacimiento, f.estado_civil, f.sexo, s.nombre_sede 
                 FROM feligres f
                 INNER JOIN sede s ON f.id_sede = s.id_sede
             """)
@@ -34,32 +40,16 @@ def obtener_feligreses():
     finally:
         conexion.close()
 
-def obtener_feligres_por_id(id_feligres):
-    conexion = obtener_conexion()
-    try:
-        with conexion.cursor() as cursor:
-            cursor.execute("""
-                SELECT id_feligres, dni, apellidos, nombres, fecha_nacimiento, estado_civil, sexo, id_sede 
-                FROM feligres 
-                WHERE id_feligres = %s
-            """, (id_feligres,))
-            feligres = cursor.fetchone()
-        return feligres
-    except Exception as e:
-        print(f"Error al obtener feligrés por id: {e}")
-        return None
-    finally:
-        conexion.close()
 
-def actualizar_feligres(dni, apellidos, nombres, fecha_nacimiento, estado_civil, sexo, id_sede, id_feligres):
+def actualizar_feligres(dni, apellidos, nombres, fecha_nacimiento, estado_civil, sexo, id_sede):
     conexion = obtener_conexion()
     try:
         with conexion.cursor() as cursor:
             cursor.execute("""
                 UPDATE feligres 
-                SET dni = %s, apellidos = %s, nombres = %s, fecha_nacimiento = %s, estado_civil = %s, sexo = %s, id_sede = %s
-                WHERE id_feligres = %s
-            """, (dni, apellidos, nombres, fecha_nacimiento, estado_civil, sexo, id_sede, id_feligres))
+                SET apellidos = %s, nombres = %s, fecha_nacimiento = %s, estado_civil = %s, sexo = %s, id_sede = %s
+                WHERE dni = %s
+            """, (apellidos, nombres, fecha_nacimiento, estado_civil, sexo, id_sede, dni))
         conexion.commit()
     except Exception as e:
         print(f"Error al actualizar feligrés: {e}")
@@ -67,11 +57,11 @@ def actualizar_feligres(dni, apellidos, nombres, fecha_nacimiento, estado_civil,
     finally:
         conexion.close()
 
-def eliminar_feligres(id_feligres):
+def eliminar_feligres(dni):
     conexion = obtener_conexion()
     try:
         with conexion.cursor() as cursor:
-            cursor.execute("DELETE FROM feligres WHERE id_feligres = %s", (id_feligres,))
+            cursor.execute("DELETE FROM feligres WHERE dni = %s", (dni,))
         conexion.commit()
     except Exception as e:
         print(f"Error al eliminar feligres: {e}")
@@ -151,7 +141,6 @@ def varificar_sessionFeligres(dni,token):
     except:
         return valor
 
-
 def actualizarTokenFeligres(dni, token):
     conexion = obtener_conexion()
     try:
@@ -187,7 +176,6 @@ def actualizarTokenFeligres(dni, token):
     finally:
         conexion.close()  # Cierra la conexión
 
-
 def obtener_feligres_por_dni(dni):
     conexion = obtener_conexion()
     try:
@@ -204,3 +192,19 @@ def obtener_feligres_por_dni(dni):
         return None
     finally:
         conexion.close()
+
+def existe_feligres(dni):
+    conexion = obtener_conexion()
+    try:
+        with conexion.cursor() as cursor:
+            cursor.execute("SELECT dni FROM feligres WHERE dni = %s", (dni,))
+            result = cursor.fetchone()
+        return result is not None
+    except Exception as e:
+        print(f"Error al verificar existencia de feligrés: {e}")
+        return False
+    finally:
+        conexion.close()
+
+
+
