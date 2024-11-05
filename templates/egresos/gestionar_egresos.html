@@ -56,6 +56,8 @@
                     </button>
 
                     <button class="btn btn-warning btn-sm" onclick="abrirModalEditar('{{ egreso[0] }}', '{{ egreso[1] }}', '{{ egreso[2] }}', '{{ egreso[3] }}', '{{ egreso[4] }}', '{{ egreso[5] }}')"><i class="fas fa-edit"></i></button>
+                    
+                    <!-- Comentario 
                     <button type="button" class="btn btn-secondary btn-sm" title="Dar de baja" onclick="mostrarAlertaBaja()">
                         <i class="fas fa-ban"></i>
                     </button>
@@ -65,6 +67,7 @@
                             <i class="fas fa-trash-alt"></i>
                         </button>                        
                     </form>
+                    -->
                 </td>
             </tr>
             {% endfor %}
@@ -156,7 +159,7 @@
 </div>
 
 
-<!-- Modal para editar -->
+<!-- Modal para editar --->
 <div class="modal fade" id="editarModal" tabindex="-1" aria-labelledby="editarModalLabel" aria-hidden="true">
     <div class="modal-dialog">
         <div class="modal-content">
@@ -185,11 +188,11 @@
                     </div>
                     <div class="mb-3">
                         <label for="fecha" class="form-label">Fecha</label>
-                        <input type="date" class="form-control" id="editarFecha" name="fecha" disabled> <!-- Campo deshabilitado -->
+                        <input type="date" class="form-control" id="editarFecha" name="fecha" disabled> 
                     </div>
                     <div class="mb-3">
                         <label for="hora" class="form-label">Hora</label>
-                        <input type="time" class="form-control" id="editarHora" name="hora" disabled> <!-- Campo deshabilitado -->
+                        <input type="time" class="form-control" id="editarHora" name="hora" disabled> 
                     </div>
                 </div>
                 <div class="modal-footer">
@@ -202,7 +205,8 @@
 </div>
 
 
-<!-- Modal de confirmación para eliminar -->
+
+<!-- Modal de confirmación para eliminar
 <div class="modal fade" id="confirmarEliminarModal" tabindex="-1" aria-labelledby="confirmarEliminarLabel" aria-hidden="true">
     <div class="modal-dialog">
         <div class="modal-content">
@@ -223,7 +227,7 @@
         </div>
     </div>
 </div>
-
+----Comentario Fin -->
 
 <script src="/static/js/egresos.js"></script>
 

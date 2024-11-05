@@ -37,10 +37,37 @@ def obtener_recaudaciones():
     try:
         with conexion.cursor() as cursor:
             cursor.execute("""
-                SELECT r.id_recaudacion, r.fecha, r.hora, r.monto, r.observacion, s.nombre_sede, tr.nombre_recaudacion
-                FROM recaudacion r
-                JOIN sede s ON r.id_sede = s.id_sede
-                JOIN tipo_recaudacion tr ON r.id_tipo_recaudacion = tr.id_tipo_recaudacion
+            SELECT 
+                r.id_recaudacion,
+                r.fecha,
+                r.hora,
+                r.monto,
+                r.observacion,
+                s.nombre_sede,
+                tr.nombre_recaudacion
+            FROM 
+                recaudacion r
+            JOIN 
+                sede s ON r.id_sede = s.id_sede
+            JOIN 
+                tipo_recaudacion tr ON r.id_tipo_recaudacion = tr.id_tipo_recaudacion
+
+            UNION ALL
+
+            SELECT 
+                c.id_comprobante AS id_recaudacion,
+                DATE(c.fecha_hora) AS fecha,
+                TIME(c.fecha_hora) AS hora,
+                c.total AS monto,
+                'Celebración de Acto Litúrgico' AS observacion,
+                s.nombre_sede,
+                tr.nombre_recaudacion
+            FROM 
+                comprobante c
+            JOIN 
+                sede s ON c.id_sede = s.id_sede
+            JOIN 
+                tipo_recaudacion tr ON tr.id_tipo_recaudacion = 34;
             """)
             recaudaciones = cursor.fetchall()
         return recaudaciones

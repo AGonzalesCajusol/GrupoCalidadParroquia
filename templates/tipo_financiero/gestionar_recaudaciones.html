@@ -43,11 +43,10 @@
 
                         <!-- Botón para editar -->
                         <button class="btn btn-warning btn-sm" title="edit"
-                            onclick="abrirModalRecaudacion('edit', '{{ recaudacion[0] }}', '{{ recaudacion[1] }}', '{{ recaudacion[2] }}', '{{ recaudacion[3] }}', '{{ recaudacion[4] }}', '{{ recaudacion[5] }}', '{{ recaudacion[6] }}')">
-                            <i class="fas fa-edit"></i>
-                        </button>
-
-                        
+                        onclick="abrirModalRecaudacion('edit', '{{ recaudacion[0] }}', '{{ recaudacion[1] }}', '{{ recaudacion[2] }}', '{{ recaudacion[3] }}', '{{ recaudacion[4] }}', '{{ recaudacion[5] }}', '{{ recaudacion[6] }}')"
+                        {% if recaudacion[6] == 'Celebración' %} disabled {% endif %}> <!-- Bloquea si el id_tipo_recaudacion es 34 -->
+                        <i class="fas fa-edit"></i>
+                       </button>
                     </td>
                 </tr>
                 {% endfor %}
