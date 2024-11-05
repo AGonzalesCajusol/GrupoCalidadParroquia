@@ -63,8 +63,8 @@ function abrirModalTipoRecaudacion(accion, id = '', nombre = '', tipo = '1', est
         // Cargar los datos en los campos
         document.getElementById('tipoRecaudacionId').value = id;
         document.getElementById('nombre_recaudacion').value = nombre;
-        document.getElementById('tipo').value = tipo === '1' ? '1' : '0'; // Asignar correctamente el tipo
-        document.getElementById('estado').checked = estado === true || estado === '1' || estado === 'Activo';
+        document.getElementById('tipo').value = tipo === '1' || tipo.toLowerCase() === 'monetario' ? '1' : '0';
+        document.getElementById('estado').checked = estado === true || estado === '1' || estado.toLowerCase() === 'activo';
 
         // Configurar campos en modo de solo lectura
         document.getElementById('nombre_recaudacion').setAttribute('disabled', true);
@@ -80,8 +80,8 @@ function abrirModalTipoRecaudacion(accion, id = '', nombre = '', tipo = '1', est
         // Cargar los datos en los campos para edición
         document.getElementById('tipoRecaudacionId').value = id;
         document.getElementById('nombre_recaudacion').value = nombre;
-        document.getElementById('tipo').value = tipo === '1' ? '1' : '0'; // Asignar correctamente el tipo
-        document.getElementById('estado').checked = estado === true || estado === '1' || estado === 'Activo';
+        document.getElementById('tipo').value = tipo === '1' || tipo.toLowerCase() === 'monetario' ? '1' : '0';
+        document.getElementById('estado').checked = estado === true || estado === '1' || estado.toLowerCase() === 'activo';
 
         // Configurar campos habilitados para edición
         document.getElementById('nombre_recaudacion').removeAttribute('disabled');
@@ -92,6 +92,7 @@ function abrirModalTipoRecaudacion(accion, id = '', nombre = '', tipo = '1', est
     // Mostrar el modal configurado
     modalRecaudacion.show();
 }
+
 document.getElementById('formRecaudacion').addEventListener('submit', function(event) {
     event.preventDefault();
 
