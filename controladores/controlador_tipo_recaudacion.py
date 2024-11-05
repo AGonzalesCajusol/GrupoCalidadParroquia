@@ -59,6 +59,19 @@ def obtener_tipo_recaudacion_por_id(id_tipo_recaudacion):
     finally:
         conexion.close()
 
+def verificar_nombre_recaudacion_existe(nombre_recaudacion):
+    conexion = obtener_conexion()
+    try:
+        with conexion.cursor() as cursor:
+            # Consulta para contar cuántos registros tienen el mismo nombre de recaudación
+            cursor.execute("SELECT COUNT(*) FROM tipo_recaudacion WHERE nombre_recaudacion = %s", (nombre_recaudacion,))
+            resultado = cursor.fetchone()[0]
+            return resultado > 0  # Retorna True si ya existe, False en caso contrario
+    except Exception as e:
+        print(f"Error al verificar el nombre de recaudación: {e}")
+        return False  # En caso de error, retornar False para evitar problemas en el flujo
+    finally:
+        conexion.close()
 # Función para actualizar un tipo de recaudación
 def actualizar_tipo_recaudacion(nombre_recaudacion, tipo, estado, id_tipo_recaudacion):
     conexion = obtener_conexion()
