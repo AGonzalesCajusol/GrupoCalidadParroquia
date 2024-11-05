@@ -1,12 +1,15 @@
 import pymysql
 from bd import obtener_conexion
 from flask import jsonify, request
+from datetime import datetime
 
 def obtener_celebraciones():
     conexion = obtener_conexion()
     try:
         start = request.args.get('start')
         end = request.args.get('end')
+        start_date = datetime.fromisoformat(start).date()  # Asumiendo que 'start' viene en formato ISO 8601
+        end_date = datetime.fromisoformat(end).date()  # Similar para 'end'
         print(f"Start: {start}, End: {end}")
         # Usar DictCursor para devolver los resultados como diccionarios
         with conexion.cursor(pymysql.cursors.DictCursor) as cursor:
@@ -14,7 +17,7 @@ def obtener_celebraciones():
                 SELECT id_celebracion, fecha, hora_inicio, hora_fin, id_sede
                 FROM celebracion
                 WHERE fecha >= %s AND fecha <= %s
-            """, (start, end))
+            """, (start_date, end_date))
             celebraciones = cursor.fetchall()
 
         eventos = []
@@ -22,8 +25,8 @@ def obtener_celebraciones():
             eventos.append({
                 'id': celebracion['id_celebracion'],  # Ahora accedemos por nombre de columna
                 'title': f"Celebración en Sede {celebracion['id_sede']}",
-                'start': f"{celebracion['fecha']}T{celebracion['hora_inicio']}",  # Combina fecha y hora_inicio
-                'end': f"{celebracion['fecha']}T{celebracion['hora_fin']}" if celebracion['hora_fin'] else None,  # Hora_fin es opcional
+                'start': f"{celebracion['fecha']}T{formatear_hora(celebracion['hora_inicio'])}",  # Combina fecha y hora_inicio
+                'end': f"{celebracion['fecha']}T{formatear_hora(celebracion['hora_fin'])}" if celebracion['hora_fin'] else None,  # Hora_fin es opcional
                 'extendedProps': {
                     'sede': celebracion['id_sede']
                 }
@@ -35,6 +38,15 @@ def obtener_celebraciones():
         return jsonify([]), 500
     finally:
         conexion.close()
+        
+def formatear_hora(hora):
+    hora_str = str(hora)
+    partes = hora_str.split(":")
+    if len(partes[0]) == 1:
+        nueva_hora = "0"+partes[0]+":"+partes[1]+":"+partes[2]
+        return nueva_hora
+    else:
+        return hora_str
     
 
 def insertar_celebracion(titulo, fecha_inicio, hora_inicio, fecha_fin, hora_fin, sede):
