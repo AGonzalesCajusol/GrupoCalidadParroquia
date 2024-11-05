@@ -8,6 +8,7 @@ import routers.router_main  # Importa las rutas generales
 import routers.router_ministro
 import routers.router_solicitud
 import routers.router_recaudaciones
+import routers.router_gestionar_intencionactos
 import routers.router_tema
 import routers.router_tipo_recaudacion  # Importa las rutas relacionadas con
 import routers.router_sede
@@ -50,6 +51,8 @@ routers.router_solicitud.registrar_rutas(app)
 
 # Registrar las rutas definidas en router_recaudaciones.py
 routers.router_recaudaciones.registrar_rutas(app)
+# registrar las rutas definidas en router_intenciones.py
+routers.router_gestionar_intencionactos.registrar_rutas(app)
 # Registrar las rutas definidas en router_recaudaciones.py
 routers.router_tipo_recaudacion.registrar_rutas(app)
 
