@@ -61,7 +61,7 @@ $(document).ready(function() {
     }
 
 
-
+    /* 
     function abrirModalEliminar(id) {
     document.getElementById("eliminarId").value = id;
     var eliminarModal = new bootstrap.Modal(document.getElementById('confirmarEliminarModal'));
@@ -72,3 +72,4 @@ $(document).ready(function() {
     function mostrarAlertaBaja() {
         alert("No se puede dar de baja porque es un egreso");
     }
+        ... */
