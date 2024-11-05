@@ -1,5 +1,6 @@
-from flask import render_template, request, redirect, url_for, flash
+from flask import render_template, request, redirect, url_for, flash, jsonify
 import traceback # Para capturar detalles del error
+from datetime import datetime
 from controladores.controlador_sede import (
     insertar_sede,
     insertar_sede_acto_liturgico,
@@ -52,6 +53,7 @@ def registrar_rutas(app):
             monto = request.form["monto"]
             id_congregacion = request.form["id_congregacion"]
             id_diosesis = request.form["id_diosesis"]
+            monto_traslado = request.form["monto_traslado"]
 
             # Capturamos todos los actos litúrgicos seleccionados
             actoliturgico = []
@@ -60,7 +62,7 @@ def registrar_rutas(app):
                     actoliturgico.append(key.split("-")[1])  # Extrae el ID del acto litúrgico
             
             # Insertar la sede una sola vez
-            id_sede = insertar_sede(nombre, direccion, creacion, telefono, correo, monto, id_congregacion, id_diosesis)
+            id_sede = insertar_sede(nombre, direccion, creacion, telefono, correo, monto, id_congregacion, id_diosesis, monto_traslado)
             
             if id_sede:  # Si la inserción fue exitosa y tenemos el id_sede
                 for acto_id in actoliturgico:
@@ -99,7 +101,8 @@ def registrar_rutas(app):
             estado = request.form.get('estado') == 'on' 
             congregacion = request.form["id_congregacion"]
             diosesis = request.form["id_diosesis"]
-            actualizar_sede(nombre, direccion, creacion, telefono, correo, monto, estado, congregacion, diosesis, id)
+            monto_traslado = request.form["monto_traslado"]
+            actualizar_sede(nombre, direccion, creacion, telefono, correo, monto, estado, congregacion, diosesis, monto_traslado, id)
             
             # Obtener los actos litúrgicos seleccionados
             actoliturgico = []
@@ -108,21 +111,39 @@ def registrar_rutas(app):
                     actoliturgico.append(key.split("-")[1])
             
             # Primero eliminar las asignaciones actuales
+
             eliminar_sede_acto_liturgico(id)
-            
+
             # Luego insertar las nuevas asignaciones
             for acto_id in actoliturgico:
                 estado_acto = request.form.get(f'estado-{acto_id}') == 'on'
                 insertar_sede_acto_liturgico(id, acto_id, estado_acto)
-            
-            flash("La sede fue actualizada exitosamente", "success")
-            return redirect(url_for("gestionar_sede"))
+
+            # Obtener las sedes actualizadas
+            sedes = obtener_sede()
+
+            # Devuelve una respuesta JSON
+            return jsonify({"success": True, "sedes": [
+                {
+                    "id": s[0],
+                    "nombre_sede": s[1],
+                    "direccion": s[2],
+                    "creacion": str(s[3]),
+                    "telefono": s[4],
+                    "correo": s[5],
+                    "monto": s[6],
+                    "estado": s[7],
+                    "id_congregacion": s[8],
+                    "id_diosesis": s[9],
+                    "monto_traslado": s[10]
+                } for s in sedes
+            ]})
 
         except Exception as e:
             error_message = str(e)
-            flash(f"Hubo un error al actualizar la sede: {error_message}", "danger")
-            traceback.print_exc()
-            return redirect(url_for("gestionar_sede"))
+            print(f"Error al actualizar la sede: {error_message}")
+            return jsonify({"success": False, "message": "Error al actualizar la sede"})
+        
 
     # **Ruta para eliminar una sede**
     @app.route("/eliminar_sede", methods=["POST"])
@@ -132,12 +153,30 @@ def registrar_rutas(app):
         flash("La sede fue eliminada exitosamente")
         return redirect(url_for("gestionar_sede"))
 
+
     @app.route("/darBaja_sede", methods=["POST"])
     def procesar_darBaja_sede():
-        id = request.form.get('id')  
-        darBaja_sede(id)  
-        flash("La sede fue dada de baja exitosamente")
-        return redirect(url_for("gestionar_sede"))
+        id = request.form.get('id')
+        try:
+            darBaja_sede(id)  # Dar de baja la sede en la base de datos
+            sedes = obtener_sede()  # Obtener todas las sedes actualizadas
+            return jsonify({"success": True, "sedes": [{
+                "id": s[0],
+                "nombre_sede": s[1],
+                "direccion": s[2],
+                "creacion": str(s[3]),
+                "telefono": s[4],
+                "correo": s[5],
+                "monto": s[6],
+                "estado": s[7],
+                "id_congregacion": s[8],
+                "id_diosesis": s[9],
+                "monto_traslado": s[10]}
+                for s in sedes]})
+        except Exception as e:
+            print(f"Error al dar de baja la sede: {e}")
+            return jsonify({"success": False, "message": "Error al dar de baja la sede"})
+
     
     @app.route('/obtener_actos_por_sede', methods=['GET'])
     def obtener_actos_por_sede():

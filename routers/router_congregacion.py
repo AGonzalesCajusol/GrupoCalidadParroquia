@@ -1,4 +1,5 @@
-from flask import render_template, request, redirect, url_for, flash
+from flask import render_template, request, redirect, url_for, flash, jsonify
+import traceback
 from controladores.controlador_congregacion import (
     insertar_congregacion,  
     obtener_congregacion,
@@ -23,9 +24,20 @@ def registrar_rutas(app):
     # Ruta para insertar una nueva congregación
     @app.route("/insertar_congregacion", methods=["POST"])
     def procesar_insertar_congregacion():
-        nombre = request.form["nombre_congregacion"]
-        insertar_congregacion(nombre)
-        flash("La congregación fue agregada exitosamente")
+        try:
+            nombre = request.form["nombre_congregacion"]
+            id_congregacion = insertar_congregacion(nombre)
+
+            if id_congregacion:  # Si la inserción fue exitosa y tenemos el id_congregacion
+                flash("La congregación fue agregada exitosamente", "success")
+            else:
+                flash("Hubo un error al agregar la congregación.", "danger")
+            
+        except Exception as e:
+            error_message = str(e)
+            flash(f"Hubo un error al procesar la solicitud: {error_message}", "danger")
+            traceback.print_exc()
+
         return redirect(url_for("gestionar_congregacion"))
 
     # Ruta para mostrar el formulario de edición de una congregación
@@ -37,12 +49,26 @@ def registrar_rutas(app):
     # Ruta para manejar la actualización de una congregación
     @app.route("/actualizar_congregacion", methods=["POST"])
     def procesar_actualizar_congregacion():
-        id = request.form["id"]  # Captura el ID desde el formulario
-        nombre = request.form["nombre_congregacion"]  # Captura el nombre actualizado
-        estado = request.form.get('estado') == 'on' 
-        actualizar_congregacion(nombre,estado, id)  # Llama a la función que actualiza en la base de datos
-        flash("La congregación fue actualizada exitosamente")
-        return redirect(url_for("gestionar_congregacion"))
+        try:
+            id = request.form["id"]  # Captura el ID desde el formulario
+            nombre = request.form["nombre_congregacion"]  # Captura el nombre actualizado
+            estado = request.form.get('estado') == 'on' 
+            actualizar_congregacion(nombre,estado, id)  # Llama a la función que actualiza en la base de datos
+
+            congregacion = obtener_congregacion()
+
+            return jsonify({"success": True, "congregacion": [
+                    {
+                        "id": c[0],
+                        "nombre_congregacion": c[1],
+                        "estado": c[2]
+                    } for c in congregacion
+            ]})
+        
+        except Exception as e:
+            error_message = str(e)
+            print(f"Error al actualizar la congregación: {error_message}")
+            return jsonify({"success": False, "message": "Error al actualizar la congregación"})
 
 
     # **Ruta para eliminar una congregación**
@@ -55,8 +81,17 @@ def registrar_rutas(app):
 
     @app.route("/darBaja_congregacion", methods=["POST"])
     def procesar_darBaja_congregacion():
-        id = request.form.get('id')  
-        darBaja_congregacion(id)  
-        flash("La congregacion fue dada de baja exitosamente")
-        return redirect(url_for("gestionar_congregacion"))
+        id = request.form.get('id')
+        try:
+            darBaja_congregacion(id)
+            congregacion = obtener_congregacion()
+            return jsonify({"success": True, "congregacion": [{
+                "id": c[0],
+                "nombre_congregacion": c[1],
+                "estado": c[2]} 
+                for c in congregacion]})
+        except Exception as e:
+            print(f"Error al dar de baja la congregación: {e}")
+            return jsonify({"success": False, "message": "Error al dar de baja la congregación"})
+
     

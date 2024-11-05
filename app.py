@@ -1,12 +1,14 @@
 from flask import Flask, render_template, request, redirect, url_for
 import routers.router_actosliturgicos
 import routers.router_celebracion
+import routers.router_charlas
 import routers.router_diocesis
 import routers.router_feligres
 import routers.router_main  # Importa las rutas generales
 import routers.router_ministro
 import routers.router_solicitud
 import routers.router_recaudaciones
+import routers.router_gestionar_intencionactos
 import routers.router_tema
 import routers.router_tipo_recaudacion  # Importa las rutas relacionadas con
 import routers.router_sede
@@ -15,7 +17,6 @@ import routers.router_congregacion  # Importa las rutas relacionadas con
 import routers.router_cargo
 import routers.router_egresos
 import routers.router_charla
-import routers.router_solicitud
 
 app = Flask(__name__)
 app.secret_key = 'super-secret'
@@ -49,6 +50,8 @@ routers.router_solicitud.registrar_rutas(app)
 
 # Registrar las rutas definidas en router_recaudaciones.py
 routers.router_recaudaciones.registrar_rutas(app)
+# registrar las rutas definidas en router_intenciones.py
+routers.router_gestionar_intencionactos.registrar_rutas(app)
 # Registrar las rutas definidas en router_recaudaciones.py
 routers.router_tipo_recaudacion.registrar_rutas(app)
 
@@ -70,7 +73,11 @@ routers.router_tema.registrar_rutas(app)
 
 routers.router_celebracion.registrar_rutas(app)
 
-routers.router_charla.registrar_rutas(app)
+routers.router_programacion.registrar_rutas(app)
+
+#charlka nueva
+routers.router_charlas.registrar_rutas(app)
+
 
 
 if __name__ == '__main__':

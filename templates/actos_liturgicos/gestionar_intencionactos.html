@@ -1,0 +1,107 @@
+{% extends "index.html" %}
+{% block title %}Gestión de Intenciones de Actos Litúrgicos{% endblock %}
+{% block cuerpo %}
+
+<div class="container mt-4">
+    <h1 class="titulo-gestion">Gestión de Intenciones de Actos Litúrgicos</h1>
+
+    <table id="intencionTable" class="table table-hover table-striped">
+        <thead class="table-light">
+            <tr class="text-center">
+                <th style="vertical-align: middle; text-align: center;">ID</th>
+                <th style="vertical-align: middle; text-align: center;">Nombre de Intención</th>
+                <th style="vertical-align: middle; text-align: center;">Descripción</th>
+                <th style="vertical-align: middle; text-align: center;">Nombre Acto Litúrgico</th>
+                <th style="vertical-align: middle; text-align: center; width: 200px;">Acciones</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for intencion in intenciones %}
+            <tr>
+                <td class="text-center border">{{ intencion[0] }}</td>
+                <td>{{ intencion[1] }}</td>
+                <td>{{ intencion[2] }}</td>
+                <td>{{ intencion[3] }}</td>
+                <td class="text-center border">
+                    <button class="btn btn-primary btn-sm" title="Ver"
+                    onclick="abrirModalIntencion('ver', '{{ intencion[0] }}', '{{ intencion[1] }}', '{{ intencion[2] }}', '{{ intencion[4] }}')">
+                    <i class="fas fa-eye"></i>
+                    </button>
+                
+                    <button class="btn btn-warning btn-sm" title="Editar"
+                        onclick="abrirModalIntencion('editar', '{{ intencion[0] }}', '{{ intencion[1] }}', '{{ intencion[2] }}', '{{ intencion[4] }}')">
+                        <i class="fas fa-edit"></i>
+                    </button>
+
+                    <form id="form-eliminar-{{ intencion[0] }}" style="display:inline-block;" title="Eliminar"
+                    onsubmit="eliminarIntencion(event, '{{ intencion[0] }}')">
+                    <input type="hidden" name="id" value="{{ intencion[0] }}">
+                    <button type="submit" class="btn btn-danger btn-sm"
+                            onclick="return confirm('¿Estás seguro de que deseas eliminar esta intención?');">
+                        <i class="fas fa-trash-alt"></i>
+                    </button>
+                    </form>
+                </td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+</div>
+
+<!-- Modal para Agregar, Ver o Editar -->
+<div class="modal fade" id="modalIntencion" tabindex="-1" aria-labelledby="modalIntencionLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <form id="formIntencion" action="{{ url_for('procesar_insertar_intencion') }}" method="POST">
+                <input type="hidden" id="intencionId" name="id">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="modalIntencionLabel">Agregar Intención</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    <div class="mb-3">
+                        <label for="nombre_intencion" class="form-label">Nombre de la Intención</label>
+                        <input type="text" class="form-control" id="nombre_intencion" name="nombre_intencion" required>
+                    </div>
+                    <div class="mb-3">
+                        <label for="descripcion" class="form-label">Descripción</label>
+                        <input type="text" class="form-control" id="descripcion" name="descripcion" maxlength="60" required>
+                    </div>
+                    <div class="mb-3">
+                        <label for="id_actoliturgico" class="form-label">Acto Litúrgico</label>
+                        <select class="form-select" id="id_actoliturgico" name="id_actoliturgico" required>
+                            <!-- Opciones serán agregadas dinámicamente por JavaScript -->
+                        </select>
+                    </div>                    
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cerrar</button>
+                    <button type="submit" class="btn btn-primary" id="submitBtn"></button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+
+{% with messages = get_flashed_messages(with_categories=True) %}
+  {% if messages %}
+    <div class="container mt-3">
+      {% for category, message in messages %}
+        <div class="alert alert-{{ category }} alert-dismissible fade show" role="alert">
+          {{ message }}
+          <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+        </div>
+      {% endfor %}
+    </div>
+  {% endif %}
+{% endwith %}
+
+<script src="/static/js/gestionar_intencionactos.js"></script>
+
+<script>
+    const insertarIntencionURL = "{{ url_for('procesar_insertar_intencion') }}";
+    const actualizarIntencionURL = "{{ url_for('procesar_actualizar_intencion') }}";
+</script>
+
+{% endblock %}

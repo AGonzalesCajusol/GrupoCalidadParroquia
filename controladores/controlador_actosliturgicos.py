@@ -59,8 +59,7 @@ def listar_actos_requisitosXid(id):
     try:
         with conexion.cursor() as cursor:
             cursor.execute('''
-                select al.id_actoliturgico , al.nombre_liturgia, r.nombre_requisito, al.monto from actoliturgico as al left join 
-                           requisito as r on al.id_actoliturgico = r.id_actoliturgico where al.id_actoliturgico = %s;
+                select al.id_actoliturgico , al.nombre_liturgia, r.nombre_requisito, al.monto from actoliturgico as al left join requisito as r on al.id_actoliturgico = r.id_actoliturgico where al.id_actoliturgico = %s;
             ''',(id)
             )
             lista = cursor.fetchall()
@@ -83,8 +82,7 @@ def modificar_acto_requisitos(id,actoliturgico,monto,lista_eliminar,lista_agrega
             if lista_eliminar and lista_eliminar[0] is not None:
                 print("no tenia porque entrrar")
                 for lis_e in lista_eliminar:
-                    cursor.execute('''
-                       delete from requisito where nombre_requisito = %s
+                    cursor.execute('''delete from requisito where nombre_requisito = %s
                     ''',(lis_e)
                     )
 
@@ -122,7 +120,7 @@ def listar_nombres_actos():
     try:
         with conexion.cursor() as cursor:
             cursor.execute('''
-                SELECT nombre_liturgia from actoliturgico 
+                SELECT id_actoliturgico, nombre_liturgia from actoliturgico 
             ''')
             valores = cursor.fetchall()
         return valores
@@ -459,4 +457,3 @@ def monto_total(acto_liturgico, sede, dni_responsable, dni1, dni2):
         return 0
     finally:
         conexion.close()
-

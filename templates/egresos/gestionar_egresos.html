@@ -32,7 +32,7 @@
         <thead>
             <tr>
                 <th class="text-center">ID Egreso</th>
-                <th class="text-center">ID Sede</th>
+                <th class="text-center">Nombre Sede</th>
                 <th class="text-center">Monto</th>
                 <th class="text-center">Descripción</th>
                 <th class="text-center">Fecha</th>
@@ -45,18 +45,25 @@
             <tr>
                 <th class="text-center">{{ egreso[0] }}</td>
                 <th class="text-center">{{ egreso[1] }}</td>
-                <th>{{ egreso[2] }}</td>
+                <td style="vertical-align: middle; text-align: center; padding-left: 45px;">{{ egreso[2] }}</td>
                 <th>{{ egreso[3] }}</td>
                 <th>{{ egreso[4] }}</td>
                 <th>{{ egreso[5] }}</td>
                 <td class="text-center">                    
+                    <button class="btn btn-primary btn-sm" title="Ver"
+                    onclick="abrirModalVer('{{ egreso[0] }}', '{{ egreso[1] }}', '{{ egreso[2] }}', '{{ egreso[3] }}', '{{ egreso[4] }}', '{{ egreso[5] }}')">
+                    <i class="fas fa-eye"></i>
+                    </button>
+
                     <button class="btn btn-warning btn-sm" onclick="abrirModalEditar('{{ egreso[0] }}', '{{ egreso[1] }}', '{{ egreso[2] }}', '{{ egreso[3] }}', '{{ egreso[4] }}', '{{ egreso[5] }}')"><i class="fas fa-edit"></i></button>
                     <button type="button" class="btn btn-secondary btn-sm" title="Dar de baja" onclick="mostrarAlertaBaja()">
                         <i class="fas fa-ban"></i>
                     </button>
                     <form action="{{ url_for('eliminar_egreso') }}" method="POST" style="display:inline-block;">
                         <input type="hidden" name="id_egreso" value="{{ egreso[0] }}">
-                        <button type="submit" class="btn btn-danger btn-sm"><i class="fas fa-trash-alt"></i></button>
+                        <button type="button" class="btn btn-danger btn-sm" title="Eliminar" onclick="abrirModalEliminar('{{ egreso[0] }}')">
+                            <i class="fas fa-trash-alt"></i>
+                        </button>                        
                     </form>
                 </td>
             </tr>
@@ -76,8 +83,16 @@
                 </div>
                 <div class="modal-body">
                     <div class="mb-3">
-                        <label for="id_sede" class="form-label">ID Sede</label>
-                        <input type="number" class="form-control" name="id_sede" required>
+                        <label for="id_sede" class="form-label">Sede</label>
+                        <select class="form-select" id="agregarSede" name="id_sede" required>
+                            {% if sede %}
+                                <option value="{{ sede[0] }}" selected>{{ sede[1] }}</option>
+                            {% else %}
+                                {% for sede in sedes %}
+                                <option value="{{ sede[0] }}">{{ sede[1] }}</option>
+                                {% endfor %}
+                            {% endif %}
+                        </select>
                     </div>
                     <div class="mb-3">
                         <label for="monto" class="form-label">Monto</label>
@@ -86,14 +101,6 @@
                     <div class="mb-3">
                         <label for="descripcion" class="form-label">Descripción</label>
                         <input type="text" class="form-control" name="descripcion" required>
-                    </div>
-                    <div class="mb-3">
-                        <label for="fecha" class="form-label">Fecha</label>
-                        <input type="date" class="form-control" name="fecha" required>
-                    </div>
-                    <div class="mb-3">
-                        <label for="hora" class="form-label">Hora</label>
-                        <input type="time" class="form-control" name="hora" required>
                     </div>
                 </div>
                 <div class="modal-footer">
@@ -104,6 +111,50 @@
         </div>
     </div>
 </div>
+
+
+
+<!-- Modal para ver -->
+<div class="modal fade" id="verModal" tabindex="-1" aria-labelledby="verModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="verModalLabel">Detalles del Egreso</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <div class="mb-3">
+                    <label class="form-label">ID Egreso</label>
+                    <input type="text" class="form-control" id="verId" disabled>
+                </div>
+                <div class="mb-3">
+                    <label class="form-label">Nombre Sede</label>
+                    <input type="text" class="form-control" id="verSede" disabled>
+                </div>
+                <div class="mb-3">
+                    <label class="form-label">Monto</label>
+                    <input type="text" class="form-control" id="verMonto" disabled>
+                </div>
+                <div class="mb-3">
+                    <label class="form-label">Descripción</label>
+                    <textarea class="form-control" id="verDescripcion" disabled></textarea>
+                </div>
+                <div class="mb-3">
+                    <label class="form-label">Fecha</label>
+                    <input type="text" class="form-control" id="verFecha" disabled>
+                </div>
+                <div class="mb-3">
+                    <label class="form-label">Hora</label>
+                    <input type="text" class="form-control" id="verHora" disabled>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cerrar</button>
+            </div>
+        </div>
+    </div>
+</div>
+
 
 <!-- Modal para editar -->
 <div class="modal fade" id="editarModal" tabindex="-1" aria-labelledby="editarModalLabel" aria-hidden="true">
@@ -117,8 +168,12 @@
                 </div>
                 <div class="modal-body">
                     <div class="mb-3">
-                        <label for="id_sede" class="form-label">ID Sede</label>
-                        <input type="number" class="form-control" id="editarSede" name="id_sede" required>
+                        <label for="id_sede" class="form-label">Sede</label>
+                        <select class="form-select" id="editarSede" name="id_sede" required>
+                            {% for sede in sedes %}
+                            <option value="{{ sede[0] }}" {% if sede[1] == nombre_sede %}selected{% endif %}>{{ sede[1] }}</option>
+                            {% endfor %}
+                        </select>
                     </div>
                     <div class="mb-3">
                         <label for="monto" class="form-label">Monto</label>
@@ -130,11 +185,11 @@
                     </div>
                     <div class="mb-3">
                         <label for="fecha" class="form-label">Fecha</label>
-                        <input type="date" class="form-control" id="editarFecha" name="fecha" required>
+                        <input type="date" class="form-control" id="editarFecha" name="fecha" disabled> <!-- Campo deshabilitado -->
                     </div>
                     <div class="mb-3">
                         <label for="hora" class="form-label">Hora</label>
-                        <input type="time" class="form-control" id="editarHora" name="hora" required>
+                        <input type="time" class="form-control" id="editarHora" name="hora" disabled> <!-- Campo deshabilitado -->
                     </div>
                 </div>
                 <div class="modal-footer">
@@ -146,37 +201,33 @@
     </div>
 </div>
 
-<!-- Scripts para manejar DataTables y la búsqueda -->
-<script>
-    $(document).ready(function() {
-        var table = $('#tablaEgresos').DataTable({
-            "language": {
-                "url": "//cdn.datatables.net/plug-ins/1.11.5/i18n/Spanish.json"
-            },
-            "dom": "t" // Desactiva los componentes de búsqueda, paginación e información predeterminados
-        });
 
-        // Filtrar solo por la columna de descripción (índice 3)
-        $('#buscarEgreso').on('keyup', function() {
-            table.columns(3).search(this.value).draw();
-        });
-    });
+<!-- Modal de confirmación para eliminar -->
+<div class="modal fade" id="confirmarEliminarModal" tabindex="-1" aria-labelledby="confirmarEliminarLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="confirmarEliminarLabel">Confirmar Eliminación</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <p>¿Estás seguro de que deseas eliminar este egreso?</p>
+            </div>
+            <div class="modal-footer">
+                <form id="formEliminar" action="{{ url_for('eliminar_egreso') }}" method="POST">
+                    <input type="hidden" name="id_egreso" id="eliminarId">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
+                    <button type="submit" class="btn btn-danger">Eliminar</button>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
 
-    function abrirModalEditar(id, sede, monto, descripcion, fecha, hora) {
-        document.getElementById("editarId").value = id;
-        document.getElementById("editarSede").value = sede;
-        document.getElementById("editarMonto").value = monto;
-        document.getElementById("editarDescripcion").value = descripcion;
-        document.getElementById("editarFecha").value = fecha;
-        document.getElementById("editarHora").value = hora;
-        var editarModal = new bootstrap.Modal(document.getElementById('editarModal'));
-        editarModal.show();
-    }
 
-    function mostrarAlertaBaja() {
-        alert("El egreso no puede ser dado de baja");
-    }
-</script>
+<script src="/static/js/egresos.js"></script>
+
+
 
 
 {% endblock %}

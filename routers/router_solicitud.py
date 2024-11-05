@@ -1,6 +1,6 @@
 from flask import render_template, request, redirect, url_for, flash, jsonify
 import controladores.controlador_actosliturgicos as cactos
-import controladores.controlador_charla as ccharla
+import controladores.controlador_programacion as ccharla
 import controladores.controlador_feligres as cfel
 import controladores.controladro_solicitud as csoli
 import os

@@ -122,7 +122,7 @@ function abir() {
     const submitBtn = document.getElementById('submitBtn');
     const formSede = document.getElementById('formSede'); // Obtener el formulario
 
-    modalTitle.textContent = 'Agregar Sede';
+    modalTitle.textContent = 'Agregar sede';
     submitBtn.textContent = 'Guardar';
 
     // Cambiar el action del formulario para que apunte a la ruta de inserción
@@ -148,23 +148,45 @@ function abir() {
     document.getElementById('estado').setAttribute('disabled', true);
     document.getElementById('id_congregacion').value = '';
     document.getElementById('id_diosesis').value = '';
+    document.getElementById('monto_traslado').value = '';
 
     modalSede.show();
 }
 
 
-function abrirModalEditar(id, nombre, direccion, creacion, telefono, correo, monto, estado, id_congregacion, id_diosesis) {
+function abrirModalEditar(id, nombre, direccion, creacion, telefono, correo, monto, estado, id_congregacion, id_diosesis, monto_traslado) {
     var modalSede = new bootstrap.Modal(document.getElementById('modalSede'));
 
     const modalTitle = document.getElementById('modalSedeLabel');
     const submitBtn = document.getElementById('submitBtn');
     const formSede = document.getElementById('formSede'); // Obtener el formulario
 
-    modalTitle.textContent = 'Editar Sede';
+    modalTitle.textContent = 'Editar sede';
     submitBtn.textContent = 'Guardar cambios';
 
-    // Cambiar el action del formulario para que apunte a la ruta de actualización
-    formSede.setAttribute('action', actualizarSedeURL);
+    // Cambia el evento de envío para usar AJAX
+    formSede.onsubmit = function(event) {
+        event.preventDefault(); // Previene el envío tradicional
+        
+        const formData = new FormData(formSede);
+
+        fetch(actualizarSedeURL, {
+            method: 'POST',
+            body: formData,
+        })
+        .then(response => response.json())
+        .then(data => {
+            if (data.success) {
+                actualizarTablaSede(data.sedes); // Actualiza solo la tabla con los datos nuevos
+                modalSede.hide(); // Cierra el modal
+            } else {
+                console.error("Error al actualizar la sede:", data.message);
+            }
+        })
+        .catch(error => {
+            console.error("Error en la solicitud de actualización:", error);
+        });
+    };
 
     // Llenar los campos con los datos existentes
     document.getElementById('sedeId').value = id;
@@ -190,6 +212,8 @@ function abrirModalEditar(id, nombre, direccion, creacion, telefono, correo, mon
     if (selectDiosesis) {
         seleccionarOpcionPorTexto(selectDiosesis, id_diosesis);
     }
+
+    document.getElementById('monto_traslado').value = monto_traslado;
 
     // Limpiar todos los checkboxes de los actos litúrgicos
     const actosCheckboxes = document.querySelectorAll('[id^="estado-"]');
@@ -233,8 +257,7 @@ function seleccionarOpcionPorTexto(selectElement, texto) {
     }
 }
 
-
-function abrirModalVer(id, nombre, direccion, creacion, telefono, correo, monto, estado, id_congregacion, id_diosesis) {
+function abrirModalVer(id, nombre, direccion, creacion, telefono, correo, monto, estado, id_congregacion, id_diosesis, monto_traslado) {
     var modalSede = new bootstrap.Modal(document.getElementById('modalSede'));
 
     const modalTitle = document.getElementById('modalSedeLabel');
@@ -252,6 +275,7 @@ function abrirModalVer(id, nombre, direccion, creacion, telefono, correo, monto,
     document.getElementById('telefono').value = telefono;
     document.getElementById('correo').value = correo;
     document.getElementById('monto').value = monto;
+    document.getElementById('monto_traslado').value = monto_traslado;
 
     const estadoCheckbox = document.getElementById('estado');
     estadoCheckbox.checked = (estado === true || estado === 'true' || estado === '1');
@@ -304,6 +328,7 @@ function abrirModalVer(id, nombre, direccion, creacion, telefono, correo, monto,
     document.getElementById('estado').setAttribute('disabled', true);
     selectCongregacion.setAttribute('disabled', true);
     selectDiosesis.setAttribute('disabled', true);
+    document.getElementById('monto_traslado').setAttribute('disabled', true);
 
     document.getElementById('modalSede').addEventListener('hidden.bs.modal', function () {
         document.getElementById('nombre_sede').removeAttribute('disabled');
@@ -313,8 +338,10 @@ function abrirModalVer(id, nombre, direccion, creacion, telefono, correo, monto,
         document.getElementById('correo').removeAttribute('disabled');
         document.getElementById('monto').removeAttribute('disabled');
         document.getElementById('estado').removeAttribute('disabled');
+        document.getElementById('monto_traslado').removeAttribute('disabled');
         selectCongregacion.removeAttribute('disabled');
         selectDiosesis.removeAttribute('disabled');
+
 
         actosCheckboxes.forEach(checkbox => {
             checkbox.removeAttribute('disabled');
@@ -328,21 +355,82 @@ function abrirModalVer(id, nombre, direccion, creacion, telefono, correo, monto,
 
 
 function darBajaSede(id, estado) {
-    // Comprobar si la sede ya está inactiva
-    if (estado === false || estado === 'false' || estado === '0') {
-        alert('La sede ya está dada de baja.');
-        return; // Salir de la función
+    if (estado === '0' || estado === false || estado === 'false') {
+        return; // Salir si la sede ya está dada de baja
     }
 
-    const formSede = document.getElementById('formSede');
+    if (confirm("¿Estás seguro de que deseas dar de baja esta sede?")) {
+        const table = $('#sedeTable').DataTable();
+        const currentPage = table.page();
 
-    formSede.setAttribute('action', darBajaSedeURL);
+        fetch(darBajaSedeURL, {
+            method: "POST",
+            headers: {
+                "Content-Type": "application/x-www-form-urlencoded",
+            },
+            body: `id=${encodeURIComponent(id)}`
+        })
+        .then(response => response.json())
+        .then(data => {
+            console.log("Data recibida del servidor:", data); // Verificar datos recibidos
+            if (data.success) {
+                actualizarTablaSede(data.sedes);  // Llamada para actualizar la tabla
+                table.page(currentPage).draw(false); // Mantener la misma página de paginación
+            } else {
+                console.error("Error:", data.message); // Mensaje de error en consola
+            }
+        })
+        .catch(error => {
+            console.error("Error en la solicitud:", error);
+        });
+    }
+}
 
-    document.getElementById('sedeId').value = id;
-    const estadoCheckbox = document.getElementById('estado');
-    estadoCheckbox.checked = true; // Marcamos como inactivo
+function actualizarTablaSede(sedes) {
+    const tbody = document.querySelector('#sedeTable tbody');
+    const table = $('#sedeTable').DataTable();
+    const currentPage = table.page();
 
-    alert('Estado de la sede cambiado exitosamente a Inactivo');
+    tbody.innerHTML = ''; // Limpiar la tabla
 
-    formSede.submit();
+    // Crear filas con los datos actualizados
+    sedes.forEach(sede => {
+        const row = document.createElement('tr');
+        row.innerHTML = `
+            <td class="text-center border">${sede.id}</td>
+            <td>${sede.nombre_sede}</td>
+            <td>${sede.direccion}</td>
+            <td>${sede.telefono}</td>
+            <td>${sede.correo}</td>
+            <td>${sede.estado == '1' ? 'Activo' : 'Inactivo'}</td>
+            <td class="text-center border">
+                <button class="btn btn-primary btn-sm" title="Ver"
+                    onclick="abrirModalVer('${sede.id}','${sede.nombre_sede}','${sede.direccion}','${sede.creacion}','${sede.telefono}','${sede.correo}','${sede.monto}','${sede.estado}','${sede.id_congregacion}','${sede.id_diosesis}','${sede.monto_traslado}')">
+                    <i class="fas fa-eye"></i>
+                </button>
+                <button class="btn btn-warning btn-sm" title="Editar"
+                    onclick="abrirModalEditar('${sede.id}','${sede.nombre_sede}','${sede.direccion}','${sede.creacion}','${sede.telefono}','${sede.correo}','${sede.monto}','${sede.estado}','${sede.id_congregacion}','${sede.id_diosesis}','${sede.monto_traslado}')">
+                    <i class="fas fa-edit"></i>
+                </button>
+                <button class="btn btn-secondary btn-sm" title="Dar de baja"
+                    onclick="darBajaSede('${sede.id}', '${sede.estado}')"
+                    ${sede.estado == "0" ? 'disabled' : ''}>
+                    <i class="fas fa-ban"></i>
+                </button>
+                <form style="display:inline-block;" onsubmit="eliminarSede(event, '${sede.id}')">
+                    <button type="submit" class="btn btn-danger btn-sm"
+                            onclick="return confirm('¿Estás seguro de que deseas eliminar esta sede?');">
+                        <i class="fas fa-trash-alt"></i>
+                    </button>
+                </form>
+            </td>
+        `;
+
+        tbody.appendChild(row);
+    });
+
+    table.clear();
+    table.rows.add($(tbody).find('tr'));
+    table.draw(false);
+    table.page(currentPage).draw(false);
 }

@@ -1,30 +1,29 @@
 from bd import obtener_conexion
 
 # Función para insertar un nuevo tipo de recaudación
-def insertar_tipo_recaudacion(nombre_recaudacion, tipo, estado=True):  # El estado por defecto es 'Activo'
+def insertar_tipo_recaudacion(nombre, tipo, estado):
     conexion = obtener_conexion()
     try:
         with conexion.cursor() as cursor:
-            # Obtener el siguiente id_tipo_recaudacion disponible
-            cursor.execute("SELECT COALESCE(MAX(id_tipo_recaudacion) + 1, 1) as siguiente_id FROM tipo_recaudacion")
-            siguiente_id = cursor.fetchone()[0]
+            # Verificar si el nombre ya existe
+            cursor.execute("SELECT COUNT(*) FROM tipo_recaudacion WHERE nombre_recaudacion = %s", (nombre,))
+            if cursor.fetchone()[0] > 0:
+                return {"success": False, "message": "Este nombre de recaudación ya existe. Por favor, elige otro nombre."}
 
-            # Inserción del nuevo tipo de recaudación con estado
+            # Si no existe, inserta el tipo de recaudación
             cursor.execute("""
-                INSERT INTO tipo_recaudacion (id_tipo_recaudacion, nombre_recaudacion, tipo, estado) 
-                VALUES (%s, %s, %s, %s)
-            """, (siguiente_id, nombre_recaudacion, tipo, estado))
-        
-        # Confirmar la transacción
-        conexion.commit()
-        return siguiente_id  # Devuelve el ID del nuevo tipo de recaudación insertado
+                INSERT INTO tipo_recaudacion (nombre_recaudacion, tipo, estado)
+                VALUES (%s, %s, %s)
+            """, (nombre, tipo, estado))
+            conexion.commit()
+            return {"success": True, "message": "Tipo de recaudación agregado exitosamente."}
     except Exception as e:
-        print(f"Error al insertar tipo de recaudación: {e}")
-        conexion.rollback()  # Revertir la transacción en caso de error
-        return None
+        conexion.rollback()
+        print("Error:", e)
+        return {"success": False, "message": "Error al insertar el tipo de recaudación."}
     finally:
-        conexion.close()  # Asegurarse de cerrar la conexión
-
+        conexion.close()
+        
 # Función para obtener todos los tipos de recaudación
 def obtener_tipos_recaudacion():
     conexion = obtener_conexion()
