@@ -140,3 +140,13 @@ def registrar_rutas(app):
         except Exception as e:
             print(f"Error al obtener años: {e}")
             return jsonify({"error": "Error al obtener los años"}), 500
+    # Ruta para obtener los tipos de recaudación en formato JSON
+    @app.route("/api/tipos", methods=["GET"])
+    def api_tipos():
+        try:
+            tipos = obtener_tipos_recaudacion()  # Esta función debe devolver una lista de tipos
+            lista_tipos = [{"tipo": tipo} for tipo in tipos]  # Asegúrate de que 'tipos' esté en el formato correcto
+            return jsonify({"data": lista_tipos})
+        except Exception as e:
+            print(f"Error al obtener tipos de recaudación: {e}")
+            return jsonify({"error": "Error al obtener los tipos de recaudación"}), 500
