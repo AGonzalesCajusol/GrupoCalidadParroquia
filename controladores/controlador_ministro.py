@@ -157,3 +157,12 @@ def obtener_todos_ministros(termino_busqueda="", limite=10, offset=0):
         return []
     finally:
         conexion.close()
+
+
+
+def dar_baja_ministro( id,estado):
+    conexion = obtener_conexion()
+    with conexion.cursor() as cursor:
+        cursor.execute("UPDATE ministro SET estado = %s WHERE id_ministro = %s", ( estado, id))
+    conexion.commit()
+    conexion.close()

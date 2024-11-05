@@ -120,3 +120,15 @@ def registrar_rutas(app):
         except Exception as e:
             print(f"Error al eliminar ministro: {str(e)}")
             return jsonify(success=False, message="Error interno del servidor: " + str(e)), 500
+
+
+    @app.route("/procesar_dar_baja_ministro", methods=["POST"])
+    def procesar_dar_baja_ministro():
+            try:
+                data = request.json
+                id = data.get("id")
+                estado = data.get("estado", 0)  # Estado del tipo de ministro (1: activo, 0: inactivo)
+                dar_baja_ministro(id,estado)
+                return jsonify(success=True)
+            except Exception as e:
+                return jsonify(success=False, message="Error al actualizar el tipo de ministro: " + str(e))

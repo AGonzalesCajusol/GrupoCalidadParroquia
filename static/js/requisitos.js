@@ -25,7 +25,7 @@ function listar() {
                     <td>${element.tipo || 'Ninguno'}</td>
                     <td>${element.estado}</td>
                     <td>${element.nivel}</td>
-                    <td>
+                    <td class="text-center">
                         <button class="btn btn-primary btn-sm" title="Ver" onclick="ver(${element.id}, '${element.nombre_acto}', '${element.nombre_requisito}', '${element.tipo}', '${element.estado}', '${element.maximo}', '${element.minimo}', '${element.nivel[0]}')">
                             <i class="fas fa-eye"></i>
                         </button>

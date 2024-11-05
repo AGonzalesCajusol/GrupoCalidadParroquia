@@ -97,6 +97,27 @@ function eliminarMinistro(id) {
     }
 }
 
+function darDeBajaMinistro(id) {
+    if (confirm("¿Estás seguro de que deseas dar de baja este ministro?")) {
+        fetch('/procesar_dar_baja_ministro', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify({ id: id, estado: 0 })  // Cambiar estado a inactivo
+        })
+        .then(response => response.json())
+        .then(data => {
+            if (data.success) {
+                alert('Ministro dado de baja exitosamente');
+                location.reload();  // Recargar la página para reflejar los cambios
+            } else {
+                alert('Error al dar de baja al ministro: ' + data.message);
+            }
+        })
+        .catch(error => console.error('Error:', error));
+    }
+}
 
 
 function limpiarModal() {

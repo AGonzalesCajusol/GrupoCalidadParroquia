@@ -1,16 +1,14 @@
 from flask import render_template, request, redirect, url_for, flash, make_response,jsonify
- 
 import random
 from hashlib import sha256
 
-
 from controladores.controlador_feligres import (
     insertar_feligres,
-    obtener_feligreses,
-    obtener_feligres_por_id,
+    obtener_feligreses,    
     actualizar_feligres,
     eliminar_feligres,
-    verificarcuentaFeligres
+    verificarcuentaFeligres,
+    obtener_feligres_por_dni
 )
 import controladores.controlador_sede as csede
 
@@ -22,12 +20,6 @@ def registrar_rutas(app):
         sedes = csede.obtener_sede()
         return render_template("/feligres/gestionar_feligres.html", feligreses=feligreses, sedes = sedes )
 
-
-    # Ruta para mostrar el formulario de registro de un nuevo feligrés
-    @app.route("/registrar_feligres", methods=["GET"])
-    def formulario_registrar_feligres():
-        return render_template("/feligres/registrar_feligres.html")
-    
     @app.route('/crearcuenta')
     def crearcuenta():
         sedes = csede.obtener_sedeparacuenta()
@@ -60,10 +52,8 @@ def registrar_rutas(app):
 
     @app.route("/principal", methods=["GET"])
     def principal():
-        return render_template('/feligres/principal_feligres.html')
+        return render_template('/feligres/principal_feligres.html')    
 
-
-    # Ruta para insertar un nuevo feligrés
     @app.route("/insertar_feligres", methods=["POST"])
     def procesar_insertar_feligres():
         dni = request.form["dni"]
@@ -73,20 +63,39 @@ def registrar_rutas(app):
         estado_civil = request.form["estado_civil"]
         sexo = request.form["sexo"]
         id_sede = request.form["id_sede"]
-        insertar_feligres(dni, apellidos, nombres, fecha_nacimiento, estado_civil, sexo, id_sede)
-        flash("El feligrés fue agregado exitosamente")
-        return redirect(url_for("gestionar_feligres"))
+        
+        resultado = insertar_feligres(dni, apellidos, nombres, fecha_nacimiento, estado_civil, sexo, id_sede)
+        
+        # Verificar si la inserción fue exitosa y devolver el objeto feligrés
+        if resultado["success"]:
+            return jsonify({
+                "success": True,
+                "feligres": {
+                    "dni": dni,  # Asegúrate de que dni tiene el valor correcto
+                    "apellidos": apellidos,
+                    "nombres": nombres,
+                    "fecha_nacimiento": fecha_nacimiento,
+                    "estado_civil": estado_civil,
+                    "sexo": sexo,
+                    "sede": id_sede  # o el nombre de la sede si prefieres mostrarlo directamente
+                }
+            })
+        else:
+            return jsonify({
+                "success": False,
+                "message": resultado["message"]
+            }), 400
 
-    # Ruta para mostrar el formulario de edición de un feligrés
-    @app.route("/editar_feligres/<int:id>", methods=["GET"])
-    def formulario_editar_feligres(id):
-        feligres = obtener_feligres_por_id(id)
-        return render_template("feligres/editar_feligres.html", feligres=feligres)
+    @app.route("/obtener_feligres/<dni>", methods=["GET"])
+    def obtener_feligres(dni):
+        feligres = obtener_feligres_por_dni(dni)
+        if feligres:
+            return jsonify(feligres)
+        else:
+            return jsonify({"error": "Feligrés no encontrado"}), 404
 
-    # Ruta para manejar la actualización de un feligrés
     @app.route("/actualizar_feligres", methods=["POST"])
     def procesar_actualizar_feligres():
-        id_feligres = request.form["id"]
         dni = request.form["dni"]
         apellidos = request.form["apellidos"]
         nombres = request.form["nombres"]
@@ -94,15 +103,16 @@ def registrar_rutas(app):
         estado_civil = request.form["estado_civil"]
         sexo = request.form["sexo"]
         id_sede = request.form["id_sede"]
-        actualizar_feligres(dni, apellidos, nombres, fecha_nacimiento, estado_civil, sexo, id_sede, id_feligres)
+
+        actualizar_feligres(dni, apellidos, nombres, fecha_nacimiento, estado_civil, sexo, id_sede)
         flash("El feligrés fue actualizado exitosamente")
         return redirect(url_for("gestionar_feligres"))
 
-    # Ruta para eliminar un feligrés
     @app.route("/eliminar_feligres", methods=["POST"])
-    def procesar_eliminar_feligres():
-        id_feligres = request.form["id"]
-        eliminar_feligres(id_feligres)
+    def procesar_eliminar_feligres():        
+        dni = request.form["dni"]
+        eliminar_feligres(dni)
         flash("El feligrés fue eliminado exitosamente")
         return redirect(url_for("gestionar_feligres"))
+    
     

@@ -1,96 +1,141 @@
-$(document).ready(function () {
-    var table = $('#feligresesTable').DataTable({
+document.addEventListener("DOMContentLoaded", function () {
+    const table = $('#feligresesTable').DataTable({
         pageLength: 8,
         dom: '<"d-flex justify-content-between align-items-center mb-3"<"d-flex"f><"d-flex justify-content-end button-section">>rt<"bottom"p>',
-        language: {
-            search: "Buscar:"
-        },
-        initComplete: function () {
-            $("div.button-section").html('<button type="button" class="btn btn-success btn-lg custom-btn ml-3 btn-agregar-ministro" data-bs-toggle="modal" onclick="openModal(\'add\')"><i class="bi bi-person-plus"></i> Agregar feligres</button>');
+        language: { search: "Buscar:" },
+        initComplete: function () {            
+            $("div.button-section").html(`
+                <button type="button" class="btn btn-success btn-lg custom-btn ml-3" onclick="openModal('add')">
+                    <i class="bi bi-person-plus"></i> Agregar Feligrés
+                </button>
+            `);
         }
     });
 });
 
-function openModal(type, id = null, dni = '', apellidos = '', nombres = '', fecha_nacimiento = '', estado_civil = '', sexo = '', sede = '') {
-    var modalTitle = '';
-    var formAction = '';
-    var isReadOnly = false;
+function openModal(type, dni = '', apellidos = '', nombres = '', fecha_nacimiento = '', estado_civil = '', sexo = '', id_sede = '') {
+    let modalTitle;
+    let formAction;
+    let isReadOnly = false;
 
     if (type === 'add') {
         modalTitle = 'Agregar Feligrés';
         formAction = urlInsertarFeligres;
-        isReadOnly = false;
         limpiarModal();
         document.getElementById('saveChanges').style.display = 'block';
     } else if (type === 'edit') {
         modalTitle = 'Editar Feligrés';
         formAction = urlActualizarFeligres;
-        isReadOnly = false;
         document.getElementById('saveChanges').style.display = 'block';
-
-        document.getElementById('feligresId').value = id;
-        document.getElementById('dni').value = dni;
-        document.getElementById('apellidos').value = apellidos;
-        document.getElementById('nombres').value = nombres;
-        document.getElementById('fecha_nacimiento').value = fecha_nacimiento;
-        document.getElementById('estado_civil').value = estado_civil;
-        document.getElementById('sexo').value = sexo;
-        document.getElementById('id_sede').value = sede;
-
     } else if (type === 'view') {
         modalTitle = 'Ver Feligrés';
-        formAction = '';
         isReadOnly = true;
         document.getElementById('saveChanges').style.display = 'none';
-
-        document.getElementById('feligresId').value = id;
-        document.getElementById('dni').value = dni;
-        document.getElementById('apellidos').value = apellidos;
-        document.getElementById('nombres').value = nombres;
-        document.getElementById('fecha_nacimiento').value = fecha_nacimiento;
-        document.getElementById('estado_civil').value = estado_civil;
-        document.getElementById('sexo').value = sexo;
-        document.getElementById('id_sede').value = sede;
     }
 
-    document.getElementById('feligresModalLabel').innerText = modalTitle;
-    document.getElementById('feligresForm').action = formAction;
+    // Configuración de los valores en el formulario
+    document.getElementById('dni').value = dni;
+    document.getElementById('apellidos').value = apellidos;
+    document.getElementById('nombres').value = nombres;
+    document.getElementById('fecha_nacimiento').value = fecha_nacimiento;
+
+    // Seleccionar el valor de Estado Civil, Sexo y Sede si existe
+    const estadoCivilSelect = document.getElementById('estado_civil');
+    const sexoSelect = document.getElementById('sexo');
+    const sedeSelect = document.getElementById('id_sede');
+
+    if (estadoCivilSelect.querySelector(`option[value="${estado_civil}"]`)) {
+        estadoCivilSelect.value = estado_civil;
+    } else {
+        estadoCivilSelect.selectedIndex = 0; // O seleccionar una opción predeterminada si no coincide
+    }
+
+    if (sexoSelect.querySelector(`option[value="${sexo}"]`)) {
+        sexoSelect.value = sexo;
+    } else {
+        sexoSelect.selectedIndex = 0;
+    }
+
+    if (sedeSelect.querySelector(`option[value="${id_sede}"]`)) {
+        sedeSelect.value = id_sede;
+    } else {
+        sedeSelect.selectedIndex = 0;
+    }
+
+    // Configuración de campos como solo lectura si está en modo "ver"
     document.querySelectorAll('#feligresForm input, #feligresForm select').forEach(function (input) {
         input.readOnly = isReadOnly;
         input.disabled = isReadOnly;
     });
 
-    var feligresModal = new bootstrap.Modal(document.getElementById('feligresModal'));
+    // Configuración del modal
+    document.getElementById('feligresModalLabel').innerText = modalTitle;
+    document.getElementById('feligresForm').action = formAction;
+
+    // Mostrar el modal
+    const feligresModal = new bootstrap.Modal(document.getElementById('feligresModal'));
     feligresModal.show();
 
+    // Configuración del envío del formulario
     document.getElementById('feligresForm').onsubmit = function (event) {
         event.preventDefault();
-        let formData = new FormData(this);
-
-        fetch(formAction, {
-            method: 'POST',
-            body: formData
-        })
-            .then(response => response.json())
-            .then(data => {
-                if (data.success) {
-                    alert(type === 'edit' ? 'Feligrés actualizado exitosamente' : 'Feligrés agregado exitosamente');
-                    if (type === 'add') {
-                        agregarFeligresATabla(data.feligres);
-                        limpiarModal();
-                    } else {
-                        location.reload();
-                    }
-                } else {
-                    alert('Error al procesar el feligrés');
-                }
-            })
-            .catch(error => console.error('Error:', error));
+        enviarFormulario(formAction, type);
     };
 }
 
+function enviarFormulario(url, type) {
+    const formData = new FormData(document.getElementById('feligresForm'));
+
+    fetch(url, {
+        method: 'POST',
+        body: formData
+    })
+    .then(response => response.json())
+    .then(data => {
+        if (data.success) {
+            alert(type === 'edit' ? 'Feligrés actualizado exitosamente' : 'Feligrés agregado exitosamente');
+            if (type === 'add') {
+                agregarFeligresATabla(data.feligres);
+                limpiarModal();
+                
+                // Cerrar el modal después de agregar
+                const feligresModal = bootstrap.Modal.getInstance(document.getElementById('feligresModal'));
+                if (feligresModal) feligresModal.hide();
+            } else {
+                location.reload();
+            }
+        } else {
+            alert(data.message);
+        }
+    })
+    .catch(error => console.error('Error:', error));
+}
+
+function agregarFeligresATabla(feligres) {
+    if (!feligres || !feligres.dni) {
+        console.error("El objeto feligres no está definido correctamente:", feligres);
+        return;
+    }
+
+    const table = $('#feligresesTable').DataTable();
+    table.row.add([
+        feligres.dni,
+        feligres.apellidos,
+        feligres.nombres,
+        feligres.fecha_nacimiento,
+        feligres.estado_civil,
+        feligres.sexo,
+        feligres.sede,
+        `<button class="btn btn-primary btn-sm" title="Ver" onclick="openModal('view', '${feligres.dni}', '${feligres.apellidos}', '${feligres.nombres}', '${feligres.fecha_nacimiento}', '${feligres.estado_civil}', '${feligres.sexo}', '${feligres.sede}')"><i class="fas fa-eye"></i></button>
+         <button class="btn btn-warning btn-sm" title="Editar" onclick="openModal('edit', '${feligres.dni}', '${feligres.apellidos}', '${feligres.nombres}', '${feligres.fecha_nacimiento}', '${feligres.estado_civil}', '${feligres.sexo}', '${feligres.sede}')"><i class="fas fa-edit"></i></button>
+         <form action="${urlEliminarFeligres}" method="POST" style="display:inline-block;">
+            <input type="hidden" name="dni" value="${feligres.dni}">
+            <button type="submit" class="btn btn-danger btn-sm" title="Eliminar" onclick="return confirm('¿Estás seguro de que deseas eliminar este feligrés?');"><i class="fas fa-trash-alt"></i></button>
+         </form>`
+    ]).draw();
+}
+
 function limpiarModal() {
-    document.getElementById('feligresId').value = '';
     document.getElementById('dni').value = '';
     document.getElementById('apellidos').value = '';
     document.getElementById('nombres').value = '';
@@ -98,62 +143,4 @@ function limpiarModal() {
     document.getElementById('estado_civil').value = '';
     document.getElementById('sexo').value = '';
     document.getElementById('id_sede').value = '';
-}
-
-
-
-//Segunda parte, Registro de usuario web
-
-
-/*function crear_cuenta(){
-    let dni = document.getElementById('dni11');
-    let apellidos = document.getElementById('apellidos11');
-    let nombres = document.getElementById('nombres11');
-    let f_naci = document.getElementById('fecha_nacimiento11');
-    let estado_civil = document.getElementById('estado_civil11');
-    let sexo = document.getElementById('sexo11');
-    let passw = document.getElementById('password11');
-
-
-    let datos_enviar = {
-        "dni": dni.value,
-        "apellidos": apellidos.value,
-        "nombres": nombres.value,
-        "fecha_nac": f_naci.value,
-        "estado_civil": estado_civil.value[0].toLowerCase(),
-        "sexo": sexo.value[0].toLowerCase(),
-        "contraseña": passw.value
-    }
-
-    // Enviar datos al servidor usando fetch
-    fetch('/registrar_feligresweb', {
-        method: 'POST',
-        headers: {
-            'Content-Type': 'application/json'
-        },
-        body: JSON.stringify(datos_enviar)
-    })
-    .then(response => response.json())  // Convertir la respuesta en JSON
-    .then(data => {
-        console.log('Datos recibidos desde el servidor:', data);
-        alert('Cuenta creada exitosamente');
-    })
-    .catch(error => {
-        console.error('Error al enviar los datos:', error);
-        alert('Error al crear la cuenta');
-    });
-
-}
-*/
- 
-
-
-
-function validar_campos11(){
-    dni = document.getElementById('dni11');
-    apellidos = document.getElementById('apellidos11');
-    nombres = document.getElementById('nombres11');
-    f_naci = document.getElementById('f_naci11');
-    estado_civil = document.getElementById('estado_civil11');
-    sexo = document.getElementById('sexo11');
 }

@@ -1,52 +1,65 @@
 {% extends "index.html" %}
 {% block title %}Gestión de Feligreses{% endblock %}
 {% block cuerpo %}
+<style>
+    #feligresesTable {
+        table-layout: auto;
+        width: 100%;
+    }
+
+    #feligresesTable th,
+    #feligresesTable td {
+        white-space: nowrap;
+        /* Evita que el contenido se ajuste en varias líneas */
+        text-align: center;
+        padding: 8px;
+    }
+</style>
 
 <div class="container mt-4">
     <h1 class="titulo-gestion">Gestión de Feligreses</h1>
 
     <div>
-        <!-- DataTable para la gestión de feligreses -->
         <table id="feligresesTable" class="table table-hover table-striped">
             <thead>
-                <th style="vertical-align: middle; text-align: center;">ID</th>
-                <th style="vertical-align: middle; text-align: center;">DNI</th>
-                <th style="vertical-align: middle; text-align: center;">Apellidos</th>
-                <th style="vertical-align: middle; text-align: center;">Nombres</th>
-                <th style="vertical-align: middle; text-align: center;">Fecha de Nacimiento</th>
-                <th style="vertical-align: middle; text-align: center;">Estado Civil</th>
-                <th style="vertical-align: middle; text-align: center;">Sexo</th>
-                <th style="vertical-align: middle; text-align: center;">Sede</th>
-                <th style="vertical-align: middle; text-align: center; width: 200px;">Acciones</th>
+                <tr>
+                    <th style="vertical-align: middle; text-align: center;">DNI</th>
+                    <th style="vertical-align: middle; text-align: center;">Apellidos</th>
+                    <th style="vertical-align: middle; text-align: center;">Nombres</th>
+                    <th style="vertical-align: middle; text-align: center;">Fecha de Nacimiento</th>
+                    <th style="vertical-align: middle; text-align: center;">Estado Civil</th>
+                    <th style="vertical-align: middle; text-align: center;">Sexo</th>
+                    <th style="vertical-align: middle; text-align: center;">Sede</th>
+                    <th style="vertical-align: middle; text-align: center; width: 200px;">Acciones</th>
+                </tr>
             </thead>
             <tbody>
                 {% for feligres in feligreses %}
                 <tr>
-                    <td class="text-center">{{ feligres[0] }}</td> <!-- ID del feligrés -->
-                    <td>{{ feligres[1] }}</td> <!-- DNI del feligrés -->
-                    <td>{{ feligres[2] }}</td> <!-- Apellidos del feligrés -->
-                    <td>{{ feligres[3] }}</td> <!-- Nombres del feligrés -->
-                    <td>{{ feligres[4] }}</td> <!-- Fecha de nacimiento -->
-                    <td>{{ feligres[5] }}</td> <!-- Estado civil -->
-                    <td>{{ feligres[6] }}</td> <!-- Sexo -->
-                    <td>{{ feligres[7] }}</td> <!-- Sede -->
+                    <td class="text-center">{{ feligres[0] }}</td>
+                    <td>{{ feligres[1] }}</td>
+                    <td>{{ feligres[2] }}</td>
+                    <td>{{ feligres[3] }}</td>
+                    <td>{{ feligres[4] }}</td>
+                    <td>{{ feligres[5] }}</td>
+                    <td>{{ feligres[6] }}</td>
 
                     <td class="text-center">
-                        <!-- Botón para ver detalles -->
+
                         <button class="btn btn-primary btn-sm" title="Ver"
-                            onclick="openModal('view', '{{ feligres[0] }}', '{{ feligres[1] }}', '{{ feligres[2] }}', '{{ feligres[3] }}', '{{ feligres[4] }}', '{{ feligres[5] }}', '{{ feligres[6] }}', '{{ feligres[7] }}')">
+                            onclick="openModal('view', '{{ feligres[0] }}', '{{ feligres[1] }}', '{{ feligres[2] }}', '{{ feligres[3] }}', '{{ feligres[4] }}', '{{ feligres[5] }}', '{{ feligres[6] }}')">
                             <i class="fas fa-eye"></i>
                         </button>
 
-                        <!-- Botón para editar -->
                         <button class="btn btn-warning btn-sm" title="Editar"
-                            onclick="openModal('edit', '{{ feligres[0] }}', '{{ feligres[1] }}', '{{ feligres[2] }}', '{{ feligres[3] }}', '{{ feligres[4] }}', '{{ feligres[5] }}', '{{ feligres[6] }}', '{{ feligres[7] }}')">
+                            onclick="openModal('edit', '{{ feligres[0] }}', '{{ feligres[1] }}', '{{ feligres[2] }}', '{{ feligres[3] }}', '{{ feligres[4] }}', '{{ feligres[5] }}', '{{ feligres[6] }}')">
                             <i class="fas fa-edit"></i>
                         </button>
 
                         <!-- Botón para eliminar -->
-                        <form action="{{ url_for('procesar_eliminar_feligres') }}" method="POST" style="display:inline-block;">
-                            <input type="hidden" name="id" value="{{ feligres[0] }}">
+                        <form action="{{ url_for('procesar_eliminar_feligres') }}" method="POST"
+                            style="display:inline-block;">
+                            <input type="hidden" name="dni" value="{{ feligres[0] }}">
                             <button type="submit" class="btn btn-danger btn-sm" title="Eliminar"
                                 onclick="return confirm('¿Estás seguro de que deseas eliminar este feligrés?');">
                                 <i class="fas fa-trash-alt"></i>
@@ -65,8 +78,6 @@
     <div class="modal-dialog">
         <div class="modal-content">
             <form id="feligresForm" action="" method="POST">
-                <input type="hidden" id="feligresId" name="id">
-
                 <div class="modal-header">
                     <h5 class="modal-title" id="feligresModalLabel">Modal Title</h5>
                     <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
@@ -95,6 +106,7 @@
                             <option value="c">Casado</option>
                         </select>
                     </div>
+
                     <div class="mb-3">
                         <label for="sexo" class="form-label">Sexo</label>
                         <select class="form-select" id="sexo" name="sexo" required>
@@ -102,11 +114,12 @@
                             <option value="f">Femenino</option>
                         </select>
                     </div>
+
                     <div class="mb-3">
                         <label for="id_sede" class="form-label">Sede</label>
                         <select class="form-select" id="id_sede" name="id_sede" required>
                             {% for sede in sedes %}
-                            <option value="{{ sede[1] }}">{{ sede[1] }}</option>
+                            <option value="{{ sede[0] }}">{{ sede[1] }}</option>
                             {% endfor %}
                         </select>
                     </div>
@@ -125,6 +138,7 @@
 <script type="text/javascript">
     const urlInsertarFeligres = "{{ url_for('procesar_insertar_feligres') }}";
     const urlActualizarFeligres = "{{ url_for('procesar_actualizar_feligres') }}";
+    const urlEliminarFeligres = "{{ url_for('procesar_eliminar_feligres') }}";
 </script>
 
 {% endblock %}

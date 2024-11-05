@@ -44,18 +44,19 @@ function listar() {
 
 
             $('#tablas').DataTable({
-                paging: false,
-                ordering: true,
-                info: false,
-                searching: true,
-                lengthChange: false,
+                pageLength: 8,
+                dom: '<"d-flex justify-content-between align-items-center mb-3"<"d-flex"f><"d-flex justify-content-end button-section">>rt<"bottom"p>',
                 language: {
                     search: "Buscar:",
                     searchPlaceholder: "Filtrar registros..."
                 },
                 columnDefs: [
                     { orderable: false, targets: [5] }
-                ]
+                ],
+                initComplete: function () {
+                    // Insertar el botón "Agregar" dinámicamente
+                    $("div.button-section").html('<button type="button" class="btn btn-success btn-sm mr-2" onclick="abrir_modal(\'agregar\')"><i class="bi bi-plus-circle"></i> Agregar acto litúrgico</button>');
+                }
             });
         })
         .catch(error => console.error('Error al listar actos:', error)); // Manejo de errores
