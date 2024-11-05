@@ -18,7 +18,6 @@ function openModal(type, dni = '', apellidos = '', nombres = '', fecha_nacimient
     let formAction;
     let isReadOnly = false;
 
-    // Configuración del modal según el tipo de acción
     if (type === 'add') {
         modalTitle = 'Agregar Feligrés';
         formAction = urlInsertarFeligres;
@@ -27,34 +26,51 @@ function openModal(type, dni = '', apellidos = '', nombres = '', fecha_nacimient
     } else if (type === 'edit') {
         modalTitle = 'Editar Feligrés';
         formAction = urlActualizarFeligres;
-        document.getElementById('dni').value = dni;
-        document.getElementById('apellidos').value = apellidos;
-        document.getElementById('nombres').value = nombres;
-        document.getElementById('fecha_nacimiento').value = fecha_nacimiento;
-        document.getElementById('estado_civil').value = estado_civil;
-        document.getElementById('sexo').value = sexo;
-        document.getElementById('id_sede').value = id_sede;
         document.getElementById('saveChanges').style.display = 'block';
     } else if (type === 'view') {
         modalTitle = 'Ver Feligrés';
         isReadOnly = true;
         document.getElementById('saveChanges').style.display = 'none';
-        document.getElementById('dni').value = dni;
-        document.getElementById('apellidos').value = apellidos;
-        document.getElementById('nombres').value = nombres;
-        document.getElementById('fecha_nacimiento').value = fecha_nacimiento;
-        document.getElementById('estado_civil').value = estado_civil;
-        document.getElementById('sexo').value = sexo;
-        document.getElementById('id_sede').value = id_sede;
     }
 
-    // Configuración del modal
-    document.getElementById('feligresModalLabel').innerText = modalTitle;
-    document.getElementById('feligresForm').action = formAction;
+    // Configuración de los valores en el formulario
+    document.getElementById('dni').value = dni;
+    document.getElementById('apellidos').value = apellidos;
+    document.getElementById('nombres').value = nombres;
+    document.getElementById('fecha_nacimiento').value = fecha_nacimiento;
+
+    // Seleccionar el valor de Estado Civil, Sexo y Sede si existe
+    const estadoCivilSelect = document.getElementById('estado_civil');
+    const sexoSelect = document.getElementById('sexo');
+    const sedeSelect = document.getElementById('id_sede');
+
+    if (estadoCivilSelect.querySelector(`option[value="${estado_civil}"]`)) {
+        estadoCivilSelect.value = estado_civil;
+    } else {
+        estadoCivilSelect.selectedIndex = 0; // O seleccionar una opción predeterminada si no coincide
+    }
+
+    if (sexoSelect.querySelector(`option[value="${sexo}"]`)) {
+        sexoSelect.value = sexo;
+    } else {
+        sexoSelect.selectedIndex = 0;
+    }
+
+    if (sedeSelect.querySelector(`option[value="${id_sede}"]`)) {
+        sedeSelect.value = id_sede;
+    } else {
+        sedeSelect.selectedIndex = 0;
+    }
+
+    // Configuración de campos como solo lectura si está en modo "ver"
     document.querySelectorAll('#feligresForm input, #feligresForm select').forEach(function (input) {
         input.readOnly = isReadOnly;
         input.disabled = isReadOnly;
     });
+
+    // Configuración del modal
+    document.getElementById('feligresModalLabel').innerText = modalTitle;
+    document.getElementById('feligresForm').action = formAction;
 
     // Mostrar el modal
     const feligresModal = new bootstrap.Modal(document.getElementById('feligresModal'));
@@ -79,13 +95,17 @@ function enviarFormulario(url, type) {
         if (data.success) {
             alert(type === 'edit' ? 'Feligrés actualizado exitosamente' : 'Feligrés agregado exitosamente');
             if (type === 'add') {
-                agregarFeligresATabla(data.feligres); // Solo llama a agregarFeligresATabla si data.feligres está definido
+                agregarFeligresATabla(data.feligres);
                 limpiarModal();
+                
+                // Cerrar el modal después de agregar
+                const feligresModal = bootstrap.Modal.getInstance(document.getElementById('feligresModal'));
+                if (feligresModal) feligresModal.hide();
             } else {
                 location.reload();
             }
         } else {
-            alert(data.message); // Mostrar el mensaje de error si el DNI ya existe
+            alert(data.message);
         }
     })
     .catch(error => console.error('Error:', error));
@@ -114,7 +134,6 @@ function agregarFeligresATabla(feligres) {
          </form>`
     ]).draw();
 }
-
 
 function limpiarModal() {
     document.getElementById('dni').value = '';
