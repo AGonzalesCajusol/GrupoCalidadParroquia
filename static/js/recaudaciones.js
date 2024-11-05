@@ -38,7 +38,7 @@
     });
 });
  */
-$(document).ready(function () {
+/* $(document).ready(function () {
     // Inicializar DataTable
     var table = $('#recaudacionesTable').DataTable({
         pageLength: 8,
@@ -76,7 +76,96 @@ $(document).ready(function () {
                 });
         }
     });
+}); */
+$(document).ready(function () {
+    // Inicializar DataTable
+    var table = $('#recaudacionesTable').DataTable({
+        pageLength: 8,
+        dom: '<"d-flex justify-content-between align-items-center mb-3"<"d-flex"f><"d-flex justify-content-end button-section">>rt<"bottom"p>',
+        language: {
+            search: "Buscar:"
+        },
+        initComplete: function () {
+            // Agregar botones para agregar y exportar recaudaciones
+            $("div.button-section").html('<button type="button" class="btn btn-success btn-lg custom-btn ml-3 btn-agregar-recaudacion" data-bs-toggle="modal" onclick="abrirModalRecaudacion(\'add\')"><i class="bi bi-person-plus"></i> Agregar recaudación</button>');
+            $("div.button-section").append('<button type="button" onclick= "exportarTablaPDF()" class="btn btn-success btn-lg custom-btn ml-3" data-bs-toggle="modal" data-bs-target="#exportModal"><i class="bi bi-file-earmark-arrow-down"></i> Exportar recaudaciones</button>');
+            
+            // Opciones para el filtro de año
+            let opcionesAño = '<option value="">Todos</option>';
+            fetch("/apiaños")
+                .then(response => response.json())
+                .then(response => { 
+                    response.data.forEach(element => {
+                        opcionesAño += `<option value="${element.año}">${element.año}</option>`;
+                    });
+
+                    // Insertar el selector de año en el DOM
+                    $("div.dataTables_filter").addClass("d-flex align-items-center");
+                    $("div.dataTables_filter").prepend(`
+                        <div class="d-flex align-items-center me-2">
+                            <label for="filtroAño" class="me-2">Año:</label>
+                            <select id="filtroAño" class="form-select" style="width: auto;" onchange="filtrarPorAño()">
+                                ${opcionesAño}
+                            </select>
+                        </div>
+                    `);
+                })
+                .catch(error => {
+                    console.error("Error al cargar los años:", error);
+                });
+
+            // Opciones para el filtro de tipo
+            let opcionesTipo = '<option value="">Todos</option>';
+            fetch("/api/tipos")
+                .then(response => response.json())
+                .then(response => {
+                    console.log(response.data); // Verifica si los datos de tipo se reciben correctamente
+                    response.data.forEach(element => {
+                        opcionesTipo += `<option value="${element.tipo}">${element.tipo}</option>`;
+                    });
+
+                    // Insertar el selector de tipo en el DOM después del filtro de año
+                    $("div.dataTables_filter").append(`
+                        <div class="d-flex align-items-center me-2">
+                            <label for="filtroTipo" class="me-2">Tipo:</label>
+                            <select id="filtroTipo" class="form-select" style="width: auto;" onchange="filtrarPorTipo()">
+                                ${opcionesTipo}
+                            </select>
+                        </div>
+                    `);
+                })
+                .catch(error => {
+                    console.error("Error al cargar los tipos:", error);
+                });
+        }
+    });
 });
+
+
+// Función para filtrar por año en el combo
+function filtrarPorAño() {
+    const añoSeleccionado = $('#filtroAño').val();
+    const tabla = $('#recaudacionesTable').DataTable();
+
+    if (añoSeleccionado) {
+        tabla.column(4).search(añoSeleccionado, true, false).draw();
+    } else {
+        tabla.column(4).search('').draw();  // Limpiar el filtro
+    }
+}
+
+// Función para filtrar por tipo en el combo
+function filtrarPorTipo() {
+    const tipoSeleccionado = $('#filtroTipo').val();
+    const tabla = $('#recaudacionesTable').DataTable();
+
+    if (tipoSeleccionado) {
+        tabla.column(2).search(tipoSeleccionado, true, false).draw();
+    } else {
+        tabla.column(2).search('').draw();  // Limpiar el filtro
+    }
+}
+
 
 $(document).ready(function () {
     // Cambiar el label de "Monto" a "Valoración" según el tipo de recaudación
