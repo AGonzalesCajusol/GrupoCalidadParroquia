@@ -88,7 +88,7 @@ $(document).ready(function () {
         initComplete: function () {
             // Agregar botones para agregar y exportar recaudaciones
             $("div.button-section").html('<button type="button" class="btn btn-success btn-lg custom-btn ml-3 btn-agregar-recaudacion" data-bs-toggle="modal" onclick="abrirModalRecaudacion(\'add\')"><i class="bi bi-person-plus"></i> Agregar recaudación</button>');
-            $("div.button-section").append('<button type="button" onclick= "exportarTablaPDF()" class="btn btn-success btn-lg custom-btn ml-3" data-bs-toggle="modal" data-bs-target="#exportModal"><i class="bi bi-file-earmark-arrow-down"></i> Exportar recaudaciones</button>');
+            $("div.button-section").append('<button type="button" onclick="exportarTablaPDF()" class="btn btn-success btn-lg custom-btn ml-3" data-bs-toggle="modal" data-bs-target="#exportModal"><i class="bi bi-file-earmark-arrow-down"></i> Exportar recaudaciones</button>');
             
             // Opciones para el filtro de año
             let opcionesAño = '<option value="">Todos</option>';
@@ -119,9 +119,9 @@ $(document).ready(function () {
             fetch("/api/tipos")
                 .then(response => response.json())
                 .then(response => {
-                    console.log(response.data); // Verifica si los datos de tipo se reciben correctamente
                     response.data.forEach(element => {
-                        opcionesTipo += `<option value="${element.tipo}">${element.tipo}</option>`;
+                        const tipoNombre = element.tipo[1];  // Solo usa el nombre, ignorando el ID
+                        opcionesTipo += `<option value="${tipoNombre}">${tipoNombre}</option>`;
                     });
 
                     // Insertar el selector de tipo en el DOM después del filtro de año
@@ -140,7 +140,6 @@ $(document).ready(function () {
         }
     });
 });
-
 
 // Función para filtrar por año en el combo
 function filtrarPorAño() {
