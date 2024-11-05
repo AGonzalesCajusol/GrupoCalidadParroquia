@@ -2,66 +2,32 @@
 {% block title %}Gestión de charlas{% endblock %}
 {% block cuerpo %}
 <style>
-
     table, table input[type="date"], table input[type="time"], table input[type="text"], table button {
         font-size: 13px;
     }
 
-    th {
+    th, td {
         text-align: center;
     }
 
-    #table td:nth-child(1) {
+    th:nth-child(1), td:nth-child(1) { width: 150px; }
+    th:nth-child(2), td:nth-child(2) { width: 120px; }
+    th:nth-child(3), td:nth-child(3) { width: 90px; }
+    th:nth-child(4), td:nth-child(4) { width: 90px; }
+    th:nth-child(5), td:nth-child(5) { width: 100px; }
+    th:nth-child(6), td:nth-child(6) { width: 120px; }
+    th:nth-child(7), td:nth-child(7) { width: 120px; }
+    th:nth-child(8), td:nth-child(8) { width: 200px; }
+
+    th:nth-child(1) {
+        text-align: center;
+    }
+
+    td:nth-child(1) {
         text-align: left;
     }
-
-    th:nth-child(1), td:nth-child(1) {
-        width: 200px;
-    }
-
-    th:nth-child(2), td:nth-child(2) {
-        width: 60px;
-    }
-
-    th:nth-child(3), td:nth-child(3), th:nth-child(4), td:nth-child(4) {
-        width: 90px;
-    }
-
-    th:nth-child(5), td:nth-child(5) {
-        width: 100px;
-    }
-
-    th:nth-child(6), td:nth-child(6), th:nth-child(7), td:nth-child(7) {
-        width: 80px;
-    }
-
-    td:nth-child(8) {
-        width: 20px !important; 
-    }
-
-    table input[type="text"] {
-        height: 25px;
-        width: 80px;
-        box-sizing: border-box;
-    }
-
-    table button {
-        padding: 3px;
-        height: 30px;
-        width: 30px;
-        display: flex;
-        align-items: center;
-        justify-content: center;
-    }
-
-    .table .btn-primary {
-        padding: 0;
-        border-radius: 4px;
-        width: 28px;
-        height: 28px;
-        font-size: 10px;
-    }
 </style>
+
 <div>
     <h1 class="titulo-gestion">Gestión de programación de charlas</h1>
     <div class="row">
