@@ -37,6 +37,13 @@
         display: none;
         /* Oculta los elementos con la clase "ocultar" */
     }
+    .navbar {
+        --bs-navbar-padding-x: unset;
+        margin-top: 12px;
+        margin-bottom: 12px;
+        background-color: white;
+        z-index: 100;
+    }
 </style>
 
 <body class="hidden">
@@ -45,7 +52,7 @@
     </div>
     <!-- Sidenav -->
     <div class="layout">
-        <header class="navbar navbar-expand-lg  shadow-sm w-100 position-fixed" id="head_ind">
+        <header class="navbar navbar-expand-lg  shadow-sm w-100 position-fixed align-items-center" id="head_ind">
             <div class="container-fluid">
                 <a class="navbar-brand me-2" href="#">
                     <img src="/static/img/celebracion.avif" alt="Logo Iglesia" width="40" height="40"
@@ -208,12 +215,13 @@
                 </div>
             </div>
         </div>
-        <div class="main-content mt-3 me-5" style="max-height: 400px;">
-
+        <div class="main-content me-5" style="max-height: 400px;">
             {% block cuerpo %}
 
             {% endblock %}
         </div>
+        
+
     </div>
 </body>
 <script src="{{ url_for('static', filename = '/js/defecto.js')}}"></script>

@@ -315,6 +315,7 @@ function grabar_solicitud() {
     for (var key in acto) {
         formData.append(key, acto[key]);  // Aquí se añaden tanto archivos como datos de texto
     }
+    var pagos = document.getElementById('pagos');
 
     fetch(`/registrarsolicitud/${id_acto}`, {
         method: 'POST',
@@ -339,7 +340,7 @@ function grabar_solicitud() {
                 icon: "error", // Cambia a 'error' para mostrar un ícono de error
                 confirmButtonText: "Aceptar" // Texto del botón de confirmación
             });
-              
+            pagos.disabled = true;
         }
     })
     .catch(error => {
@@ -349,8 +350,9 @@ function grabar_solicitud() {
             icon: "error", // Cambia a 'error' para mostrar un ícono de error
             confirmButtonText: "Aceptar" // Texto del botón de confirmación
           });
-          
+        pagos.disabled = true;
     });
+    pagos.disabled = true;
 }
 
 
@@ -377,23 +379,23 @@ function array_matrimonio() {
         'responsable' : document.getElementById('responsable').value,
         'metodo': document.getElementById('metodo').textContent,
         'sede': document.getElementById('sede').value,
-        'es_copia_dninovio': document.getElementById('es_copia_dninovio').checked,
-        'es_dni_novio': document.getElementById('es_dni_novio').checked,
-        'es_copia_dninovia': document.getElementById('es_copia_dninovia').checked,
-        'es_dni_novia': document.getElementById('es_dni_novia').checked,
-        'es_dni_testigo1': document.getElementById('es_dni_testigo1').checked,
-        'es_dni_testigo2': document.getElementById('es_dni_testigo2').checked,
-        'es_sede': document.getElementById('es_sede').checked,
-        'es_f_matrimonio': document.getElementById('es_f_matrimonio').checked,
-        'es_consb_novio': document.getElementById('es_consb_novio').checked,
-        'es_consc_novio': document.getElementById('es_consc_novio').checked,
-        'es_consb_novia': document.getElementById('es_consb_novia').checked,
-        'es_consc_novia': document.getElementById('es_consc_novia').checked,
-        'es_fc_novio': document.getElementById('es_fc_novio').checked,
-        'es_fc_novia': document.getElementById('es_fc_novia').checked,
-        'es_fvih_novio': document.getElementById('es_fvih_novio').checked,
-        'es_fvih_novia': document.getElementById('es_fvih_novia').checked,
-        'es_charlas': document.getElementById('es_charlas').checked
+        'es_copia_dninovio': document.getElementById('es_copia_dninovio').checked ? 'V' : 'F',
+        'es_dni_novio': document.getElementById('es_dni_novio').checked ? 'V' : 'F',
+        'es_copia_dninovia': document.getElementById('es_copia_dninovia').checked ? 'V' : 'F',
+        'es_dni_novia': document.getElementById('es_dni_novia').checked ? 'V' : 'F',
+        'es_dni_testigo1': document.getElementById('es_dni_testigo1').checked ? 'V' : 'F',
+        'es_dni_testigo2': document.getElementById('es_dni_testigo2').checked ? 'V' : 'F',
+        'es_sede': document.getElementById('es_sede').checked ? 'V' : 'F',
+        'es_f_matrimonio': document.getElementById('es_f_matrimonio').checked ? 'V' : 'F',
+        'es_consb_novio': document.getElementById('es_consb_novio').checked ? 'V' : 'F',
+        'es_consc_novio': document.getElementById('es_consc_novio').checked ? 'V' : 'F',
+        'es_consb_novia': document.getElementById('es_consb_novia').checked ? 'V' : 'F',
+        'es_consc_novia': document.getElementById('es_consc_novia').checked ? 'V' : 'F',
+        'es_fc_novio': document.getElementById('es_fc_novio').checked ? 'V' : 'F',
+        'es_fc_novia': document.getElementById('es_fc_novia').checked ? 'V' : 'F',
+        'es_fvih_novio': document.getElementById('es_fvih_novio').checked ? 'V' : 'F',
+        'es_fvih_novia': document.getElementById('es_fvih_novia').checked ? 'V' : 'F',
+        'es_charlas': document.getElementById('es_charlas').checked ? 'V' : 'F'
     };
     return array;
 }

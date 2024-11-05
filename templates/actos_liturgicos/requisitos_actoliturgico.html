@@ -10,16 +10,18 @@
             <select name="actos" id="actos" class="form-select mt-1" onchange="filtrar()">
                 <option value="todos">todos</option>
                 {% for li in lista %}
-                <option value="{{ li[0] }}">{{ li[0] }}</option>
+                <option value="{{ li[1] }}">{{ li[1] }}</option>
                 {% endfor %}
             </select>       
         </form>
         <div class="col-6 -1" id="enviar">
             <label for="form-control">Ingrese su correo para enviar:</label>
-            <div class="d-flex mt-1">
-                <input type="email" class="form-control me-2" id="correo">
-                <button class="btn btn-primary" onclick="enviar()">Enviar</button>
+            <div class="d-flex mt-1 align-items-center">
+                <input type="email" class="form-control me-2" id="correo" placeholder="Ingrese su correo" style="flex: 1;">
+                <button class="btn btn-primary" onclick="enviar()"><i class="bi bi-send-check-fill"></i></button>
             </div>
+            
+            
         </div>
     </div>
 
@@ -30,7 +32,7 @@
                 <th class="text-center">Acto Liturgico</th>
                 <th class="text-center">Requisitos</th>
                 <th class="text-center">Nivel requisito</th>
-                <th class="text-center">Tipo requisito</th>
+                <th class="text-center">Formato</th>
             </tr>
         </thead>
         <tbody id="tabla_actosbody"> 

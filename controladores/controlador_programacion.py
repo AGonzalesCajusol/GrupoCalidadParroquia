@@ -6,14 +6,10 @@ def charlas_acto(id_acto):
     conexion = obtener_conexion()
     with conexion.cursor() as cursor:
         cursor.execute('''
-            select pr.id_programacion, tm.descripcion, pr.fecha , pr.hora_inicio, pr.hora_fin from programacion_charlas as pr inner join tema as tm
-            on pr.id_tema = tm.id_tema
-            where pr.id_charla = (select id_charla from charlas
-            inner join actoliturgico as al1
-            on charlas.id_actoliturgico = al1.id_actoliturgico
-            where current_date < charlas.fecha_inicio and al1.id_actoliturgico = %s
-            order by charlas.fecha_inicio asc
-            limit 1)
+            SELECT pr.id_programacion, tm.descripcion, pr.fecha, pr.hora_inicio, pr.hora_fin
+            FROM programacion_charlas AS pr inner join charlas as ch 
+            on pr.id_charla = ch.id_charla inner join tema as tm
+            on pr.id_tema = tm.id_tema where ch.id_charla = %s
                 ''', (id_acto,))
         charlas = cursor.fetchall()
     conexion.close()
