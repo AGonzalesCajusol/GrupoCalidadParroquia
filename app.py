@@ -16,8 +16,8 @@ import routers.router_tipo_ministro # Importa las rutas relacionadas con tipos d
 import routers.router_congregacion  # Importa las rutas relacionadas con
 import routers.router_cargo
 import routers.router_egresos
-import routers.router_charla
-
+import routers.router_charlas
+import routers.router_programacion
 app = Flask(__name__)
 app.secret_key = 'super-secret'
 
