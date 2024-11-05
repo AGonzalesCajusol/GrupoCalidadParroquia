@@ -107,19 +107,22 @@ def registrar_rutas(app):
                     'id': r[0],
                     'nombre_acto': r[1],
                     'requisitos': r[2],
-                    'monto' : r[3]
+                    'nivel' : r[3],
+                    'tipo': r[4]
                 }
                 lista_actos.append(dato)
             
         else:
-            r = cal.listar_requisitoXacto(acto)
-            dato = {
-                'id': r[0],
-                'nombre_acto': r[1],
-                'requisitos': r[2],
-                'monto' : r[3]
-            }
-            lista_actos.append(dato)
+            requisitos = cal.listar_requisitoXacto(acto)
+            for r in requisitos:
+                dato = {
+                    'id': r[0],
+                    'nombre_acto': r[1],
+                    'requisitos': r[2],
+                    'nivel' : r[3],
+                    'tipo': r[4]
+                }
+                lista_actos.append(dato)
         return jsonify({'data': lista_actos})
     
     @app.route('/enviar', methods=['POST'])
@@ -245,6 +248,12 @@ def registrar_rutas(app):
                 estado = "Activo"
             else:
                 estado = "Inactivo"
+
+            if acto[14] == 'O':
+                nivel = "Obligatorio"
+            else:
+                nivel = "Requerido"
+
             lista_actos.append({
                 'id': acto[0],
                 'nombre_acto': acto[1],
@@ -253,7 +262,8 @@ def registrar_rutas(app):
                 'tipo' : acto[8],
                 'estado': estado,
                 'maximo':acto[10],
-                'minimo':acto[11]
+                'minimo':acto[11],
+                'nivel': nivel
             })
         return jsonify(lista_actos)
 
@@ -262,6 +272,7 @@ def registrar_rutas(app):
         try:
             acto = request.form.get('nombreLiturgico')
             requisito = request.form.get('nombrerequisito')
+            nivel = request.form.get('nivel')
             tipo = request.form.get('opciones')
             estado = request.form.get('estado')
             maximo = request.form.get('maxim')
@@ -271,8 +282,7 @@ def registrar_rutas(app):
             estado = 'A' if estado == 'on' else 'I'
 
             # Insertar requisito
-            st = cal.insertar_requisito(acto, requisito, tipo, estado, maximo, minimo)
-            print(st)
+            st = cal.insertar_requisito(acto, requisito, tipo, estado, maximo, minimo, nivel)
 
             if st == 'error':  # Cambiado de 'if st is not None' a 'if not st'
                 return jsonify({'estado': 'Incorrecto'}), 400
@@ -310,10 +320,11 @@ def registrar_rutas(app):
             estado = request.form.get('estado')
             maximo = request.form.get('maxim')
             minimo = request.form.get('minim')
+            nivel = request.form.get('nivel')
 
             estado = 'A' if estado == 'on' else 'I'
 
-            st = cal.modificar_requisito(id_requisito, requisito, tipo, estado, maximo, minimo)
+            st = cal.modificar_requisito(id_requisito, requisito, tipo, estado, maximo, minimo,nivel)
 
             if not st:
                 return jsonify({'estado': 'Incorrecto'}), 400

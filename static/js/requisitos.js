@@ -24,17 +24,21 @@ function listar() {
                     <td>${element.nombre_requisito || 'Ninguno'}</td>
                     <td>${element.tipo || 'Ninguno'}</td>
                     <td>${element.estado}</td>
+                    <td>${element.nivel}</td>
                     <td>
-                        <button class="btn btn-primary btn-sm" title="Ver" onclick="ver(${element.id}, '${element.nombre_acto}', '${element.nombre_requisito}', '${element.tipo}', '${element.estado}', '${element.maximo}', '${element.minimo}')">
+                        <button class="btn btn-primary btn-sm" title="Ver" onclick="ver(${element.id}, '${element.nombre_acto}', '${element.nombre_requisito}', '${element.tipo}', '${element.estado}', '${element.maximo}', '${element.minimo}', '${element.nivel[0]}')">
                             <i class="fas fa-eye"></i>
                         </button>
-                        <button class="btn btn-warning btn-sm" title="Editar" onclick="modificarw(${element.id_requisito}, ${element.id}, '${element.nombre_acto}', '${element.nombre_requisito}', '${element.tipo}', '${element.estado}', '${element.maximo}', '${element.minimo}')" ${element.id_requisito > 0 ? '' : 'disabled'}>
+                        <button class="btn btn-warning btn-sm" title="Editar" onclick="modificarw(${element.id_requisito}, ${element.id}, '${element.nombre_acto}', '${element.nombre_requisito}', '${element.tipo}', '${element.estado}', '${element.maximo}', '${element.minimo}', '${element.nivel[0]}' )" ${element.id_requisito > 0 ? '' : 'disabled'} >
                             <i class="fas fa-edit"></i>
                         </button>
                         <button class="btn btn-secondary btn-sm" title="Dar de baja" onclick="darbaja(${element.id}, ${element.id_requisito})" ${element.estado === 'Inactivo' ? 'disabled' : ''}>
                             <i class="fas fa-ban"></i>
                         </button>
-                        <button class="btn btn-danger btn-sm" title="Eliminar" onclick="eliminar(${element.id}, ${element.id_requisito})" ${element.id_requisito > 0 ? '' : 'disabled'}>
+                        <button class="btn btn-danger btn-sm" 
+                                title="Eliminar" 
+                                onclick="eliminar(${element.id}, ${element.id_requisito})" 
+                                ${element.id_requisito > 0 && element.nivel[0] !== 'O' ? '' : 'disabled'}>
                             <i class="fas fa-trash-alt"></i>
                         </button>
                     </td>
@@ -70,7 +74,6 @@ function abrir_modal(tipo){
     var titulo = document.getElementById('modalactosLabel');
     modal.show();
     form_elementos('habilitar');
-    configuracion();
     if(tipo == 'agregar'){
         titulo.textContent = "Agregar requisitos al acto litúrgico";
         boton.textContent = "Agregar";
@@ -80,25 +83,6 @@ function abrir_modal(tipo){
     }else if(tipo == 'modificar'){
         titulo.textContent = "Modificar requisito";
         boton.textContent = "Modificar";
-    }
-}
-
-
-function configuracion() {
-    var variable = document.getElementById('opciones').value;
-    var div_conf1 = document.getElementById('cuadro_opciones');
-
-    if (variable == "Numerico" || variable == "Texto") {
-        document.getElementById('maximo').value = "";
-        document.getElementById('minimo').value = "";
-        document.getElementById('maximo').required = true;  // Establece 'required' en true
-        document.getElementById('minimo').required = true;  // Establece 'required' en true
-        div_conf1.classList.remove('d-none')
-    } else {
-        document.getElementById('maximo').required = false; 
-        document.getElementById('minimo').required = false;  
-
-        div_conf1.classList.add('d-none')
     }
 }
 
@@ -151,14 +135,13 @@ function enviar_datos(event){
     }
 }
 
-function ver(id,nombre_acto,nombre_requisito, tipo,estado, maximo,minimo){
+function ver(id,nombre_acto,nombre_requisito, tipo,estado, maximo,minimo,nivel){
     abrir_modal('ver');
     document.getElementById('nombreLiturgico1').value= id;
     document.getElementById('nombrerequisito').value = nombre_requisito;
     document.getElementById('opciones').value = tipo;
-    configuracion();
+    document.getElementById('nivel').value = nivel;
     document.getElementById('maximo').value = maximo;
-    document.getElementById('minimo').value = minimo;
 
     var estadof =document.getElementById('estado');
     if(estado == 'Activo'){
@@ -174,6 +157,7 @@ function form_elementos(accion) {
     var opciones =  document.getElementById('opciones');
     var maximo = document.getElementById('maximo');
     var minimo = document.getElementById('minimo');
+    var nivel = document.getElementById('nivel');
 
     if(accion == 'habilitar'){
         name.disabled = false;
@@ -182,6 +166,7 @@ function form_elementos(accion) {
         opciones.disabled = false;
         maximo.disabled = false;
         minimo.disabled = false;
+        nivel.disabled = false;
     }else{
         name.disabled = true;
         nombrerequisito.disabled = true;
@@ -189,6 +174,7 @@ function form_elementos(accion) {
         opciones.disabled = true;
         maximo.disabled = true;
         minimo.disabled = true;
+        nivel.disabled = true;
     }
 
 }
@@ -226,13 +212,13 @@ function eliminar(id_actoliturgico, id_requisito) {
     }
 }
 
-function modificarw(id_requisito, id,nombre_acto,nombre_requisito, tipo,estado, maximo,minimo){
+function modificarw(id_requisito, id,nombre_acto,nombre_requisito, tipo,estado, maximo,minimo, nivel){
     abrir_modal('modificar');
     document.getElementById('nombreLiturgico1').value= id;
     document.getElementById('nombrerequisito').value = nombre_requisito;
     document.getElementById('opciones').value = tipo;
     document.getElementById('id_r').value = id_requisito;
-    configuracion();
+    document.getElementById('nivel').value = nivel;
     document.getElementById('maximo').value = maximo;
     document.getElementById('minimo').value = minimo;
 

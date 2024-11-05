@@ -1,5 +1,5 @@
 window.onload = function(){
-    
+    filtrar();
 }
 
 function filtrar() {
@@ -15,27 +15,29 @@ function filtrar() {
     fetch(`/filtrorequisitosxacto/${acto}`)
         .then(response => response.json())
         .then(elemento => {
-            elemento = elemento.data;  // Asignamos el array de datos
+            elemento = elemento.data;
 
             // Iterar sobre los datos
             elemento.forEach(data => {
                 // Crear fila para la primera tabla
                 const row = document.createElement('tr');
                 row.innerHTML = `
-                    <td class="text-center">${data.id}</td>
+                    <td class="text-center">${data.id === null ? '-' : data.id}</td>
                     <td>${data.nombre_acto}</td>
-                    <td>${data.requisitos}</td>
-                    <td>${data.monto}</td>
+                    <td>${data.requisitos === null ? '-' : data.requisitos}</td>
+                    <td class="text-center">${data.id === null ? '-' : data.nivel == 'R' ? 'Requerido' : 'Obligatorio' }</td>
+                    <td>${data.tipo === null ? '-' : data.tipo}</td>
                 `;
                 tbody.appendChild(row); // Agrega la fila al tbody
 
                 // Crear fila para la segunda tabla
                 const row2 = document.createElement('tr');
                 row2.innerHTML = `
-                    <td class="text-center">${data.id}</td>
+                    <td class="text-center">${data.id === null ? '-' : data.id}</td>
                     <td>${data.nombre_acto}</td>
-                    <td>${data.requisitos}</td>
-                    <td>${data.monto}</td>
+                    <td>${data.requisitos === null ? '-' : data.requisitos}</td>
+                    <td class="text-center">${data.id === null ? '-' : data.nivel == 'R' ? 'Requerido' : 'Obligatorio' }</td>
+                    <td>${data.tipo === null ? '-' : data.tipo}</td>
                 `;
                 tbody2.appendChild(row2); // Agrega la fila al tbody2
             });
@@ -44,8 +46,8 @@ function filtrar() {
 
 
 function enviar() {
-    const texto = document.getElementById('con').innerHTML; // Captura el contenido HTML
-    const destinatario = document.getElementById('correo').value; // Captura el correo del destinatario
+    const texto = document.getElementById('con').innerHTML;
+    const destinatario = document.getElementById('correo').value;
     
     const datos = {
         text: texto,

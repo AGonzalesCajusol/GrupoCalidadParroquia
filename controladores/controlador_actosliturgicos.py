@@ -43,19 +43,8 @@ def listar_actos_requisitos():
     try:
         with conexion.cursor() as cursor:
             cursor.execute('''
-                SELECT 
-                    al.id_actoliturgico, 
-                    al.nombre_liturgia, 
-                    COALESCE(GROUP_CONCAT(r.nombre_requisito SEPARATOR ', '), 'Ninguno') AS requisitos, 
-                    al.monto 
-                FROM 
-                    actoliturgico AS al 
-                LEFT JOIN 
-                    requisito AS r ON al.id_actoliturgico = r.id_actoliturgico 
-                GROUP BY 
-                    al.id_actoliturgico, al.nombre_liturgia, al.monto 
-                ORDER BY 
-                    al.id_actoliturgico ASC;
+                    select rq.id_requisito, al.nombre_liturgia, rq.nombre_requisito, rq.nivel_requisito, rq.tipo from actoliturgico as   al left join  requisito as rq 
+                    on rq.id_actoliturgico = al.id_actoliturgico order by rq.id_requisito asc
             '''
             )
             lista = cursor.fetchall()
@@ -147,20 +136,10 @@ def listar_requisitoXacto(acto):
     try:
         with conexion.cursor() as cursor:
             cursor.execute('''
-                SELECT 
-                    al.id_actoliturgico, 
-                    al.nombre_liturgia, 
-                    COALESCE(GROUP_CONCAT(r.nombre_requisito SEPARATOR ', '), 'Ninguno') AS requisitos, 
-                    al.monto 
-                FROM 
-                    actoliturgico AS al 
-                LEFT JOIN 
-                    requisito AS r ON al.id_actoliturgico = r.id_actoliturgico 
-                WHERE al.nombre_liturgia = %s
-                GROUP BY 
-                    al.id_actoliturgico, al.nombre_liturgia, al.monto;
+                    select rq.id_requisito, al.nombre_liturgia, rq.nombre_requisito, rq.nivel_requisito, rq.tipo  from actoliturgico as   al left join  requisito as rq 
+                    on rq.id_actoliturgico = al.id_actoliturgico WHERE al.nombre_liturgia  = %s order by rq.id_requisito asc 
             ''',(acto))
-            valores = cursor.fetchone()
+            valores = cursor.fetchall()
         return valores
     except Exception as e:  
         raise("Error en la consulta")
@@ -305,7 +284,7 @@ def listar_requisitosLit():
     finally:
         conexion.close()  
 
-def insertar_requisito(acto, requisito, tipo, estado, maximo, minimo):
+def insertar_requisito(acto, requisito, tipo, estado, maximo, minimo, nivel):
     conexion = obtener_conexion()
     try:
         with conexion.cursor() as cursor:
@@ -319,9 +298,9 @@ def insertar_requisito(acto, requisito, tipo, estado, maximo, minimo):
                 return 'duplicado'
 
             cursor.execute('''
-                INSERT INTO requisito (nombre_requisito, id_actoliturgico, tipo, estado, maximo, minimo) 
-                VALUES (%s, %s, %s, %s, %s, %s)
-            ''', (requisito, acto, tipo, estado, maximo, minimo))
+                INSERT INTO requisito (nombre_requisito, id_actoliturgico, tipo, estado, maximo, minimo, nivel_requisito) 
+                VALUES (%s, %s, %s, %s, %s, %s,%s)
+            ''', (requisito, acto, tipo, estado, maximo, minimo,nivel))
             conexion.commit()
             return True
     except Exception as e:
@@ -379,15 +358,15 @@ def eliminar_requisito(id_actoliturgico, id_requisito):
     finally:
         conexion.close()
 
-def modificar_requisito(id_requisito, requisito, tipo, estado, maximo, minimo):
+def modificar_requisito(id_requisito, requisito, tipo, estado, maximo, minimo, nivel):
     conexion = obtener_conexion()
     try:
         with conexion.cursor() as cursor:
             cursor.execute('''
                 UPDATE requisito 
-                SET nombre_requisito = %s, tipo = %s, estado = %s, maximo = %s, minimo = %s 
+                SET nombre_requisito = %s, tipo = %s, estado = %s, maximo = %s, minimo = %s , nivel_requisito = %s
                 WHERE id_requisito = %s
-            ''', (requisito, tipo, estado, maximo, minimo, id_requisito))
+            ''', (requisito, tipo, estado, maximo, minimo,nivel, id_requisito))
             conexion.commit()
             return True
     except Exception:
@@ -411,18 +390,73 @@ def listar_requisitos(id_actoliturgico):
     finally:
         conexion.close()
 
-def monto_acto(id_acto):
+def monto_total(acto_liturgico, sede, dni_responsable, dni1, dni2):
     conexion = obtener_conexion()
     try:
         with conexion.cursor() as cursor:
-            cursor.execute('''
-                SELECT al.monto FROM actoliturgico AS al WHERE id_actoliturgico = %s
-            ''', (id_acto,))
-            resultado = cursor.fetchone()
-            monto = resultado[0] if resultado else 0  # Devuelve 0 si no se encuentra el acto
-        return monto
+            # Monto fijo de ese acto litúrgico
+            cursor.execute(
+                '''
+                SELECT al.monto FROM actoliturgico AS al WHERE al.nombre_liturgia = %s
+                ''', (acto_liturgico,)
+            )
+            resultado_acto = cursor.fetchone()
+            if resultado_acto:
+                pf_acto = resultado_acto[0]
+            else:
+                print("No se encontró el acto litúrgico especificado.")
+                return 0
+
+            # Monto fijo por ser sede principal
+            cursor.execute(
+                '''
+                SELECT sd.monto FROM sede AS sd WHERE sd.nombre_sede = %s
+                ''', (sede,)
+            )
+            resultado_sede = cursor.fetchone()
+            if resultado_sede:
+                pf_sede = resultado_sede[0]
+            else:
+                print("No se encontró la sede especificada.")
+                return 0
+
+            # Verificar si los feligreses pertenecen a la sede
+            cursor.execute(
+                '''
+                SELECT * FROM feligres AS fl INNER JOIN sede AS sd
+                ON sd.id_sede = fl.id_sede WHERE sd.nombre_sede = %s AND (fl.dni = %s OR fl.dni = %s)
+                ''', (sede, dni1, dni2)
+            )
+            verificar = cursor.fetchone()
+            if verificar:
+                return {
+                    'pf_acto': float(pf_acto),
+                    'pf_sede': float(pf_sede)
+                }
+            else:
+                # Si no pertenecen a la sede, calcular el monto de traslado
+                cursor.execute(
+                    '''
+                    SELECT fl.id_sede, sd.monto_traslado FROM feligres AS fl INNER JOIN sede AS sd
+                    ON sd.id_sede = fl.id_sede WHERE fl.dni = %s
+                    ''', (dni_responsable,)
+                )
+                resultado_traslado = cursor.fetchone()
+                if resultado_traslado:
+                    id_sedetraslado = resultado_traslado[0]
+                    pf_traslado = resultado_traslado[1]
+                    return {
+                        'pf_acto': float(pf_acto),
+                        'pf_sede': float(pf_sede),
+                        'pf_traslado': float(pf_traslado),
+                        'id_sedetraslado': id_sedetraslado
+                    }
+                else:
+                    print("No se encontró el responsable especificado para calcular el traslado.")
+                    return 0
     except Exception as e:  
-        print(f"Error al obtener el monto del acto: {e}")
-        return 0  # Retorna 0 en caso de excepción
+        print(f"Error al calcular el monto total: {e}")
+        return 0
     finally:
         conexion.close()
+

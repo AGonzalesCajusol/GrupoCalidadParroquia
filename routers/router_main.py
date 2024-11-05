@@ -17,6 +17,7 @@ def registrar_rutas(app):
         password = request.form['password22']
         'me retornará 4 estados 0, significa que no existe esa cuenta; 1 que los datos son incorrectos; 2 ministro y 3 feligres'
         valor = cfel.iniciosesion(dni,password)
+        print(valor)
         #en casos 1 y 2 se crea otro token y se remplaza por el anterior ademas retornas su usuario
         token = str(random.randint(1,1024))
         token_h = sha256(token.encode('utf-8')).hexdigest()

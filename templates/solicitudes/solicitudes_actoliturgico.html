@@ -32,21 +32,26 @@
             margin-bottom: 20px;
         }
     .qr-code  img{
-        width: 100%;
+        width: 50%;
         height: 100%;
         object-fit: cover;
-    } 
+    }
+    #imagen_qr{
+        width: 250px;
+        height: auto;
+    }
+
 </style>
 <main class="ms-5">
     <!---------<button class="btn btn-primary"><i class="bi bi-plus-circle-fill me-2"></i>Nueva Solicitud</button>
     <hr>-------------->
-    <div class="row">
+    <div class="row" id="div_sol">
         <!-- Contenedor para pestañas -->
         <div class="tab-content mt-1">
             <div class="col-12 mt-3" >
                 <h6><strong>Solicitudes de Actos liturgicos:</strong></h6>
                 <div class="d-flex">
-                    <select name="" id="acto_seleccionado" class="form-select w-25">
+                    <select name="acto_seleccionado" id="acto_seleccionado" class="form-select w-25">
                         <option value="" >
                             ----Seleccione un acto litúrgico----
                         </option>
@@ -62,8 +67,8 @@
                     </button>
                 </div>
 
-                <div id="requi_actos">
-                    <form  id="formulario_solicitud">
+                <div id="requi_actos" class="d-none">
+                    <form  id="formulario_solicitud" enctype="multipart/form-data">
                         <table class="table mt-3">
                             <thead>
                                 <tr>
@@ -82,7 +87,7 @@
                                 </tr>
                             </thead>
                             <tbody id="datos_solicitud" >
-                
+                                
                             </tbody>   
                         </table>
                         <div>
@@ -205,45 +210,54 @@
     </div>
 
 
-<div class="container d-none">
+<div class="container d-none" id="pago">
     <div class="payment-form">
         <div class="form-header">
-            <h2>Formulario de Pago</h2>
+            <h2>Método de pago</h2> 
+            <h2><strong id="metodo">efectivo</strong></h2>
         </div>
-
         <div class="qr-code d-inline-flex">
-            <div class="card col-3 me-2">
+            <div class="col-3 me-2 btn" onclick="mostrar_img('yape')">
                 <img src="/static/img/yape.png" class="card-img-top" alt="...">
             </div>
-            <div class="card col-3 me-2">
+            <div class="col-3 me-2 btn" onclick="mostrar_img('plin')">
                 <img src="/static/img/plin.jpg" class="card-img-top" alt="...">
             </div>
-            <div class="card col-3 me-2">
+            <div class="col-3 me-2 btn" onclick="mostrar_img('tarjeta')">
                 <img src="/static/img/tarjeta.webp" class="card-img-top" alt="...">
             </div>
-            <div class="card col-3 me-5">
+            <div class="col-3 me-5 btn" onclick="mostrar_img('efecto')">
                 <img src="/static/img/efectivo.jpg" class="card-img-top" alt="...">
             </div>
         </div>
 
-        <form>
-            <div class="form-group">
+        <div class="d-flex  mt-4">
+            <img class="mx-auto" id="imagen_qr"  alt="" >
+        </div>
+        <form id="paguitos" enctype="multipart/form-data">
+            <div>
+                <label for="responsable">Seleccione el feligres responsable</label>
+                <select name="responsable" id="responsable" class="form-select" onchange="precio()" required>
+                </select>
+            </div>
+            
+            <div class="form-group mt-2">
                 <label for="amount">Monto a Pagar</label>
-                <input type="text" class="form-control" id="amount" placeholder="Ingrese el monto" required>
+                <input type="text" class="form-control" id="amount" placeholder="Ingrese el monto">
             </div>
 
-            <div class="form-group">
-                <label for="billingAddress">Dirección de Facturación</label>
-                <input type="text" class="form-control" id="billingAddress" placeholder="123 Calle Ejemplo" required>
-            </div>
-
-            <button type="submit" class="btn btn-primary btn-block">Confirmar Pago</button>
+            <button id="pagos" type="button" class="btn btn-primary btn-block mt-2 w-100" onclick="grabar_solicitud()" disabled >Confirmar Pago</button>
         </form>
     </div>
 </div>
-    </div>
+
+
+
+</div>
 
 </main>
 
 <script src="/static/js/solicitudes.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+
 {% endblock %}

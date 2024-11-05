@@ -29,6 +29,9 @@
                         estado
                     </th>
                     <th>
+                        Nivel
+                    </th>
+                    <th>
                         Opciones
                     </th>
                 </tr>
@@ -66,6 +69,14 @@
                         <label for="nombrerequisito" class="form-label">Nombre requisito</label>
                         <input type="text" name="nombrerequisito" class="form-control" id="nombrerequisito" placeholder="Ingrese el nombre del requisito" required>
                     </div>
+                    <div>
+                        <label for="tipo" class="form-label">Nivel del requisito</label>
+                        <select name="nivel" id="nivel" class="form-select" required>
+                            <option value="">----Seleccione el nivel del requisito ------</option>
+                            <option value="O">Obligatorio</option>
+                            <option value="R">Requerido</option>
+                        </select>
+                    </div>
                     <div class="mb-3 mt-3">
                         <label for="tipo" class="form-label">Tipo de requisito</label>
                         <div class="">
@@ -74,10 +85,10 @@
                                     <select name="opciones" id="opciones" class="form-select" required onchange="configuracion()">
                                         <option value="">----Seleccione tipo de requisito ------</option>
                                         <option value="Imagen">Imagen</option>
-                                        <option value="Numerico">Numerico</option>
+                                        <option value="Sede">Sede</option>
+                                        <option value="Dni">Dni</option>
                                         <option value="Texto">Texto</option>
                                         <option value="Charla">Charla</option>
-                                        <option value="Sede">Sede</option>
                                         <option value="FechaHora">Fecha y hora</option>
                                         <option value="Fecha">Fecha</option>
                                         <option value="Hora">Hora</option>
