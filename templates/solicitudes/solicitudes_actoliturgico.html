@@ -49,7 +49,8 @@
         <!-- Contenedor para pestañas -->
         <div class="tab-content mt-1">
             <div class="col-12 mt-3" >
-                <h6><strong>Solicitudes de Actos liturgicos:</strong></h6>
+                <h1 class="titulo-gestion">GESTIÓN DE SOLICITUDES DE ACTO LITÚRGICO</h1>
+                <h6><strong>Acto litúrgico:</strong></h6>
                 <div class="d-flex">
                     <select name="acto_seleccionado" id="acto_seleccionado" class="form-select w-25">
                         <option value="" >
@@ -66,7 +67,7 @@
                         <i class="bi bi-plus-circle-fill me-2"></i>Nuevo
                     </button>
                 </div>
-
+                <!---------   Esta es la tabla donde se muestran los requisitos    ----------->
                 <div id="requi_actos" class="d-none">
                     <form  id="formulario_solicitud" enctype="multipart/form-data">
                         <table class="table mt-3">
@@ -96,6 +97,8 @@
                     </form>
 
                 </div>
+
+                <!---------   Esta es la tabla donde se muestran el horarios escogido por el feligres   ----------->
                 <div class="mt-2 d-none" id="contenido_calendario_celebracion">
                     <div class="d-flex justify-content-end">
                         <button type="button" class="btn btn-danger " onclick="exportarTablaPDF()"><i class="bi bi-file-pdf-fill"></i></button>
@@ -253,19 +256,19 @@
 
 
 <!----- Tabla solicitudes ------>
-<div>
+<div class="ms-4">
     <table class="table">
         <thead>
             <tr>
                 <th>Id solicitud</th>
-                <th></th>
-                <th></th>
-                <th></th>
+                <th>Sede</th>
+                <th>Acto liturgico</th>
+                <th>Feligres responsable</th>
                 <th>Opciones</th>
             </tr>
         </thead>
-        <tbody>
-            
+        <tbody id="solicitud"> 
+
         </tbody>
     </table>
 </div>

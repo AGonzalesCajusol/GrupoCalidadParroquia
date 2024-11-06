@@ -19,7 +19,24 @@ def charlas_rangoaño(acto_liturgico):
     finally:
         conexion.close() 
 
-
+def solicitudes(sede):
+    conexion = obtener_conexion()
+    try:
+        with conexion.cursor() as cursor:
+            cursor.execute("""
+                SELECT sl.id_solicitud, sd.id_sede , sd.nombre_sede ,fl.dni , al.nombre_liturgia  ,CONCAT(fl.nombres, ' ', fl.apellidos) as 'nombres' 
+                FROM solicitud AS sl
+                INNER JOIN feligres AS fl ON fl.dni = sl.dni_feligres inner join sede as sd
+                on sd.id_sede = sl.id_sede  inner join celebracion as cl
+                on cl.id_celebracion = sl.id_celebracion inner join actoliturgico as al
+                on al.id_actoliturgico = cl.id_actoliturgico
+                where sd.nombre_sede = %s order by sl.id_solicitud asc
+            """, (sede))
+        return cursor.fetchall()
+    except Exception as e:
+        return "Error"
+    finally:
+        conexion.close() 
 
 
 def insertar_solicitudMatrimonio(requisitos_data):
