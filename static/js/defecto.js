@@ -4,6 +4,7 @@ function openNav() {
     document.getElementById('abrir').style.visibility = 'hidden'; // Ocultar el botón de abrir
 }
 
+
 function closeNav() {
     document.getElementById("mySidenav").classList.remove('open');
     document.querySelector('.main-content').classList.remove('shifted');
@@ -15,6 +16,8 @@ window.onload = function() {
         $('#spinner').fadeOut(); // Oculta el spinner con un efecto fadeOut después de 2 segundos
         $('body').removeClass('hidden'); // Muestra el contenido eliminando la clase hidden
     }, 500); // 2000 milisegundos = 2 segundos
+
+
 };
 
 //MODIFICAR >>>> onclick="return modificar()"
@@ -144,5 +147,15 @@ function volver(e) {
         }
     });
 }
+
+function finalizar_sesion(){
+    document.cookie = "token=; path=/;"; 
+    document.cookie = "dni=; path=/;"; 
+    document.cookie = "tipo=; path=/;"; 
+    document.cookie = "nombre=;path=/; "
+    window.location.href = "http://127.0.0.1:5000/";
+
+}
+
 
 

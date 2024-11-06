@@ -1,4 +1,4 @@
-from flask import render_template, request, redirect, url_for, make_response
+from flask import render_template, request, redirect, url_for, make_response, flash
 import controladores.controlador_feligres as cfel
 import controladores.controlador_ministro as cmin
 import random
@@ -49,8 +49,8 @@ def registrar_rutas(app):
                 response.set_cookie('nombre', '')  # Manejo si no se encuentra el nombre
 
             return response
-
         else:
+            flash("Verifique su usuario o contraseña")
             return redirect(url_for('raiz'))
            
     
