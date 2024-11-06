@@ -402,7 +402,7 @@ function actualizarTablaSede(sedes) {
             <td>${sede.direccion}</td>
             <td>${sede.telefono}</td>
             <td>${sede.correo}</td>
-            <td>${sede.estado == '1' ? 'Activo' : 'Inactivo'}</td>
+            <td class="text-center">${sede.estado == '1' ? 'Activo' : 'Inactivo'}</td>
             <td class="text-center border">
                 <button class="btn btn-primary btn-sm" title="Ver"
                     onclick="abrirModalVer('${sede.id}','${sede.nombre_sede}','${sede.direccion}','${sede.creacion}','${sede.telefono}','${sede.correo}','${sede.monto}','${sede.estado}','${sede.id_congregacion}','${sede.id_diosesis}','${sede.monto_traslado}')">

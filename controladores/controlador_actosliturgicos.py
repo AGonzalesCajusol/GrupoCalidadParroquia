@@ -184,6 +184,15 @@ def listar_actosLit():
             cursor.execute('''
                 SELECT * from actoliturgico 
             ''')
+            '''
+                SELECT al.* 
+                FROM actoliturgico AS al
+                left JOIN sede_acto_liturgico AS sdal
+                    ON al.id_actoliturgico = sdal.id_actoliturgico
+                left JOIN sede AS sd
+                    ON sd.id_sede = sdal.id_sede
+                WHERE sd.nombre_sede = 'Sede central';
+            '''
             valores = cursor.fetchall()
         return valores
     except Exception as e:  

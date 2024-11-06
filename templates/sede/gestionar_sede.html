@@ -34,7 +34,8 @@
                 <td>{{ sed[5] }}</td> <!-- correo -->
                 <!-- <td>{{ sed[6] }}</td>  monto -->
                 <!-- <td>{{ sed[7] }}</td>  Estado -->
-                <td style="vertical-align: middle; text-align: center">{{ 'Activo' if sed[7] == 1 else 'Inactivo' }}</td>
+                <td style="vertical-align: middle; text-align: center">{{ 'Activo' if sed[7] == 1 else 'Inactivo' }}
+                </td>
                 <!-- <td>{{ sed[8] }}</td>  id congregación -->
                 <!-- <td>{{ sed[9] }}</td> id diosesis-->
                 <!-- <td>{{ sed[10] }}</td> monto_traslado -->
@@ -51,8 +52,7 @@
                     </button>
 
                     <button type="button" class="btn btn-secondary btn-sm" title="Dar de baja"
-                        onclick="darBajaSede('{{ sed[0] }}','{{ sed[7] }}')"
-                        {% if sed[7] == 0 %} disabled {% endif %}>
+                        onclick="darBajaSede('{{ sed[0] }}','{{ sed[7] }}')" {% if sed[7]==0 %} disabled {% endif %}>
                         <i class="fas fa-ban"></i>
                     </button>
 
@@ -73,7 +73,7 @@
 
 <!-- Modal para Agregar o Editar -->
 <div class="modal fade" id="modalSede" tabindex="-1" aria-labelledby="modalSedeLabel" aria-hidden="true">
-    <div class="modal-dialog">
+    <div class="modal-dialog modal-lg">
         <div class="modal-content">
             <form id="formSede" action="{{ url_for('procesar_insertar_sede') }}" method="POST">
                 <input type="hidden" id="sedeId" name="id">
@@ -82,87 +82,95 @@
                     <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
                 </div>
                 <div class="modal-body">
-                    <div class="mb-3">
-                        <label for="nombre_sede" class="form-label">Nombre de la Sede</label>
-                        <input type="text" class="form-control" id="nombre_sede" name="nombre_sede" required>
-                    </div>
-                    <div class="mb-3">
-                        <label for="direccion" class="form-label">Dirección</label>
-                        <input type="text" class="form-control" id="direccion" name="direccion" required>
-                    </div>
-                    <div class="mb-3">
-                        <label for="creacion" class="form-label">Creación</label>
-                        <input type="date" class="form-control" id="creacion" name="creacion" required>
-                    </div>
-                    <div class="mb-3">
-                        <label for="telefono" class="form-label">Telefono</label>
-                        <input type="tel" class="form-control" id="telefono" name="telefono" maxlength="9"
-                            pattern="[0-9]{9}" inputmode="numeric" required>
-                    </div>
-                    <div class="mb-3">
-                        <label for="correo" class="form-label">Correo</label>
-                        <input type="email" class="form-control" id="correo" name="correo" required>
-                    </div>
-                    <div class="mb-3">
-                        <label for="monto" class="form-label">Monto</label>
-                        <input type="number" class="form-control" id="monto" name="monto" required>
-                    </div>
-                    <div class="mb-3">
-                        <label for="estado" class="form-label">Estado</label>
-                        <input type="checkbox" class="form-check-input" id="estado" name="estado">
-                        <label class="form-check-label" for="estado">Activo</label>
-                    </div>
-                    <div class="mb-3">
-                        <label for="id_congregacion">Congregación</label>
-                        <select class="form-select" id="id_congregacion" name="id_congregacion" required>
-                            {% for congre in congregacion %}
-                            {% if congre[2] == 1 %}
-                            <option value="{{ congre[0] }}">{{ congre[1] }}</option>
-                            {% endif %}
-                            {% endfor %}
-                        </select>
-                    </div>
-                    <div class="mb-3">
-                        <label for="id_diosesis">Diocesis</label>
-                        <select class="form-select" id="id_diosesis" name="id_diosesis" required>
-                            {% for dioss in diosesis %}
-                            <option value="{{ dioss[0] }}">{{ dioss[1] }}</option>
-                            {% endfor %}
-                        </select>
-                    </div>
-                    <div class="mb-3">
-                        <label for="monto_traslado" class="form-label">Monto traslado</label>
-                        <input type="number" class="form-control" id="monto_traslado" name="monto_traslado" required>
-                    </div>
-                    <div>
-                        <h6>Actos litúrgicos</h6>
-                        {% for acto in actoliturgico %}
-                        <div class="mb-3">
-                            <input type="checkbox" class="form-check-input" id="estado-{{ acto[0] }}"
-                                name="estado-{{ acto[0] }}">
-                            <label class="form-check-label" for="estado-{{ acto[0] }}">{{ acto[1] }}</label>
+                    <div class="row">
+                        <div class="col-md-5">
+                            <div class="mb-3">
+                                <label for="nombre_sede" class="form-label">Nombre de la Sede</label>
+                                <input type="text" class="form-control" id="nombre_sede" name="nombre_sede" required>
+                            </div>
+                            <div class="mb-3">
+                                <label for="direccion" class="form-label">Dirección</label>
+                                <input type="text" class="form-control" id="direccion" name="direccion" required>
+                            </div>
+                            <div class="mb-3">
+                                <label for="creacion" class="form-label">Creación</label>
+                                <input type="date" class="form-control" id="creacion" name="creacion" required>
+                            </div>
+                            <div class="mb-3">
+                                <label for="telefono" class="form-label">Telefono</label>
+                                <input type="tel" class="form-control" id="telefono" name="telefono" maxlength="9"
+                                    pattern="[0-9]{9}" inputmode="numeric" required>
+                            </div>
+                            <div class="mb-3">
+                                <label for="correo" class="form-label">Correo</label>
+                                <input type="email" class="form-control" id="correo" name="correo" required>
+                            </div>
                         </div>
-                        {% endfor %}
+                        <div class="col-md-4">
+                            <div class="mb-3">
+                                <label for="monto" class="form-label">Monto</label>
+                                <input type="number" class="form-control" id="monto" name="monto" required>
+                            </div>
+                            <div class="mb-3">
+                                <label for="estado" class="form-label">Estado</label>
+                                <input type="checkbox" class="form-check-input" id="estado" name="estado">
+                                <label class="form-check-label" for="estado">Activo</label>
+                            </div>
+                            <div class="mb-3">
+                                <label for="id_congregacion">Congregación</label>
+                                <select class="form-select" id="id_congregacion" name="id_congregacion" required>
+                                    {% for congre in congregacion %}
+                                    {% if congre[2] == 1 %}
+                                    <option value="{{ congre[0] }}">{{ congre[1] }}</option>
+                                    {% endif %}
+                                    {% endfor %}
+                                </select>
+                            </div>
+                            <div class="mb-3">
+                                <label for="id_diosesis">Diocesis</label>
+                                <select class="form-select" id="id_diosesis" name="id_diosesis" required>
+                                    {% for dioss in diosesis %}
+                                    <option value="{{ dioss[0] }}">{{ dioss[1] }}</option>
+                                    {% endfor %}
+                                </select>
+                            </div>
+                            <div class="mb-3">
+                                <label for="monto_traslado" class="form-label">Monto traslado</label>
+                                <input type="number" class="form-control" id="monto_traslado" name="monto_traslado"
+                                    required>
+                            </div>
+                        </div>
+                        <div class="col-md-3">
+                            <div>
+                                <h6>Actos litúrgicos que realiza</h6>
+                                {% for acto in actoliturgico %}
+                                <div class="mb-3">
+                                    <input type="checkbox" class="form-check-input" id="estado-{{ acto[0] }}"
+                                        name="estado-{{ acto[0] }}">
+                                    <label class="form-check-label" for="estado-{{ acto[0] }}">{{ acto[1] }}</label>
+                                </div>
+                                {% endfor %}
+                            </div>
+                        </div>
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cerrar</button>
+                        <button type="submit" class="btn btn-primary" id="submitBtn"></button>
                     </div>
                 </div>
-                <div class="modal-footer">
-                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cerrar</button>
-                    <button type="submit" class="btn btn-primary" id="submitBtn"></button>
-                </div>
+            </form>
         </div>
-        </form>
     </div>
-</div>
 
 
-<script src="/static/js/sede.js"></script>
+    <script src="/static/js/sede.js"></script>
 
-<script>
-    // Definir las URLs de acción generadas por Flask
-    const insertarSedeURL = "{{ url_for('procesar_insertar_sede') }}";
-    const actualizarSedeURL = "{{ url_for('procesar_actualizar_sede') }}";
-    const darBajaSedeURL = "{{ url_for('procesar_darBaja_sede') }}";
-</script>
+    <script>
+        // Definir las URLs de acción generadas por Flask
+        const insertarSedeURL = "{{ url_for('procesar_insertar_sede') }}";
+        const actualizarSedeURL = "{{ url_for('procesar_actualizar_sede') }}";
+        const darBajaSedeURL = "{{ url_for('procesar_darBaja_sede') }}";
+    </script>
 
 
-{% endblock %}
+    {% endblock %}

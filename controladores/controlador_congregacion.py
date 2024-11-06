@@ -42,10 +42,28 @@ def actualizar_congregacion(nombre,estado, id):
 
 def eliminar_congregacion(id):
     conexion = obtener_conexion()
-    with conexion.cursor() as cursor:
-        cursor.execute("DELETE FROM congregacion WHERE id_congregacion = %s", (id,))
-    conexion.commit()
-    conexion.close()
+    try:
+        with conexion.cursor() as cursor:
+            # Verificar si el id_congregacion está en uso en la tabla sede
+            cursor.execute("SELECT COUNT(*) FROM sede WHERE id_congregacion = %s", (id,))
+            en_uso_en_sede = cursor.fetchone()[0]
+
+            # Si el id_congregacion está en uso en alguna otra tabla, devolver mensaje de error
+            if en_uso_en_sede > 0:
+                mensaje_error = "No se puede eliminar esta congregación porque está siendo utilizada en otra tabla."
+                print(mensaje_error)
+                return mensaje_error
+            
+            # Si no hay dependencias, proceder con la eliminación
+            cursor.execute("DELETE FROM congregacion WHERE id_congregacion = %s", (id,))
+        conexion.commit()
+        return "Congregación eliminada correctamente."
+    except Exception as e:
+        print(f"Error al eliminar la congregación: {e}")
+        conexion.rollback()
+        return "Error al intentar eliminar la congregación."
+    finally:
+        conexion.close()
 
 def obtener_id_congregacion_por_nombre(nombre):
         conexion = obtener_conexion()

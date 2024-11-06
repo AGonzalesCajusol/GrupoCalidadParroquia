@@ -21,10 +21,6 @@ import routers.router_programacion
 app = Flask(__name__)
 app.secret_key = 'super-secret'
 
-
-#decorador ministros
-
-
 # Ruta para la página de inicio de sesión
 @app.route('/')
 def raiz():

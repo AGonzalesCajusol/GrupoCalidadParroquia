@@ -11,8 +11,27 @@ def registrar_rutas(app):
     # Ruta para gestionar tipos de ministro
     @app.route('/solicitudes')
     def solicitudes():
+        #nombre_sede = request.cookies.get('sede')
         lista_actos = cactos.listar_actosLit()
         return render_template('solicitudes/solicitudes_actoliturgico.html', lista_actos=lista_actos)
+    
+    @app.route('/listar_solicitudes', methods=['GET'])
+    def listar_solicitudes():
+        sede = request.cookies.get('sede')
+        solicitudes = csoli.solicitudes(sede)
+        listar_solicitudes = []
+        if solicitudes != 'Error':
+            for sl in solicitudes:
+                listar_solicitudes.append({
+                'id_solicitud': sl[0],
+                'id_sede': sl[1],
+                'nombre_sede' : sl[2],
+                'dni': sl[3],
+                'nombre_liturgia': sl[4],
+                'nombres': sl[5]
+            })
+            return jsonify({'data': listar_solicitudes})
+        return jsonify({'mensaje': 'Error'})
     
 
     @app.route('/calendario_solicitud/<int:id_charla>')
@@ -85,8 +104,6 @@ def registrar_rutas(app):
             return jsonify({'data': lista_charlas})
         return jsonify({'data': 'Error'})
 
-
-
     @app.route('/registrarsolicitud/<int:acto_liturgico>', methods=['POST'])
     def registrarsolicitud(acto_liturgico):
         #Insertamos si es matrimonio
@@ -139,3 +156,5 @@ def registrar_rutas(app):
                     return jsonify({'estado': 'Error'})
             except Exception as e:
                 return jsonify({'estado': 'Error'})
+            
+    

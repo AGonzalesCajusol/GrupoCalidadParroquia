@@ -1,4 +1,9 @@
 let datos_pago = '';
+document.addEventListener('DOMContentLoaded', function() {
+    'listar_solicitudes();'
+});
+
+
 function exportarTablaPDF() {
     const tabla = document.getElementById('miTabla');
     const tabla2 = tabla.cloneNode(true); // Clona la tabla existente
@@ -403,3 +408,43 @@ function array_matrimonio() {
     return array;
 }
 
+function listar_solicitudes() {
+    fetch('/listar_solicitudes')
+        .then(response => response.json())  // Parseamos la respuesta como JSON
+        .then(data => {
+            const tbody = document.getElementById('solicitud');
+            tbody.innerHTML = '';  // Limpiar el contenido actual del tbody
+
+            if (data.data) {
+                // Si hay datos, los insertamos en la tabla
+                data.data.forEach(solicitud => {
+                    const row = document.createElement('tr');
+
+                    // Creamos celdas para cada campo de la solicitud
+                    row.innerHTML = `
+                        <td>${solicitud.id_solicitud}</td>
+                        <td>${solicitud.nombre_sede}</td>
+                        <td>${solicitud.nombre_liturgia}</td>
+                        <td>${solicitud.nombres}</td>
+                        <td>
+                            <button class="btn btn-primary">
+                                <i class="bi bi-check2-circle"></i>
+                            </button>
+                            <button class="btn btn-secondary">
+                                <i class="bi bi-calendar3"></i>
+                            </button>
+                        </td>
+                    `;
+                    tbody.appendChild(row);  // Añadimos la fila a la tabla
+                });
+            } else {
+                // Si no hay datos, podemos agregar un mensaje o manejar el error
+                const row = document.createElement('tr');
+                row.innerHTML = '<td colspan="6">No se encontraron solicitudes</td>';
+                tbody.appendChild(row);
+            }
+        })
+        .catch(error => {
+            console.error('Error al obtener solicitudes:', error);
+        });
+}
