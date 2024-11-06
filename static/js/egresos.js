@@ -60,6 +60,69 @@ $(document).ready(function() {
     editarModal.show();
     }
 
+    function exportarTablaPDF() {
+        const { jsPDF } = window.jspdf;
+        const doc = new jsPDF();
+    
+        // Título del informe
+        doc.setFontSize(18);
+        doc.text("Informe de Egresos", 14, 20);
+    
+        // Obtener solo las filas visibles en la tabla (las filtradas)
+        const table = $('#egresosTable').DataTable();
+        const datos = [];
+        table.rows({ search: 'applied' }).every(function () {
+            const data = this.data();
+            datos.push([
+                data[0], // ID Egreso
+                data[1], // Nombre Sede
+                data[2], // Descripción
+                data[3], // Fecha
+                data[4], // Hora
+                data[5]  // Monto
+            ]);
+        });
+    
+        // Configuración de la tabla en el PDF
+        doc.autoTable({
+            head: [['ID', 'Sede', 'Descripción', 'Fecha', 'Hora', 'Monto']],
+            body: datos,
+            startY: 30,
+            styles: {
+                fontSize: 10,
+                cellPadding: 3,
+                valign: 'middle',
+            },
+            headStyles: {
+                fillColor: [167, 192, 221],
+                textColor: 255,
+                fontSize: 11,
+                fontStyle: 'bold',
+            },
+            bodyStyles: {
+                textColor: [0, 0, 0],
+            },
+            alternateRowStyles: {
+                fillColor: [240, 248, 255],
+            },
+            columnStyles: {
+                0: { cellWidth: 15, halign: 'center' },   // ID Egreso
+                1: { cellWidth: 30, halign: 'center' },   // Nombre Sede
+                2: { cellWidth: 40, halign: 'left' },     // Descripción
+                3: { cellWidth: 25, halign: 'center' },   // Fecha
+                4: { cellWidth: 20, halign: 'center' },   // Hora
+                5: { cellWidth: 20, halign: 'right' }     // Monto
+            },
+            didDrawPage: function (data) {
+                doc.setFontSize(10);
+                doc.text("Página " + doc.internal.getCurrentPageInfo().pageNumber, 180, 10);
+            }
+        });
+    
+        // Guardar el PDF
+        doc.save("Informe_Egresos.pdf");
+    }
+    
 
     /* 
     function abrirModalEliminar(id) {
