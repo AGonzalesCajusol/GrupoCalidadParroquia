@@ -15,7 +15,7 @@ import controladores.controlador_sede as csede
 def registrar_rutas(app):
     # Ruta para gestionar feligreses
     @app.route("/gestionar_feligres", methods=["GET"])
-    def gestionar_feligres():
+    def gestionar_feligres():   
         feligreses = obtener_feligreses()
         sedes = csede.obtener_sede()
         return render_template("/feligres/gestionar_feligres.html", feligreses=feligreses, sedes = sedes )
@@ -52,7 +52,7 @@ def registrar_rutas(app):
 
     @app.route("/principal", methods=["GET"])
     def principal():
-        return render_template('/feligres/principal_feligres.html')    
+        return render_template('/principal_usuario.html')    
 
     @app.route("/insertar_feligres", methods=["POST"])
     def procesar_insertar_feligres():

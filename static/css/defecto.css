@@ -27,7 +27,7 @@ body {
 
 .header {
     background-color: #ECEADE;
-    padding: 40px 50px;
+    padding: 10px 20px;
     display: flex;
     justify-content: space-between;
     align-items: center;
@@ -36,7 +36,7 @@ body {
     top: 0;
     width: 100%;
     z-index: 1050;
-    height: 60px;
+    height: auto;
     color: #033D8EBF;
 }
 
@@ -141,20 +141,17 @@ body {
 }
 
 .sidenav {
-    width: 250px;
-    /* Fija el ancho del menú lateral */
+    width: 250px;    
     background-color: #ffffff;
-    position: fixed;
-    /* Esto mantiene el menú fijo mientras haces scroll */
-    top: 81px;
-    /* Ajusta si tienes un header */
+    position: fixed;    
+    top: 56px;
     bottom: 0;
     z-index: 1;
     color: #033D8EBF;
     overflow-y: auto;
     border-right: 5px solid #ECEADE;
-    /* Aquí agregamos la línea separadora */
     padding-right: 10px;
+    height: calc(100vh - 56px);
 }
 
 .layout {
@@ -163,22 +160,16 @@ body {
 }
 
 .sidenav a {
-    color: #033D8EBF;
-    /* Fondo azul para la opción activa */
+    color: #033D8EBF;    
     font-weight: bold;
-    /* Negrita para la opción activa */
 }
 
-/* Ajustes para los botones dentro de las colapsables */
 .sidenav .btn {
     background-color: transparent;
     border: none;
     color: #033D8EBF;
-    /* Texto gris claro */
 }
 
-
-/* Personalización del scrollbar (opcional, para WebKit) */
 .sidenav::-webkit-scrollbar {
     width: 15px;
 }
@@ -489,3 +480,7 @@ table.dataTable tbody td {
     /* Ajuste del color del borde */
 }
 
+
+#head_ind {
+    margin: auto;
+}

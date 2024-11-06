@@ -34,8 +34,7 @@
     }
 
     #miTablaClonada .ocultar {
-        display: none;
-        /* Oculta los elementos con la clase "ocultar" */
+        display: none;    
     }
     .navbar {
         --bs-navbar-padding-x: unset;
@@ -49,8 +48,7 @@
 <body class="hidden">
     <div id="spinner" class="spinner-overlay ">
         <div class="spinner"></div>
-    </div>
-    <!-- Sidenav -->
+    </div>    
     <div class="layout">
         <header class="navbar navbar-expand-lg  shadow-sm w-100 position-fixed align-items-center" id="head_ind">
             <div class="container-fluid">
@@ -61,13 +59,12 @@
                     <input type="text" id="sede" value="{{ request.cookies.get('sede') }}" hidden>
                 </a>
                 <div class="collapse navbar-collapse justify-content-end ms-4" id="navbarNav">
-      
                     <div class="d-flex align-items-center mt-1">
                         <button type="button" class="btn btn-link position-relative text-black me-4">
                             <i class="bi bi-bell"></i>
                             <span
                                 class="position-absolute top-0 start-100 translate-middle badge rounded-pill bg-danger">
-                                3 <span class="visually-hidden">nuevas notificaciones</span>
+                                 <span class="visually-hidden">nuevas notificaciones</span>
                             </span>
                         </button>
                         {% if request.cookies.get('nombre') %}
@@ -84,11 +81,11 @@
             </div>
 
         </header>
+
+
+        
         <div id="mySidenav" class="sidenav">
-
             <div>
-
-                <!------------------------- Modulo de seguridad ------------------------>
                 <a class="btn btn-primary  mb-2 mt-2" data-bs-toggle="collapse" href="#moduloSeguridad" role="button"
                     aria-expanded="false" aria-controls="moduloSeguridad">
                     <i class="bi bi-shield-lock"></i> Gestión de seguridad
@@ -140,14 +137,14 @@
                 </a>
                 <div class="collapse ms-4 mt-2" id="moduloCatequesis">
                     <a href="{{ url_for('gestionar_actos') }}" class="btn btn-outline-primary mt-2">
-                        <i class="bi bi-arrow-return-right"></i> Gestion Actos liturgicos
+                        <i class="bi bi-arrow-return-right"></i> Actos liturgicos
                     </a>
                     <a href="{{ url_for('gestionar_requisitosactos') }}" class="btn btn-outline-primary mt-2">
-                        <i class="bi bi-arrow-return-right"></i> Gestion de requisitos de actos litúrgico
+                        <i class="bi bi-arrow-return-right"></i> Requisitos de actos litúrgico
                     </a>
 
                     <a href="{{ url_for('gestionar_intenciones') }}" class="btn btn-outline-primary mt-2">
-                        <i class="bi bi-arrow-return-right"></i> Gestion de registrar las intención de los actos litúrgicos
+                        <i class="bi bi-arrow-return-right"></i> Registrar las intención de los actos litúrgicos
                     </a>
 
                     <a href="{{ url_for('requisitosXactoliturgico') }}" class="btn btn-outline-primary mt-2">
@@ -155,10 +152,10 @@
                     </a>
 
                     <a href="{{ url_for('gestionar_tema') }}" class="btn btn-outline-primary mt-2">
-                        <i class="bi bi-arrow-return-right"></i> Gestion de temas
+                        <i class="bi bi-arrow-return-right"></i> Temas
                     </a>
                     <a href="{{ url_for('gestionar_charlas') }}" class="btn btn-outline-primary mt-2">
-                        <i class="bi bi-arrow-return-right"></i> Gestión de charlas
+                        <i class="bi bi-arrow-return-right"></i> Charlas
                     </a>
                 </div>
 
