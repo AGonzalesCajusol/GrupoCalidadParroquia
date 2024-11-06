@@ -82,10 +82,36 @@ def actualizar_sede(nombre_sede,direccion,creacion,telefono,correo,monto,estado,
 
 def eliminar_sede(id):
     conexion = obtener_conexion()
-    with conexion.cursor() as cursor:
-        cursor.execute("DELETE FROM sede WHERE id_sede = %s", (id,))
-    conexion.commit()
-    conexion.close()
+    try:
+        with conexion.cursor() as cursor:
+            # Verificar si el id_sede está en uso en sede_acto_liturgico
+            cursor.execute("SELECT COUNT(*) FROM sede_acto_liturgico WHERE id_sede = %s", (id,))
+            en_uso_sede_acto_liturgico = cursor.fetchone()[0]
+            
+            # Verificar si el id_sede está en uso en programacion_charlas
+            cursor.execute("SELECT COUNT(*) FROM programacion_charlas WHERE id_sede = %s", (id,))
+            en_uso_programacion_charlas = cursor.fetchone()[0]
+
+            # Agregar más verificaciones si existen otras tablas relacionadas
+            ##ministro
+
+            # Si el id_sede está en uso en alguna de las tablas relacionadas, no se elimina
+            if en_uso_sede_acto_liturgico > 0 or en_uso_programacion_charlas > 0:
+                mensaje_error = "No se puede eliminar este registro porque está siendo utilizado en otras tablas."
+                print(mensaje_error)
+                return mensaje_error
+            
+            # Si no hay dependencias, proceder con la eliminación
+            cursor.execute("DELETE FROM sede WHERE id_sede = %s", (id,))
+        conexion.commit()
+        return "Registro eliminado correctamente."
+    except Exception as e:
+        print(f"Error al eliminar la sede: {e}")
+        conexion.rollback()
+        return "Error al intentar eliminar el registro."
+    finally:
+        conexion.close()
+
 
 def darBaja_sede(id):
     conexion = obtener_conexion()

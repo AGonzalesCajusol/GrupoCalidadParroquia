@@ -173,7 +173,7 @@ function actualizarTablaCongregacion(congregacion) {
         row.innerHTML = `
             <td class="text-center border">${Congre.id}</td>
             <td>${Congre.nombre_congregacion}</td>
-            <td>${Congre.estado == '1' ? 'Activo' : 'Inactivo'}</td>
+            <td class="text-center">${Congre.estado == '1' ? 'Activo' : 'Inactivo'}</td>
             <td class="text-center border">
                 <button class="btn btn-primary btn-sm" title="Ver"
                     onclick="abrirModalVerC('${Congre.id}','${Congre.nombre_congregacion}','${Congre.estado}')">
