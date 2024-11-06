@@ -1,4 +1,4 @@
-from flask import render_template, request, redirect, url_for, flash
+from flask import render_template, request, redirect, url_for, flash,jsonify
 from controladores.controlador_diocesis import (
     insertar_diocesis,  
     obtener_diocesis,
@@ -6,7 +6,9 @@ from controladores.controlador_diocesis import (
     actualizar_diocesis,
     eliminar_diocesis,
     obtener_departamento,
-    obtener_provincia
+    obtener_provincia,
+    obtener_id_departamento_por_nombre,
+    obtener_id_provincia_por_nombre
 )
 
 def registrar_rutas(app):
@@ -18,38 +20,74 @@ def registrar_rutas(app):
         provincia = obtener_provincia()
         return render_template("diocesis/gestionar_diocesis.html", diocesis=diocesis, departamento = departamento, provincia = provincia)
     
-    # Ruta para mostrar el formulario de registro de una nueva diócesis
-    @app.route("/registrar_diocesis", methods=["GET"])
-    def formulario_registrar_diocesis():
-        return render_template("diocesis/registrar_diocesis.html")
-
-    # Ruta para insertar una nueva diócesis
     @app.route("/insertar_diocesis", methods=["POST"])
     def procesar_insertar_diocesis():
-        nombre = request.form["nombre"]
-        id_departamento = request.form["id_departamento"]
-        id_provincia = request.form["id_provincia"]
-        insertar_diocesis(nombre, id_departamento, id_provincia)
-        flash("La diócesis fue agregada exitosamente")
-        return redirect(url_for("gestionar_diocesis"))
+        try:
+            nombre = request.form["nombre"]
+            nombre_departamento = request.form["id_departamento"]
+            nombre_provincia = request.form["id_provincia"]
 
-    # Ruta para mostrar el formulario de edición de una diócesis
-    @app.route("/editar_diocesis/<int:id>", methods=["GET"])
-    def formulario_editar_diocesis(id):
-        diocesis = obtener_diocesis_por_id(id)
-        return render_template("diocesis/editar_diocesis.html", diocesis=diocesis)
+            # Obtener los IDs de departamento y provincia basados en sus nombres
+            id_departamento = obtener_id_departamento_por_nombre(nombre_departamento)
+            id_provincia = obtener_id_provincia_por_nombre(nombre_provincia)
 
-    # Ruta para manejar la actualización de una diócesis
+            if id_departamento is None or id_provincia is None:
+                return jsonify(success=False, message="Departamento o Provincia no encontrados")
+
+            insertar_diocesis(nombre, id_departamento, id_provincia)
+
+            # Obtener las diócesis actualizadas
+            diocesis = obtener_diocesis()
+            diocesis_data = [
+                {
+                    "id": dio[0],
+                    "nombre": dio[1],
+                    "departamento": dio[2],
+                    "provincia": dio[3]
+                }
+                for dio in diocesis
+            ]
+
+            return jsonify(success=True, message="Diócesis agregada exitosamente", diocesis=diocesis_data)
+        except Exception as e:
+            print(f"Error al insertar diócesis: {e}")
+            return jsonify(success=False, message=f"Error al insertar diócesis: {str(e)}"), 400
+
+    # Ruta para actualizar una diócesis
     @app.route("/actualizar_diocesis", methods=["POST"])
     def procesar_actualizar_diocesis():
-        id = request.form["id"]
-        nombre = request.form["nombre"]
-        id_departamento = request.form["id_departamentoEditar"]
-        id_provincia = request.form["id_provinciaEditar"]
-        actualizar_diocesis(nombre, id_departamento, id_provincia, id)
-        flash("La diócesis fue actualizada exitosamente")
-        return redirect(url_for("gestionar_diocesis"))
+        try:
+            id = request.form["id"]
+            nombre = request.form["nombre"]
+            nombre_departamento = request.form["id_departamento"]
+            nombre_provincia = request.form["id_provincia"]
 
+            # Obtener los IDs de departamento y provincia basados en sus nombres
+            id_departamento = obtener_id_departamento_por_nombre(nombre_departamento)
+            id_provincia = obtener_id_provincia_por_nombre(nombre_provincia)
+
+            if id_departamento is None or id_provincia is None:
+                return jsonify(success=False, message="Departamento o Provincia no encontrados")
+
+            actualizar_diocesis(nombre, id_departamento, id_provincia, id)
+
+            # Obtener las diócesis actualizadas
+            diocesis = obtener_diocesis()
+            diocesis_data = [
+                {
+                    "id": dio[0],
+                    "nombre": dio[1],
+                    "departamento": dio[2],
+                    "provincia": dio[3]
+                }
+                for dio in diocesis
+            ]
+
+            return jsonify(success=True, message="Diócesis actualizada exitosamente", diocesis=diocesis_data)
+        except Exception as e:
+            print(f"Error al actualizar diócesis: {e}")
+            return jsonify(success=False, message=f"Error al actualizar diócesis: {str(e)}"), 400
+    
     # Ruta para eliminar una diócesis
     @app.route("/eliminar_diocesis", methods=["POST"])
     def procesar_eliminar_diocesis():
@@ -57,3 +95,22 @@ def registrar_rutas(app):
         eliminar_diocesis(id)
         flash("La diócesis fue eliminada exitosamente")
         return redirect(url_for("gestionar_diocesis"))
+    
+    @app.route("/obtener_provincias_por_departamento")
+    def obtener_provincias_por_departamento():
+        nombre_departamento = request.args.get("departamento")
+        
+        # Obtener el ID del departamento basado en el nombre
+        id_departamento = obtener_id_departamento_por_nombre(nombre_departamento)
+
+        # Si el departamento no existe, devolver un error
+        if not id_departamento:
+            return jsonify({"provincias": []})
+
+        # Obtener las provincias del departamento
+        provincias = obtener_provincias_por_departamento(id_departamento)
+        provincias_data = [{"nombre": provincia[1]} for provincia in provincias]
+
+        # Devolver las provincias en formato JSON
+        return jsonify({"provincias": provincias_data})
+

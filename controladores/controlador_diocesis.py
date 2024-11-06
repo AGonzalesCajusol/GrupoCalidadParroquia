@@ -68,3 +68,29 @@ def eliminar_diocesis(id):
         cursor.execute("DELETE FROM diosesis WHERE id_diosesis = %s", (id,))
     conexion.commit()
     conexion.close()
+
+def obtener_id_departamento_por_nombre(nombre_departamento):
+    conexion = obtener_conexion()
+    try:
+        with conexion.cursor() as cursor:
+            cursor.execute(
+                "SELECT id_departamento FROM departamento WHERE nombre_departamento = %s",
+                (nombre_departamento,)
+            )
+            resultado = cursor.fetchone()
+            return resultado[0] if resultado else None
+    finally:
+        conexion.close()
+
+def obtener_id_provincia_por_nombre(nombre_provincia):
+    conexion = obtener_conexion()
+    try:
+        with conexion.cursor() as cursor:
+            cursor.execute(
+                "SELECT id_provincia FROM provincia WHERE nombre_provincia = %s",
+                (nombre_provincia,)
+            )
+            resultado = cursor.fetchone()
+            return resultado[0] if resultado else None
+    finally:
+        conexion.close()
