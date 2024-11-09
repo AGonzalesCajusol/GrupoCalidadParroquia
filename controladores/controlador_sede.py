@@ -84,31 +84,36 @@ def eliminar_sede(id):
     conexion = obtener_conexion()
     try:
         with conexion.cursor() as cursor:
-            # Verificar si el id_sede está en uso en sede_acto_liturgico
-            cursor.execute("SELECT COUNT(*) FROM sede_acto_liturgico WHERE id_sede = %s", (id,))
-            en_uso_sede_acto_liturgico = cursor.fetchone()[0]
-            
-            # Verificar si el id_sede está en uso en programacion_charlas
-            cursor.execute("SELECT COUNT(*) FROM programacion_charlas WHERE id_sede = %s", (id,))
-            en_uso_programacion_charlas = cursor.fetchone()[0]
+            # Verificar si el id_sede está en uso en las diferentes tablas
+            tablas_a_verificar = [
+                ("sede_acto_liturgico", "id_sede"),
+                ("programacion_charlas", "id_sede"),
+                ("celebracion", "id_sede"),
+                ("comprobante", "id_sede"),
+                ("egreso", "id_sede"),
+                ("feligres", "id_sede"),
+                ("ministro", "id_sede"),
+                ("recaudacion", "id_sede"),
+                ("solicitud", "id_sede")
+            ]
 
-            # Agregar más verificaciones si existen otras tablas relacionadas
-            ##ministro
-
-            # Si el id_sede está en uso en alguna de las tablas relacionadas, no se elimina
-            if en_uso_sede_acto_liturgico > 0 or en_uso_programacion_charlas > 0:
-                mensaje_error = "No se puede eliminar este registro porque está siendo utilizado en otras tablas."
-                print(mensaje_error)
-                return mensaje_error
+            # Revisar cada tabla para ver si existe una referencia
+            for tabla, columna in tablas_a_verificar:
+                cursor.execute(f"SELECT COUNT(*) FROM {tabla} WHERE {columna} = %s", (id,))
+                en_uso = cursor.fetchone()[0]
+                if en_uso > 0:
+                    mensaje_error = f"No se puede eliminar la sede porque está en uso en la tabla '{tabla}'."
+                    print(mensaje_error)
+                    return {"success": False, "message": mensaje_error}
             
             # Si no hay dependencias, proceder con la eliminación
             cursor.execute("DELETE FROM sede WHERE id_sede = %s", (id,))
         conexion.commit()
-        return "Registro eliminado correctamente."
+        return {"success": True, "message": "Sede eliminada correctamente."}
     except Exception as e:
         print(f"Error al eliminar la sede: {e}")
         conexion.rollback()
-        return "Error al intentar eliminar el registro."
+        return {"success": False, "message": "Error al intentar eliminar la sede."}
     finally:
         conexion.close()
 

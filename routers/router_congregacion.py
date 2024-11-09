@@ -75,9 +75,8 @@ def registrar_rutas(app):
     @app.route("/eliminar_congregacion", methods=["POST"])
     def procesar_eliminar_congregacion():
         id = request.form["id"]  # Captura el ID desde el formulario
-        eliminar_congregacion(id)  # Llama a la función que elimina en la base de datos
-        flash("La congregación fue eliminada exitosamente")
-        return redirect(url_for("gestionar_congregacion"))
+        resultado = eliminar_congregacion(id)  # Llama a la función que elimina en la base de datos
+        return jsonify(resultado)
 
     @app.route("/darBaja_congregacion", methods=["POST"])
     def procesar_darBaja_congregacion():

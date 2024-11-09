@@ -149,10 +149,8 @@ def registrar_rutas(app):
     @app.route("/eliminar_sede", methods=["POST"])
     def procesar_eliminar_sede():
         id = request.form["id"]  # Captura el ID desde el formulario
-        eliminar_sede(id)  # Llama a la función que elimina en la base de datos
-        flash("La sede fue eliminada exitosamente")
-        return redirect(url_for("gestionar_sede"))
-
+        resultado = eliminar_sede(id)  # Llama a la función que elimina en la base de datos
+        return jsonify(resultado)
 
     @app.route("/darBaja_sede", methods=["POST"])
     def procesar_darBaja_sede():
