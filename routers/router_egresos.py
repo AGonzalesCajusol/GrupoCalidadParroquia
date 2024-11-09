@@ -110,7 +110,16 @@ def registrar_rutas(app):
         except Exception as e:
             traceback.print_exc()
             return jsonify(success=False, message=f"Error al insertar egreso: {str(e)}"), 400
-    
+    @app.route("/apiaños", methods=["GET"])
+    def api_años():
+        try:
+            años = obtener_rango_de_años()  # Esta función debería devolver una lista de años, por ejemplo [(2021,), (2022,), ...]
+            lista_años = [{'año': año[0]} for año in años]  # Convertir a formato de diccionario
+            return jsonify({'data': lista_años})
+        except Exception as e:
+            print(f"Error al obtener años: {e}")
+            return jsonify({"error": "Error al obtener los años"}), 500
+
 #   @app.route("/apiaños", methods=["GET"])
 #    def apiaños():
 #        try:

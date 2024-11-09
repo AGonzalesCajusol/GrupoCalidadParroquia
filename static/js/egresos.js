@@ -15,13 +15,12 @@ $(document).ready(function(){
             fetch("/apiaños")
                 .then(response => response.json())
                 .then(response => { 
-                    // Generar las opciones directamente en la variable de opciones
                     response.data.forEach(element => {
                         opciones += `<option value="${element.año}">${element.año}</option>`;
                     });
 
-                    // Insertar el selector de año en el DOM después de que opciones esté lleno
-                    $("div.dataTables_filter").addClass("d-flex align-items-center"); // Para alinear ambos elementos
+                    // Insertar el selector de año en el DOM
+                    $("div.dataTables_filter").addClass("d-flex align-items-center");
                     $("div.dataTables_filter").append(`
                         <div class="d-flex align-items-center ms-2">
                             <label for="filtroAño" class="me-2">Año:</label>
@@ -57,12 +56,13 @@ function filtrarPorAño() {
     const tabla = $('#egresosTable').DataTable();
 
     if (añoSeleccionado) {
-        // Ajusta el filtro para buscar el año en cualquier parte de la cadena de la fecha
-        tabla.column(4).search(añoSeleccionado, true, false).draw();
+        // Filtrar la tabla para mostrar solo los registros del año seleccionado
+        tabla.column(3).search(añoSeleccionado, true, false).draw();
     } else {
-        tabla.column(4).search('').draw();  // Limpiar el filtro
+        tabla.column(3).search('').draw();  // Limpiar el filtro si "Todos" está seleccionado
     }
 }
+
 
 function exportarTablaPDF() {
     const { jsPDF } = window.jspdf;

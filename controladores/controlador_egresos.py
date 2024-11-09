@@ -181,14 +181,19 @@ def obtener_egresos_por_año(año):
 
 def obtener_rango_de_años():
     conexion = obtener_conexion()
-    with conexion.cursor() as cursor:
-        cursor.execute("""
-            SELECT DISTINCT YEAR(fecha) as año
-            FROM egreso
-            ORDER BY año DESC;
-        """)
-        rango_años = cursor.fetchall()
-    
-    # Convertimos la lista de tuplas en una lista simple de años
-    return rango_años
+    try:
+        with conexion.cursor() as cursor:
+            cursor.execute("""
+                SELECT DISTINCT YEAR(fecha) as año
+                FROM egreso
+                ORDER BY año DESC;
+            """)
+            rango_años = cursor.fetchall()  # Devuelve algo como [(2021,), (2022,), ...]
+        return rango_años
+    except Exception as e:
+        print(f"Error al obtener rango de años: {e}")
+        return []
+    finally:
+        conexion.close()
+
 
