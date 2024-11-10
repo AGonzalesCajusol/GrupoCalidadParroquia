@@ -18,6 +18,7 @@ import routers.router_cargo
 import routers.router_egresos
 import routers.router_charlas
 import routers.router_programacion
+import routers.router_asistencia
 app = Flask(__name__)
 app.secret_key = 'super-secret'
 
@@ -74,6 +75,7 @@ routers.router_programacion.registrar_rutas(app)
 #charlka nueva
 routers.router_charlas.registrar_rutas(app)
 
+routers.router_asistencia.registrar_rutas(app)
 
 
 if __name__ == '__main__':
