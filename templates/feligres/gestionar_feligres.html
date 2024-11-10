@@ -30,6 +30,7 @@
                     <th style="vertical-align: middle; text-align: center;">Estado Civil</th>
                     <th style="vertical-align: middle; text-align: center;">Sexo</th>
                     <th style="vertical-align: middle; text-align: center;">Sede</th>
+                    <th style="vertical-align: middle; text-align: center;">Correo electronico</th>
                     <th style="vertical-align: middle; text-align: center; width: 200px;">Acciones</th>
                 </tr>
             </thead>
@@ -43,16 +44,17 @@
                     <td>{{ feligres[4] }}</td>
                     <td>{{ feligres[5] }}</td>
                     <td>{{ feligres[6] }}</td>
+                    <td>{{ feligres[7] }}</td>
 
                     <td class="text-center">
 
                         <button class="btn btn-primary btn-sm" title="Ver"
-                            onclick="openModal('view', '{{ feligres[0] }}', '{{ feligres[1] }}', '{{ feligres[2] }}', '{{ feligres[3] }}', '{{ feligres[4] }}', '{{ feligres[5] }}', '{{ feligres[6] }}')">
+                            onclick="openModal('view', '{{ feligres[0] }}', '{{ feligres[1] }}', '{{ feligres[2] }}', '{{ feligres[3] }}', '{{ feligres[4] }}', '{{ feligres[5] }}', '{{ feligres[6] }}', '{{ feligres[7] }}')">
                             <i class="fas fa-eye"></i>
                         </button>
 
                         <button class="btn btn-warning btn-sm" title="Editar"
-                            onclick="openModal('edit', '{{ feligres[0] }}', '{{ feligres[1] }}', '{{ feligres[2] }}', '{{ feligres[3] }}', '{{ feligres[4] }}', '{{ feligres[5] }}', '{{ feligres[6] }}')">
+                            onclick="openModal('edit', '{{ feligres[0] }}', '{{ feligres[1] }}', '{{ feligres[2] }}', '{{ feligres[3] }}', '{{ feligres[4] }}', '{{ feligres[5] }}', '{{ feligres[6] }}', '{{ feligres[7] }}')">
                             <i class="fas fa-edit"></i>
                         </button>
 
@@ -123,6 +125,12 @@
                             {% endfor %}
                         </select>
                     </div>
+
+                    <div class="mb-3">
+                        <label for="correo" class="form-label">Correo electrónico</label>
+                        <input type="email" class="form-control" id="email" name="correo" required>
+                    </div>
+                    
                 </div>
                 <div class="modal-footer">
                     <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cerrar</button>

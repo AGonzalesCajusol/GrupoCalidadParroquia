@@ -1,6 +1,7 @@
+from datetime import timedelta
 from flask import jsonify
 from bd import obtener_conexion
-
+import traceback
 
 def charlas_acto(id_acto):
     conexion = obtener_conexion()
@@ -15,199 +16,196 @@ def charlas_acto(id_acto):
     conexion.close()
     return charlas 
 
-def verificar_existencia_programacion(id_charla):
+def obtener_temas_por_acto(acto_id):
     conexion = obtener_conexion()
     try:
         with conexion.cursor() as cursor:
-            # Consultar si existen registros en programacion_charlas para el id_charla
-            cursor.execute("""
-                SELECT COUNT(*) FROM programacion_charlas
-                WHERE id_charla = %s
-            """, (id_charla,))
-            resultado = cursor.fetchone()
+            # Consulta SQL con LEFT JOIN para obtener temas junto con la programación, ministro y sede
+            query_temas = """
+                SELECT 
+                    tm.id_tema,
+                    tm.descripcion,
+                    tm.duracion,
+                    tm.orden,
+                    COALESCE(pc.hora_inicio, '00:00'),
+                    COALESCE(pc.dias_semana, ''),
+                    COALESCE(m.nombre_ministro, 'N/A'),
+                    COALESCE(s.nombre_sede, 'N/A')
+                FROM tema tm
+                LEFT JOIN programacion_charlas pc ON tm.id_tema = pc.id_tema
+                LEFT JOIN ministro m ON pc.id_ministro = m.id_ministro
+                LEFT JOIN sede s ON pc.id_sede = s.id_sede
+                WHERE tm.id_actoliturgico = %s
+                ORDER BY tm.orden ASC
+            """
+            cursor.execute(query_temas, (acto_id,))
+            temas = cursor.fetchall()
+
+            # Registro de depuración para verificar resultados
+            print("Resultados obtenidos de la consulta SQL:")
+            for tema in temas:
+                print(tema)
+
+            temas_serializable = [
+                {
+                    "id_tema": tema[0],
+                    "descripcion": tema[1],
+                    "duracion": str(tema[2]) if tema[2] else "",
+                    "orden": tema[3],
+                    "hora_inicio": tema[4],
+                    "dias_semana": tema[5],
+                    "ministro": tema[6],
+                    "sede": tema[7]
+                }
+                for tema in temas
+            ]
             
-            # Si existe al menos un registro, devolvemos True
-            existe_programacion = resultado[0] > 0
-            return {"existe_programacion": existe_programacion}
+            return jsonify({"success": True, "temas": temas_serializable})
+
     except Exception as e:
-        print(f"Error al verificar existencia de programación: {e}")
-        return {"error": str(e)}
+        print(f"Error al obtener los temas: {e}")
+        return jsonify({"success": False, "error": str(e)})
     finally:
         conexion.close()
 
-def generar_programacion_automatica(id_actoliturgico, fecha_inicio, id_charla, id_ministro, id_sede):
+def registrar_programacion(id_tema, hora_inicio, dia_semana, id_ministro, id_sede):
     conexion = obtener_conexion()
     try:
         with conexion.cursor() as cursor:
-            # Llamada al procedimiento almacenado con los cinco parámetros
-            cursor.callproc("GenerarProgramacionCharlas", [id_actoliturgico, fecha_inicio, id_charla, id_ministro, id_sede])
+            cursor.execute("""
+                INSERT INTO programacion_charlas (id_tema, hora_inicio, dias_semana, id_ministro, id_sede)
+                VALUES (%s, %s, %s, %s, %s)
+            """, (id_tema, hora_inicio, dia_semana, id_ministro, id_sede))
         conexion.commit()
-        return {"success": True, "message": "Programación generada automáticamente"}
+        return {"success": True, "message": "Programación registrada exitosamente"}
     except Exception as e:
         conexion.rollback()
-        print(f"Error al generar programación automática: {e}")
-        return {"success": False, "error": "Error al generar la programación automática"}
-    finally:
-        conexion.close()
-
-def obtener_programacion_por_charla(id_charla):
-    conexion = obtener_conexion()
-    try:
-        with conexion.cursor() as cursor:
-            cursor.execute("""
-                SELECT 
-                    p.id_programacion, 
-                    t.descripcion AS tema,
-                    p.fecha, 
-                    p.hora_inicio, 
-                    p.hora_fin, 
-                    p.estado,
-                    m.nombre_ministro, 
-                    s.nombre_sede
-                FROM 
-                    programacion_charlas p
-                JOIN 
-                    tema t ON p.id_tema = t.id_tema
-                LEFT JOIN 
-                    ministro m ON p.id_ministro = m.id_ministro
-                LEFT JOIN 
-                    sede s ON p.id_sede = s.id_sede
-                WHERE 
-                    p.id_charla = %s
-            """, (id_charla,))
-            programacion = cursor.fetchall()
-
-            # Formatear los datos en una estructura serializable
-            programacion_serializable = [
-                {
-                    "id_programacion": prog[0],
-                    "tema": prog[1],
-                    "fecha": str(prog[2]),
-                    "hora_inicio": str(prog[3]),
-                    "hora_fin": str(prog[4]),
-                    "estado": "Realizado" if prog[5] == 'R' else "Pendiente",
-                    "ministro": prog[6] or "Sin asignar",
-                    "sede": prog[7] or "No especificada"
-                }
-                for prog in programacion
-            ]
-            return {"success": True, "programacion": programacion_serializable}
-    except Exception as e:
-        print(f"Error al obtener programación por charla: {e}")
+        print(f"Error al registrar la programación: {e}")
         return {"success": False, "error": str(e)}
     finally:
         conexion.close()
 
-def registrar_programacion_en_bloque(id_charla, programaciones):
-    if not id_charla or not programaciones:
-        return {"success": False, "error": "Datos incompletos"}
-    
+def verificar_programacion(id_acto):
     conexion = obtener_conexion()
     try:
+        print(f"Verificando programación para el acto: {id_acto}")
         with conexion.cursor() as cursor:
-            for prog in programaciones:
-                id_programacion = prog.get("id_programacion")
-                fecha = prog.get("fecha")
-                hora_inicio = prog.get("hora_inicio")
-                hora_fin = prog.get("hora_fin")
-                estado = prog.get("estado")
-                ministro = prog.get("ministro")
-                sede = prog.get("sede")
-
-                # Actualizar cada fila en programacion_charlas
-                cursor.execute("""
-                    UPDATE programacion_charlas
-                    SET fecha = %s, hora_inicio = %s, hora_fin = %s, estado = %s, 
-                        id_ministro = (SELECT id_ministro FROM ministro WHERE nombre_ministro = %s LIMIT 1), 
-                        id_sede = (SELECT id_sede FROM sede WHERE nombre_sede = %s LIMIT 1)
-                    WHERE id_programacion = %s
-                """, (fecha, hora_inicio, hora_fin, estado, ministro, sede, id_programacion))
-        
-        conexion.commit()
-        return {"success": True, "message": "Programación actualizada con éxito"}
+            # Realizar un JOIN para obtener los nombres del ministro y la sede
+            cursor.execute("""
+                SELECT 
+                    pc.id_programacion,
+                    pc.hora_inicio,
+                    tm.descripcion,
+                    pc.dias_semana,
+                    m.nombre_ministro AS ministro,
+                    s.nombre_sede AS sede
+                FROM programacion_charlas pc
+                JOIN tema tm ON pc.id_tema = tm.id_tema
+                LEFT JOIN ministro m ON pc.id_ministro = m.id_ministro
+                LEFT JOIN sede s ON pc.id_sede = s.id_sede
+                WHERE tm.id_actoliturgico = %s
+            """, (id_acto,))
+            
+            resultados = cursor.fetchall()
+            print(f"Resultados obtenidos: {resultados}")
+            
+            if resultados:
+                programaciones = []
+                for resultado in resultados:
+                    # Convertir 'hora_inicio' a 'HH:MM' si es un timedelta
+                    hora_inicio = resultado[1]
+                    if isinstance(hora_inicio, timedelta):
+                        total_seconds = int(hora_inicio.total_seconds())
+                        hora_inicio_str = f"{total_seconds // 3600:02}:{(total_seconds % 3600) // 60:02}"
+                    else:
+                        hora_inicio_str = hora_inicio.strftime('%H:%M') if hora_inicio else None
+                    
+                    programaciones.append({
+                        "id_programacion": resultado[0],
+                        "hora_inicio": hora_inicio_str,
+                        "descripcion": resultado[2],
+                        "dias_semana": resultado[3],
+                        "ministro": resultado[4] if resultado[4] else 'N/A',
+                        "sede": resultado[5] if resultado[5] else 'N/A'
+                    })
+                
+                print("Programaciones procesadas:", programaciones)
+                return {
+                    "success": True,
+                    "programaciones": programaciones
+                }
+            else:
+                print("No se encontraron resultados")
+                return {"success": False, "error": "No hay programación registrada"}
     except Exception as e:
-        conexion.rollback()
-        print(f"Error al registrar la programación: {e}")
-        return {"success": False, "error": "Error al registrar la programación"}
+        print("Error al verificar programación:")
+        print(traceback.format_exc())
+        return {"success": False, "error": str(e)}
     finally:
         conexion.close()
 
-def obtener_ids_por_dni(dni):
+def obtener_ministro_y_sede_por_dni(dni):
+    """Función para obtener el id_ministro y id_sede usando el DNI"""
     conexion = obtener_conexion()
     try:
         with conexion.cursor() as cursor:
             cursor.execute("""
-                SELECT id_ministro, id_sede
-                FROM ministro
-                WHERE numero_documento = %s
+                SELECT id_ministro, id_sede 
+                FROM ministro 
+                WHERE numero_documento = %s AND estado = 1
             """, (dni,))
             resultado = cursor.fetchone()
+            return resultado if resultado else None
+    except Exception as e:
+        print(f"Error al obtener datos del ministro y sede: {e}")
+        return None
+    finally:
+        conexion.close()
+
+def obtener_detalle_programacion(id_programacion):
+    print(f"Conectando a la base de datos para el ID de programación: {id_programacion}")
+    conexion = obtener_conexion()
+    try:
+        with conexion.cursor() as cursor:
+            print("Ejecutando la consulta SQL...")
+            cursor.execute("""
+                SELECT tm.descripcion, pc.hora_inicio, pc.dias_semana, m.nombre_ministro AS ministro, s.nombre_sede AS sede
+                FROM programacion_charlas pc
+                JOIN tema tm ON pc.id_tema = tm.id_tema
+                JOIN ministro m ON pc.id_ministro = m.id_ministro
+                JOIN sede s ON pc.id_sede = s.id_sede
+                WHERE pc.id_programacion = %s
+            """, (id_programacion,))
             
+            resultado = cursor.fetchone()
+            print(f"Resultado de la consulta: {resultado}")
+
             if resultado:
-                return {"success": True, "id_ministro": resultado[0], "id_sede": resultado[1]}
+                # Convertir timedelta a 'HH:MM'
+                hora_inicio = resultado[1]
+                if isinstance(hora_inicio, timedelta):
+                    total_seconds = int(hora_inicio.total_seconds())
+                    hora_formateada = f"{total_seconds // 3600:02}:{(total_seconds % 3600) // 60:02}"
+                else:
+                    hora_formateada = hora_inicio.strftime('%H:%M') if hora_inicio else None
+
+                return {
+                    "descripcion": resultado[0],
+                    "hora_inicio": hora_formateada,
+                    "dias_semana": resultado[2],
+                    "ministro": resultado[3],
+                    "sede": resultado[4]
+                }
             else:
-                return {"success": False, "error": "Ministro no encontrado"}
+                print("No se encontró programación para el ID proporcionado.")
+                return {"success": False, "error": "No se encontró la programación"}
     except Exception as e:
-        print(f"Error al obtener IDs por DNI: {e}")
-        return {"success": False, "error": "Error al obtener IDs"}
+        print(f"Error en la consulta a la base de datos: {e}")
+        return {"success": False, "error": str(e)}
     finally:
         conexion.close()
+        print("Conexión a la base de datos cerrada.")
+    
+    return None
 
-def actualizar_programacion(id_programacion, tema, fecha, hora_inicio, hora_fin, estado, ministro, sede):
-    conexion = obtener_conexion()
-    try:
-        with conexion.cursor() as cursor:
-            cursor.execute("""
-                UPDATE programacion_charlas
-                SET 
-                    fecha = %s, 
-                    hora_inicio = %s, 
-                    hora_fin = %s, 
-                    estado = %s, 
-                    id_ministro = (SELECT id_ministro FROM ministro WHERE nombre_ministro = %s LIMIT 1), 
-                    id_sede = (SELECT id_sede FROM sede WHERE nombre_sede = %s LIMIT 1)
-                WHERE id_programacion = %s
-            """, (fecha, hora_inicio, hora_fin, estado, ministro, sede, id_programacion))
-        conexion.commit()
-        return {"success": True, "message": "Programación actualizada con éxito"}
-    except Exception as e:
-        conexion.rollback()
-        print(f"Error al actualizar programación: {e}")
-        return {"success": False, "error": "Error al actualizar la programación"}
-    finally:
-        conexion.close()
 
-def dar_de_baja_programacion(id_programacion):
-    conexion = obtener_conexion()
-    try:
-        with conexion.cursor() as cursor:
-            cursor.execute("""
-                UPDATE programacion_charlas
-                SET estado = 'I'
-                WHERE id_programacion = %s
-            """, (id_programacion,))
-        conexion.commit()
-        return {"success": True, "message": "Programación dada de baja con éxito"}
-    except Exception as e:
-        conexion.rollback()
-        print(f"Error al dar de baja la programación: {e}")
-        return {"success": False, "error": "Error al dar de baja la programación"}
-    finally:
-        conexion.close()
-
-def eliminar_programacion(id_programacion):
-    conexion = obtener_conexion()
-    try:
-        with conexion.cursor() as cursor:
-            cursor.execute("""
-                DELETE FROM programacion_charlas
-                WHERE id_programacion = %s
-            """, (id_programacion,))
-        conexion.commit()
-        return {"success": True, "message": "Programación eliminada con éxito"}
-    except Exception as e:
-        conexion.rollback()
-        print(f"Error al eliminar la programación: {e}")
-        return {"success": False, "error": "Error al eliminar la programación"}
-    finally:
-        conexion.close()

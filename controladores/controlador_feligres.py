@@ -1,7 +1,7 @@
 from bd import obtener_conexion
 from hashlib import sha256
 
-def insertar_feligres(dni, apellidos, nombres, fecha_nacimiento, estado_civil, sexo, id_sede):
+def insertar_feligres(dni, apellidos, nombres, fecha_nacimiento, estado_civil, sexo, id_sede, correo):
     print(f"Recibido DNI: {dni}")  # Para verificar que el DNI se está recibiendo
     if existe_feligres(dni):
         print("El feligrés con este DNI ya existe.")
@@ -11,9 +11,9 @@ def insertar_feligres(dni, apellidos, nombres, fecha_nacimiento, estado_civil, s
     try:
         with conexion.cursor() as cursor:
             cursor.execute("""
-                INSERT INTO feligres (dni, apellidos, nombres, fecha_nacimiento, estado_civil, sexo, id_sede)
-                VALUES (%s, %s, %s, %s, %s, %s, %s)
-            """, (dni, apellidos, nombres, fecha_nacimiento, estado_civil, sexo, id_sede))
+                INSERT INTO feligres (dni, apellidos, nombres, fecha_nacimiento, estado_civil, sexo, id_sede, correo)
+                VALUES (%s, %s, %s, %s, %s, %s, %s, %s)
+            """, (dni, apellidos, nombres, fecha_nacimiento, estado_civil, sexo, id_sede, correo))
         conexion.commit()
         return {"success": True, "message": "Feligrés insertado exitosamente"}
     except Exception as e:
@@ -28,7 +28,7 @@ def obtener_feligreses():
     try:
         with conexion.cursor() as cursor:
             cursor.execute("""
-                SELECT f.dni, f.apellidos, f.nombres, f.fecha_nacimiento, f.estado_civil, f.sexo, s.nombre_sede 
+                SELECT f.dni, f.apellidos, f.nombres, f.fecha_nacimiento, f.estado_civil, f.sexo, s.nombre_sede, f.correo 
                 FROM feligres f
                 INNER JOIN sede s ON f.id_sede = s.id_sede
             """)
@@ -40,16 +40,15 @@ def obtener_feligreses():
     finally:
         conexion.close()
 
-
-def actualizar_feligres(dni, apellidos, nombres, fecha_nacimiento, estado_civil, sexo, id_sede):
+def actualizar_feligres(dni, apellidos, nombres, fecha_nacimiento, estado_civil, sexo, id_sede, correo):
     conexion = obtener_conexion()
     try:
         with conexion.cursor() as cursor:
             cursor.execute("""
                 UPDATE feligres 
-                SET apellidos = %s, nombres = %s, fecha_nacimiento = %s, estado_civil = %s, sexo = %s, id_sede = %s
+                SET apellidos = %s, nombres = %s, fecha_nacimiento = %s, estado_civil = %s, sexo = %s, id_sede = %s, correo = %s
                 WHERE dni = %s
-            """, (apellidos, nombres, fecha_nacimiento, estado_civil, sexo, id_sede, dni))
+            """, (apellidos, nombres, fecha_nacimiento, estado_civil, sexo, id_sede, correo, dni))
         conexion.commit()
     except Exception as e:
         print(f"Error al actualizar feligrés: {e}")
@@ -181,7 +180,7 @@ def obtener_feligres_por_dni(dni):
     try:
         with conexion.cursor() as cursor:
             cursor.execute("""
-                SELECT dni, apellidos, nombres, fecha_nacimiento, estado_civil, sexo, id_sede 
+                SELECT dni, apellidos, nombres, fecha_nacimiento, estado_civil, sexo, id_sede, correo
                 FROM feligres 
                 WHERE dni = %s
             """, (dni,))

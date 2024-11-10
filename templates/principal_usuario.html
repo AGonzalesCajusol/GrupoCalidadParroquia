@@ -1,0 +1,293 @@
+<!DOCTYPE html>
+<html lang="es">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="shortcut icon" href="{{ url_for('static', filename='img/iconoiglesia.png') }}" type="image/x-icon" />
+    <title>Parroquia - Página Principal</title>
+    <!-- Bootstrap CSS -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons/font/bootstrap-icons.css">
+
+    <!-- Estilos Personalizados -->
+    <link rel="stylesheet" href="/static/css/principal_u.css" />
+
+<body>
+
+    <header>
+        <nav class="navbar navbar-expand-lg navbar-dark fixed-top">
+            <div class="container">
+                <!-- Logo y nombre de la parroquia -->
+                <a class="navbar-brand" href="#">
+                    <img src="/static/img/iconoiglesia.png" alt="Logo" width="40" height="40"
+                        class="d-inline-block align-text-top">
+                </a>
+
+                <!-- Botón de menú para móviles -->
+                <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav"
+                    aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
+                    <span class="navbar-toggler-icon"></span>
+                </button>
+
+                <!-- Elementos del menú -->
+                <div class="collapse navbar-collapse" id="navbarNav">
+                    <ul class="navbar-nav ms-auto">
+                        <li class="nav-item"><a class="nav-link" href="#carouselExample">Inicio</a></li>
+                        <li class="nav-item"><a class="nav-link" href="#sobrenosotros">Sobre Nosotros</a></li>
+                        <li class="nav-item dropdown">
+                            <a class="nav-link dropdown-toggle" href="#" id="navbarDropdown" role="button"
+                                data-bs-toggle="dropdown">Secretaría</a>
+                            <ul class="dropdown-menu">                                                        
+                                <li><a class="dropdown-item" href="#">Solicitudes</a></li>
+                            </ul>
+                        </li>
+                        <li class="nav-item dropdown">
+                            <a class="nav-link dropdown-toggle" href="#" id="catequesisDropdown" role="button"
+                                data-bs-toggle="dropdown">Catequesis</a>
+                            <ul class="dropdown-menu">
+                                <li><a class="dropdown-item" href="#">Actos Litúrgicos</a></li>                                                          
+                            </ul>
+                        </li>
+                        <li class="nav-item"><a class="nav-link" href="#">Donaciones</a></li>
+                        <li class="nav-item"><a class="nav-link" href="#">Contacto</a></li>
+                    </ul>
+                    <!-- Botón de inicio de sesión -->
+                    <a href="#" class="btn btn-outline-light ms-3">Iniciar Sesión</a>
+                </div>
+            </div>
+        </nav>
+    </header>
+
+    <main>
+        <div id="carouselExample" class="carousel slide" data-bs-ride="carousel">
+            <div class="carousel-inner">
+                <div class="carousel-item active">
+                    <img src="/static/img/slide/sacerdotesedinson.jpg" class="d-block w-100" alt="Slide 1">
+                    <div class="carousel-caption enhanced-caption d-none d-md-block">
+                        <h5>Bienvenidos a Nuestra Parroquia</h5>
+                        <p>Únete a nuestras actividades y celebraciones.</p>
+                    </div>
+                </div>
+                <div class="carousel-item">
+                    <img src="/static/img/slide/noticia34_principal.jpg" class="d-block w-100" alt="Slide 2">
+                    <div class="carousel-caption enhanced-caption d-none d-md-block">
+                        <h5>Catequesis y Formación</h5>
+                        <p>Participa en nuestras charlas y retiros espirituales.</p>
+                    </div>
+                </div>
+                <div class="carousel-item">
+                    <img src="/static/img/slide/noticia39_principal.jpg" class="d-block w-100" alt="Slide 3">
+                    <div class="carousel-caption enhanced-caption d-none d-md-block">
+                        <h5>Visita Pastoral del Papa Francisco</h5>
+                        <p>La parroquia celebra con alegría la histórica visita del Papa Francisco a nuestra comunidad.
+                            Un
+                            evento de gran espiritualidad que nos unió en oración y fe.</p>
+                    </div>
+                </div>
+                <div class="carousel-item">
+                    <img src="/static/img/slide/noticia38_principal.jpg" class="d-block w-100" alt="Slide 4">
+                    <div class="carousel-caption enhanced-caption d-none d-md-block">
+                        <h5>Misa Dominical - El Encuentro con Dios</h5>
+                        <p>Cada domingo, nuestra parroquia se reúne para celebrar la Santa Misa, un espacio de oración y
+                            reflexión para todos los fieles. Te invitamos a unirte a nuestra comunidad.</p>
+                    </div>
+                </div>
+                <div class="carousel-item">
+                    <img src="/static/img/slide/noticia37_01.jpg" class="d-block w-100" alt="Slide 5">
+                    <div class="carousel-caption enhanced-caption d-none d-md-block">
+                        <h5>Encuentro de Jóvenes</h5>
+                        <p>Los jóvenes de nuestra parroquia participan en actividades formativas, celebraciones y
+                            momentos
+                            de reflexión que los fortalecen en su fe y compromiso cristiano.</p>
+                    </div>
+                </div>
+                <div class="carousel-item">
+                    <img src="/static/img/slide/noticia34_01.jpg" class="d-block w-100" alt="Slide 6">
+                    <div class="carousel-caption enhanced-caption d-none d-md-block">
+                        <h5>Pasacalles para Celebrar Nuestra Fiesta Patronal</h5>
+                        <p>La parroquia organiza un colorido pasacalles para honrar a nuestra patrona, un evento que
+                            llena
+                            las calles de alegría y devoción.</p>
+                    </div>
+                </div>
+            </div>
+            <button class="carousel-control-prev" type="button" data-bs-target="#carouselExample" data-bs-slide="prev">
+                <span class="carousel-control-prev-icon" aria-hidden="true"></span>
+                <span class="visually-hidden">Anterior</span>
+            </button>
+            <button class="carousel-control-next" type="button" data-bs-target="#carouselExample" data-bs-slide="next">
+                <span class="carousel-control-next-icon" aria-hidden="true"></span>
+                <span class="visually-hidden">Siguiente</span>
+            </button>
+        </div>
+
+        <section id="sobrenosotros" class="container mt-5">
+            <div class="row">
+                <div class="col-md-6">
+                    <img src="/static/img/chiclayo2.jpg" alt="Historia" class="img-fluid rounded">
+                </div>
+                <div class="col-md-6">
+                    <h2>Nuestra Historia</h2>
+                    <p>
+                        Nuestra parroquia fue fundada en 1980 con el firme propósito de servir a nuestra comunidad,
+                        ofreciendo un espacio de fe, oración y apoyo espiritual para todos los que buscan acercarse a
+                        Dios. Desde entonces, hemos sido testigos del crecimiento y la transformación de nuestra
+                        iglesia, que ha llegado a convertirse en un faro de esperanza y fraternidad para nuestros
+                        feligreses. A lo largo de los años, hemos acompañado a innumerables personas en su caminar de
+                        fe, y nuestra misión ha sido siempre la de fortalecer los lazos entre todos, independientemente
+                        de su origen o situación.
+                    </p>
+                    <p>
+                        Nos enorgullecemos de nuestras tradiciones, que han sido transmitidas de generación en
+                        generación. Las celebraciones litúrgicas, los sacramentos y los eventos comunitarios han sido
+                        momentos claves que han unido a los fieles en un mismo espíritu, y han reforzado el compromiso
+                        de vivir el Evangelio en el día a día. Estas tradiciones, vividas con fervor y amor, nos han
+                        ayudado a mantener una identidad sólida como parroquia, y han permitido que nuestra comunidad
+                        crezca no solo en número, sino también en madurez espiritual.
+                    </p>
+                    <p>
+                        Hoy, nuestra parroquia sigue siendo un pilar esencial de la vida cristiana en la comunidad. Nos
+                        sentimos profundamente agradecidos por cada uno de los miembros que han formado parte de nuestra
+                        familia parroquial a lo largo de los años. Con un corazón lleno de gratitud y esperanza,
+                        seguimos adelante en nuestra misión de ser un lugar de acogida, consuelo y crecimiento
+                        espiritual, guiados siempre por el amor de Cristo y el deseo de servir a los demás con
+                        generosidad y dedicación.
+
+                    </p>
+                </div>
+            </div>
+        </section>
+
+        <section id="mision-vision-valores" class="section-small bg-light py-5 animate-on-scroll">
+            <div class="container">
+                <h2 class="text-center mb-5">Misión, Visión y Valores</h2>
+                <div class="row">
+                    <!-- Misión -->
+                    <div class="col-lg-4 col-md-6 mb-4">
+                        <div class="card shadow-sm mission-card">
+                            <div class="card-body text-center">
+                                <i class="bi bi-bullseye fs-1 text-primary"></i>
+                                <h3 class="card-title mt-3">Misión</h3>
+                                <p class="card-text">
+                                    Guiar a nuestra comunidad hacia una vida de fe, esperanza y amor, promoviendo los
+                                    valores cristianos y el servicio a los demás.
+                                </p>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Visión -->
+                    <div class="col-lg-4 col-md-6 mb-4">
+                        <div class="card shadow-sm vision-card">
+                            <div class="card-body text-center">
+                                <i class="bi bi-eye-fill fs-1 text-success"></i>
+                                <h3 class="card-title mt-3">Visión</h3>
+                                <p class="card-text">
+                                    Ser una comunidad unida en la fe, donde todos puedan encontrar un lugar de
+                                    pertenencia y crecimiento espiritual.
+                                </p>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Valores -->
+                    <div class="col-lg-4 col-md-12 mb-4">
+                        <div class="card shadow-sm values-card">
+                            <div class="card-body text-center">
+                                <i class="bi bi-heart-fill fs-1 text-danger"></i>
+                                <h3 class="card-title mt-3">Nuestros Valores</h3>
+                                <p class="card-text">Promovemos el amor, la comunidad y la fe como pilares fundamentales
+                                    de nuestra parroquia.</p>                                
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+
+        <section class="section-large container mt-5 animate-on-scroll">
+
+            <h2 class="text-center mb-5">Conoce a Nuestro Equipo Pastoral</h2>
+            <div class="row">
+                <!-- Miembro del Equipo -->
+                <div class="col-lg-4 col-md-6 mb-4">
+                    <div class="card team-card shadow-sm">
+                        <img src="/static/img/IMG-20240113-WA0045.jpg" class="card-img-top rounded-top"
+                            alt="Sacerdote 1">
+                        <div class="card-body text-center">
+                            <h5 class="card-title">P. Anggelo</h5>
+                            <p class="card-text">Párroco</p>
+                            <p class="bio">Con más de 20 años de experiencia, el P. Anggelo es un guía espiritual
+                                dedicado y apasionado por la comunidad.
+                                Siendo unos de los fundadores del cristianismo en el Peru
+                            </p>
+                            <!-- Redes Sociales -->
+                            <div class="social-icons">
+                                <a href="https://www.facebook.com/JaimeBustio/" class="text-dark"><i
+                                        class="bi bi-facebook"></i></a>
+                                <a href="https://wa.me/+51975544912" class="text-dark"><i
+                                        class="bi bi-whatsapp"></i></a>
+                                <a href="https://www.instagram.com/anggelo_gonza/" class="text-dark"><i
+                                        class="bi bi-instagram"></i></a>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Miembro del Equipo -->
+                <div class="col-lg-4 col-md-6 mb-4">
+                    <div class="card team-card shadow-sm">
+                        <img src="/static/img/obispo_2.jpg" class="card-img-top rounded-top" alt="Sacerdote 2">
+                        <div class="card-body text-center">
+                            <h5 class="card-title">P. Miguel</h5>
+                            <p class="card-text">Vicario</p>
+                            <p class="bio">Apasionado por la enseñanza y la catequesis, el P. Miguel se especializa en
+                                el trabajo con jóvenes.</p>
+                            <div class="social-icons">
+                                <a href="#" class="text-dark"><i class="bi bi-facebook"></i></a>
+                                <a href="#" class="text-dark"><i class="bi bi-twitter"></i></a>
+                                <a href="#" class="text-dark"><i class="bi bi-linkedin"></i></a>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Miembro del Equipo -->
+                <div class="col-lg-4 col-md-6 mb-4">
+                    <div class="card team-card shadow-sm">
+                        <img src="/static/img/obispo_3.jpg" class="card-img-top rounded-top" alt="Sacerdote 3">
+                        <div class="card-body text-center">
+                            <h5 class="card-title">P. Luis</h5>
+                            <p class="card-text">Diácono</p>
+                            <p class="bio">El P. Luis es conocido por su cercanía con los feligreses y su dedicación a
+                                los servicios comunitarios.</p>
+                            <div class="social-icons">
+                                <a href="#" class="text-dark"><i class="bi bi-facebook"></i></a>
+                                <a href="#" class="text-dark"><i class="bi bi-twitter"></i></a>
+                                <a href="#" class="text-dark"><i class="bi bi-instagram"></i></a>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+    </main>
+
+    <footer class="bg-dark text-white text-center py-4 mt-5">
+        <p>&copy; 2024 Parroquia. Todos los derechos reservados.</p>
+        <div>
+            <a href="#" class="text-white me-3"><i class="bi bi-facebook"></i></a>
+            <a href="#" class="text-white me-3"><i class="bi bi-twitter"></i></a>
+            <a href="#" class="text-white me-3"><i class="bi bi-instagram"></i></a>
+        </div>
+    </footer>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons/font/bootstrap-icons.css">
+    <script src="/static/js/principal_u.js"></script>
+</body>
+
+</html>

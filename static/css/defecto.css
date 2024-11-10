@@ -484,3 +484,8 @@ table.dataTable tbody td {
 #head_ind {
     margin: auto;
 }
+
+.fc-daygrid-day-events {
+    max-height: 100px; /* Ajusta según el diseño */
+    overflow-y: auto; /* Agrega scroll cuando sea necesario */
+}

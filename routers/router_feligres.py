@@ -35,7 +35,7 @@ def registrar_rutas(app):
         estado_civil = request.form['estado_civil11'][0].lower()
         sexo = request.form['sexo11'][0].lower()
         contraseña = request.form['contraseña11']
-        sede = request.form['sede11']
+        sede = request.form['sede11']        
 
         valor = str(random.randint(1,1024))
         token = sha256(valor.encode('utf-8')).hexdigest()
@@ -63,21 +63,22 @@ def registrar_rutas(app):
         estado_civil = request.form["estado_civil"]
         sexo = request.form["sexo"]
         id_sede = request.form["id_sede"]
+        correo = request.form["correo"]
         
-        resultado = insertar_feligres(dni, apellidos, nombres, fecha_nacimiento, estado_civil, sexo, id_sede)
-        
-        # Verificar si la inserción fue exitosa y devolver el objeto feligrés
+        resultado = insertar_feligres(dni, apellidos, nombres, fecha_nacimiento, estado_civil, sexo, id_sede, correo)
+                
         if resultado["success"]:
             return jsonify({
                 "success": True,
                 "feligres": {
-                    "dni": dni,  # Asegúrate de que dni tiene el valor correcto
+                    "dni": dni,
                     "apellidos": apellidos,
                     "nombres": nombres,
                     "fecha_nacimiento": fecha_nacimiento,
                     "estado_civil": estado_civil,
                     "sexo": sexo,
-                    "sede": id_sede  # o el nombre de la sede si prefieres mostrarlo directamente
+                    "sede": id_sede,
+                    "correo": correo
                 }
             })
         else:
@@ -85,6 +86,7 @@ def registrar_rutas(app):
                 "success": False,
                 "message": resultado["message"]
             }), 400
+
 
     @app.route("/obtener_feligres/<dni>", methods=["GET"])
     def obtener_feligres(dni):
@@ -96,17 +98,22 @@ def registrar_rutas(app):
 
     @app.route("/actualizar_feligres", methods=["POST"])
     def procesar_actualizar_feligres():
-        dni = request.form["dni"]
-        apellidos = request.form["apellidos"]
-        nombres = request.form["nombres"]
-        fecha_nacimiento = request.form["fecha_nacimiento"]
-        estado_civil = request.form["estado_civil"]
-        sexo = request.form["sexo"]
-        id_sede = request.form["id_sede"]
+        try:
+            dni = request.form["dni"]
+            apellidos = request.form["apellidos"]
+            nombres = request.form["nombres"]
+            fecha_nacimiento = request.form["fecha_nacimiento"]
+            estado_civil = request.form["estado_civil"]
+            sexo = request.form["sexo"]
+            id_sede = request.form["id_sede"]
+            correo = request.form["correo"]
 
-        actualizar_feligres(dni, apellidos, nombres, fecha_nacimiento, estado_civil, sexo, id_sede)
-        flash("El feligrés fue actualizado exitosamente")
-        return redirect(url_for("gestionar_feligres"))
+            actualizar_feligres(dni, apellidos, nombres, fecha_nacimiento, estado_civil, sexo, id_sede, correo)
+            return jsonify({"success": True, "message": "Feligrés actualizado exitosamente"}), 200
+        except Exception as e:
+            print(f"Error al actualizar feligrés: {e}")
+            return jsonify({"success": False, "message": str(e)}), 500
+
 
     @app.route("/eliminar_feligres", methods=["POST"])
     def procesar_eliminar_feligres():        

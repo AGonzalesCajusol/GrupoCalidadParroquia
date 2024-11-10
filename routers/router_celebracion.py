@@ -6,11 +6,14 @@ from controladores.controlador_celebracion import (
     eliminar_celebracion
 )
 
+import controladores.controlador_sede as csede
+
 def registrar_rutas(app):
     
     @app.route("/gestionar_celebracion", methods=["GET"])
     def gestionar_celebracion():
-        return render_template("celebracion/gestionar_celebracion.html")
+        sedes = csede.obtener_sede()
+        return render_template("celebracion/gestionar_celebracion.html",sedes = sedes)
 
     # Ruta para obtener las celebraciones en formato JSON
     @app.route("/api/obtener_celebraciones", methods=["GET"])

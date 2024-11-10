@@ -169,6 +169,7 @@ def eliminaracto_requisitos(id):
         return False
     finally:
         conexion.close()
+
 def obtener_acto():
     conexion = obtener_conexion()
     with conexion.cursor() as cursor:

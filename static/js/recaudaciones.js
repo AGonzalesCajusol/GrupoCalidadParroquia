@@ -101,12 +101,22 @@ $(document).ready(function () {
 
                     // Insertar el selector de año en el DOM
                     $("div.dataTables_filter").addClass("d-flex align-items-center");
-                    $("div.dataTables_filter").prepend(`
+                    $("div.dataTables_filter").html(`
                         <div class="d-flex align-items-center me-2">
                             <label for="filtroAño" class="me-2">Año:</label>
                             <select id="filtroAño" class="form-select" style="width: auto;" onchange="filtrarPorAño()">
                                 ${opcionesAño}
                             </select>
+                        </div>
+                        <div class="d-flex align-items-center me-2">
+                            <label for="filtroTipo" class="me-2">Tipo:</label>
+                            <select id="filtroTipo" class="form-select" style="width: auto;" onchange="filtrarPorTipo()">
+                                ${opcionesTipo}
+                            </select>
+                        </div>
+                        <div class="d-flex align-items-center">
+                            <label for="buscar" class="me-2">Buscar:</label>
+                            <input type="search" id="buscar" class="form-control input-sm" placeholder="" aria-controls="example1">
                         </div>
                     `);
                 })
@@ -123,16 +133,6 @@ $(document).ready(function () {
                         const tipoNombre = element.tipo[1];  // Solo usa el nombre, ignorando el ID
                         opcionesTipo += `<option value="${tipoNombre}">${tipoNombre}</option>`;
                     });
-
-                    // Insertar el selector de tipo en el DOM después del filtro de año
-                    $("div.dataTables_filter").append(`
-                        <div class="d-flex align-items-center me-2">
-                            <label for="filtroTipo" class="me-2">Tipo:</label>
-                            <select id="filtroTipo" class="form-select" style="width: auto;" onchange="filtrarPorTipo()">
-                                ${opcionesTipo}
-                            </select>
-                        </div>
-                    `);
                 })
                 .catch(error => {
                     console.error("Error al cargar los tipos:", error);
@@ -140,6 +140,7 @@ $(document).ready(function () {
         }
     });
 });
+
 
 // Función para filtrar por año en el combo
 function filtrarPorAño() {
