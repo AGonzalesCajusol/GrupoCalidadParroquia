@@ -7,6 +7,7 @@ from controladores.controlador_asistencia import (
     obtener_solicitud,
     actualizar_asistencia as actualizar_asistencia_controlador
 )
+from routers.router_main import requerido_login
 
 def registrar_rutas(app):
     @app.route("/gestionar_asistencia", methods=["GET"])

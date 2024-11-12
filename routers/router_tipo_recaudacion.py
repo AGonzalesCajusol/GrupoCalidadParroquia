@@ -9,20 +9,24 @@ from controladores.controlador_tipo_recaudacion import (
     verificar_nombre_recaudacion_existe,
     eliminar_tipo_recaudacion
 )
+from routers.router_main import requerido_login
 
 def registrar_rutas(app):
     # Ruta para gestionar tipos de recaudación
     @app.route("/gestionar_tipo_recaudacion", methods=["GET"])
+    @requerido_login
     def gestionar_tipo_recaudacion():
         tipos_recaudacion = obtener_tipos_recaudacion()  # Obtener todos los tipos de recaudación
         return render_template("tipo_financiero/gestionar_tipo_recaudacion.html", tipos_recaudacion=tipos_recaudacion)
 
     # Ruta para mostrar el formulario de registro de un nuevo tipo de recaudación
     @app.route("/registrar_tipo_recaudacion", methods=["GET"])
+    @requerido_login
     def formulario_registrar_tipo_recaudacion():
         return render_template("tipo_recaudacion/registrar_tipo_recaudacion.html")
 
     @app.route("/insertar_tipo_recaudacion", methods=["POST"])
+    @requerido_login
     def procesar_insertar_tipo_recaudacion():
         try:
             nombre_recaudacion = request.form["nombre_recaudacion"].strip()
@@ -66,12 +70,14 @@ def registrar_rutas(app):
 
     # Ruta para mostrar el formulario de edición de un tipo de recaudación
     @app.route("/editar_tipo_recaudacion/<int:id>", methods=["GET"])
+    @requerido_login
     def formulario_editar_tipo_recaudacion(id):
         tipo_recaudacion = obtener_tipo_recaudacion_por_id(id)
         return render_template("tipo_recaudacion/editar_tipo_recaudacion.html", tipo_recaudacion=tipo_recaudacion)
 
     # Ruta para manejar la actualización de un tipo de recaudación
     @app.route("/actualizar_tipo_recaudacion", methods=["POST"])
+    @requerido_login
     def procesar_actualizar_tipo_recaudacion():
         try:
             # Obtener datos del formulario
@@ -105,6 +111,7 @@ def registrar_rutas(app):
             return jsonify({"success": False, "message": f"Error al actualizar: {str(e)}"}), 400
     # Ruta para eliminar un tipo de recaudación
     @app.route("/eliminar_tipo_recaudacion", methods=["POST"])
+    @requerido_login
     def procesar_eliminar_tipo_recaudacion():
         id = request.form["id"]
         resultado = eliminar_tipo_recaudacion(id)
@@ -129,6 +136,7 @@ def registrar_rutas(app):
     
     # Ruta para dar de baja un tipo de recaudación
     @app.route("/dar_baja_tipo_recaudacion", methods=["POST"])
+    @requerido_login
     def procesar_dar_baja_tipo_recaudacion():
         try:
             id = request.form.get('id')

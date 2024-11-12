@@ -10,6 +10,7 @@ from controladores.controlador_diocesis import (
     obtener_id_departamento_por_nombre,
     obtener_id_provincia_por_nombre
 )
+from routers.router_main import requerido_login
 
 def registrar_rutas(app):
     # Ruta para gestionar diócesis

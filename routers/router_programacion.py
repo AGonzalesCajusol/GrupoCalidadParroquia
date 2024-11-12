@@ -5,6 +5,9 @@ import controladores.controlador_ministro as cmin
 import controladores.controlador_actosliturgicos as contro
 import controladores.controlador_tema as tema
 import controladores.controlador_sede as sed 
+from routers.router_main import requerido_login
+
+
 
 def registrar_rutas(app):
     @app.route("/gestionar_programacionActo", methods=["GET"])

@@ -1,6 +1,7 @@
 from flask import render_template, request, redirect, url_for, flash, make_response,jsonify
 import random
 from hashlib import sha256
+from routers.router_main import requerido_login
 
 from controladores.controlador_feligres import (
     insertar_feligres,

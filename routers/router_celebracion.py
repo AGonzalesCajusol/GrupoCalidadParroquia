@@ -5,6 +5,7 @@ from controladores.controlador_celebracion import (
     actualizar_celebracion,
     eliminar_celebracion
 )
+from routers.router_main import requerido_login
 
 import controladores.controlador_sede as csede
 

@@ -6,6 +6,7 @@ from controladores.controlador_charlas import (
     actualizar_charla,
     eliminar_charla
 )
+from routers.router_main import requerido_login
 
 import controladores.controlador_actosliturgicos as acto
 

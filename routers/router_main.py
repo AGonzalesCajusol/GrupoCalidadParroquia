@@ -5,34 +5,43 @@ import random
 from hashlib import sha256
 from functools import wraps
 
-def registrar_rutas(app):
+def requerido_login(f):
+    @wraps(f)
+    def decorador_ministro(*args, **kwargs):
+        print("El decorador ha sido ejecutado")  # Depuración
+        dni = request.cookies.get('dni')
+        token = request.cookies.get('token')
+        print(f"DNI: {dni}, Token: {token}")  # Depuración
+        if not dni or not token:
+            print("No se encontraron cookies")
+            return redirect(url_for('raiz'))  # Si no hay cookies, redirigir
+        
+        # Verificar token (asumir que cmin.verificar_ministro es correcto)
+        valor = cmin.verificar_ministro(token, dni)
+        print(f"Valor de verificación: {valor}")  # Depuración
+        if valor == 1:
+            # Aquí es donde obtenemos la respuesta real
+            response = f(*args, **kwargs)  # Ejecuta la función decorada y obtiene la respuesta
+            # Si la respuesta es un string (como el contenido HTML), conviértelo a un objeto Response
+            if isinstance(response, str):
+                response = make_response(response)
+            # Manipular las cabeceras de la respuesta
+            response.headers['Cache-Control'] = 'no-store, no-cache, must-revalidate, private'
+            response.headers['Pragma'] = 'no-cache'
+            response.headers['Expires'] = '0'
+            return response
+        else:
+            print("Redirigiendo a raiz")
+            return redirect(url_for('raiz'))
+    return decorador_ministro
 
-    def requerido_login(f):
-        @wraps(f)
-        def decorador_ministro(*args, **kwargs):
-            print("El decorador ha sido ejecutado")  # Depuración
-            dni = request.cookies.get('dni')
-            token = request.cookies.get('token')
-            print(f"DNI: {dni}, Token: {token}")  # Depuración
-            if not dni or not token:
-                print("No se encontraron cookies")
-                return redirect(url_for('raiz'))  # Si no hay cookies, redirigir
-            valor = cmin.verificar_ministro(token, dni)
-            print(f"Valor de verificación: {valor}")  # Depuración
-            if valor == 1:
-                return f(*args, **kwargs)
-            else:
-                print("Redirigiendo a raiz")
-                return redirect(url_for('raiz'))
-        return decorador_ministro
+def registrar_rutas(app):
 
     @app.route('/inicio')
     @requerido_login
     def inicio():
         return render_template('index.html')
     
-
-
     @app.route('/verificarusuario', methods=['POST'])
     def verificarusuario():
         

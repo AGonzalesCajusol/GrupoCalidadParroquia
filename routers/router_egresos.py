@@ -1,6 +1,7 @@
 from flask import jsonify, render_template, request, redirect, url_for,flash,send_file
 import traceback
 from datetime import datetime, timedelta
+from routers.router_main import requerido_login
 
 
 from controladores.controlador_egresos import (

@@ -7,6 +7,8 @@ from controladores.controlador_tema import (
         eliminar_tema_por_id
 )
 import controladores.controlador_actosliturgicos as acto
+from routers.router_main import requerido_login
+
 
 def registrar_rutas(app):
     

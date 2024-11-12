@@ -25,6 +25,7 @@ from controladores.controlador_diocesis import (
 from controladores.controlador_actosliturgicos import(
     listar_actosLit
 )
+from routers.router_main import requerido_login
 
 def registrar_rutas(app):
     # Ruta para gestionar sede

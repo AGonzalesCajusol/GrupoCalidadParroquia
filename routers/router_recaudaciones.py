@@ -14,6 +14,7 @@ from controladores.controlador_recaudaciones import (
     actualizar_recaudacion,
     eliminar_recaudacion
 )
+from routers.router_main import requerido_login
 
 def registrar_rutas(app):
     # Ruta para gestionar recaudaciones

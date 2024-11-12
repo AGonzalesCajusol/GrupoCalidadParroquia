@@ -6,6 +6,7 @@ from controladores.controlador_cargo import (
     actualizar_cargo,
     eliminar_cargo
 )
+from routers.router_main import requerido_login
 
 
 def registrar_rutas(app):

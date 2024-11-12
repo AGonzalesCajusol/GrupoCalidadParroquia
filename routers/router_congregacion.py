@@ -8,6 +8,7 @@ from controladores.controlador_congregacion import (
     eliminar_congregacion,
     darBaja_congregacion
 )
+from routers.router_main import requerido_login
 
 def registrar_rutas(app):
     # Ruta para gestionar congregación
