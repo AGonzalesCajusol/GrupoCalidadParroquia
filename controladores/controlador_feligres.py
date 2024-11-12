@@ -107,7 +107,6 @@ def iniciosesion(dni, contraseña):
     conexion = obtener_conexion()
     valor = 0
     contraseña = sha256(contraseña.encode('utf-8')).hexdigest()
-    print(contraseña)
     try:
         with conexion.cursor() as cursor:
             cursor.execute("""

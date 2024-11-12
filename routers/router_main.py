@@ -12,19 +12,18 @@ def registrar_rutas(app):
     
     @app.route('/verificarusuario', methods=['POST'])
     def verificarusuario():
-        'si el usuario existe sino le mandamos un mensaje que tiene que registrarse'
         dni = request.form['dni22']
         password = request.form['password22']
-        'me retornará 4 estados 0, significa que no existe esa cuenta; 1 que los datos son incorrectos; 2 ministro y 3 feligres'
+
         valor = cfel.iniciosesion(dni,password)
-        print(valor)
-        #en casos 1 y 2 se crea otro token y se remplaza por el anterior ademas retornas su usuario
         token = str(random.randint(1,1024))
         token_h = sha256(token.encode('utf-8')).hexdigest()
 
         if valor == 1:
-            #Falta actualizar tokeeeen
+            cmin.actualizar_token(token_h,dni)
             dn, nom, tk, tp, sd = cmin.retornar_datos_ministro(dni)
+            print(dn)
+            print(tk)
             response = make_response(redirect(url_for('inicio')))   
             response.set_cookie('dni', dn)
             response.set_cookie('nombre', nom)
@@ -33,16 +32,11 @@ def registrar_rutas(app):
             response.set_cookie('sede',sd)
             return response
         elif valor == 2:
-            #actualizar token del feligres y extraer nombre
             nombre = cfel.actualizarTokenFeligres(dni,token_h)
             response = make_response(redirect(url_for('principal')))
-
-            # Establecer cookies con la información del feligres
             response.set_cookie('dni', dni)
             response.set_cookie('token', token_h)
             response.set_cookie('tipo', 'feligres')
-
-            # Verificar y establecer el nombre
             if nombre:
                 response.set_cookie('nombre', nombre)
             else:
@@ -53,9 +47,6 @@ def registrar_rutas(app):
             flash("Verifique su usuario o contraseña")
             return redirect(url_for('raiz'))
            
-    
-
-
     # Aquí puedes agregar otras rutas generales
     # @app.route('/about')
     # def about():

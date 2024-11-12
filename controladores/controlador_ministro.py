@@ -136,6 +136,19 @@ def retornar_datos_ministro(num_doc):
     finally:
         conexion.close()
 
+def actualizar_token(token,dni):
+    conexion = obtener_conexion()
+    try:
+        with conexion.cursor() as cursor:
+            cursor.execute('''
+                update ministro set token = %s where numero_documento = %s
+            ''', (token,dni,))
+            conexion.commit()
+            return cursor.fetchone()
+    finally:
+        conexion.close()
+
+
 ##anggelooo
 def obtener_todos_ministros(termino_busqueda="", limite=10, offset=0):
     conexion = obtener_conexion()
