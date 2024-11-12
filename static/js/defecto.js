@@ -120,6 +120,12 @@ function confirmarCancelacion(e) {
     });
 }
 
+//window.addEventListener( "pageshow", function ( event ) {
+   // if ( event.persisted ) {
+  //    //window.location.reload();
+ //   }
+//  });
+
 //GUARDAR   >>>> en el form al lado de: method="post" onsubmit="return validarFormulario()"
 
 function validarFormulario(e) {
