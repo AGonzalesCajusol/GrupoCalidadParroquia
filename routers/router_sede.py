@@ -30,7 +30,7 @@ def registrar_rutas(app):
     # Ruta para gestionar sede
     @app.route("/gestionar_sede", methods=["GET"])
     def gestionar_sede():
-        sede = obtener_sede()  # Asegúrate de que esta función esté devolviendo los datos correctamente
+        sede = obtener_sede()
         congregacion = obtener_congregacion()
         diosesis = obtener_diocesis() 
         actoliturgico = listar_actosLit()

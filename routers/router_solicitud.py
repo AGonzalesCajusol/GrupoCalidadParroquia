@@ -11,8 +11,8 @@ def registrar_rutas(app):
     # Ruta para gestionar tipos de ministro
     @app.route('/solicitudes')
     def solicitudes():
-        #nombre_sede = request.cookies.get('sede')
-        lista_actos = cactos.listar_actosLit()
+        nombre_sede = request.cookies.get('sede')
+        lista_actos = cactos.listar_actosxsede(nombre_sede)
         return render_template('solicitudes/solicitudes_actoliturgico.html', lista_actos=lista_actos)
     
     @app.route('/listar_solicitudes', methods=['GET'])
