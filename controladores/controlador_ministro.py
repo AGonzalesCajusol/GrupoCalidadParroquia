@@ -148,6 +148,22 @@ def actualizar_token(token,dni):
     finally:
         conexion.close()
 
+def verificar_ministro(token,dni):
+    conexion = obtener_conexion()
+    try:
+        with conexion.cursor() as cursor:
+            cursor.execute('''
+                select * from  ministro where numero_documento = %s and token = %s
+            ''', (dni,token))
+            lista = cursor.fetchall()
+            if lista:
+                return 1
+            else:
+                return 0
+    except:
+        return 0
+    finally:
+        conexion.close()
 
 ##anggelooo
 def obtener_todos_ministros(termino_busqueda="", limite=10, offset=0):

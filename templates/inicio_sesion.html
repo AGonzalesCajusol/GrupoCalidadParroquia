@@ -67,6 +67,23 @@
         }, 2000);
     }
     });
-</script>
 
+    window.addEventListener('pageshow', function(event) {
+    if (event.persisted) {
+        borrarCookies();
+        location.reload();
+    }
+    });
+
+    history.pushState(null, null, window.location.href);
+
+    function borrarCookies() {
+    const cookies = document.cookie.split(";");
+    cookies.forEach(function(cookie) {
+        const cookieName = cookie.split("=")[0].trim();
+        document.cookie = cookieName + "=; expires=Thu, 01 Jan 1970 00:00:00 GMT; path=/";
+    });
+}
+
+</script>
 </html>
