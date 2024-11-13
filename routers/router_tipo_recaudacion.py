@@ -5,7 +5,7 @@ from controladores.controlador_tipo_recaudacion import (
     obtener_tipos_recaudacion,
     obtener_tipo_recaudacion_por_id,
     actualizar_tipo_recaudacion,
-    dar_baja_tipo_recaudacion,
+    cambiar_estado_tipo_recaudacion,
     verificar_nombre_recaudacion_existe,
     eliminar_tipo_recaudacion
 )
@@ -134,33 +134,33 @@ def registrar_rutas(app):
             message = "El tipo de recaudación fue eliminado exitosamente"
             return jsonify({"success": True, "tipos_recaudacion": tipos_recaudacion_data, "message": message})
     
-    # Ruta para dar de baja un tipo de recaudación
     @app.route("/dar_baja_tipo_recaudacion", methods=["POST"])
     @requerido_login
-    def procesar_dar_baja_tipo_recaudacion():
+    def procesar_cambio_estado_tipo_recaudacion():
         try:
             id = request.form.get('id')
-            dar_baja_tipo_recaudacion(id)
-            
-            # Obtener los tipos de recaudación actualizados
-            tipos_recaudacion = obtener_tipos_recaudacion()
-            tipos_recaudacion_data = [
-                {
-                    "id": tipo[0],
-                    "nombre": tipo[1],
-                    "tipo": "Monetario" if tipo[2] == 1 else "No Monetario",
-                    "estado": "Activo" if tipo[3] == 1 else "Inactivo"
-                }
-                for tipo in tipos_recaudacion
-            ]
-            
-            # Enviar respuesta JSON con el mensaje de éxito
-            message = "El tipo de recaudación fue dado de baja exitosamente"
-            return jsonify({"success": True, "tipos_recaudacion": tipos_recaudacion_data, "message": message})
-        
+            nuevo_estado = request.form.get('estado') == '1'  # `1` indica Activo, `0` indica Inactivo
+
+            # Llamar al controlador para cambiar el estado
+            success, message = cambiar_estado_tipo_recaudacion(id, nuevo_estado)
+
+            if success:
+                # Obtener los tipos de recaudación actualizados
+                tipos_recaudacion = obtener_tipos_recaudacion()
+                tipos_recaudacion_data = [
+                    {
+                        "id": tipo[0],
+                        "nombre": tipo[1],
+                        "tipo": "Monetario" if tipo[2] == 1 else "No Monetario",
+                        "estado": "Activo" if tipo[3] == 1 else "Inactivo"
+                    }
+                    for tipo in tipos_recaudacion
+                ]
+                return jsonify({"success": True, "tipos_recaudacion": tipos_recaudacion_data, "message": message})
+            else:
+                return jsonify({"success": False, "message": message}), 500
+
         except Exception as e:
-            # Enviar respuesta JSON con el mensaje de error
-            message = f"Hubo un error al dar de baja el tipo de recaudación: {str(e)}"
-            return jsonify({"success": False, "message": message}), 500
+            return jsonify({"success": False, "message": f"Error en el servidor: {str(e)}"}), 500
 
 
