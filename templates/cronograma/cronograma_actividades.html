@@ -1,29 +1,20 @@
-<!DOCTYPE html>
-<html lang="es">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Cronograma de Actividades</title>
-    <!-- FullCalendar CSS -->
-    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/fullcalendar@5.11.0/main.min.css">
-</head>
-<body>
+{% extends 'index.html' %}
 
+{% block title %}Cronograma de Actividades{% endblock %}
+
+{% block cuerpo %}
 <div class="container mt-4">
     <h1 class="text-center">Cronograma de Actividades</h1>
     <div id="calendar" style="max-width: 100%; margin: 0 auto;"></div>
 </div>
 
-<!-- FullCalendar JS -->
+<!-- FullCalendar CSS y JS -->
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/fullcalendar@5.11.0/main.min.css">
 <script src="https://cdn.jsdelivr.net/npm/fullcalendar@5.11.0/main.min.js"></script>
 
 <script>
 document.addEventListener('DOMContentLoaded', function() {
-    console.log("El script está funcionando correctamente");  // Prueba básica para verificar carga
-
     var calendarEl = document.getElementById('calendar');
-
-    // Inicialización de FullCalendar
     var calendar = new FullCalendar.Calendar(calendarEl, {
         initialView: 'dayGridMonth',
         locale: 'es',
@@ -32,26 +23,24 @@ document.addEventListener('DOMContentLoaded', function() {
             center: 'title',
             right: 'dayGridMonth,timeGridWeek,timeGridDay'
         },
-        events: '/api/obtener_actividades', // URL para obtener los datos de las actividades en formato JSON
-        height: 'auto',  // Ajusta el alto para evitar desbordamientos
+        events: '/api/obtener_actividades',
+        height: 'auto',
     });
 
-    calendar.render();  // Renderizar el calendario
+    calendar.render();
 });
 </script>
 
 <style>
-    /* Ajustes de estilo para FullCalendar para que coincida con el estilo de la aplicación */
-    #calendar {
-        background-color: white; /* Fondo blanco para integrarse con el diseño */
-        border-radius: 8px;
-        padding: 10px;
-        box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
-    }
-    .fc-header-toolbar {
-        margin-bottom: 20px;
-    }
+#calendar {
+    background-color: white;
+    border-radius: 8px;
+    padding: 10px;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+    margin-bottom: 20px;
+}
+.fc-header-toolbar {
+    margin-bottom: 20px;
+}
 </style>
-
-</body>
-</html>
+{% endblock %}

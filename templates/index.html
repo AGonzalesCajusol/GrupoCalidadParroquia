@@ -202,6 +202,24 @@
                         <i class="bi bi-arrow-return-right"></i> Egresos
                     </a>
                 </div>
+                <a class="btn btn-primary  mt-2" data-bs-toggle="collapse" href="#moduloReportes" role="button"
+                    aria-expanded="false" aria-controls="moduloReportes">
+                    <i class="bi bi-bar-chart-line"></i> Reportes
+                </a>
+
+                <div class="collapse ms-4 mt-2" id="moduloReportes">
+                    <a href="{{ url_for('cronograma_actividades') }}" class="btn btn-outline-primary">
+                        <i class="bi bi-arrow-return-right"></i> Cronograma de actividades
+                    </a>
+
+                    <a href="{{ url_for('gestionar_tipo_recaudacion') }}" class="btn btn-outline-primary">
+                        <i class="bi bi-arrow-return-right"></i> Reporte 2
+                    </a>
+                    <a href="{{ url_for('gestionar_egresos') }}" class="btn btn-outline-primary">
+                        <i class="bi bi-arrow-return-right"></i> Reporte 3
+                    </a>
+                </div>
+                
             </div>
         </div>
         <div class="main-content me-5" style="max-height: 400px;">
