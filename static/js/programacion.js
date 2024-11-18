@@ -284,6 +284,7 @@ async function registrarProgramacion() {
         if (data.success) {
             alert("Programación registrada con éxito.");
             cargarTemasPorActo()
+            location.reload();
         } else {
             console.error("Error al registrar la programación:", data.error);
             alert("Error al registrar la programación.");
