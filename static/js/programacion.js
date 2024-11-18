@@ -1,4 +1,4 @@
-document.addEventListener("DOMContentLoaded", function () {
+document.addEventListener("DOMContentLoaded", async function () {
     // Inicializar DataTables para la tabla de programación
     $('#tablaProgramacion').DataTable({
         pageLength: 8,
@@ -7,22 +7,19 @@ document.addEventListener("DOMContentLoaded", function () {
         paging: true,
         info: false,
         autoWidth: false,
-        destroy: true, // Asegúrate de que se pueda reinicializar
+        destroy: true,
         language: {
             paginate: {
                 previous: "Anterior",
                 next: "Siguiente"
             }
         }
-    });
-});
-
-document.addEventListener("DOMContentLoaded", async function () {
-    console.log("Cargando datos del ministro y sede...");
+    });    
     await obtenerDatosMinistroSede();
-    verificarProgramacionActo();
+    verificarProgramacionActo();    
+    cargarActosLiturgicos();
+ 
 });
-
 
 function cargarActosLiturgicos() {
     console.log("Cargando actos litúrgicos...");
@@ -107,8 +104,12 @@ async function cargarTemasPorActo() {
                         <button class="btn btn-primary btn-sm" title="Ver" onclick="abrirModalVer(this)">
                             <i class="fas fa-eye"></i>
                         </button>
-                        <button class="btn btn-warning btn-sm" title="Editar"><i class="fas fa-edit"></i></button>
-                        <button class="btn btn-danger btn-sm" title="Eliminar"><i class="fas fa-trash-alt"></i></button>
+                        <button class="btn btn-warning btn-sm" title="Editar" onclick="abrirModalEditar(this)">
+                            <i class="fas fa-edit"></i>
+                        </button>
+                        <button class="btn btn-danger btn-sm" title="Eliminar" onclick="eliminarProgramacion(this)">
+                            <i class="fas fa-trash-alt"></i>
+                        </button>                            
                     </td>
                 </tr>`;
             temasTable.row.add($(row)).draw();
@@ -119,8 +120,6 @@ async function cargarTemasPorActo() {
     }
 }
 
-
-// Función auxiliar para obtener el nombre del día de la semana
 function getDiaSemana(dia) {
     const dias = {
         1: "Lunes",
@@ -142,22 +141,17 @@ function actualizarDiaSeleccionado(selectElement) {
 const diasSelect = document.getElementById('diasSemanaSelect');
 const selectActo = document.getElementById('selectActoLiturgico');
 if (selectActo) {
-    const actoId = selectActo.value;
-    if (actoId) {
-        cargarTemasPorActo();
+        const actoId = selectActo.value;
+        if (actoId) {
+            cargarTemasPorActo();
+        }
+    } else {
+        console.error("El elemento selectActoLiturgico no existe.");
     }
-} else {
-    console.error("El elemento selectActoLiturgico no existe.");
-}
-
-document.addEventListener("DOMContentLoaded", function () {
-    cargarActosLiturgicos();
-});
 
 function abrirModalVer(button) {
     console.log("Botón 'Ver' clickeado");
-
-    // Obtener el ID de la programación desde la fila seleccionada
+    
     const row = button.closest('tr');
     const idProgramacion = row.getAttribute('data-id-programacion');
     console.log("ID de programación enviado al backend:", idProgramacion);
@@ -347,8 +341,13 @@ async function verificarProgramacionActo() {
                             <button class="btn btn-primary btn-sm" title="Ver" onclick="abrirModalVer(this)">
                                 <i class="fas fa-eye"></i>
                             </button>
-                            <button class="btn btn-warning btn-sm" title="Editar"><i class="fas fa-edit"></i></button>
-                            <button class="btn btn-danger btn-sm" title="Eliminar"><i class="fas fa-trash-alt"></i></button>
+                            <button class="btn btn-warning btn-sm" title="Editar" onclick="abrirModalEditar(this)">
+                                <i class="fas fa-edit"></i>
+                            </button>                
+                                <button class="btn btn-danger btn-sm" title="Eliminar" onclick="eliminarProgramacion(this)">
+                                    <i class="fas fa-trash-alt"></i>
+                                </button>                            
+
                         </td>
                     </tr>`;
                 temasTable.row.add($(row)).draw();
@@ -361,16 +360,241 @@ async function verificarProgramacionActo() {
     }
 }
 
-function getDiaSemana(dia) {
-    const dias = {
-        1: "Lunes",
-        2: "Martes",
-        3: "Miércoles",
-        4: "Jueves",
-        5: "Viernes",
-        6: "Sábado",
-        7: "Domingo"
-    };
-    return dias[dia] || "Desconocido";
+function abrirModalEditar(button) {
+    const row = button.closest('tr');
+    const idProgramacion = row.getAttribute('data-id-programacion');
+    
+    if (!idProgramacion) return alert("No se encontró la programación a editar.");
+
+    fetch(`/obtener_programacion_detalle?id_programacion=${idProgramacion}`)
+        .then(response => response.json())
+        .then(data => {
+            if (data.success) {
+                document.getElementById('editarIdProgramacion').value = idProgramacion;
+                document.getElementById('editarTema').value = data.detalle.descripcion;
+                document.getElementById('editarHoraInicio').value = data.detalle.hora_inicio;
+                document.getElementById('editarDiaSemana').value = data.detalle.dias_semana;
+                document.getElementById('editarMinistro').value = data.detalle.ministro;
+                document.getElementById('editarSede').value = data.detalle.sede;
+
+                const modal = new bootstrap.Modal(document.getElementById('modalEditarProgramacion'));
+                modal.show();
+            }
+        })
+        .catch(error => console.error("Error al cargar los detalles:", error));
 }
 
+function guardarCambiosProgramacion() {
+    const idProgramacion = document.getElementById('editarIdProgramacion').value;
+    const horaInicio = document.getElementById('editarHoraInicio').value;
+    const diaSemana = document.getElementById('editarDiaSemana').value;
+    const idMinistro = document.getElementById('hiddenIdMinistro').value;
+    const idSede = document.getElementById('hiddenIdSede').value;
+
+    if (!idProgramacion || !horaInicio || !diaSemana || !idMinistro || !idSede) {
+        alert("Todos los campos son obligatorios.");
+        return;
+    }
+
+    const datos = {
+        id_programacion: idProgramacion,
+        hora_inicio: horaInicio,
+        dia_semana: diaSemana,
+        id_ministro: idMinistro,
+        id_sede: idSede
+    };
+
+    fetch('/actualizar_programacion', {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json'
+        },
+        body: JSON.stringify(datos)
+    })
+    .then(response => response.json())
+    .then(data => {
+        if (data.success) {
+            alert("Programación actualizada con éxito.");
+            location.reload();
+        } else {
+            alert("Error al actualizar la programación.");
+        }
+    })
+    .catch(error => console.error("Error al guardar cambios:", error));
+}
+
+// ------------------------------------- MINISTRO -------------------------------------
+
+async function abrirModalMinistro() {
+    try {
+        const response = await fetch('/obtener_ministros');
+        const data = await response.json();
+
+        if (data.success) {
+            const tablaMinistrosBody = document.getElementById('tablaMinistrosBody');
+            tablaMinistrosBody.innerHTML = '';
+
+            // Generar filas para cada ministro
+            data.ministros.forEach(ministro => {
+                const row = `
+                    <tr>
+                        <td>${ministro.nombre}</td>
+                        <td>${ministro.documento}</td>
+                        <td>${ministro.sede}</td>
+                        <td>
+                            <button class="btn btn-primary btn-sm" onclick="seleccionarMinistro(${ministro.id}, '${ministro.nombre}')">
+                                Seleccionar
+                            </button>
+                        </td>
+                    </tr>`;
+                tablaMinistrosBody.insertAdjacentHTML('beforeend', row);
+            });
+
+            // Destruir la tabla si ya fue inicializada anteriormente
+            if ($.fn.DataTable.isDataTable('#tablaMinistros')) {
+                $('#tablaMinistros').DataTable().destroy();
+            }
+
+            // Inicializar DataTables en el modal
+            $('#tablaMinistros').DataTable({
+                pageLength: 8,
+                lengthChange: false,
+                searching: true,
+                paging: true,
+                info: true,
+                autoWidth: false,
+                destroy: true,
+                language: {
+                    paginate: {
+                        previous: "Anterior",
+                        next: "Siguiente"
+                    },
+                    search: "Buscar:",
+                    lengthMenu: "Mostrar _MENU_ registros por página",
+                    info: "Mostrando _START_ a _END_ de _TOTAL_ registros",
+                    infoEmpty: "No hay registros disponibles"
+                }
+            });
+
+            // Mostrar el modal
+            const modal = new bootstrap.Modal(document.getElementById('modalSeleccionarMinistro'));
+            modal.show();
+        } else {
+            alert('Error al cargar los ministros.');
+        }
+    } catch (error) {
+        console.error("Error al obtener los ministros:", error);
+    }
+}
+
+function seleccionarMinistro(id, nombre) {
+    // Asignar el nombre y el ID del ministro seleccionado al formulario principal
+    document.getElementById('editarMinistro').value = nombre;
+    document.getElementById('hiddenIdMinistro').value = id;
+
+    // Cerrar el modal
+    const modal = bootstrap.Modal.getInstance(document.getElementById('modalSeleccionarMinistro'));
+    modal.hide();
+}
+
+// --------------------------------------- SEDE ---------------------------------------
+
+async function abrirModalSede() {
+    try {
+        const response = await fetch('/obtener_sedes');
+        const data = await response.json();
+
+        if (data.success) {
+            const tablaSedesBody = document.getElementById('tablaSedesBody');
+            tablaSedesBody.innerHTML = '';
+
+            // Generar filas para cada sede
+            data.sedes.forEach(sede => {
+                const row = `
+                    <tr>
+                        <td>${sede.nombre}</td>
+                        <td>${sede.direccion}</td>
+                        <td>
+                            <button class="btn btn-primary btn-sm" onclick="seleccionarSede(${sede.id}, '${sede.nombre}')">
+                                Seleccionar
+                            </button>
+                        </td>
+                    </tr>`;
+                tablaSedesBody.insertAdjacentHTML('beforeend', row);
+            });
+
+            // Inicializar DataTables para la tabla de sedes
+            if ($.fn.DataTable.isDataTable('#tablaSedes')) {
+                $('#tablaSedes').DataTable().destroy();
+            }
+            
+            $('#tablaSedes').DataTable({
+                pageLength: 8,
+                lengthChange: false,
+                searching: true,
+                paging: true,
+                info: true,
+                autoWidth: false,
+                destroy: true,
+                language: {
+                    paginate: {
+                        previous: "Anterior",
+                        next: "Siguiente"
+                    },
+                    search: "Buscar:",
+                    lengthMenu: "Mostrar _MENU_ registros por página",
+                    info: "Mostrando _START_ a _END_ de _TOTAL_ registros",
+                    infoEmpty: "No hay registros disponibles"
+                }
+            });
+
+            const modal = new bootstrap.Modal(document.getElementById('modalSeleccionarSede'));
+            modal.show();
+        } else {
+            alert('Error al cargar las sedes.');
+        }
+    } catch (error) {
+        console.error("Error al obtener las sedes:", error);
+    }
+}
+
+function seleccionarSede(id, nombre) {
+    // Asignar el nombre y el ID de la sede seleccionada al formulario principal
+    document.getElementById('editarSede').value = nombre;
+    document.getElementById('hiddenIdSede').value = id;
+
+    // Cerrar el modal
+    const modal = bootstrap.Modal.getInstance(document.getElementById('modalSeleccionarSede'));
+    modal.hide();
+}
+
+// eliminaaaaaar
+function eliminarProgramacion(button) {
+    const row = button.closest('tr');
+    const idProgramacion = row.getAttribute('data-id-programacion');
+
+    if (!idProgramacion) {
+        alert("No se pudo obtener el ID de la programación.");
+        return;
+    }
+
+    // Confirmación antes de eliminar
+    if (!confirm("¿Estás seguro de que deseas eliminar esta programación?")) {
+        return;
+    }
+
+    // Enviar solicitud al backend para eliminar la programación
+    fetch(`/eliminar_programacion?id_programacion=${idProgramacion}`, {
+        method: 'DELETE'
+    })
+    .then(response => response.json())
+    .then(data => {
+        if (data.success) {
+            alert("Programación eliminada con éxito.");
+            location.reload(); // Recargar la tabla para reflejar los cambios
+        } else {
+            alert("Error al eliminar la programación.");
+        }
+    })
+    .catch(error => console.error("Error al eliminar programación:", error));
+}

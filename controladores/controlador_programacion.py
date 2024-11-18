@@ -208,4 +208,106 @@ def obtener_detalle_programacion(id_programacion):
     
     return None
 
+def listar_ministros_programacion():
+    try:
+        conexion = obtener_conexion()
+        cursor = conexion.cursor()
+
+        query = """
+            SELECT 
+                m.id_ministro, 
+                m.nombre_ministro, 
+                m.numero_documento, 
+                s.nombre_sede 
+            FROM ministro m 
+            INNER JOIN sede s ON m.id_sede = s.id_sede
+            WHERE m.estado = 1;
+        """
+        cursor.execute(query)
+        resultados = cursor.fetchall()
+
+        ministros = [
+            {
+                "id": row[0],
+                "nombre": row[1],
+                "documento": row[2],
+                "sede": row[3]
+            }
+            for row in resultados
+        ]
+
+        cursor.close()
+        conexion.close()
+        return jsonify({"success": True, "ministros": ministros})
+
+    except Exception as e:
+        print(f"Error al obtener ministros: {e}")
+        return jsonify({"success": False, "error": "Error al obtener los ministros"}), 500
+
+def listar_sedes_programacion():    
+    try:
+        conexion = obtener_conexion()
+        cursor = conexion.cursor()
+
+        query = """
+            SELECT 
+                id_sede, 
+                nombre_sede, 
+                direccion 
+            FROM sede
+            WHERE estado = 1;
+        """
+        cursor.execute(query)
+        resultados = cursor.fetchall()
+
+        sedes = [
+            {
+                "id": row[0],
+                "nombre": row[1],
+                "direccion": row[2]
+            }
+            for row in resultados
+        ]
+
+        cursor.close()
+        conexion.close()
+        return jsonify({"success": True, "sedes": sedes})
+
+    except Exception as e:
+        print(f"Error al obtener sedes: {e}")
+        return jsonify({"success": False, "error": "Error al obtener las sedes"}), 500
+
+def actualizar_programacion(id_programacion, hora_inicio, dia_semana, id_ministro, id_sede):
+    conexion = obtener_conexion()
+    try:
+        with conexion.cursor() as cursor:            
+            cursor.execute("""
+                UPDATE programacion_charlas
+                SET hora_inicio = %s, dias_semana = %s, id_ministro = %s, id_sede = %s
+                WHERE id_programacion = %s
+            """, (hora_inicio, dia_semana, id_ministro, id_sede, id_programacion))
+        conexion.commit()
+        return {"success": True, "message": "Programación actualizada correctamente"}
+    except Exception as e:
+        conexion.rollback()
+        print(f"Error al actualizar la programación: {e}")
+        return {"success": False, "error": str(e)}
+    finally:
+        conexion.close()
+
+def eliminar_programacion(id_programacion):    
+    conexion = obtener_conexion()
+    try:
+        with conexion.cursor() as cursor:
+            cursor.execute("DELETE FROM programacion_charlas WHERE id_programacion = %s", (id_programacion,))
+        conexion.commit()
+        return {"success": True, "message": "Programación eliminada correctamente"}
+    except Exception as e:
+        conexion.rollback()
+        print(f"Error al eliminar la programación: {e}")
+        return {"success": False, "error": str(e)}
+    finally:
+        conexion.close()
+
+
 

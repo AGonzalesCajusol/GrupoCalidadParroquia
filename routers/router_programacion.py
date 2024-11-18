@@ -113,6 +113,38 @@ def registrar_rutas(app):
             print(f"Error al obtener los detalles de la programación: {e}")
             return jsonify({"success": False, "error": "Error al obtener los detalles"}), 500
 
+    @app.route('/obtener_ministros', methods=['GET'])
+    def obtener_ministros():        
+        return cncha.listar_ministros_programacion()
 
+    @app.route('/obtener_sedes', methods=['GET'])
+    def obtener_sedes():
+        """
+        Ruta para obtener la lista de sedes.
+        """
+        return cncha.listar_sedes_programacion()
+    
+    @app.route('/actualizar_programacion', methods=['POST'])
+    def actualizar_programacion():
+        data = request.json
+        id_programacion = data.get("id_programacion")
+        hora_inicio = data.get("hora_inicio")
+        dia_semana = data.get("dia_semana")
+        id_ministro = data.get("id_ministro")
+        id_sede = data.get("id_sede")
 
+        if not all([id_programacion, hora_inicio, dia_semana, id_ministro, id_sede]):
+            return jsonify({"success": False, "error": "Datos incompletos"}), 400
 
+        resultado = cncha.actualizar_programacion(id_programacion, hora_inicio, dia_semana, id_ministro, id_sede)
+        return jsonify(resultado)
+
+    @app.route('/eliminar_programacion', methods=['DELETE'])
+    def eliminar_programacion():
+        id_programacion = request.args.get('id_programacion')
+        
+        if not id_programacion:
+            return jsonify({"success": False, "error": "ID de programación no proporcionado"}), 400
+
+        resultado = cncha.eliminar_programacion(id_programacion)
+        return jsonify(resultado)
