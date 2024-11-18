@@ -115,7 +115,7 @@ $(document).ready(function () {
                         </div>
                         <div class="d-flex align-items-center">
                         <label for="buscar" class="me-2">Buscar:</label>
-                        <input type="search" id="buscar" style="flex-grow: 1; max-width: 400px;" placeholder="" aria-controls="recaudacionesTable">
+                        <input type="search" id="buscar" style="flex-grow: 1; max-width: 200px; height: 37.5px; padding: 5px;" placeholder="" aria-controls="recaudacionesTable">
                         </div>
                     `);
                     $('#buscar').on('keyup', function() {
@@ -131,10 +131,14 @@ $(document).ready(function () {
             fetch("/api/tipos")
                 .then(response => response.json())
                 .then(response => {
-                    response.data.forEach(element => {
-                        const tipoNombre = element.tipo[1];  // Solo usa el nombre, ignorando el ID
-                        opcionesTipo += `<option value="${tipoNombre}">${tipoNombre}</option>`;
-                    });
+                    if (response.data) {
+                        response.data.forEach(element => {
+                            opcionesTipo += `<option value="${element.tipo}">${element.tipo}</option>`;
+                        });
+            
+                        // Insertar las opciones en el select ya existente
+                        $('#filtroTipo').html(opcionesTipo);
+                    }
                 })
                 .catch(error => {
                     console.error("Error al cargar los tipos:", error);
