@@ -19,12 +19,55 @@ def charlas_rangoaño(acto_liturgico):
     finally:
         conexion.close() 
 
+def verificar_fecha(fecha,sede):
+    conexion = obtener_conexion()
+    try:
+        with conexion.cursor() as cursor:
+            fecha = str(fecha)
+            fecha= fecha.replace('T', ' ')
+            print(fecha)
+            cursor.execute("""
+                SET @hora_inicio_usuario = %s;
+            """, (fecha,))
+            
+            # Segundo SET para hora_fin_usuario (sumando 1:30 horas)
+            cursor.execute("""
+                SET @hora_fin_usuario = DATE_ADD(@hora_inicio_usuario, INTERVAL 1 HOUR);
+            """)
+            cursor.execute("""
+                SET @hora_fin_usuario = DATE_ADD(@hora_fin_usuario, INTERVAL 30 MINUTE);
+            """)
+            
+            # Consulta para verificar si hay conflicto de fechas y horas
+            cursor.execute("""
+                SELECT 1 AS conflicto  
+                FROM celebracion AS ce
+                INNER JOIN sede AS sd 
+                    ON sd.id_sede = ce.id_sede
+                WHERE sd.nombre_sede = %s
+                AND (
+                    @hora_inicio_usuario < CONCAT(ce.fecha, ' ', ce.hora_fin)
+                    AND @hora_fin_usuario > CONCAT(ce.fecha, ' ', ce.hora_inicio)
+                )
+                LIMIT 1;
+            """, (sede,))
+            
+            # Si se encuentra algún conflicto, devuelve 1
+            if cursor.fetchone():
+                return 1
+            return 0
+    except Exception as e:
+        print("fallo")
+        return 1
+    finally:
+        conexion.close() 
+
 def solicitudes(sede):
     conexion = obtener_conexion()
     try:
         with conexion.cursor() as cursor:
             cursor.execute("""
-                SELECT sl.id_solicitud, sd.id_sede , sd.nombre_sede ,fl.dni , al.nombre_liturgia  ,CONCAT(fl.nombres, ' ', fl.apellidos) as 'nombres' 
+                SELECT sl.id_solicitud, sd.id_sede , sd.nombre_sede ,fl.dni , al.nombre_liturgia  ,CONCAT(fl.nombres, ' ', fl.apellidos) as 'nombres', sl.fecha_registro
                 FROM solicitud AS sl
                 INNER JOIN feligres AS fl ON fl.dni = sl.dni_feligres inner join sede as sd
                 on sd.id_sede = sl.id_sede  inner join celebracion as cl
@@ -54,7 +97,7 @@ def insertar_solicitudMatrimonio(requisitos_data):
         hora_fin = hora_fin_objeto.time()
 
         # Obtener ID de la sede
-        id_sede = csede.obtener_id_sede_por_nombre(requisitos_data['sede'])  # Cambiado a la notación de clave
+        id_sede = csede.obtener_id_sede_por_nombre(requisitos_data['sede']) 
 
         # Aquí deberías agregar la lógica para insertar en la base de datos
         with conexion.cursor() as cursor:
@@ -65,7 +108,7 @@ def insertar_solicitudMatrimonio(requisitos_data):
             id_celebracion = cursor.lastrowid
             cursor.execute(
                 '''
-                insert into solicitud(id_actoliturgico,id_sede,estado,id_celebracion,dni_feligres) values (%s,%s,%s,%s,%s)
+                insert into solicitud(id_actoliturgico,id_sede,estado,id_celebracion,dni_feligres, asistencia, fecha_registro) values (%s,%s,%s,%s,%s,0, CURRENT_DATE())
                 ''',(requisitos_data['id_acto'],id_sede,'P',id_celebracion,requisitos_data['dni_responsable'])
             )
             id_solicitud = cursor.lastrowid
@@ -79,28 +122,19 @@ def insertar_solicitudMatrimonio(requisitos_data):
                     insert into solicitud_feligres (dni_feligres,id_solicitud,rol) values (%s,%s,%s) '''
                     ,(requisitos_data['dni_novia'],id_solicitud,'Novia')
             )
-            #Grabamos asistencias 
-            #novio
+            #Grabamos asistencias tanto de novio como de la novia
+
             cursor.execute(
                 '''
-                    INSERT INTO asistencia (id_programacion, id_feligres, id_solicitud, estado)
-                    SELECT pc.id_programacion, %s, %s, 'P'
-                    FROM programacion_charlas AS pc
-                    INNER JOIN charlas AS ch ON ch.id_charla = pc.id_charla
-                    WHERE ch.id_charla = %s;
-                '''
-                    ,(requisitos_data['dni_novio'],id_solicitud,requisitos_data['charlas'])
+                    CALL registrar_asistencias(CURRENT_DATE(), %s);
+                ''', (id_solicitud,)  # Nota la coma al final para crear una tupla
             )
-            cursor.execute(
-                '''
-                    INSERT INTO asistencia (id_programacion, id_feligres, id_solicitud, estado)
-                    SELECT pc.id_programacion, %s, %s, 'P'
-                    FROM programacion_charlas AS pc
-                    INNER JOIN charlas AS ch ON ch.id_charla = pc.id_charla
-                    WHERE ch.id_charla = %s;
-                '''
-                    ,(requisitos_data['dni_novia'],id_solicitud, requisitos_data['charlas'])
-            )
+            mensaje = cursor.fetchone()  # Devuelve una tupla
+            print(mensaje[0])
+            
+            ##Pasamos a realozar los pagos de igual forma el comprobante
+
+
             monto = cactos.monto_total('Matrimonio', requisitos_data['sede'], requisitos_data['dni_responsable'], requisitos_data['dni_novio'], requisitos_data['dni_novia'])
             print(monto)
             cursor.execute(
@@ -158,3 +192,60 @@ def insertar_solicitudMatrimonio(requisitos_data):
     finally:
         if conexion:
             conexion.close()  # Cierra la conexión si fue abierta
+
+
+def monto_butismo(sede):
+    try:
+        conexion = obtener_conexion()
+        with conexion.cursor() as cursor:
+            cursor.execute(
+                '''
+                    select (select monto from actoliturgico as al 
+                    where id_actoliturgico = 2) + (select monto from sede where nombre_sede = %s) as monto
+                ''',(sede)
+            )
+            monto = cursor.fetchone()[0]
+            return monto
+    except:
+        return 0
+    finally:
+        conexion.close()
+def obtener_asistencias(id_solicitud):
+    try:
+        conexion = obtener_conexion()
+        with conexion.cursor() as cursor:
+            cursor.execute(
+                '''
+                    select asis.id_asistencia,tm.descripcion, DATE(asis.fecha)  as  fecha , sfel.rol , fl.dni  , concat(fl.apellidos, ' ', fl.nombres) as nombre , asis.estado from solicitud_feligres as sfel inner join asistencia as asis
+                    on asis.id_solicitud = sfel.id_solicitud and asis.dni_feligres = sfel.dni_feligres inner join programacion_charlas as pch
+                    on pch.id_programacion = asis.id_programacion inner join tema as tm 
+                    on tm.id_tema = pch.id_tema inner join feligres as fl
+                    on asis.dni_feligres = fl.dni
+                    where asis.id_solicitud = %s
+                    ORDER BY tm.id_tema ASC, fl.apellidos DESC;
+                ''',(id_solicitud)
+            )
+            calendario = cursor.fetchall()
+            return calendario
+    except:
+        return 0
+    finally:
+        conexion.close()
+
+
+
+def check_asistencia(id,estado):
+    try:
+        conexion = obtener_conexion()
+        with conexion.cursor() as cursor:
+            cursor.execute(
+                '''
+                    update asistencia set estado = %s where id_asistencia = %s
+                ''',(estado,id)
+            )
+            conexion.commit()
+            return 1
+    except:
+        return 0
+    finally:
+        conexion.close()
