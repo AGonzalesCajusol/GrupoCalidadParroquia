@@ -29,7 +29,8 @@ def registrar_rutas(app):
                 'nombre_sede' : sl[2],
                 'dni': sl[3],
                 'nombre_liturgia': sl[4],
-                'nombres': sl[5]
+                'nombres': sl[5],
+                'fecha': str(sl[6])
             })
             return jsonify({'data': listar_solicitudes})
         return jsonify({'mensaje': 'Error'})
@@ -114,13 +115,12 @@ def registrar_rutas(app):
                 'metodo': request.form.get('metodo'),
                 'dni_responsable': request.form.get('responsable'),
                 'dni_novio': request.form.get('dni_novio'),
-                'dni_novia': '01234567',
-                #'dni_novia': request.form.get('dni_novia'),
+                'dni_novia': request.form.get('dni_novia'),
                 'dni_testigo1': request.form.get('dni_testigo1'),
                 'dni_testigo2': request.form.get('dni_testigo2'),
                 'sede': request.form.get('sede'),
                 'f_matrimonio': request.form.get('f_matrimonio'),
-                'charlas': request.form.get('charlas'),
+                'charlas': '',
                 'copia_dninovio': request.files.get('copia_dninovio'),
                 'copia_dninovia': request.files.get('copia_dninovia'),
                 'consb_novio': request.files.get('consb_novio'),
@@ -159,3 +159,53 @@ def registrar_rutas(app):
                 return jsonify({'estado': 'Error'})
             
     
+    @app.route('/verificar_fecha/<string:fecha>', methods=['GET', 'POST'])
+    def verificar_fecha(fecha):
+        sede = request.cookies.get('sede')
+        valor = csoli.verificar_fecha(fecha,sede)
+        if valor ==0:
+            print("A")
+            return jsonify({'estado': "Aceptado"})
+        else:
+      
+            return jsonify({'estado': "Rechazado"})
+
+    @app.route('/montobautismo/<string:sede>', methods=['GET'])
+    def montobautismo(sede):
+        monto = csoli.monto_butismo(sede)
+        
+        # Imprimir el monto total
+        print("Monto Total:", monto)
+
+        if monto == 0:
+            return jsonify({'estado': 'no'}) 
+        else:
+            return jsonify({'estado': 'si', 'datos': monto})
+        
+    @app.route('/asistencias_solicitud/<int:id_solicitud>', methods=['GET'])
+    def asistencias_solicitud(id_solicitud):
+        asistencias = csoli.obtener_asistencias(id_solicitud)
+        lista_asistencia = []
+        if asistencias == 0:
+            return jsonify({'estado': 'no'})
+        else:
+            for asis in asistencias:
+                lista_asistencia.append({
+                    'id_asistencia': asis[0],
+                    'descripcion':asis[1],
+                    'fecha':str(asis[2]),
+                    'rol':asis[3],
+                    'dni':asis[4],
+                    'nombre':asis[5],
+                    'estado':asis[6],
+                })          
+            return jsonify({'estado': 'si',
+                            'data': lista_asistencia})
+        
+    @app.route('/check_asistencia/<int:id>/<int:estado>', methods=['GET'])
+    def check_asistencia(id,estado):
+        valor = csoli.check_asistencia(id,estado)
+        if valor == 1:
+            return jsonify({'estado': 'correcto'})
+        else:
+            return jsonify({'estado': 'incorrecto'})
