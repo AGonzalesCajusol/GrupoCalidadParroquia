@@ -20,6 +20,7 @@ import routers.router_charlas
 import routers.router_programacion
 import routers.router_asistencia
 import routers.router_cronograma
+
 app = Flask(__name__)
 app.secret_key = 'super-secret'
 

@@ -154,7 +154,7 @@ def insertar_solicitudMatrimonio(requisitos_data):
             )
             #ahora falta insertar el nombre de las imagenes y sus estados
             requisitos = cactos.listar_requisitos(requisitos_data['id_acto'])
-            directorio = 'static/archivos_usuario/'+ str(id_solicitud)
+            directorio = 'static/archivos_usuario/'+ str(id_solicitud) +'/'
             print(f"Directorio donde se guardará la imagen: {directorio}")  # Imprimir para verificar
 
             if not os.path.exists(directorio):
@@ -164,7 +164,7 @@ def insertar_solicitudMatrimonio(requisitos_data):
                 if rq[3] == "Imagen" :
                     archivo_imagen = requisitos_data[rq[7]] 
                     if archivo_imagen :
-                        ruta_imagen = os.path.join(directorio,archivo_imagen.filename) 
+                        ruta_imagen = directorio + archivo_imagen.filename 
                         try:
                             archivo_imagen.save(ruta_imagen)  # Guardar la imagen en el sistema de archivos
                             enlace_imagen = ruta_imagen  # Guarda la ruta de la imagen
@@ -210,6 +210,8 @@ def monto_butismo(sede):
         return 0
     finally:
         conexion.close()
+
+
 def obtener_asistencias(id_solicitud):
     try:
         conexion = obtener_conexion()
@@ -245,6 +247,74 @@ def check_asistencia(id,estado):
             )
             conexion.commit()
             return 1
+    except:
+        return 0
+    finally:
+        conexion.close()
+
+def datos_soliictud_matrimonio(id):
+    try:
+        conexion = obtener_conexion()
+        with conexion.cursor() as cursor:
+            cursor.execute('''
+                select rq.id_js_requisito, rq.id_js_estado ,ar.id_requisito, ar.estado, ar.enlace_imagen, rq.tipo from solicitud as sol inner join aprobacionrequisitos as ar
+                on ar.id_solicitud = sol.id_solicitud inner join requisito as rq
+                on rq.id_requisito = ar.id_requisito
+                where sol.id_solicitud = %s
+            ''',(id,))
+            datos = cursor.fetchall()
+            return datos
+    except:
+        return 0
+    finally:
+        conexion.close()
+
+def fcelebraciones(id,sede):
+    try:
+        conexion = obtener_conexion()
+        
+        with conexion.cursor() as cursor:
+            cursor.execute('''
+                SELECT 
+                    cl.id_celebracion, 
+                    CONCAT('Fecha:', cl.fecha, ' Hora inicio:  ', cl.hora_inicio, ' Hora fin ', cl.hora_fin) AS fechas
+                FROM 
+                    celebracion AS cl
+                INNER JOIN 
+                    sede AS sd ON sd.id_sede = cl.id_sede
+                WHERE 
+                    cl.id_actoliturgico = %s
+                    AND sd.nombre_sede = %s
+                    AND cl.fecha > CURRENT_DATE();
+            ''',(id,sede,))
+            datos = cursor.fetchall()
+            return datos
+    except:
+        return 0
+    finally:
+        conexion.close()
+
+
+def viww(id):
+    try:
+        conexion = obtener_conexion()
+        
+        with conexion.cursor() as cursor:
+            cursor.execute('''
+                    SELECT tm.descripcion, 
+                        DATE_SUB(cl.fecha, INTERVAL 1 DAY) AS fecha, 
+                        pch.hora_inicio, 
+                        DATE_ADD(pch.hora_inicio, INTERVAL (HOUR(tm.duracion) * 60 + MINUTE(tm.duracion)) MINUTE) AS hora_suma
+                    FROM tema AS tm
+                    INNER JOIN celebracion AS cl
+                    ON tm.id_actoliturgico = cl.id_actoliturgico 
+                    INNER JOIN programacion_charlas AS pch
+                    ON pch.id_tema = tm.id_tema
+                    WHERE cl.id_celebracion = %s;
+
+            ''',(id,))
+            datos = cursor.fetchall()
+            return datos
     except:
         return 0
     finally:

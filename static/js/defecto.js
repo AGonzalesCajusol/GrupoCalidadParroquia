@@ -160,7 +160,6 @@ function finalizar_sesion(){
     document.cookie = "tipo=; path=/;"; 
     document.cookie = "nombre=;path=/; "
     window.location.href = "http://127.0.0.1:5000/";
-
 }
 
 
