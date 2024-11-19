@@ -6,54 +6,53 @@
 <div class="container mt-4">
     <h1 class="titulo-gestion">Gestión de Asistencia</h1>
     <div id="alerta" class="mt-3"></div>
-    <table id="asistenciaTable" class="table table-hover table-striped">
-        <thead class="table-light">
-            <tr class="text-center">
-                <th style="vertical-align: middle; text-align: center;">ID</th>
-                <th style="vertical-align: middle; text-align: center;">Programacion</th>
-                <th style="vertical-align: middle; text-align: center;">DNI feligres</th>
-                <th style="vertical-align: middle; text-align: center;">Nombres</th>
-                <th style="vertical-align: middle; text-align: center;">Apellidos</th>
-                <th style="vertical-align: middle; text-align: center;">Solicitud</th>
-                <th style="vertical-align: middle; text-align: center;">Estado</th>
-                <th style="vertical-align: middle; text-align: center;">Fecha</th>
-                <th style="vertical-align: middle; text-align: center; width: 80px;">Asistencia</th>
+    <div class="mt-4" id="calendar-container" style="padding: 10px; border-radius: 5px;">
+        <button id="toggle-calendar" class="btn btn-info mb-3">Mostrar Calendario</button>
+        <div id="calendar" style="background-color: rgba(195, 230, 255, 0.326); display: none;"></div> <!-- Ocultamos el calendario por defecto -->
+    </div>
+    <div class="mt-4">
+        <table id="asistenciaTable" class="table table-hover table-striped">
+            <thead class="table-light">
+                <tr class="text-center">
+                    <th style="vertical-align: middle; text-align: center;">Fecha</th>
+                    <th style="vertical-align: middle; text-align: center;">prog</th>
+                    <th style="vertical-align: middle; text-align: center;">DNI feligres</th>
+                    <th style="vertical-align: middle; text-align: center;">Nombre completo</th>
+                    <th style="vertical-align: middle; text-align: center;">Estado</th>
+                    <th style="vertical-align: middle; text-align: center; width: 80px;">Asistencia</th>
 
-            </tr>
-        </thead>
-        <tbody>
-            {% for asist in asistencia %}
-            <tr>
-                <td class="text-center border">{{ asist[0] }}</td> <!-- ID del Asistencia -->
-                <td class="text-center border">{{ asist[1] }}</td><!-- ID programacion -->
-                <td class="text-center border">{{ asist[2] }}</td><!-- DNI -->
-                <td class="text-center border">{{ asist[4] }}</td><!-- apellidos -->
-                <td class="text-center border">{{ asist[3] }}</td><!-- nombres -->
-                <td class="text-center border">{{ asist[5] }}</td><!-- ID solicitud -->
-                <td style="vertical-align: middle; text-align: center">
-                    {% if asist[6] == 1 or asist[6] == '1' %}
+                </tr>
+            </thead>
+            <tbody>
+                {% for asist in asistencia %}
+                <tr>
+                    <td class="text-center border">{{ asist[1] }}</td><!-- fecha -->
+                    <td class="text-center border">{{ asist[2] }}</td><!-- fecha -->
+                    <td class="text-center border">{{ asist[3] }}</td><!-- DNI -->
+                    <td class="text-center border">{{ asist[4] }}</td><!-- nombres -->
+                    <td style="vertical-align: middle; text-align: center">
+                        {% if asist[6] == 1 or asist[6] == '1' %}
                         Asistió
-                    {% else %}
+                        {% else %}
                         Faltó
-                    {% endif %}
-                </td><!-- estado -->
-                <td class="text-center border">{{ asist[7] }}</td><!-- fecha -->
-                <td class="text-center border">
-                    <input type="checkbox" class="form-check-input asistencia-checkbox" 
-                        data-id="{{ asist[0] }}"
-                        title="Marcar asistencia"
-                        style="border-color: greenyellow; font-size: 20px; align-items: center;" 
-                        {% if asist[6] == 1 or asist[6] == '1' %} checked disabled {% endif %}>
-                </td>
-            </tr>
-            {% endfor %}
-        </tbody>
-    </table>
+                        {% endif %}
+                    </td><!-- estado -->
+                    <td class="text-center border">
+                        <input type="checkbox" class="form-check-input asistencia-checkbox" data-id="{{ asist[0] }}"
+                            title="Marcar asistencia"
+                            style="border-color: greenyellow; font-size: 20px; align-items: center;" {% if asist[6]==1
+                            or asist[6]=='1' %} checked disabled {% endif %}>
+                    </td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
 </div>
 
-<!-- Modal para Agregar o Editar -->
 
-
+<!-- FullCalendar JS -->
+<script src="https://cdn.jsdelivr.net/npm/fullcalendar@5.11.3/main.min.js"></script>
 <script src="/static/js/asistencia.js"></script>
 
 <script>
@@ -67,7 +66,91 @@
         display: inline-block;
         margin-left: 10px;
     }
+    #calendar-container {
+        border-radius: 5px;
+        padding: 10px;
+        margin-bottom: 20px;
+    }
+    #calendar {
+        display: none;
+        min-height: 400px;
+        max-width: 100%; 
+        margin: 0 auto; 
+        overflow: hidden; 
+    }
+    #toggle-calendar {
+        margin-bottom: 10px;
+        background-color: rgba(89, 147, 255, 0.779);
+    }
 </style>
+<style>
+    .fc-toolbar.fc-header-toolbar {
+        background-color: #d3d3d3;
+        border-radius: 5px;
+    }
+    .fc-toolbar-title {
+        color: #000;
+    }
+    .fc-button {
+        background-color: #a9a9a9 !important;
+        color: #fff !important;
+        border: none !important;
+    }
+    .fc-button:hover {
+        background-color: #888888 !important;
+        color: #fff !important;
+    }
+    .fc-daygrid-day {
+        background-color: #eaf7ff;
+    }
+    .fc-daygrid-day.fc-day-today {
+        background-color: #cce7f9 !important;
+    }
+    .fc-col-header-cell {
+        background-color: #d3d3d3 !important;
+        color: #000 !important;
+    }
+    .fc-event {
+        background-color: #4d94ff !important;
+        color: #fff !important;
+        border-radius: 5px;
+    }
+    .fc-toolbar.fc-header-toolbar {
+        background-color: #d3d3d3;
+        border-radius: 5px;
+    }
+    .fc-toolbar-title {
+        color: #000;
+    }
+    .fc-button {
+        background-color: #a9a9a9 !important;
+        color: #fff !important;
+        border: none !important;
+    }
+    .fc-button:hover {
+        background-color: #888888 !important;
+        color: #fff !important;
+    }
+    .fc-button.fc-button-active {
+        background-color: #555555 !important; /* Más oscuro al seleccionarlo */
+        color: #fff !important;
+    }
+    .fc-daygrid-day {
+        background-color: #eaf7ff;
+    }
+    .fc-daygrid-day.fc-day-today {
+        background-color: #cce7f9 !important;
+    }
+    .fc-col-header-cell {
+        background-color: #d3d3d3 !important;
+        color: #000 !important;
+    }
+    .fc-event {
+        background-color: #4d94ff !important;
+        color: #fff !important;
+        border-radius: 5px;
+    }
+</style>    
 
 
 {% endblock %}
