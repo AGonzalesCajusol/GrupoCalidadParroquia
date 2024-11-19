@@ -8,10 +8,9 @@ def obtener_celebraciones():
     try:
         start = request.args.get('start')
         end = request.args.get('end')
-        start_date = datetime.fromisoformat(start).date()  # Asumiendo que 'start' viene en formato ISO 8601
-        end_date = datetime.fromisoformat(end).date()  # Similar para 'end'
-        print(f"Start: {start}, End: {end}")
-        # Usar DictCursor para devolver los resultados como diccionarios
+        start_date = datetime.fromisoformat(start).date()  
+        end_date = datetime.fromisoformat(end).date()  
+        print(f"Start: {start}, End: {end}")        
         with conexion.cursor(pymysql.cursors.DictCursor) as cursor:
             cursor.execute("""
                 SELECT id_celebracion, fecha, hora_inicio, hora_fin, id_sede
@@ -97,3 +96,4 @@ def eliminar_celebracion(id_celebracion):
         return jsonify(success=False), 500
     finally:
         conexion.close()
+

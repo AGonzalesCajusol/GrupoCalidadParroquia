@@ -52,7 +52,36 @@ function openModal(type, id_tema) {
     const saveButton = document.getElementById('saveChanges');
     const temaIdInput = document.getElementById('temaId');
 
-    if (type === 'edit') {
+    const modal = document.getElementById('temaModal');
+    const inputs = modal ? modal.querySelectorAll('.form-control') : [];
+    const selects = modal ? modal.querySelectorAll('select') : [];
+
+    // Resetear campos
+    inputs.forEach(input => {
+        input.disabled = false; // Habilitar todos los campos por defecto
+    });
+
+    selects.forEach(select => {
+        select.disabled = false; // Habilitar todos los select por defecto
+    });
+
+    saveButton.style.display = 'inline-block'; // Mostrar botón de guardar por defecto
+
+    if (type === 'view') {
+        modalTitle.textContent = 'Ver Tema';
+        saveButton.style.display = 'none'; // Ocultar botón de guardar
+
+        
+        inputs.forEach(input => {
+            input.disabled = true;
+        });
+
+        selects.forEach(select => {
+            select.disabled = true;
+        });
+
+        cargarTema(id_tema); // Cargar datos para ver
+    }else if (type === 'edit') {
         modalTitle.textContent = 'Editar Tema';
         saveButton.textContent = 'Actualizar';
         saveButton.onclick = actualizarTema; 
@@ -75,10 +104,12 @@ function cargarTema(id_tema) {
         .then(data => {
             if (data.success) {
                 const tema = data.tema;
+                const duracionFormateada = formatearDuracion(tema.duracion);
+
                 document.getElementById('temaId').value = tema.id_tema;
                 document.getElementById('id_actoliturgico').value = tema.id_actoliturgico;
                 document.getElementById('descripcion').value = tema.descripcion;                                                
-                document.getElementById('duracion').value = tema.duracion && tema.duracion !== 'None' ? tema.duracion : '';
+                document.getElementById('duracion').value = duracionFormateada;
                 document.getElementById('orden').value = tema.orden;
             } else {
                 alert(data.message);
@@ -86,6 +117,13 @@ function cargarTema(id_tema) {
         })
         .catch(error => console.error('Error al obtener el tema:', error));
 }
+
+function formatearDuracion(duracion) {
+    if (!duracion) return ''; // Validar si la duración es nula o no está definida
+    const [horas, minutos] = duracion.split(':'); // Dividir la duración en partes
+    return `${horas.padStart(2, '0')}:${minutos.padStart(2, '0')}`; // Formatear con dos dígitos
+}
+
 
 // Función para actualizar un tema
 function actualizarTema() {

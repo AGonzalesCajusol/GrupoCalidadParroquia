@@ -221,8 +221,6 @@ def listar_actosxsede(nombre_sede):
     finally:
         conexion.close()  
 
-
-
 def insertar_acto(acto,tipo,monto,estado):
     conexion = obtener_conexion()
     try:
@@ -498,5 +496,18 @@ def listar_sacramentos():
             cursor.execute("SELECT id_actoliturgico ,nombre_liturgia FROM actoliturgico WHERE es_sacramento = 'S'")
             sacramentos = cursor.fetchall()
             return sacramentos
+    finally:
+        conexion.close()
+
+def obtener_actos_liturgicos():    
+    conexion = obtener_conexion()
+    try:
+        with conexion.cursor() as cursor:
+            cursor.execute("SELECT id_actoliturgico, nombre_liturgia FROM actoliturgico")
+            actos = cursor.fetchall()
+            return actos
+    except Exception as e:
+        print(f"Error al obtener actos litúrgicos: {e}")
+        return []
     finally:
         conexion.close()

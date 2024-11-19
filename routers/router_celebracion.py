@@ -6,8 +6,8 @@ from controladores.controlador_celebracion import (
     eliminar_celebracion
 )
 from routers.router_main import requerido_login
-
 import controladores.controlador_sede as csede
+import controladores.controlador_actosliturgicos as cacto
 
 def registrar_rutas(app):
     
