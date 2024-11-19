@@ -342,7 +342,12 @@ function abrirModalRecaudacion(type, id = null, fecha = '', hora = '', monto = '
             document.getElementById('hora').value = hora;
             document.getElementById('fechaContainer').style.display = 'block';
             document.getElementById('horaContainer').style.display = 'block';
-            document.getElementById('id_tipo_recaudacion').add = ("tipo_recaudacion");
+            //alert(tipo_recaudacion);
+            const select = document.getElementById('id_tipo_recaudacion');
+            if (!select.querySelector(`option[value="${tipo_recaudacion}"]`)) {
+                select.innerHTML += `<option value="${tipo_recaudacion}">${tipo_recaudacion}</option>`;
+              }
+            //document.getElementById('id_tipo_recaudacion').add = ("tipo_recaudacion");
 
         } else {
             document.getElementById('fecha').value = '';
