@@ -21,7 +21,26 @@ def obtener_intenciones():
         return []
     finally:
         conexion.close()
+        
+def obtener_tipos_actos_liturgicos():
+    conexion = obtener_conexion()
+    try:
+        with conexion.cursor() as cursor:
+            # Selecciona los actos litúrgicos donde estado = 1
+            cursor.execute("""
+                SELECT id_actoliturgico, nombre_liturgia
+                FROM actoliturgico
+                
+            """)
+            actos_liturgicos = cursor.fetchall()
+        return actos_liturgicos
+    except Exception as e:
+        print(f"Error al obtener tipos de actos litúrgicos: {e}")
+        return []
+    finally:
+        conexion.close()
 
+        
 def insertar_intencion(nombre_intencion, descripcion, id_actoliturgico):
     conexion = obtener_conexion()
     try:

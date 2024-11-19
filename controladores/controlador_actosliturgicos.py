@@ -555,6 +555,45 @@ def obtener_celebraciones_por_fecha(year, month=None):
         conexion.close()
 
 
+def obtener_celebraciones_por_fecha(year, month=None):
+    conexion = obtener_conexion()
+    try:
+        query = '''
+            SELECT
+                al.nombre_liturgia AS acto_liturgico,
+                COUNT(c.id_celebracion) AS num_celebraciones
+            FROM
+                celebracion c
+            JOIN
+                actoliturgico al ON c.id_actoliturgico = al.id_actoliturgico
+            WHERE
+                EXTRACT(YEAR FROM c.fecha) = %s
+        '''
+        params = [year]
+
+        if month:
+            query += ' AND EXTRACT(MONTH FROM c.fecha) = %s'
+            params.append(month)
+
+        query += '''
+            GROUP BY
+                al.nombre_liturgia
+            ORDER BY
+                al.nombre_liturgia;
+        '''  # Cambié 'al.nombre_liturgica' a 'al.nombre_liturgia'
+
+        with conexion.cursor() as cursor:
+            cursor.execute(query, params)
+            resultados = cursor.fetchall()
+            celebraciones = [{'acto_liturgico': row[0], 'num_celebraciones': row[1]} for row in resultados]
+        return celebraciones
+    except Exception as e:
+        print(f"Error al obtener celebraciones por fecha: {e}")
+        return []
+    finally:
+        conexion.close()
+
+
 def obtener_anos():
     conexion = obtener_conexion()
     try:
@@ -581,6 +620,61 @@ def obtener_actos_liturgicos():
             return actos
     except Exception as e:
         print(f"Error al obtener actos litúrgicos: {e}")
+        return []
+    finally:
+        conexion.close()
+
+def obtener_celebraciones_por_fecha(year, month=None, acto=None):
+    conexion = obtener_conexion()
+    try:
+        query = '''
+            SELECT
+                EXTRACT(MONTH FROM c.fecha) AS mes,
+                COUNT(c.id_celebracion) AS num_celebraciones
+            FROM
+                celebracion c
+            JOIN
+                actoliturgico al ON c.id_actoliturgico = al.id_actoliturgico
+            WHERE
+                EXTRACT(YEAR FROM c.fecha) = %s
+        '''
+        params = [year]
+
+        if month:
+            query += ' AND EXTRACT(MONTH FROM c.fecha) = %s'
+            params.append(month)
+
+        if acto:
+            query += ' AND al.nombre_liturgia = %s'
+            params.append(acto)
+
+        query += '''
+            GROUP BY
+                EXTRACT(MONTH FROM c.fecha)
+            ORDER BY
+                mes;
+        '''
+
+        with conexion.cursor() as cursor:
+            cursor.execute(query, params)
+            resultados = cursor.fetchall()
+            celebraciones = [{'mes': int(row[0]), 'num_celebraciones': int(row[1])} for row in resultados]
+        return celebraciones
+    except Exception as e:
+        print(f"Error al obtener celebraciones por fecha: {e}")
+        return []
+    finally:
+        conexion.close()
+
+def listar_actos():
+    conexion = obtener_conexion()
+    try:
+        with conexion.cursor() as cursor:
+            cursor.execute('SELECT nombre_liturgia FROM actoliturgico')
+            resultados = cursor.fetchall()
+            return [{'nombre_acto': row[0]} for row in resultados]
+    except Exception as e:
+        print(f"Error al listar los actos litúrgicos: {e}")
         return []
     finally:
         conexion.close()

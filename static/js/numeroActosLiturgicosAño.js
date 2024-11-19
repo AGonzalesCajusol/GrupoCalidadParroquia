@@ -1,156 +1,138 @@
-document.addEventListener('DOMContentLoaded', async function() {
-    await cargarAnios();  // Carga los años como botones
-
+document.addEventListener('DOMContentLoaded', function () {
     let selectedYear = null;
-    let selectedMonth = null;
-    const monthFiltersContainer = document.getElementById('monthFiltersContainer'); // Contenedor de meses
+    let selectedActo = null;
 
-    // Manejar la selección de año
-    document.getElementById('yearFilters').addEventListener('click', function(event) {
-        if (event.target.tagName === 'BUTTON') {
-            selectedYear = event.target.getAttribute('data-year');
-            marcarSeleccion('yearFilters', selectedYear, 'data-year');
-
-            // Mostrar el contenedor de meses cuando se seleccione un año
-            if (selectedYear) {
-                monthFiltersContainer.style.display = 'block';
-            }
-
-            crearGrafico(selectedYear, selectedMonth);  // Actualizar el gráfico al seleccionar año
-        }
+    // Capturar selección del año
+    document.getElementById('yearFilter').addEventListener('change', function (event) {
+        selectedYear = event.target.value;
+        crearGrafico(selectedYear, selectedActo);
     });
 
-    // Manejar la selección de mes
-    document.getElementById('monthFilters').addEventListener('click', function(event) {
-        if (event.target.tagName === 'BUTTON') {
-            selectedMonth = event.target.getAttribute('data-month');
-            marcarSeleccion('monthFilters', selectedMonth, 'data-month');
-            crearGrafico(selectedYear, selectedMonth);  // Actualizar el gráfico al seleccionar mes
-        }
+    // Capturar selección del tipo de acto litúrgico
+    document.getElementById('actoFilter').addEventListener('change', function (event) {
+        selectedActo = event.target.value;
+        crearGrafico(selectedYear, selectedActo);
     });
 });
 
+// Mapeo de meses
+const meses = [
+    "Enero", "Febrero", "Marzo", "Abril", "Mayo", "Junio",
+    "Julio", "Agosto", "Septiembre", "Octubre", "Noviembre", "Diciembre"
+];
 
-// Función para marcar la selección en los botones
-function marcarSeleccion(containerId, value, dataAttr) {
-    const container = document.getElementById(containerId);
-    Array.from(container.children).forEach(btn => {
-        if (btn.getAttribute(dataAttr) === value) {
-            btn.classList.add('btn-primary');
-            btn.classList.remove('btn-outline-secondary');
-        } else {
-            btn.classList.add('btn-outline-secondary');
-            btn.classList.remove('btn-primary');
-        }
-    });
-}
-
-// Función para cargar los años como botones
-async function cargarAnios() {
-    try {
-        const response = await fetch('/api/obtener_anos');
-        if (!response.ok) throw new Error('Error al obtener los años');
-        
-        const data = await response.json();
-        const yearFilters = document.getElementById('yearFilters');
-        yearFilters.innerHTML = '';  // Limpiar botones previos
-
-        data.data.forEach(element => {
-            const button = document.createElement('button');
-            button.type = 'button';
-            button.className = 'btn btn-outline-secondary';
-            button.setAttribute('data-year', element.año);
-            button.textContent = element.año;
-            yearFilters.appendChild(button);
-        });
-    } catch (error) {
-        console.error("Error al cargar los años:", error);
-    }
-}
-
-// Función para obtener los datos de la API según el año y mes seleccionados
-async function obtenerDatos(year, month) {
-    const url = `/api/celebraciones_por_fecha?year=${year}${month ? `&month=${month}` : ''}`;
+// Función para obtener los datos según el año y acto seleccionados
+async function obtenerDatos(year, acto) {
+    const url = `/api/celebraciones_por_fecha?year=${year}${acto ? `&acto=${acto}` : ''}`;
     try {
         const response = await fetch(url);
         if (!response.ok) throw new Error(`Error en la solicitud: ${response.statusText}`);
-        
+
         const data = await response.json();
         return data;
     } catch (error) {
-        console.error("Error al obtener los datos:", error);
+        console.error('Error al obtener los datos:', error);
         return [];
     }
 }
 
-async function crearGrafico(year, month) {
-    const data = await obtenerDatos(year, month);
+// Función para crear o actualizar el gráfico
+async function crearGrafico(year, acto) {
     const noDataMessage = document.getElementById('noDataMessage');
     const chartContainer = document.getElementById('chartContainer');
     const ctx = document.getElementById('actosLiturgicosChart').getContext('2d');
 
-    const labels = data.length > 0 ? data.map(d => d.acto_liturgico) : ['No hay datos'];
-    const valores = data.length > 0 ? data.map(d => d.num_celebraciones) : [0];
+    // Validar que se hayan seleccionado año y acto
+    if (!year || !acto) {
+        noDataMessage.style.display = 'block';
+        noDataMessage.textContent = "Seleccione un año y un tipo de acto litúrgico para ver el gráfico.";
+        chartContainer.style.display = 'none';
+        return;
+    }
+
+    const data = await obtenerDatos(year, acto);
 
     // Mostrar mensaje si no hay datos
     if (data.length === 0) {
-        noDataMessage.style.display = 'block'; // Asegurarse de que se muestre
-        noDataMessage.style.opacity = '1';    // Restablecer la opacidad inicial
-
-        // Ocultar con una transición suave después de 3 segundos
-        setTimeout(() => {
-            noDataMessage.style.opacity = '0'; // Desvanece el mensaje
-            setTimeout(() => {
-                noDataMessage.style.display = 'none'; // Lo oculta completamente después del desvanecimiento
-            }, 1000); // 1 segundo para coincidir con la transición CSS
-        }, 3000); // Esperar 3 segundos antes de comenzar a desvanecer
+        noDataMessage.style.display = 'block';
+        noDataMessage.textContent = "No hay datos disponibles para los filtros seleccionados.";
+        chartContainer.style.display = 'none';
+        return;
+    } else {
+        noDataMessage.style.display = 'none';
+        chartContainer.style.display = 'block';
     }
 
-    // Asegurarse de que el gráfico se renderice incluso si no hay datos
+    // Crear un objeto con todos los meses inicializados en 0
+    const mesesData = meses.reduce((acc, mes, index) => {
+        acc[index + 1] = 0; // Inicializamos cada mes (1 a 12) con valor 0
+        return acc;
+    }, {});
+
+    // Llenar los meses con los datos obtenidos
+    data.forEach((d) => {
+        mesesData[d.mes] = d.num_celebraciones;
+    });
+
+    // Convertir el objeto a arrays para el gráfico
+    const labels = Object.values(meses); // Nombres de los meses
+    const valores = Object.values(mesesData); // Valores (incluyendo 0 donde no hay datos)
+
     if (window.chartInstance) {
         window.chartInstance.destroy();
     }
 
     window.chartInstance = new Chart(ctx, {
-        type: 'bar',
+        type: 'line',
         data: {
-            labels: labels,
-            datasets: [{
-                label: 'Número de Celebraciones',
-                data: valores,
-                backgroundColor: 'rgba(75, 192, 192, 0.2)',
-                borderColor: 'rgba(75, 192, 192, 1)',
-                borderWidth: 1
-            }]
+            labels: labels, // Nombres de los meses
+            datasets: [
+                {
+                    label: 'Número de Celebraciones',
+                    data: valores,
+                    borderColor: 'rgba(75, 192, 192, 1)',
+                    borderWidth: 2,
+                    fill: false,
+                    pointRadius: 4, // Ajusta el tamaño de los puntos
+                    pointHoverRadius: 6, // Ajusta el tamaño del punto al pasar el cursor
+                },
+            ],
         },
         options: {
             responsive: true,
-            maintainAspectRatio: true,
+            maintainAspectRatio: false,
             scales: {
                 x: {
                     title: {
                         display: true,
-                        text: 'Acto Litúrgico'
-                    }
+                        text: 'Mes',
+                    },
+                    ticks: {
+                        maxRotation: 0, // Mantiene las etiquetas horizontales
+                        minRotation: 0, // Evita la rotación
+                        padding: 5, // Reduce el espacio entre las etiquetas y la línea del eje
+                    },
+                    grid: {
+                        display: false, // Elimina las líneas verticales del grid
+                    },
                 },
                 y: {
                     beginAtZero: true,
                     title: {
                         display: true,
-                        text: 'Número de Celebraciones'
+                        text: 'Número de Celebraciones',
                     },
-                    max: Math.max(10, ...valores) // Asegura un rango adecuado
-                }
+                    ticks: {
+                        precision: 0, // Asegura que los valores del eje Y sean enteros
+                    },
+                },
             },
             plugins: {
                 legend: {
                     display: true,
-                    position: 'top'
+                    position: 'top',
                 },
-                tooltip: {
-                    enabled: true
-                }
-            }
-        }
+            },
+        },
     });
 }

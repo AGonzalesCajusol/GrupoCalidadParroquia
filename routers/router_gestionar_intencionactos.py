@@ -3,7 +3,8 @@ from controladores.controlador_gestionar_intencionactos import (
     obtener_intenciones,
     insertar_intencion,
     actualizar_intencion,
-    eliminar_intencion
+    eliminar_intencion,
+    obtener_tipos_actos_liturgicos
 )
 from controladores.controlador_actosliturgicos import obtener_actos_liturgicos  # Asegúrate de tener esta función
 #router_intencion = Blueprint("router_intencion", __name__)
@@ -11,8 +12,21 @@ def registrar_rutas(app):
     @app.route("/gestionar_intencionactos", methods=["GET"])
     def gestionar_intenciones():
         intenciones = obtener_intenciones()
-        return render_template("actos_liturgicos/gestionar_intencionactos.html", intenciones=intenciones)
+        tipos = obtener_tipos_actos_liturgicos()
+        return render_template("actos_liturgicos/gestionar_intencionactos.html", intenciones=intenciones, tipos=tipos)
 
+    @app.route("/api/tipos", methods=["GET"])
+    def api_tipos_actos_liturgicos():
+        try:
+            tipos = obtener_tipos_actos_liturgicos()
+            lista_tipos = [{"tipo": tipo[1]} for tipo in tipos]  # Asegúrate de que 'tipos' sea una lista de tuplas (id, nombre)
+            return jsonify({"data": lista_tipos})
+        except Exception as e:
+            print(f"Error al obtener tipos de actos litúrgicos: {e}")
+            return jsonify({"error": "Error al obtener los tipos de actos litúrgicos"}), 500
+
+    #Endpoint para obtener todos los tipos (activos e inactivos)
+    
     @app.route("/procesar_insertar_intencion", methods=["POST"])
     def procesar_insertar_intencion():
         nombre_intencion = request.form.get("nombre_intencion")
