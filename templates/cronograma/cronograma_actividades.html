@@ -5,33 +5,63 @@
 {% block cuerpo %}
 <div class="container mt-4">
     <h1 class="text-center">Cronograma de Actividades</h1>
+
+    <!-- Filtro de selección de año -->
+    <div class="mb-4 text-center">
+        <label for="yearSelect">Seleccionar Año:</label>
+        <select id="yearSelect" class="form-control d-inline-block" style="width: 150px;">
+            <option value="2023">2023</option>
+            <option value="2024" selected>2024</option>
+            <option value="2025">2025</option>
+        </select>
+    </div>
+
+    <!-- Contenedor del calendario -->
     <div id="calendar" style="max-width: 100%; margin: 0 auto;"></div>
 </div>
 
 <!-- FullCalendar CSS y JS -->
 <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/fullcalendar@5.11.0/main.min.css">
 <script src="https://cdn.jsdelivr.net/npm/fullcalendar@5.11.0/main.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/fullcalendar@5.11.0/locales/es.js"></script>
 
 <script>
 document.addEventListener('DOMContentLoaded', function() {
     var calendarEl = document.getElementById('calendar');
+    var yearSelect = document.getElementById('yearSelect');
+    
+    // Inicializar el calendario
     var calendar = new FullCalendar.Calendar(calendarEl, {
         initialView: 'dayGridMonth',
-        locale: 'es',
+        locale: 'es', // Cambiar idioma a español
         headerToolbar: {
             left: 'prev,next today',
             center: 'title',
             right: 'dayGridMonth,timeGridWeek,timeGridDay'
         },
-        events: '/api/obtener_actividades',
+        events: function(fetchInfo, successCallback, failureCallback) {
+            // Lógica para filtrar eventos por el año seleccionado
+            var selectedYear = yearSelect.value;
+            fetch('/api/obtener_actividades?year=' + selectedYear) // Ajusta esta URL según tu API
+                .then(response => response.json())
+                .then(events => successCallback(events))
+                .catch(error => failureCallback(error));
+        },
         height: 'auto',
     });
 
+    // Renderizar el calendario
     calendar.render();
+
+    // Cambiar el año y recargar eventos
+    yearSelect.addEventListener('change', function() {
+        calendar.refetchEvents(); // Recargar los eventos en función del nuevo año
+    });
 });
 </script>
 
 <style>
+/* Estilos adicionales */
 #calendar {
     background-color: white;
     border-radius: 8px;
@@ -39,8 +69,55 @@ document.addEventListener('DOMContentLoaded', function() {
     box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
     margin-bottom: 20px;
 }
-.fc-header-toolbar {
-    margin-bottom: 20px;
+
+.fc-toolbar {
+    background-color: #007bff !important;
+    color: white !important;
+    border-radius: 8px;
+    padding: 5px;
+}
+
+.fc-col-header-cell {
+    background-color: #007bff !important;
+    color: white !important;
+}
+
+.fc-daygrid-day {
+    border-color: #007bff !important;
+}
+
+.fc-header-toolbar .fc-button {
+    background-color: #007bff !important;
+    border-color: #007bff !important;
+    color: white !important;
+}
+
+.fc-header-toolbar .fc-button:hover {
+    background-color: #0056b3 !important;
+    border-color: #0056b3 !important;
+}
+
+.fc-button-active {
+    background-color: #0056b3 !important;
+    border-color: #0056b3 !important;
+    color: white !important;
+}
+
+.fc-event {
+    background-color: #007bff !important;
+    border-color: #0056b3 !important;
+    color: white !important;
+}
+
+.fc-day-today {
+    background-color: rgba(0, 123, 255, 0.2) !important;
+    border-color: #007bff !important;
+    color: black !important;
+}
+
+.fc-day-other {
+    background-color: #f0f0f0 !important;
+    color: #6c757d !important;
 }
 </style>
 {% endblock %}
