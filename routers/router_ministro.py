@@ -27,10 +27,7 @@ def registrar_rutas(app):
     @app.route("/insertar_ministro", methods=["POST"])
     def procesar_insertar_ministro():
         try:
-            # Imprimir los datos del formulario para revisar qué se está enviando
-            print("Datos recibidos:", request.form)
-
-            # Capturar los datos del formulario
+            # Capturar y validar los datos del formulario
             nombre = request.form.get("nombre")
             documento = request.form.get("documento")
             nacimiento = request.form.get("nacimiento")
@@ -42,40 +39,47 @@ def registrar_rutas(app):
             contraseña = request.form.get("password")
             confirmar_contraseña = request.form.get("confirmPassword")
 
+            # Validación básica de los campos requeridos
+            if not all([nombre, documento, nacimiento, ordenacion, tipo_ministro_nombre, sede_nombre, cargo_nombre, contraseña, confirmar_contraseña]):
+                return jsonify(success=False, message="Todos los campos son obligatorios"), 400
+
             # Validar que las contraseñas coinciden
-            if not contraseña or not confirmar_contraseña:
-                return jsonify(success=False, message="Las contraseñas no pueden estar vacías"), 400
             if contraseña != confirmar_contraseña:
                 return jsonify(success=False, message="Las contraseñas no coinciden"), 400
 
             # Encriptar la contraseña antes de almacenarla
             contraseña_encriptada = encriptar_contraseña(contraseña)
 
-            # Obtener el id_tipoministro, id_sede y id_cargo a partir del nombre
+            # Obtener los IDs a partir de los nombres proporcionados
             id_tipoministro = obtener_id_tipoMinistro_por_nombre(tipo_ministro_nombre)
             id_sede = obtener_id_sede_por_nombre(sede_nombre)
             id_cargo = obtener_id_cargo_por_nombre(cargo_nombre)
 
-            
-
-
-
-            # Imprimir los IDs para asegurarnos de que están obtenidos correctamente
-            print(f"id_tipoministro: {id_tipoministro}, id_sede: {id_sede}, id_cargo: {id_cargo}")
-
-            if not id_tipoministro or not id_sede or not id_cargo:
-                return jsonify(success=False, message="Datos no válidos para el tipo de ministro, sede o cargo"), 400
+            # Validar que los IDs se obtuvieron correctamente
+            if not id_tipoministro:
+                return jsonify(success=False, message="Tipo de ministro no válido"), 400
+            if not id_sede:
+                return jsonify(success=False, message="Sede no válida"), 400
+            if not id_cargo:
+                return jsonify(success=False, message="Cargo no válido"), 400
 
             # Insertar el ministro en la base de datos
-            insertar_ministro(nombre, documento, nacimiento, ordenacion, actividades, id_tipoministro, id_sede, id_cargo, contraseña_encriptada)
-            return jsonify(success=True)
+            insertar_ministro(
+                nombre, documento, nacimiento, ordenacion, actividades,
+                id_tipoministro, id_sede, id_cargo, contraseña_encriptada
+            )
+
+            # Responder con éxito
+            return jsonify(success=True, message="Ministro registrado exitosamente")
         except Exception as e:
             print(f"Error al insertar ministro: {str(e)}")
-            return jsonify(success=False, message="Error al procesar el ministro: " + str(e)), 500
+            return jsonify(success=False, message=f"Error al procesar el ministro: {str(e)}"), 500
+
 
     @app.route("/procesar_actualizar_ministro", methods=["POST"])
     def procesar_actualizar_ministro():
         try:
+            # Obtener los datos del formulario
             id = request.form["id"]
             nombre = request.form["nombre"]
             documento = request.form["documento"]
@@ -85,30 +89,46 @@ def registrar_rutas(app):
             tipo_ministro_nombre = request.form["id_tipoministro"]
             sede_nombre = request.form["id_sede"]
             cargo_nombre = request.form["id_cargo"]
-            nueva_contraseña = request.form.get("password", None)
-            confirmar_contraseña = request.form.get("confirmPassword", None)
+
+            # Obtener la nueva contraseña y la confirmación
+            nueva_contraseña = request.form.get("password")
+            confirmar_contraseña = request.form.get("confirmPassword")
 
             # Obtener el id_tipoministro, id_sede y id_cargo a partir del nombre
             id_tipoministro = obtener_id_tipoMinistro_por_nombre(tipo_ministro_nombre)
             id_sede = obtener_id_sede_por_nombre(sede_nombre)
             id_cargo = obtener_id_cargo_por_nombre(cargo_nombre)
 
+            # Validar que los IDs se obtuvieron correctamente
             if not id_tipoministro or not id_sede or not id_cargo:
                 return jsonify(success=False, message="Datos no válidos para el tipo de ministro, sede o cargo"), 400
 
-            # Si se proporciona una nueva contraseña, encriptarla
-            if nueva_contraseña and confirmar_contraseña:
+            # Si se proporciona una nueva contraseña, validar y encriptarla
+            contraseña_encriptada = None
+            if nueva_contraseña or confirmar_contraseña:
                 if nueva_contraseña != confirmar_contraseña:
                     return jsonify(success=False, message="Las contraseñas no coinciden"), 400
-                contraseña_encriptada = encriptar_contraseña(nueva_contraseña)
-            else:
-                contraseña_encriptada = None  # No se actualiza la contraseña
+                if nueva_contraseña:
+                    contraseña_encriptada = encriptar_contraseña(nueva_contraseña)
 
             # Actualizar el ministro en la base de datos
-            actualizar_ministro(nombre, documento, nacimiento, ordenacion, actividades, id_tipoministro, id_sede, id_cargo, id, contraseña_encriptada)
+            actualizar_ministro(
+                nombre,
+                documento,
+                nacimiento,
+                ordenacion,
+                actividades,
+                id_tipoministro,
+                id_sede,
+                id_cargo,
+                id,
+                contraseña_encriptada  # Solo se actualizará si se proporcionó una nueva contraseña
+            )
             return jsonify(success=True)
         except Exception as e:
+            print(f"Error al actualizar ministro: {str(e)}")
             return jsonify(success=False, message=str(e)), 500
+
 
     # Procesar la eliminación de un ministro
     @app.route("/eliminar_ministro", methods=["POST"])
@@ -132,3 +152,4 @@ def registrar_rutas(app):
                 return jsonify(success=True)
             except Exception as e:
                 return jsonify(success=False, message="Error al actualizar el tipo de ministro: " + str(e))
+

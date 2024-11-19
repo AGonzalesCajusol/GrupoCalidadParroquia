@@ -6,14 +6,6 @@ def generar_token():
     # Genera un token alfanumérico aleatorio de 20 caracteres
     return secrets.token_hex(10)
 
-def encriptar_contraseña(contraseña):
-    # Encripta la contraseña usando SHA-256
-    print(f"Encriptando la contraseña: {contraseña}")  # Añadimos un print para ver la contraseña antes de encriptar
-    sha_signature = hashlib.sha256(contraseña.encode('utf8')).hexdigest()
-    print(f"Resultado de la encriptación: {sha_signature}")  # Añadimos un print para ver la contraseña encriptada
-    return sha_signature
-
-
 def insertar_ministro(nombre_ministro, numero_documento, fecha_nacimiento, fecha_ordenacion, fin_actividades, tipoministro, id_sede, id_cargo, contraseña_encriptada):
     token = generar_token()  # Genera un token aleatorio
     conexion = obtener_conexion()
@@ -40,31 +32,55 @@ def insertar_ministro(nombre_ministro, numero_documento, fecha_nacimiento, fecha
     finally:
         conexion.close()  # Asegurarse de cerrar la conexión
 
+
+def encriptar_contraseña(contraseña):
+    # Encripta la contraseña usando SHA-256
+    print(f"Encriptando la contraseña: {contraseña}")  # Añadimos un print para ver la contraseña antes de encriptar
+    sha_signature = hashlib.sha256(contraseña.encode('utf8')).hexdigest()
+    print(f"Resultado de la encriptación: {sha_signature}")  # Añadimos un print para ver la contraseña encriptada
+    return sha_signature
+
+
+
 def actualizar_ministro(nombre_ministro, numero_documento, fecha_nacimiento, fecha_ordenacion, fin_actividades, tipoministro, id_sede, id_cargo, id_ministro, contraseña_encriptada=None):
     conexion = obtener_conexion()
     try:
         with conexion.cursor() as cursor:
-            if contraseña_encriptada:  # Si se proporciona una contraseña, encriptarla y actualizarla
-                cursor.execute("""
-                    UPDATE ministro 
-                    SET nombre_ministro = %s, numero_documento = %s, fecha_nacimiento = %s, fecha_ordenacion = %s, fin_actividades = %s, tipoministro = %s, id_sede = %s, id_cargo = %s, contraseña = %s
-                    WHERE id_ministro = %s
-                """, (nombre_ministro, numero_documento, fecha_nacimiento, fecha_ordenacion, fin_actividades, tipoministro, id_sede, id_cargo, contraseña_encriptada, id_ministro))
-            else:
-                # Si no se proporciona contraseña, actualizar solo los otros campos
-                cursor.execute("""
-                    UPDATE ministro 
-                    SET nombre_ministro = %s, numero_documento = %s, fecha_nacimiento = %s, fecha_ordenacion = %s, fin_actividades = %s, tipoministro = %s, id_sede = %s, id_cargo = %s
-                    WHERE id_ministro = %s
-                """, (nombre_ministro, numero_documento, fecha_nacimiento, fecha_ordenacion, fin_actividades, tipoministro, id_sede, id_cargo, id_ministro))
-        
-        # Confirmar la transacción
+            # Construir la base de la consulta de actualización
+            query = """
+                UPDATE ministro 
+                SET nombre_ministro = %s, 
+                    numero_documento = %s, 
+                    fecha_nacimiento = %s, 
+                    fecha_ordenacion = %s, 
+                    fin_actividades = %s, 
+                    tipoministro = %s, 
+                    id_sede = %s, 
+                    id_cargo = %s
+            """
+            params = [nombre_ministro, numero_documento, fecha_nacimiento, fecha_ordenacion, fin_actividades, tipoministro, id_sede, id_cargo]
+
+            # Si se proporciona una nueva contraseña, agregarla a la consulta
+            if contraseña_encriptada:
+                query += ", contraseña = %s"
+                params.append(contraseña_encriptada)
+
+            # Agregar la cláusula WHERE para actualizar el ministro específico
+            query += " WHERE id_ministro = %s"
+            params.append(id_ministro)
+
+            # Ejecutar la consulta
+            cursor.execute(query, tuple(params))
+
+        # Confirmar la transacción si no hubo errores
         conexion.commit()
     except Exception as e:
         print(f"Error al actualizar ministro: {e}")
         conexion.rollback()  # Revertir la transacción en caso de error
+        raise  # Lanzar la excepción para manejarla externamente si es necesario
     finally:
         conexion.close()  # Asegurarse de cerrar la conexión
+
 
 # Las demás funciones no necesitan modificaciones
 def obtener_ministros():

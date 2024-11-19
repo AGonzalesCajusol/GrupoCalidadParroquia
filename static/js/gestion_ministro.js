@@ -23,14 +23,16 @@ function openModal(type, id = null, nombre = '', documento = '', nacimiento = ''
 
     if (type === 'add') {
         modalTitle = 'Agregar Ministro';
-        formAction = '/insertar_ministro';  // Asegúrate de que coincida con la ruta de Flask
+        formAction = '/insertar_ministro';
         limpiarModal();
+        // Mostrar los campos de contraseña al agregar
         document.getElementById('passwordSection').style.display = 'block';
         document.getElementById('confirmPasswordSection').style.display = 'block';
+        document.getElementById('password').required = true;
+        document.getElementById('confirmPassword').required = true;
     } else if (type === 'edit') {
         modalTitle = 'Editar Ministro';
-        formAction = '/procesar_actualizar_ministro';  // Asegúrate de que coincida con la ruta de Flask
-        isReadOnly = false;
+        formAction = '/procesar_actualizar_ministro';
         document.getElementById('ministroId').value = id;
         document.getElementById('nombre').value = nombre;
         document.getElementById('documento').value = documento;
@@ -40,12 +42,16 @@ function openModal(type, id = null, nombre = '', documento = '', nacimiento = ''
         document.getElementById('id_tipoministro').value = tipo;
         document.getElementById('id_sede').value = sede;
         document.getElementById('id_cargo').value = cargo;
-        document.getElementById('passwordSection').style.display = 'block';
-        document.getElementById('confirmPasswordSection').style.display = 'block';
+
+        // Ocultar campos de contraseña al editar
+        document.getElementById('passwordSection').style.display = 'none';
+        document.getElementById('confirmPasswordSection').style.display = 'none';
+        document.getElementById('password').required = false;
+        document.getElementById('confirmPassword').required = false;
     } else if (type === 'view') {
         modalTitle = 'Ver Ministro';
-        formAction = '';  // No habrá acción de envío de formulario
-        isReadOnly = true;  // Marcar todos los campos como solo lectura
+        formAction = '';
+        isReadOnly = true;
         document.getElementById('ministroId').value = id;
         document.getElementById('nombre').value = nombre;
         document.getElementById('documento').value = documento;
@@ -55,24 +61,19 @@ function openModal(type, id = null, nombre = '', documento = '', nacimiento = ''
         document.getElementById('id_tipoministro').value = tipo;
         document.getElementById('id_sede').value = sede;
         document.getElementById('id_cargo').value = cargo;
+
+        // Ocultar los campos de contraseña en modo "Ver"
         document.getElementById('passwordSection').style.display = 'none';
-        document.getElementById('confirmPasswordSection').style.display = 'none';  // Ocultar los campos de contraseña en modo "Ver"
+        document.getElementById('confirmPasswordSection').style.display = 'none';
     }
 
-    // Configurar el modal
     document.getElementById('ministroModalLabel').innerText = modalTitle;
     document.getElementById('ministroForm').action = formAction;
 
-    // Hacer todos los campos de solo lectura si es el modo "Ver"
-    document.querySelectorAll('#ministroForm input, #ministroForm select').forEach(function (input) {
-        input.readOnly = isReadOnly;
-        input.disabled = isReadOnly;
-    });
-
-    // Mostrar el modal
     var ministroModal = new bootstrap.Modal(document.getElementById('ministroModal'));
     ministroModal.show();
 }
+
 
 
 function eliminarMinistro(id) {
@@ -133,3 +134,40 @@ function limpiarModal() {
     document.getElementById('password').value = '';
     document.getElementById('confirmPassword').value = '';
 }
+
+
+// Escuchar el evento de envío del formulario del ministro
+document.addEventListener('DOMContentLoaded', function () {
+    const ministroForm = document.getElementById('ministroForm');
+
+    if (ministroForm) {
+        ministroForm.addEventListener('submit', function (event) {
+            event.preventDefault(); // Prevenir el envío predeterminado del formulario
+
+            const form = this;
+            const url = form.action;
+            const formData = new FormData(form);
+
+            // Enviar el formulario usando fetch
+            fetch(url, {
+                method: 'POST',
+                body: formData
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.success) {
+                    alert('Ministro registrado exitosamente');
+                    location.reload(); // Recargar la página si el registro fue exitoso
+                } else {
+                    alert('Error al registrar ministro: ' + data.message);
+                }
+            })
+            .catch(error => {
+                console.error('Error:', error);
+                alert('Ocurrió un error al procesar la solicitud');
+            });
+        });
+    }
+});
+
+

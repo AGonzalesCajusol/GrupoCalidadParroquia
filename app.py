@@ -18,6 +18,7 @@ import routers.router_cargo
 import routers.router_egresos
 import routers.router_charlas
 import routers.router_programacion
+import routers.router_celebracionesR
 app = Flask(__name__)
 app.secret_key = 'super-secret'
 
@@ -66,7 +67,7 @@ routers.router_actosliturgicos.registrar_rutas(app)
 routers.router_feligres.registrar_rutas(app)
 
 routers.router_tema.registrar_rutas(app)
-
+routers.router_celebracionesR.registrar_rutas(app)
 routers.router_celebracion.registrar_rutas(app)
 
 routers.router_programacion.registrar_rutas(app)

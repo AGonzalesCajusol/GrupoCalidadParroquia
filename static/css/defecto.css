@@ -489,3 +489,15 @@ table.dataTable tbody td {
     /* Ajuste del color del borde */
 }
 
+.btn-asistencia {
+    background-color: transparent !important; /* Sin fondo */
+    border: none !important; /* Sin borde */
+    box-shadow: none !important; /* Sin sombra */
+    padding: 0; /* Sin relleno */
+    cursor: pointer;
+}
+
+.btn-asistencia i {
+    color: #28a745; /* Color del ícono */
+    font-size: 24px; /* Tamaño del ícono */
+}
