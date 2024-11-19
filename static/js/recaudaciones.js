@@ -115,7 +115,7 @@ $(document).ready(function () {
                         </div>
                         <div class="d-flex align-items-center">
                         <label for="buscar" class="me-2">Buscar:</label>
-                        <input type="search" id="buscar" style="flex-grow: 1; max-width: 400px;" placeholder="" aria-controls="recaudacionesTable">
+                        <input type="search" id="buscar" style="flex-grow: 1; max-width: 200px; height: 37.5px; padding: 5px;" placeholder="" aria-controls="recaudacionesTable">
                         </div>
                     `);
                     $('#buscar').on('keyup', function() {
@@ -128,13 +128,17 @@ $(document).ready(function () {
 
             // Opciones para el filtro de tipo
             let opcionesTipo = '<option value="">Todos</option>';
-            fetch("/api/tipos")
+            fetch("/api/tipos_todos")
                 .then(response => response.json())
                 .then(response => {
-                    response.data.forEach(element => {
-                        const tipoNombre = element.tipo[1];  // Solo usa el nombre, ignorando el ID
-                        opcionesTipo += `<option value="${tipoNombre}">${tipoNombre}</option>`;
-                    });
+                    if (response.data) {
+                        response.data.forEach(element => {
+                            opcionesTipo += `<option value="${element.tipo}">${element.tipo}</option>`;
+                        });
+            
+                        // Insertar las opciones en el select ya existente
+                        $('#filtroTipo').html(opcionesTipo);
+                    }
                 })
                 .catch(error => {
                     console.error("Error al cargar los tipos:", error);
@@ -338,6 +342,13 @@ function abrirModalRecaudacion(type, id = null, fecha = '', hora = '', monto = '
             document.getElementById('hora').value = hora;
             document.getElementById('fechaContainer').style.display = 'block';
             document.getElementById('horaContainer').style.display = 'block';
+            //alert(tipo_recaudacion);
+            const select = document.getElementById('id_tipo_recaudacion');
+            if (!select.querySelector(`option[value="${tipo_recaudacion}"]`)) {
+                select.innerHTML += `<option value="${tipo_recaudacion}">${tipo_recaudacion}</option>`;
+              }
+            //document.getElementById('id_tipo_recaudacion').add = ("tipo_recaudacion");
+
         } else {
             document.getElementById('fecha').value = '';
             document.getElementById('hora').value = '';

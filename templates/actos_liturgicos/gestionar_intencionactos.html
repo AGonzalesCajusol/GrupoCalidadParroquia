@@ -33,14 +33,15 @@
                         <i class="fas fa-edit"></i>
                     </button>
 
-                    <form id="form-eliminar-{{ intencion[0] }}" style="display:inline-block;" title="Eliminar"
+                    <form id="form-eliminar-{{ intencion[0] }}" style="display:inline-block;" title="Eliminar" 
                     onsubmit="eliminarIntencion(event, '{{ intencion[0] }}')">
-                    <input type="hidden" name="id" value="{{ intencion[0] }}">
-                    <button type="submit" class="btn btn-danger btn-sm"
-                            onclick="return confirm('¿Estás seguro de que deseas eliminar esta intención?');">
-                        <i class="fas fa-trash-alt"></i>
-                    </button>
+                        <input type="hidden" name="id" value="{{ intencion[0] }}">
+                        <button type="submit" class="btn btn-danger btn-sm">
+                        
+                            <i class="fas fa-trash-alt"></i>
+                        </button>
                     </form>
+                    
                 </td>
             </tr>
             {% endfor %}
@@ -65,7 +66,7 @@
                     <div class="mb-3">
                         <label for="id_actoliturgico" class="form-label">Acto Litúrgico</label>
                         <select class="form-select" id="id_actoliturgico" name="id_actoliturgico" required>
-                            {% for acto in actos %}
+                            {% for acto in intenciones %}
                                 <option value="{{ acto[0] }}">{{ acto[1] }}</option> <!-- `acto[1]` es el nombre -->
                             {% endfor %}
                         </select>                                                                       

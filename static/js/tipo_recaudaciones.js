@@ -31,7 +31,7 @@ function abrirModalTipoRecaudacion(accion, id = '', nombre = '', tipo = '1', est
 
     // Limpiar y configurar el modal según la acción
     if (accion === 'agregar') {
-        modalTitle.textContent = 'Agregar Tipo de Recaudación';
+        modalTitle.textContent = 'Agregar tipo de recaudación';
         submitBtn.textContent = 'Guardar';
         submitBtn.style.display = 'block';
         formRecaudacion.setAttribute('action', insertarTipoRecaudacionURL);
@@ -48,7 +48,7 @@ function abrirModalTipoRecaudacion(accion, id = '', nombre = '', tipo = '1', est
         document.getElementById('estado').setAttribute('disabled', true); // Estado fijo en activo al agregar
 
     } else if (accion === 'ver') {
-        modalTitle.textContent = 'Ver Tipo de Recaudación';
+        modalTitle.textContent = 'Ver tipo de recaudación';
         submitBtn.style.display = 'none'; // Ocultar botón de guardar en el modo de visualización
         formRecaudacion.setAttribute('action', '');
 
@@ -64,7 +64,7 @@ function abrirModalTipoRecaudacion(accion, id = '', nombre = '', tipo = '1', est
         document.getElementById('estado').setAttribute('disabled', true);
 
     } else if (accion === 'editar') {
-        modalTitle.textContent = 'Editar Tipo de Recaudación';
+        modalTitle.textContent = 'Editar tipo de recaudación';
         submitBtn.textContent = 'Guardar cambios';
         submitBtn.style.display = 'block';
         formRecaudacion.setAttribute('action', actualizarTipoRecaudacionURL);

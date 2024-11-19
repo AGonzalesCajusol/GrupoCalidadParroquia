@@ -165,11 +165,42 @@ def obtener_tipos_recaudacion():
     try:
         with conexion.cursor() as cursor:
             # Solo selecciona los tipos de recaudación donde estado = 1
-            cursor.execute("SELECT id_tipo_recaudacion, nombre_recaudacion FROM tipo_recaudacion WHERE estado = 1")
+            cursor.execute("""
+                SELECT DISTINCT tr.id_tipo_recaudacion, tr.nombre_recaudacion 
+                FROM recaudacion r
+                JOIN tipo_recaudacion tr ON r.id_tipo_recaudacion = tr.id_tipo_recaudacion
+                WHERE tr.estado = 1
+            """)
             tipos_recaudacion = cursor.fetchall()
         return tipos_recaudacion
     except Exception as e:
         print(f"Error al obtener tipos de recaudación: {e}")
+        return []
+    finally:
+        conexion.close()
+        
+def obtener_todos_los_tipos_recaudacion():
+    conexion = obtener_conexion()
+    try:
+        with conexion.cursor() as cursor:
+            cursor.execute("SELECT id_tipo_recaudacion, nombre_recaudacion FROM tipo_recaudacion")
+            tipos_recaudacion = cursor.fetchall()
+        return tipos_recaudacion
+    except Exception as e:
+        print(f"Error al obtener todos los tipos de recaudación: {e}")
+        return []
+    finally:
+        conexion.close()
+
+def obtener_tipos_recaudacion_activos():
+    conexion = obtener_conexion()
+    try:
+        with conexion.cursor() as cursor:
+            cursor.execute("SELECT id_tipo_recaudacion, nombre_recaudacion FROM tipo_recaudacion WHERE estado = 1")
+            tipos_recaudacion = cursor.fetchall()
+        return tipos_recaudacion
+    except Exception as e:
+        print(f"Error al obtener tipos de recaudación activos: {e}")
         return []
     finally:
         conexion.close()

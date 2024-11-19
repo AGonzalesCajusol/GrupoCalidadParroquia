@@ -1,0 +1,43 @@
+{% extends "index.html" %}
+{% block title %}Gestión de Celebraciones{% endblock %}
+{% block cuerpo %}
+
+<div class="container mt-4">
+    <h1>Marcar Asistencia por Acto Litúrgico</h1>
+    
+    <!-- Botón para seleccionar/deseleccionar todas las asistencias -->
+    <button class="btn btn-primary mb-3" onclick="toggleAllCheckboxes()">Seleccionar/Deseleccionar Todos</button>
+
+    <form id="asistenciaForm">
+        <table class="table table-hover table-striped">
+            <thead>
+                <tr>
+                    <th>ID Solicitud</th>
+                    <th>ID Celebración</th>
+                    <th>DNI Feligres</th>
+                    <th>Estado</th>
+                    <th>Asistencia</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for solicitud in solicitudes %}
+                <tr>
+                    <td>{{ solicitud.id_solicitud }}</td>
+                    <td>{{ solicitud.id_celebracion }}</td>
+                    <td>{{ solicitud.dni_feligres }}</td>
+                    <td>{{ solicitud.estado }}</td>
+                    <td>
+                        <input type="checkbox" class="asistencia-checkbox" 
+                               data-id="{{ solicitud.id_solicitud }}" 
+                               {% if solicitud.asistencia == 1 %}checked{% endif %}>
+                    </td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+        <button type="button" class="btn btn-success" onclick="guardarAsistencias()">Guardar Asistencias</button>
+    </form>
+</div>
+
+<script src="/static/js/gestionar_asistencias_celebracion.js"></script>
+{% endblock %}

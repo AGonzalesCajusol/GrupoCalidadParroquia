@@ -12,7 +12,9 @@ from controladores.controlador_recaudaciones import (
     obtener_recaudaciones_por_año,
     obtener_id_tipoR_por_nombre,
     actualizar_recaudacion,
-    eliminar_recaudacion
+    eliminar_recaudacion,
+    obtener_todos_los_tipos_recaudacion,
+    obtener_tipos_recaudacion_activos
 )
 from routers.router_main import requerido_login
 
@@ -145,9 +147,31 @@ def registrar_rutas(app):
     @app.route("/api/tipos", methods=["GET"])
     def api_tipos():
         try:
-            tipos = obtener_tipos_recaudacion()  # Esta función debe devolver una lista de tipos
-            lista_tipos = [{"tipo": tipo} for tipo in tipos]  # Asegúrate de que 'tipos' esté en el formato correcto
+            tipos = obtener_tipos_recaudacion()
+            lista_tipos = [{"tipo": tipo[1]} for tipo in tipos]  # Asegúrate de que 'tipos' sea una lista de tuplas (id, nombre)
             return jsonify({"data": lista_tipos})
         except Exception as e:
             print(f"Error al obtener tipos de recaudación: {e}")
             return jsonify({"error": "Error al obtener los tipos de recaudación"}), 500
+    #Endpoint para obtener todos los tipos (activos e inactivos)
+    @app.route("/api/tipos_todos", methods=["GET"])
+    def api_tipos_todos():
+        try:
+            tipos = obtener_todos_los_tipos_recaudacion()
+            lista_tipos = [{"tipo": tipo[1]} for tipo in tipos]
+            return jsonify({"data": lista_tipos})
+        except Exception as e:
+            print(f"Error al obtener todos los tipos de recaudación: {e}")
+            return jsonify({"error": "Error al obtener los tipos de recaudación"}), 500
+    #Endpoint para obtener solo los tipos activos
+    @app.route("/api/tipos_activos", methods=["GET"])
+    def api_tipos_activos():
+        try:
+            tipos = obtener_tipos_recaudacion_activos()
+            lista_tipos = [{"tipo": tipo[1]} for tipo in tipos]
+            return jsonify({"data": lista_tipos})
+        except Exception as e:
+            print(f"Error al obtener tipos de recaudación activos: {e}")
+            return jsonify({"error": "Error al obtener los tipos de recaudación activos"}), 500
+
+
