@@ -170,6 +170,23 @@ def eliminaracto_requisitos(id):
     finally:
         conexion.close()
 
+def obtener_actos_liturgicos():
+    conexion = obtener_conexion()
+    try:
+        with conexion.cursor() as cursor:
+            cursor.execute("""
+                SELECT id_actoliturgico, nombre_liturgia
+                FROM actoliturgico
+                WHERE estado = '1'
+            """)
+            actos = cursor.fetchall()
+        return actos
+    except Exception as e:
+        print(f"Error al obtener actos litúrgicos: {e}")
+        return []
+    finally:
+        conexion.close()
+
 def obtener_acto():
     conexion = obtener_conexion()
     with conexion.cursor() as cursor:
