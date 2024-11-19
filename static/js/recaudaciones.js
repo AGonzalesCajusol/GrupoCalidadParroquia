@@ -128,7 +128,7 @@ $(document).ready(function () {
 
             // Opciones para el filtro de tipo
             let opcionesTipo = '<option value="">Todos</option>';
-            fetch("/api/tipos")
+            fetch("/api/tipos_todos")
                 .then(response => response.json())
                 .then(response => {
                     if (response.data) {
@@ -342,6 +342,8 @@ function abrirModalRecaudacion(type, id = null, fecha = '', hora = '', monto = '
             document.getElementById('hora').value = hora;
             document.getElementById('fechaContainer').style.display = 'block';
             document.getElementById('horaContainer').style.display = 'block';
+            document.getElementById('id_tipo_recaudacion').add = ("tipo_recaudacion");
+
         } else {
             document.getElementById('fecha').value = '';
             document.getElementById('hora').value = '';
