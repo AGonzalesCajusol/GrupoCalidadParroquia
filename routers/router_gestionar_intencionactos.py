@@ -23,7 +23,7 @@ def registrar_rutas(app):
             flash("Intención insertada con éxito", "success")
         else:
             flash("Error al insertar intención", "danger")
-        return redirect(url_for("router_intencion.gestionar_intenciones"))
+        return redirect(url_for("gestionar_intenciones"))
 
     @app.route("/procesar_actualizar_intencion", methods=["POST"])
     def procesar_actualizar_intencion():
@@ -36,7 +36,7 @@ def registrar_rutas(app):
             flash("Intención actualizada con éxito", "success")
         else:
             flash("Error al actualizar intención", "danger")
-        return redirect(url_for("router_intencion.gestionar_intenciones"))
+        return redirect(url_for("gestionar_intenciones"))
 
     @app.route("/eliminar_intencion/<int:id_intencion>", methods=["POST"])
     def procesar_eliminar_intencion(id_intencion):
@@ -44,4 +44,4 @@ def registrar_rutas(app):
             flash("Intención eliminada con éxito", "success")
         else:
             flash("Error al eliminar intención", "danger")
-        return redirect(url_for("router_intencion.gestionar_intenciones"))
+        return redirect(url_for("gestionar_intenciones"))
