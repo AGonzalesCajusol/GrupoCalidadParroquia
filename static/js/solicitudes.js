@@ -1,347 +1,1069 @@
-let datos_pago = '';
-document.addEventListener('DOMContentLoaded', function() {
-    'listar_solicitudes();'
-});
-
-
-function exportarTablaPDF() {
-    const tabla = document.getElementById('miTabla');
-    const tabla2 = tabla.cloneNode(true); // Clona la tabla existente
-    tabla2.id = 'miTablaClonada';
-
-    html2pdf(tabla2, {
-        margin: 1,
-        filename: 'tabla_excluyendo_columna.pdf',
-        image: { type: 'jpeg', quality: 1 },
-        html2canvas: { scale: 2 },
-        jsPDF: { unit: 'cm', format: 'a4', orientation: 'portrait' }
-    });
-}
-function visualizar_calendario(id_fecha) {
-    var tbody = document.getElementById('calendario_cuerpo');
-    var id_charla = document.getElementById(id_fecha).value;
-    fetch(`/calendario_solicitud/${id_charla}`)
-        .then(data => data.json())
-        .then(item => {
-            tbody.innerHTML = '';
-            item.forEach(elemento => {
-                var tr = document.createElement('tr');
-
-                var tdId = document.createElement('td');
-                tdId.textContent = elemento.id;
-                tdId.classList.add('ocultar');
-                tr.appendChild(tdId);
-
-                var tdDescripcion = document.createElement('td');
-                tdDescripcion.textContent = elemento.descripcion;
-                tr.appendChild(tdDescripcion);
-
-                var tdFecha = document.createElement('td');
-                tdFecha.textContent = elemento.fecha;
-                tr.appendChild(tdFecha);
-
-                var tdHoraInicio = document.createElement('td');
-                tdHoraInicio.textContent = elemento.hora_inicio;
-                tr.appendChild(tdHoraInicio);
-
-                var tdHoraFin = document.createElement('td');
-                tdHoraFin.textContent = elemento.hora_fin;
-                tr.appendChild(tdHoraFin);
-
-                tbody.appendChild(tr);
-            });
-        })
-
-    document.getElementById('requi_actos').classList.add("d-none");
-    document.getElementById('contenido_calendario_celebracion').classList.remove("d-none");
-}
-function retornar(){
-    document.getElementById('contenido_calendario_celebracion').classList.add("d-none");
-    document.getElementById('requi_actos').classList.remove("d-none");
-}
-function verificar() {
-    var id_acto = document.getElementById('acto_seleccionado');
-    var requi_actos = document.getElementById('requi_actos');
-    if (id_acto.value == "") {
-        requi_actos.classList.add("d-none");
-    } else {
-        listar_formulario(id_acto.value);
-        requi_actos.classList.remove("d-none")
-    }
-}
-function visualizar(id_imagen) {
-    const imagen_formulario = document.getElementById(id_imagen).files[0];
-    const imagen_modal = document.getElementById('imagen_modal');
-
-    if (imagen_formulario && imagen_formulario.name.length > 0) {
-        const objUrl = URL.createObjectURL(imagen_formulario);
-        imagen_modal.src = objUrl;
-
-        var myModal = new bootstrap.Modal(document.getElementById('myModal'));
-        myModal.show();
-    }
-}
-
-function listar_formulario(id_acto) {
-    const tbody = document.getElementById('datos_solicitud');
-    var acto = document.getElementById('acto_seleccionado').value;
-    tbody.innerHTML = '';
-    fetch(`/requisitosXacto/${id_acto}`)
-        .then(response => response.json())
-        .then(elemento => {
-            elemento.forEach(element=> {
-                const tr = document.createElement('tr');
-                tr.innerHTML = `
-                    <td>${element.nombre_requisito}</td>
-                    <td>
-                        ${obtenerInputPorTipo(element.tipo, element.maximo, element.minimo, element.id_requisito, element.nivel)}
-                    </td>
-                    <td>
-                        <input  type="checkbox"  ${element.tipo == "Dni" ? `onclick="validar_dni('${element.id_requisito}', '${element.id_estador}')"` : ''}   name="${element.id_estador}" id="${element.id_estador}" ${element.nivel[0] == 'O' || element.tipo == "Sede" || element.tipo == "Charla" ? 'required' : ''}>
-                        <label for="">Validado</label>
-                    </td>
-                    <td>
-                        ${
+    var plantilla_matrimonio =  
+    `
+        <tr>
+                        <td>Copia del DNI del novio</td>
+                        <td>
+                            <input id="copia_dninovio" name="copia_dninovio" type="file" class="form-control" accept="image/*,application/pdf" >
+                        </td>
+                        <td>
+                            <input type="checkbox" name="es_copia_dninovio" id="es_copia_dninovio">
+                            <label for="">Validado</label>
+                        </td>
+                        <td>
                             
-                            element.tipo === 'Charla' 
-                            ? `
-                                <button class="btn btn-primary" type="button" onclick="visualizar_calendario('${element.id_requisito}')">
-                                    <i class="bi bi-calendar3"></i>
-                                </button>
-                            `
-                            : (element.tipo == 'Imagen' ) 
-                                ? `
-                                    <button type="button" class="btn btn-primary btn-sm" title="Ver" onclick="visualizar('${element.id_requisito}')">
-                                        <i class="fas fa-eye"></i>
+                            <button type="button" class="btn btn-primary btn-sm" title="Ver" onclick="visualizar('copia_dninovio')">
+                                <svg class="svg-inline--fa fa-eye" aria-hidden="true" focusable="false" data-prefix="fas" data-icon="eye" role="img" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 576 512" data-fa-i2svg=""><path fill="currentColor" d="M572.5 238.1C518.3 115.5 410.9 32 288 32S57.69 115.6 3.469 238.1C1.563 243.4 0 251 0 256c0 4.977 1.562 12.6 3.469 17.03C57.72 396.5 165.1 480 288 480s230.3-83.58 284.5-206.1C574.4 268.6 576 260.1 576 256C576 251 574.4 243.4 572.5 238.1zM432 256c0 79.45-64.47 144-143.9 144C208.6 400 144 335.5 144 256S208.5 112 288 112S432 176.5 432 256zM288 160C285.7 160 282.4 160.4 279.5 160.8C284.8 170 288 180.6 288 192c0 35.35-28.65 64-64 64C212.6 256 201.1 252.7 192.7 247.5C192.4 250.5 192 253.6 192 256c0 52.1 43 96 96 96s96-42.99 96-95.99S340.1 160 288 160z"></path></svg><!-- <i class="fas fa-eye"></i> Font Awesome fontawesome.com -->
+                            </button>
+                                    
+                        </td>
+                    </tr><tr>
+                        <td>DNI del novio</td>
+                        <td>
+                            
+                    <div class="d-flex">
+                        <div class="col-5">
+                            <input id="dni_novio" name="dni_novio" oninput="desabilitar('es_dni_novio')" required="" type="number" max="99999999" min="10000000" class="form-control" placeholder="Ingrese un número">  
+                        </div>
+                        <div class="col-6">
+                            <input type="text" id="Feligresdni_novio" name="Feligresdni_novio" class="form-control" placeholder="Nombre del feligres" readonly="" disabled="">
+                        </div>
+                    </div>
+                
+                        </td>
+                        <td>
+                            <input type="checkbox" onclick="validar_dni('dni_novio', 'es_dni_novio', 'Feligresdni_novio' )" name="es_dni_novio" id="es_dni_novio" required="">
+                            <label for="">Validado</label>
+                        </td>
+                        <td>
+                            
+                        </td>
+                    </tr><tr>
+                        <td>Copia del DNI de la novia</td>
+                        <td>
+                            <input id="copia_dninovia" name="copia_dninovia" type="file" class="form-control" accept="image/*,application/pdf">
+                        </td>
+                        <td>
+                            <input type="checkbox" name="es_copia_dninovia" id="es_copia_dninovia">
+                            <label for="">Validado</label>
+                        </td>
+                        <td>                      
+                            <button type="button" class="btn btn-primary btn-sm" title="Ver" onclick="visualizar('copia_dninovia')">
+                                <svg class="svg-inline--fa fa-eye" aria-hidden="true" focusable="false" data-prefix="fas" data-icon="eye" role="img" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 576 512" data-fa-i2svg=""><path fill="currentColor" d="M572.5 238.1C518.3 115.5 410.9 32 288 32S57.69 115.6 3.469 238.1C1.563 243.4 0 251 0 256c0 4.977 1.562 12.6 3.469 17.03C57.72 396.5 165.1 480 288 480s230.3-83.58 284.5-206.1C574.4 268.6 576 260.1 576 256C576 251 574.4 243.4 572.5 238.1zM432 256c0 79.45-64.47 144-143.9 144C208.6 400 144 335.5 144 256S208.5 112 288 112S432 176.5 432 256zM288 160C285.7 160 282.4 160.4 279.5 160.8C284.8 170 288 180.6 288 192c0 35.35-28.65 64-64 64C212.6 256 201.1 252.7 192.7 247.5C192.4 250.5 192 253.6 192 256c0 52.1 43 96 96 96s96-42.99 96-95.99S340.1 160 288 160z"></path></svg><!-- <i class="fas fa-eye"></i> Font Awesome fontawesome.com -->
+                            </button>        
+                        </td>
+                    </tr><tr>
+                        <td>DNI de la novia</td>
+                        <td>
+                            
+                    <div class="d-flex">
+                        <div class="col-5">
+                            <input id="dni_novia" name="dni_novia" oninput="desabilitar('es_dni_novia')" required="" type="number" max="99999999" min="10000000" class="form-control" placeholder="Ingrese un número">  
+                        </div>
+                        <div class="col-6">
+                            <input type="text" id="Feligresdni_novia" name="Feligresdni_novia" class="form-control" placeholder="Nombre del feligres" readonly="" disabled="">
+                        </div>
+                    </div>
+                
+                        </td>
+                        <td>
+                            <input type="checkbox" onclick="validar_dni('dni_novia', 'es_dni_novia','Feligresdni_novia')" name="es_dni_novia" id="es_dni_novia" required="">
+                            <label for="">Validado</label>
+                        </td>
+                        <td>
+                            
+                        </td>
+                    </tr><tr>
+                        <td>DNI del primer testigo</td>
+                        <td>
+                            
+                    <div class="d-flex">
+                        <div class="col-5">
+                            <input id="dni_testigo1" name="dni_testigo1" oninput="desabilitar('es_dni_testigo1')" required="" type="number" max="99999999" min="10000000" class="form-control" placeholder="Ingrese un número">  
+                        </div>
+                        <div class="col-6">
+                            <input type="text" id="Feligresdni_testigo1" name="Feligresdni_testigo1" class="form-control" placeholder="Nombre del feligres" readonly="" disabled="">
+                        </div>
+                    </div>
+                
+                        </td>
+                        <td>
+                            <input type="checkbox" onclick="validar_dni('dni_testigo1', 'es_dni_testigo1','Feligresdni_testigo1')" name="es_dni_testigo1" id="es_dni_testigo1" required="">
+                            <label for="">Validado</label>
+                        </td>
+                        <td>
+                            
+                        </td>
+                    </tr><tr>
+                        <td>DNI del segundo testigo</td>
+                        <td>
+                            
+                    <div class="d-flex">
+                        <div class="col-5">
+                            <input id="dni_testigo2" name="dni_testigo2" oninput="desabilitar('es_dni_testigo2')" required="" type="number" max="99999999" min="10000000" class="form-control" placeholder="Ingrese un número">  
+                        </div>
+                        <div class="col-6">
+                            <input type="text" id="Feligresdni_testigo2" name="Feligresdni_testigo2" class="form-control" placeholder="Nombre del feligres" readonly="" disabled="">
+                        </div>
+                    </div>
+                
+                        </td>
+                        <td>
+                            <input type="checkbox" onclick="validar_dni('dni_testigo2', 'es_dni_testigo2','Feligresdni_testigo2')" name="es_dni_testigo2" id="es_dni_testigo2" required="">
+                            <label for="">Validado</label>
+                        </td>
+                        <td>
+                            
+                        </td>
+                    </tr><tr>
+                        <td>Sede a realizarse el acto litúrgico</td>
+                        <td>
+                            <input id="sede" name="sede" value="Sede Central" type="text" class="form-control" placeholder="Ingrese texto" disabled="">
+                        </td>
+                        <td>
+                            <input type="checkbox" name="es_sede" id="es_sede" required="">
+                            <label for="">Validado</label>
+                        </td>
+                        <td>
+                            
+                        </td>
+                    </tr><tr>
+                        <td>Fecha de matrimonio</td>
+                        <td>
+                            <input id="f_matrimonio"   name="f_matrimonio" required="" type="datetime-local" class="form-control">
+                        </td>
+                        <td>
+                            <input type="checkbox" name="es_f_matrimonio" id="es_f_matrimonio" oninput="validar_fecha('f_matrimonio','es_f_matrimonio')">
+                            <label for="">Validado</label>
+                        </td>
+                        <td>
+                            
+                        </td>
+                    </tr><tr>
+                        <td>Constancia de bautismo del Novio</td>
+                        <td>
+                            <input id="consb_novio" name="consb_novio" type="file" class="form-control" accept="image/*,application/pdf">
+                        </td>
+                        <td>
+                            <input type="checkbox" name="es_consb_novio" id="es_consb_novio">
+                            <label for="">Validado</label>
+                        </td>
+                        <td>
+                            
+                            <button type="button" class="btn btn-primary btn-sm" title="Ver" onclick="visualizar('consb_novio')">
+                                <svg class="svg-inline--fa fa-eye" aria-hidden="true" focusable="false" data-prefix="fas" data-icon="eye" role="img" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 576 512" data-fa-i2svg=""><path fill="currentColor" d="M572.5 238.1C518.3 115.5 410.9 32 288 32S57.69 115.6 3.469 238.1C1.563 243.4 0 251 0 256c0 4.977 1.562 12.6 3.469 17.03C57.72 396.5 165.1 480 288 480s230.3-83.58 284.5-206.1C574.4 268.6 576 260.1 576 256C576 251 574.4 243.4 572.5 238.1zM432 256c0 79.45-64.47 144-143.9 144C208.6 400 144 335.5 144 256S208.5 112 288 112S432 176.5 432 256zM288 160C285.7 160 282.4 160.4 279.5 160.8C284.8 170 288 180.6 288 192c0 35.35-28.65 64-64 64C212.6 256 201.1 252.7 192.7 247.5C192.4 250.5 192 253.6 192 256c0 52.1 43 96 96 96s96-42.99 96-95.99S340.1 160 288 160z"></path></svg><!-- <i class="fas fa-eye"></i> Font Awesome fontawesome.com -->
+                            </button>
+                                    
+                        </td>
+                    </tr><tr>
+                        <td>Constancia de confirmación del Novio</td>
+                        <td>
+                            <input id="consc_novio" name="consc_novio" type="file" class="form-control" accept="image/*,application/pdf">
+                        </td>
+                        <td>
+                            <input type="checkbox" name="es_consc_novio" id="es_consc_novio">
+                            <label for="">Validado</label>
+                        </td>
+                        <td>
+                            
+                                        <button type="button" class="btn btn-primary btn-sm" title="Ver" onclick="visualizar('consc_novio')">
+                                            <svg class="svg-inline--fa fa-eye" aria-hidden="true" focusable="false" data-prefix="fas" data-icon="eye" role="img" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 576 512" data-fa-i2svg=""><path fill="currentColor" d="M572.5 238.1C518.3 115.5 410.9 32 288 32S57.69 115.6 3.469 238.1C1.563 243.4 0 251 0 256c0 4.977 1.562 12.6 3.469 17.03C57.72 396.5 165.1 480 288 480s230.3-83.58 284.5-206.1C574.4 268.6 576 260.1 576 256C576 251 574.4 243.4 572.5 238.1zM432 256c0 79.45-64.47 144-143.9 144C208.6 400 144 335.5 144 256S208.5 112 288 112S432 176.5 432 256zM288 160C285.7 160 282.4 160.4 279.5 160.8C284.8 170 288 180.6 288 192c0 35.35-28.65 64-64 64C212.6 256 201.1 252.7 192.7 247.5C192.4 250.5 192 253.6 192 256c0 52.1 43 96 96 96s96-42.99 96-95.99S340.1 160 288 160z"></path></svg><!-- <i class="fas fa-eye"></i> Font Awesome fontawesome.com -->
+                                        </button>
+                                    
+                        </td>
+                    </tr><tr>
+                        <td>Constancia de bautismo de la Novia</td>
+                        <td>
+                            <input id="consb_novia" name="consb_novia" type="file" class="form-control" accept="image/*,application/pdf">
+                        </td>
+                        <td>
+                            <input type="checkbox" name="es_consb_novia" id="es_consb_novia">
+                            <label for="">Validado</label>
+                        </td>
+                        <td>
+                            
+                                        <button type="button" class="btn btn-primary btn-sm" title="Ver" onclick="visualizar('consb_novia')">
+                                            <svg class="svg-inline--fa fa-eye" aria-hidden="true" focusable="false" data-prefix="fas" data-icon="eye" role="img" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 576 512" data-fa-i2svg=""><path fill="currentColor" d="M572.5 238.1C518.3 115.5 410.9 32 288 32S57.69 115.6 3.469 238.1C1.563 243.4 0 251 0 256c0 4.977 1.562 12.6 3.469 17.03C57.72 396.5 165.1 480 288 480s230.3-83.58 284.5-206.1C574.4 268.6 576 260.1 576 256C576 251 574.4 243.4 572.5 238.1zM432 256c0 79.45-64.47 144-143.9 144C208.6 400 144 335.5 144 256S208.5 112 288 112S432 176.5 432 256zM288 160C285.7 160 282.4 160.4 279.5 160.8C284.8 170 288 180.6 288 192c0 35.35-28.65 64-64 64C212.6 256 201.1 252.7 192.7 247.5C192.4 250.5 192 253.6 192 256c0 52.1 43 96 96 96s96-42.99 96-95.99S340.1 160 288 160z"></path></svg><!-- <i class="fas fa-eye"></i> Font Awesome fontawesome.com -->
+                                        </button>
+                                    
+                        </td>
+                    </tr><tr>
+                        <td>Constancia de confirmación de la Novia</td>
+                        <td>
+                            <input id="consc_novia" name="consc_novia" type="file" class="form-control" accept="image/*,application/pdf">
+                        </td>
+                        <td>
+                            <input type="checkbox" name="es_consc_novia" id="es_consc_novia">
+                            <label for="">Validado</label>
+                        </td>
+                        <td>
+                            
+                                        <button type="button" class="btn btn-primary btn-sm" title="Ver" onclick="visualizar('consc_novia')">
+                                            <svg class="svg-inline--fa fa-eye" aria-hidden="true" focusable="false" data-prefix="fas" data-icon="eye" role="img" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 576 512" data-fa-i2svg=""><path fill="currentColor" d="M572.5 238.1C518.3 115.5 410.9 32 288 32S57.69 115.6 3.469 238.1C1.563 243.4 0 251 0 256c0 4.977 1.562 12.6 3.469 17.03C57.72 396.5 165.1 480 288 480s230.3-83.58 284.5-206.1C574.4 268.6 576 260.1 576 256C576 251 574.4 243.4 572.5 238.1zM432 256c0 79.45-64.47 144-143.9 144C208.6 400 144 335.5 144 256S208.5 112 288 112S432 176.5 432 256zM288 160C285.7 160 282.4 160.4 279.5 160.8C284.8 170 288 180.6 288 192c0 35.35-28.65 64-64 64C212.6 256 201.1 252.7 192.7 247.5C192.4 250.5 192 253.6 192 256c0 52.1 43 96 96 96s96-42.99 96-95.99S340.1 160 288 160z"></path></svg><!-- <i class="fas fa-eye"></i> Font Awesome fontawesome.com -->
+                                        </button>
+                                    
+                        </td>
+                    </tr><tr>
+                        <td>Foto tamaño carnet del Novio</td>
+                        <td>
+                            <input id="fc_novio" name="fc_novio" type="file" class="form-control" accept="image/*,application/pdf">
+                        </td>
+                        <td>
+                            <input type="checkbox" name="es_fc_novio" id="es_fc_novio">
+                            <label for="">Validado</label>
+                        </td>
+                        <td>
+                            
+                                        <button type="button" class="btn btn-primary btn-sm" title="Ver" onclick="visualizar('fc_novio')">
+                                            <svg class="svg-inline--fa fa-eye" aria-hidden="true" focusable="false" data-prefix="fas" data-icon="eye" role="img" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 576 512" data-fa-i2svg=""><path fill="currentColor" d="M572.5 238.1C518.3 115.5 410.9 32 288 32S57.69 115.6 3.469 238.1C1.563 243.4 0 251 0 256c0 4.977 1.562 12.6 3.469 17.03C57.72 396.5 165.1 480 288 480s230.3-83.58 284.5-206.1C574.4 268.6 576 260.1 576 256C576 251 574.4 243.4 572.5 238.1zM432 256c0 79.45-64.47 144-143.9 144C208.6 400 144 335.5 144 256S208.5 112 288 112S432 176.5 432 256zM288 160C285.7 160 282.4 160.4 279.5 160.8C284.8 170 288 180.6 288 192c0 35.35-28.65 64-64 64C212.6 256 201.1 252.7 192.7 247.5C192.4 250.5 192 253.6 192 256c0 52.1 43 96 96 96s96-42.99 96-95.99S340.1 160 288 160z"></path></svg><!-- <i class="fas fa-eye"></i> Font Awesome fontawesome.com -->
+                                        </button>
+                                    
+                        </td>
+                    </tr><tr>
+                        <td>Foto tamaño carnet de la Novia</td>
+                        <td>
+                            <input id="fc_novia" name="fc_novia" type="file" class="form-control" accept="image/*,application/pdf">
+                        </td>
+                        <td>
+                            <input type="checkbox" name="es_fc_novia" id="es_fc_novia">
+                            <label for="">Validado</label>
+                        </td>
+                        <td>
+                            
+                                        <button type="button" class="btn btn-primary btn-sm" title="Ver" onclick="visualizar('fc_novia')">
+                                            <svg class="svg-inline--fa fa-eye" aria-hidden="true" focusable="false" data-prefix="fas" data-icon="eye" role="img" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 576 512" data-fa-i2svg=""><path fill="currentColor" d="M572.5 238.1C518.3 115.5 410.9 32 288 32S57.69 115.6 3.469 238.1C1.563 243.4 0 251 0 256c0 4.977 1.562 12.6 3.469 17.03C57.72 396.5 165.1 480 288 480s230.3-83.58 284.5-206.1C574.4 268.6 576 260.1 576 256C576 251 574.4 243.4 572.5 238.1zM432 256c0 79.45-64.47 144-143.9 144C208.6 400 144 335.5 144 256S208.5 112 288 112S432 176.5 432 256zM288 160C285.7 160 282.4 160.4 279.5 160.8C284.8 170 288 180.6 288 192c0 35.35-28.65 64-64 64C212.6 256 201.1 252.7 192.7 247.5C192.4 250.5 192 253.6 192 256c0 52.1 43 96 96 96s96-42.99 96-95.99S340.1 160 288 160z"></path></svg><!-- <i class="fas fa-eye"></i> Font Awesome fontawesome.com -->
+                                        </button>
+                                    
+                        </td>
+                    </tr><tr>
+                        <td>Prueba médica de VIH del Novio</td>
+                        <td>
+                            <input id="fvih_novio" name="fvih_novio" type="file" class="form-control" accept="image/*,application/pdf">
+                        </td>
+                        <td>
+                            <input type="checkbox" name="es_fvih_novio" id="es_fvih_novio">
+                            <label for="">Validado</label>
+                        </td>
+                        <td>
+                            
+                                        <button type="button" class="btn btn-primary btn-sm" title="Ver" onclick="visualizar('fvih_novio')">
+                                            <svg class="svg-inline--fa fa-eye" aria-hidden="true" focusable="false" data-prefix="fas" data-icon="eye" role="img" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 576 512" data-fa-i2svg=""><path fill="currentColor" d="M572.5 238.1C518.3 115.5 410.9 32 288 32S57.69 115.6 3.469 238.1C1.563 243.4 0 251 0 256c0 4.977 1.562 12.6 3.469 17.03C57.72 396.5 165.1 480 288 480s230.3-83.58 284.5-206.1C574.4 268.6 576 260.1 576 256C576 251 574.4 243.4 572.5 238.1zM432 256c0 79.45-64.47 144-143.9 144C208.6 400 144 335.5 144 256S208.5 112 288 112S432 176.5 432 256zM288 160C285.7 160 282.4 160.4 279.5 160.8C284.8 170 288 180.6 288 192c0 35.35-28.65 64-64 64C212.6 256 201.1 252.7 192.7 247.5C192.4 250.5 192 253.6 192 256c0 52.1 43 96 96 96s96-42.99 96-95.99S340.1 160 288 160z"></path></svg><!-- <i class="fas fa-eye"></i> Font Awesome fontawesome.com -->
+                                        </button>
+                                    
+                        </td>
+                    </tr><tr>
+                        <td>Prueba médica de VIH de la Novia</td>
+                        <td>
+                            <input id="fvih_novia" name="fvih_novia" type="file" class="form-control" accept="image/*,application/pdf">
+                        </td>
+                        <td>
+                            <input type="checkbox" name="es_fvih_novia" id="es_fvih_novia">
+                            <label for="">Validado</label>
+                        </td>
+                        <td>
+                            
+                                        <button type="button" class="btn btn-primary btn-sm" title="Ver" onclick="visualizar('fvih_novia')">
+                                            <svg class="svg-inline--fa fa-eye" aria-hidden="true" focusable="false" data-prefix="fas" data-icon="eye" role="img" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 576 512" data-fa-i2svg=""><path fill="currentColor" d="M572.5 238.1C518.3 115.5 410.9 32 288 32S57.69 115.6 3.469 238.1C1.563 243.4 0 251 0 256c0 4.977 1.562 12.6 3.469 17.03C57.72 396.5 165.1 480 288 480s230.3-83.58 284.5-206.1C574.4 268.6 576 260.1 576 256C576 251 574.4 243.4 572.5 238.1zM432 256c0 79.45-64.47 144-143.9 144C208.6 400 144 335.5 144 256S208.5 112 288 112S432 176.5 432 256zM288 160C285.7 160 282.4 160.4 279.5 160.8C284.8 170 288 180.6 288 192c0 35.35-28.65 64-64 64C212.6 256 201.1 252.7 192.7 247.5C192.4 250.5 192 253.6 192 256c0 52.1 43 96 96 96s96-42.99 96-95.99S340.1 160 288 160z"></path></svg><!-- <i class="fas fa-eye"></i> Font Awesome fontawesome.com -->
+                                        </button>
+                                    
+                        </td>
+                    </tr><tr>
+                        <td>Charlas preparatorias para los involucrados</td>
+                        <td>
+                            <div id="rcharlas"></div>
+                        </td>
+                        <td>
+                            <input type="checkbox" name="es_charlas" id="es_charlas" >
+                            <label for="">Validado</label>
+                        </td>
+                        <td>
+                            
+                                    <button class="btn btn-primary btn-sm" type="button" onclick="visualizar_calendario('charlas')">
+                                        <i class="bi bi-calendar3"></i>
                                     </button>
-                                `
-                                : ' '
-                        }
-                    </td>
-                `;
-                tbody.appendChild(tr);
-
-            })
-        })
-        .catch(error => console.error('Error al listar formulario:', error));
-}
-let html_opcionescharla = [];
-function obtenerInputPorTipo(tipo, maximo, minimo, id, nivel) {
-    html_opcionescharla = [];
-    const requerido = (nivel === 'O' || id === 'f_matrimonio') ? 'required' : '';
-
-    switch (tipo) {
-        case 'Texto':
-            return `<input id="${id}" name="${id}" ${requerido}  type="text" maxlength="${maximo}" minlength="${minimo}" class="form-control" placeholder="Ingrese texto">`;
-        case 'Dni':
-            var maximo = 10**(maximo) -1 ;
-            var minimo =10**(minimo-1);
-            return `
-                <div class="d-flex">
-                    <div class="col-5">
-                        <input id="${id}" name="${id}"  oninput="desabilitar('es_${id}')" ${requerido} type="number" max="${maximo}" min="${minimo}" class="form-control" placeholder="Ingrese un número">  
-                    </div>
-                    <div class="col-6">
-                        <input type="text" id="Feligres${id}" name="Feligres${id}" class="form-control" placeholder="Nombre del feligres" readonly disabled>
-                    </div>
-                </div>
-            `;
-        case 'Imagen':
-            return `<input id="${id}" name="${id}" ${requerido} type="file" class="form-control" accept="image/*">`;
-        case 'Fecha':
-
-            return `<input id="${id}" name="${id}" ${requerido} type="date" class="form-control">`;
-        case 'Hora':
-            return `<input id="${id}" name="${id}" ${requerido} type="time" class="form-control">`;
-        case 'FechaHora':
-            return `<input id="${id}" name="${id}" ${requerido} type="datetime-local" class="form-control">`;
-        case 'Charla':
-            let html_opcionescharla = ''; // Declara la variable fuera del fetch
-            let opciones = '';
-            var acto_liturgico = document.getElementById('acto_seleccionado').value;
+                                
+                        </td>
+                    </tr>
+    `;
+    var plantilla_bautismo  =
+    `
+    <tr>
+        <td>DNI del padrino</td>
+        <td>
             
-            fetch(`/charlas_rangoaño/${acto_liturgico}`)
-                .then(response => {
-                    if (!response.ok) {
-                        throw new Error('Network response was not ok');
-                    }
-                    return response.json(); // Convertir la respuesta a JSON
-                })
-                .then(data => {
-                    if (data && data.data) {
-                        data.data.forEach(element => {
-                            opciones += `<option value="${element.id_charla}">${element.charla}</option>`;
-                        });
+    <div class="d-flex">
+        <div class="col-5">
+            <input id="dni_padrino" oninput="desabilitar('es_dni_padrino')" name="dni_padrino" required="" type="number" max="99999999" min="11111111" class="form-control" placeholder="Ingrese un DNI vigente">  
+        </div>
+        <div class="col-6">
+            <input type="text" id="nombre_feligres" name="nombre_feligres" class="form-control" placeholder="Nombre del padrino" readonly="" disabled="">
+        </div>
+    </div>
+
+        </td>
+        <td>
+            <input type="checkbox"  id="es_dni_padrino" onclick="validar_dni('dni_padrino', 'es_dni_padrino', 'nombre_feligres')" name="es_dni_padrino" required>
+            <label for="">Validado</label>
+        </td>
+        <td>
+                
+        </td>
+    </tr><tr>
+        <td>DNIde la madrina </td>
+        <td>
             
-                        // Crear el combo de charlas
-                        html_opcionescharla = `
-                            <select name="" id="${id}" class="form-select w-100" required>
-                                ${opciones}
-                            </select>
-                        `;
-                        document.getElementById(`r${id}`).innerHTML = html_opcionescharla;
-                    } else {
-                        console.error("La respuesta no tiene el formato esperado.");
+    <div class="d-flex">
+        <div class="col-5">
+            <input id="dni_madrina" name="dni_madrina" oninput="desabilitar('es_dni_madrina')" required="" type="number" max="99999999" min="100000000" class="form-control" placeholder="Ingrese un número">  
+        </div>
+        <div class="col-6">
+            <input type="text" id="nombre_madrina" name="nombre_madrina" class="form-control" placeholder="Nombre de la madrina" readonly="" disabled="">
+        </div>
+    </div>
+
+        </td>
+        <td>
+            <input type="checkbox" onclick="validar_dni('dni_madrina', 'es_dni_madrina','nombre_madrina')" name="es_dni_madrina" id="es_dni_madrina" required="">
+            <label for="">Validado</label>
+        </td>
+        <td>
+                
+        </td>
+    </tr><tr>
+        <td>Copia del DNI o acta de nacimiento del niño(a)</td>
+        <td>
+            <input id="co_dniactan" name="co_dniactan" required type="file" class="form-control" accept="image/*,application/pdf" >
+        </td>
+        <td>
+            <input type="checkbox" name="es_co_dniactan" id="es_co_dniactan" required="">
+            <label for="">Validado</label>
+        </td>
+        <td>
+            <button type="button" class="btn btn-primary btn-sm" title="Ver" onclick="visualizar('co_dniactan')">
+                <svg class="svg-inline--fa fa-eye" aria-hidden="true" focusable="false" data-prefix="fas" data-icon="eye" role="img" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 576 512" data-fa-i2svg=""><path fill="currentColor" d="M572.5 238.1C518.3 115.5 410.9 32 288 32S57.69 115.6 3.469 238.1C1.563 243.4 0 251 0 256c0 4.977 1.562 12.6 3.469 17.03C57.72 396.5 165.1 480 288 480s230.3-83.58 284.5-206.1C574.4 268.6 576 260.1 576 256C576 251 574.4 243.4 572.5 238.1zM432 256c0 79.45-64.47 144-143.9 144C208.6 400 144 335.5 144 256S208.5 112 288 112S432 176.5 432 256zM288 160C285.7 160 282.4 160.4 279.5 160.8C284.8 170 288 180.6 288 192c0 35.35-28.65 64-64 64C212.6 256 201.1 252.7 192.7 247.5C192.4 250.5 192 253.6 192 256c0 52.1 43 96 96 96s96-42.99 96-95.99S340.1 160 288 160z"></path></svg><!-- <i class="fas fa-eye"></i> Font Awesome fontawesome.com -->
+            </button>    
+        </td>
+    </tr><tr>
+        <td>Nombre del niño (a)</td>
+        <td>
+            <input id="nom_niño" name="nom_niño" oninput="desabilitar('es_niño')" required="" type="text" maxlength="70" minlength="15" class="form-control" placeholder="Ingrese texto">
+        </td>
+        <td>
+            <input type="checkbox" onclick=validarNombre('nom_niño','es_niño') name="es_niño" id="es_niño" required="">
+            <label for="">Validado</label>
+        </td>
+        <td>
+                
+        </td>
+    </tr><tr>
+        <td>Copia del DNI de los padres</td>
+        <td>
+            <input id="cop_dni_padres" name="cop_dni_padres" required="file" type="file" class="form-control" accept="image/*,application/pdf">
+        </td>
+        <td>
+            <input type="checkbox" name="es_cop_dni_padres" id="es_cop_dni_padres" required="">
+            <label for="">Validado</label>
+        </td>
+        <td>
+            
+            <button type="button" class="btn btn-primary btn-sm" title="Ver" onclick="visualizar('cop_dni_padres')">
+                <svg class="svg-inline--fa fa-eye" aria-hidden="true" focusable="false" data-prefix="fas" data-icon="eye" role="img" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 576 512" data-fa-i2svg=""><path fill="currentColor" d="M572.5 238.1C518.3 115.5 410.9 32 288 32S57.69 115.6 3.469 238.1C1.563 243.4 0 251 0 256c0 4.977 1.562 12.6 3.469 17.03C57.72 396.5 165.1 480 288 480s230.3-83.58 284.5-206.1C574.4 268.6 576 260.1 576 256C576 251 574.4 243.4 572.5 238.1zM432 256c0 79.45-64.47 144-143.9 144C208.6 400 144 335.5 144 256S208.5 112 288 112S432 176.5 432 256zM288 160C285.7 160 282.4 160.4 279.5 160.8C284.8 170 288 180.6 288 192c0 35.35-28.65 64-64 64C212.6 256 201.1 252.7 192.7 247.5C192.4 250.5 192 253.6 192 256c0 52.1 43 96 96 96s96-42.99 96-95.99S340.1 160 288 160z"></path></svg><!-- <i class="fas fa-eye"></i> Font Awesome fontawesome.com -->
+            </button>
+                    
+        </td>
+    </tr><tr>
+        <td>Copia recibo de luz o agua</td>
+        <td>
+            <input id="cop_agualuz" name="cop_agualuz" type="file" class="form-control" accept="image/*,application/pdf">
+        </td>
+        <td>
+            <input type="checkbox" name="es_cop_agualuz" id="es_cop_agualuz">
+            <label for="">Validado</label>
+        </td>
+        <td>
+            
+            <button type="button" class="btn btn-primary btn-sm" title="Ver" onclick="visualizar('cop_agualuz')">
+                <svg class="svg-inline--fa fa-eye" aria-hidden="true" focusable="false" data-prefix="fas" data-icon="eye" role="img" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 576 512" data-fa-i2svg=""><path fill="currentColor" d="M572.5 238.1C518.3 115.5 410.9 32 288 32S57.69 115.6 3.469 238.1C1.563 243.4 0 251 0 256c0 4.977 1.562 12.6 3.469 17.03C57.72 396.5 165.1 480 288 480s230.3-83.58 284.5-206.1C574.4 268.6 576 260.1 576 256C576 251 574.4 243.4 572.5 238.1zM432 256c0 79.45-64.47 144-143.9 144C208.6 400 144 335.5 144 256S208.5 112 288 112S432 176.5 432 256zM288 160C285.7 160 282.4 160.4 279.5 160.8C284.8 170 288 180.6 288 192c0 35.35-28.65 64-64 64C212.6 256 201.1 252.7 192.7 247.5C192.4 250.5 192 253.6 192 256c0 52.1 43 96 96 96s96-42.99 96-95.99S340.1 160 288 160z"></path></svg><!-- <i class="fas fa-eye"></i> Font Awesome fontawesome.com -->
+            </button>
+                    
+        </td>
+    </tr><tr>
+        <td>Constancia de confirmación del padrino</td>
+        <td>
+            <input id="cop_conspadrino" name="cop_conspadrino" required="" type="file" class="form-control" accept="image/*,application/pdf">
+        </td>
+        <td>
+            <input type="checkbox" name="es_cop_conspadrino" id="es_cop_conspadrino" accept="image/*,application/pdf">
+            <label for="">Validado</label>
+        </td>
+        <td>
+            
+            <button type="button" class="btn btn-primary btn-sm" title="Ver" onclick="visualizar('cop_conspadrino')">
+                <svg class="svg-inline--fa fa-eye" aria-hidden="true" focusable="false" data-prefix="fas" data-icon="eye" role="img" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 576 512" data-fa-i2svg=""><path fill="currentColor" d="M572.5 238.1C518.3 115.5 410.9 32 288 32S57.69 115.6 3.469 238.1C1.563 243.4 0 251 0 256c0 4.977 1.562 12.6 3.469 17.03C57.72 396.5 165.1 480 288 480s230.3-83.58 284.5-206.1C574.4 268.6 576 260.1 576 256C576 251 574.4 243.4 572.5 238.1zM432 256c0 79.45-64.47 144-143.9 144C208.6 400 144 335.5 144 256S208.5 112 288 112S432 176.5 432 256zM288 160C285.7 160 282.4 160.4 279.5 160.8C284.8 170 288 180.6 288 192c0 35.35-28.65 64-64 64C212.6 256 201.1 252.7 192.7 247.5C192.4 250.5 192 253.6 192 256c0 52.1 43 96 96 96s96-42.99 96-95.99S340.1 160 288 160z"></path></svg><!-- <i class="fas fa-eye"></i> Font Awesome fontawesome.com -->
+            </button>
+                    
+        </td>
+    </tr><tr>
+        <td>Constancia de confirmación de la madrina</td>
+        <td>
+            <input id="cop_consmadrina" name="cop_consmadrina" required="" type="file" class="form-control" accept="image/*,application/pdf">
+        </td>
+        <td>
+            <input type="checkbox" name="es_cop_consmadrina" id="es_cop_consmadrina" required="">
+            <label for="">Validado</label>
+        </td>
+        <td>
+            
+            <button type="button" class="btn btn-primary btn-sm" title="Ver" onclick="visualizar('cop_consmadrina')">
+                <svg class="svg-inline--fa fa-eye" aria-hidden="true" focusable="false" data-prefix="fas" data-icon="eye" role="img" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 576 512" data-fa-i2svg=""><path fill="currentColor" d="M572.5 238.1C518.3 115.5 410.9 32 288 32S57.69 115.6 3.469 238.1C1.563 243.4 0 251 0 256c0 4.977 1.562 12.6 3.469 17.03C57.72 396.5 165.1 480 288 480s230.3-83.58 284.5-206.1C574.4 268.6 576 260.1 576 256C576 251 574.4 243.4 572.5 238.1zM432 256c0 79.45-64.47 144-143.9 144C208.6 400 144 335.5 144 256S208.5 112 288 112S432 176.5 432 256zM288 160C285.7 160 282.4 160.4 279.5 160.8C284.8 170 288 180.6 288 192c0 35.35-28.65 64-64 64C212.6 256 201.1 252.7 192.7 247.5C192.4 250.5 192 253.6 192 256c0 52.1 43 96 96 96s96-42.99 96-95.99S340.1 160 288 160z"></path></svg><!-- <i class="fas fa-eye"></i> Font Awesome fontawesome.com -->
+            </button>
+                    
+        </td>
+    </tr><tr>
+        <td>DNI del tutor</td>
+        <td>
+            
+    <div class="d-flex">
+        <div class="col-5">
+            <input id="dni_tutor" name="dni_tutor" oninput="dni_tutor('es_dni_tutor)" required="" type="number" max="0" min="0.1" class="form-control" placeholder="Ingrese un número">  
+        </div>
+        <div class="col-6">
+            <input type="text" id="nombre_tutor" name="nombre_tutor" class="form-control" placeholder="Nombre del feligres" readonly="" disabled="">
+        </div>
+    </div>
+
+        </td>
+        <td>
+            <input type="checkbox" onclick="validar_dni('dni_tutor', 'es_dni_tutor','nombre_tutor')" name="es_dni_tutor" id="es_dni_tutor" required="">
+            <label for="">Validado</label>
+        </td>
+        <td>
+                
+        </td>
+    </tr><tr>
+        <td>Sede a realizarse el acto litúrgico	</td>
+        <td>
+            <input id="null" name="null" value="Sede Central" type="text" class="form-control" placeholder="Ingrese texto" disabled="">
+        </td>
+        <td>
+            <input type="checkbox" name="null" id="null" required="">
+            <label for="">Validado</label>
+        </td>
+        <td>
+                
+        </td>
+    </tr><tr>
+        <td>Charla de preparación para padres y padrinos	</td>
+        <td>
+            <div id="rnull"></div>
+        </td>
+        <td>
+            <input type="checkbox" name="null" id="null" required="">
+            <label for="">Validado</label>
+        </td>
+        <td>
+            
+                    <button class="btn btn-primary" type="button" onclick="visualizar_calendario('null')">
+                        <i class="bi bi-calendar3"></i>
+                    </button>
+                
+        </td>
+    </tr>
+
+    `;
+    var primera_comunion = 
+    `
+    <tr>
+                        <td>DNI responsable </td>
+                        <td>
+                            
+                    <div class="d-flex">
+                        <div class="col-5">
+                            <input id="null" name="null" oninput="desabilitar('es_null')" required="" type="number" max="0" min="0.1" class="form-control" placeholder="Ingrese un número">  
+                        </div>
+                        <div class="col-6">
+                            <input type="text" id="Feligresnull" name="Feligresnull" class="form-control" placeholder="Nombre del feligres" readonly="" disabled="">
+                        </div>
+                    </div>
+                
+                        </td>
+                        <td>
+                            <input type="checkbox" onclick="validar_dni('null', 'null')" name="null" id="null" required="">
+                            <label for="">Validado</label>
+                        </td>
+                        <td>
+                            
+                        </td>
+                    </tr><tr>
+                        <td>Copia del DNI celebrante</td>
+                        <td>
+                            <input id="null" name="null" required="" type="file" class="form-control" accept="image/*,application/pdf">
+                        </td>
+                        <td>
+                            <input type="checkbox" name="null" id="null" required="">
+                            <label for="">Validado</label>
+                        </td>
+                        <td>
+                            
+                                        <button type="button" class="btn btn-primary btn-sm" title="Ver" onclick="visualizar('null')">
+                                            <svg class="svg-inline--fa fa-eye" aria-hidden="true" focusable="false" data-prefix="fas" data-icon="eye" role="img" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 576 512" data-fa-i2svg=""><path fill="currentColor" d="M572.5 238.1C518.3 115.5 410.9 32 288 32S57.69 115.6 3.469 238.1C1.563 243.4 0 251 0 256c0 4.977 1.562 12.6 3.469 17.03C57.72 396.5 165.1 480 288 480s230.3-83.58 284.5-206.1C574.4 268.6 576 260.1 576 256C576 251 574.4 243.4 572.5 238.1zM432 256c0 79.45-64.47 144-143.9 144C208.6 400 144 335.5 144 256S208.5 112 288 112S432 176.5 432 256zM288 160C285.7 160 282.4 160.4 279.5 160.8C284.8 170 288 180.6 288 192c0 35.35-28.65 64-64 64C212.6 256 201.1 252.7 192.7 247.5C192.4 250.5 192 253.6 192 256c0 52.1 43 96 96 96s96-42.99 96-95.99S340.1 160 288 160z"></path></svg><!-- <i class="fas fa-eye"></i> Font Awesome fontawesome.com -->
+                                        </button>
+                                    
+                        </td>
+                    </tr><tr>
+                        <td>Copia DNI del padrino o madrina</td>
+                        <td>
+                            <input id="null" name="null" required="" type="file" class="form-control" accept="image/*,application/pdf">
+                        </td>
+                        <td>
+                            <input type="checkbox" name="null" id="null" required="">
+                            <label for="">Validado</label>
+                        </td>
+                        <td>
+                            
+                                        <button type="button" class="btn btn-primary btn-sm" title="Ver" onclick="visualizar('null')">
+                                            <svg class="svg-inline--fa fa-eye" aria-hidden="true" focusable="false" data-prefix="fas" data-icon="eye" role="img" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 576 512" data-fa-i2svg=""><path fill="currentColor" d="M572.5 238.1C518.3 115.5 410.9 32 288 32S57.69 115.6 3.469 238.1C1.563 243.4 0 251 0 256c0 4.977 1.562 12.6 3.469 17.03C57.72 396.5 165.1 480 288 480s230.3-83.58 284.5-206.1C574.4 268.6 576 260.1 576 256C576 251 574.4 243.4 572.5 238.1zM432 256c0 79.45-64.47 144-143.9 144C208.6 400 144 335.5 144 256S208.5 112 288 112S432 176.5 432 256zM288 160C285.7 160 282.4 160.4 279.5 160.8C284.8 170 288 180.6 288 192c0 35.35-28.65 64-64 64C212.6 256 201.1 252.7 192.7 247.5C192.4 250.5 192 253.6 192 256c0 52.1 43 96 96 96s96-42.99 96-95.99S340.1 160 288 160z"></path></svg><!-- <i class="fas fa-eye"></i> Font Awesome fontawesome.com -->
+                                        </button>
+                                    
+                        </td>
+                    </tr><tr>
+                        <td>Copia de constancia de bautismo del celebrante</td>
+                        <td>
+                            <input id="null" name="null" required="" type="file" class="form-control" accept="image/*,application/pdf">
+                        </td>
+                        <td>
+                            <input type="checkbox" name="null" id="null" required="">
+                            <label for="">Validado</label>
+                        </td>
+                        <td>
+                            
+                                        <button type="button" class="btn btn-primary btn-sm" title="Ver" onclick="visualizar('null')">
+                                            <svg class="svg-inline--fa fa-eye" aria-hidden="true" focusable="false" data-prefix="fas" data-icon="eye" role="img" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 576 512" data-fa-i2svg=""><path fill="currentColor" d="M572.5 238.1C518.3 115.5 410.9 32 288 32S57.69 115.6 3.469 238.1C1.563 243.4 0 251 0 256c0 4.977 1.562 12.6 3.469 17.03C57.72 396.5 165.1 480 288 480s230.3-83.58 284.5-206.1C574.4 268.6 576 260.1 576 256C576 251 574.4 243.4 572.5 238.1zM432 256c0 79.45-64.47 144-143.9 144C208.6 400 144 335.5 144 256S208.5 112 288 112S432 176.5 432 256zM288 160C285.7 160 282.4 160.4 279.5 160.8C284.8 170 288 180.6 288 192c0 35.35-28.65 64-64 64C212.6 256 201.1 252.7 192.7 247.5C192.4 250.5 192 253.6 192 256c0 52.1 43 96 96 96s96-42.99 96-95.99S340.1 160 288 160z"></path></svg><!-- <i class="fas fa-eye"></i> Font Awesome fontawesome.com -->
+                                        </button>
+                                    
+                        </td>
+                    </tr><tr>
+                        <td>Constancia de estudios de 3°, 4° o 5° primaria</td>
+                        <td>
+                            <input id="null" name="null" type="file" class="form-control" accept="image/*,application/pdf">
+                        </td>
+                        <td>
+                            <input type="checkbox" name="null" id="null">
+                            <label for="">Validado</label>
+                        </td>
+                        <td>
+                            
+                                        <button type="button" class="btn btn-primary btn-sm" title="Ver" onclick="visualizar('null')">
+                                            <svg class="svg-inline--fa fa-eye" aria-hidden="true" focusable="false" data-prefix="fas" data-icon="eye" role="img" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 576 512" data-fa-i2svg=""><path fill="currentColor" d="M572.5 238.1C518.3 115.5 410.9 32 288 32S57.69 115.6 3.469 238.1C1.563 243.4 0 251 0 256c0 4.977 1.562 12.6 3.469 17.03C57.72 396.5 165.1 480 288 480s230.3-83.58 284.5-206.1C574.4 268.6 576 260.1 576 256C576 251 574.4 243.4 572.5 238.1zM432 256c0 79.45-64.47 144-143.9 144C208.6 400 144 335.5 144 256S208.5 112 288 112S432 176.5 432 256zM288 160C285.7 160 282.4 160.4 279.5 160.8C284.8 170 288 180.6 288 192c0 35.35-28.65 64-64 64C212.6 256 201.1 252.7 192.7 247.5C192.4 250.5 192 253.6 192 256c0 52.1 43 96 96 96s96-42.99 96-95.99S340.1 160 288 160z"></path></svg><!-- <i class="fas fa-eye"></i> Font Awesome fontawesome.com -->
+                                        </button>
+                                    
+                        </td>
+                    </tr><tr>
+                        <td>Copia de recibo de luz o agua</td>
+                        <td>
+                            <input id="null" name="null" type="file" class="form-control" accept="image/*,application/pdf">
+                        </td>
+                        <td>
+                            <input type="checkbox" name="null" id="null">
+                            <label for="">Validado</label>
+                        </td>
+                        <td>
+                            
+                                        <button type="button" class="btn btn-primary btn-sm" title="Ver" onclick="visualizar('null')">
+                                            <svg class="svg-inline--fa fa-eye" aria-hidden="true" focusable="false" data-prefix="fas" data-icon="eye" role="img" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 576 512" data-fa-i2svg=""><path fill="currentColor" d="M572.5 238.1C518.3 115.5 410.9 32 288 32S57.69 115.6 3.469 238.1C1.563 243.4 0 251 0 256c0 4.977 1.562 12.6 3.469 17.03C57.72 396.5 165.1 480 288 480s230.3-83.58 284.5-206.1C574.4 268.6 576 260.1 576 256C576 251 574.4 243.4 572.5 238.1zM432 256c0 79.45-64.47 144-143.9 144C208.6 400 144 335.5 144 256S208.5 112 288 112S432 176.5 432 256zM288 160C285.7 160 282.4 160.4 279.5 160.8C284.8 170 288 180.6 288 192c0 35.35-28.65 64-64 64C212.6 256 201.1 252.7 192.7 247.5C192.4 250.5 192 253.6 192 256c0 52.1 43 96 96 96s96-42.99 96-95.99S340.1 160 288 160z"></path></svg><!-- <i class="fas fa-eye"></i> Font Awesome fontawesome.com -->
+                                        </button>
+                                    
+                        </td>
+                    </tr><tr>
+                        <td>Nombre del celebrado</td>
+                        <td>
+                            <input id="null" name="null" required="" type="text" maxlength="" minlength="" class="form-control" placeholder="Ingrese texto">
+                        </td>
+                        <td>
+                            <input type="checkbox" name="null" id="null" required="">
+                            <label for="">Validado</label>
+                        </td>
+                        <td>
+                            
+                        </td>
+                    </tr>
+
+                    <tr>
+                        <td>Nombre sede</td>
+                        <td>
+                            <input id="null" name="null" value="Sede Central" type="text" class="form-control" placeholder="Ingrese texto" disabled="">
+                        </td>
+                        <td>
+                            <input type="checkbox" name="null" id="null" required="">
+                            <label for="">Validado</label>
+                        </td>
+                        <td>
+                            
+                        </td>
+                    </tr>
+                    <tr>
+                        <td>charlas preparación</td>
+                        <td>
+                            <div id="rnull"></div>
+                        </td>
+                        <td>
+                            <input type="checkbox" name="null" id="null" required="">
+                            <label for="">Validado</label>
+                        </td>
+                        <td>
+                            
+                                    <button class="btn btn-primary" type="button" onclick="visualizar_calendario('null')">
+                                        <i class="bi bi-calendar3"></i>
+                                    </button>
+                                
+                        </td>
+                    </tr>
+    `
+    ;
+
+    var confirmacion = 
+    `
+    <tr>
+            <td>Constancia de bautizo</td>
+            <td>
+                <input id="null" name="null" required="" type="file" class="form-control" accept="image/*,application/pdf">
+            </td>
+            <td>
+                <input type="checkbox" name="null" id="null" required="">
+                <label for="">Validado</label>
+            </td>
+            <td>
+                
+                            <button type="button" class="btn btn-primary btn-sm" title="Ver" onclick="visualizar('null')">
+                                <svg class="svg-inline--fa fa-eye" aria-hidden="true" focusable="false" data-prefix="fas" data-icon="eye" role="img" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 576 512" data-fa-i2svg=""><path fill="currentColor" d="M572.5 238.1C518.3 115.5 410.9 32 288 32S57.69 115.6 3.469 238.1C1.563 243.4 0 251 0 256c0 4.977 1.562 12.6 3.469 17.03C57.72 396.5 165.1 480 288 480s230.3-83.58 284.5-206.1C574.4 268.6 576 260.1 576 256C576 251 574.4 243.4 572.5 238.1zM432 256c0 79.45-64.47 144-143.9 144C208.6 400 144 335.5 144 256S208.5 112 288 112S432 176.5 432 256zM288 160C285.7 160 282.4 160.4 279.5 160.8C284.8 170 288 180.6 288 192c0 35.35-28.65 64-64 64C212.6 256 201.1 252.7 192.7 247.5C192.4 250.5 192 253.6 192 256c0 52.1 43 96 96 96s96-42.99 96-95.99S340.1 160 288 160z"></path></svg><!-- <i class="fas fa-eye"></i> Font Awesome fontawesome.com -->
+                            </button>
+                        
+            </td>
+        </tr><tr>
+            <td>DNI del confirmando</td>
+            <td>
+                <input id="null" name="null" required="" type="file" class="form-control" accept="image/*,application/pdf">
+            </td>
+            <td>
+                <input type="checkbox" name="null" id="null" required="">
+                <label for="">Validado</label>
+            </td>
+            <td>
+                
+                            <button type="button" class="btn btn-primary btn-sm" title="Ver" onclick="visualizar('null')">
+                                <svg class="svg-inline--fa fa-eye" aria-hidden="true" focusable="false" data-prefix="fas" data-icon="eye" role="img" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 576 512" data-fa-i2svg=""><path fill="currentColor" d="M572.5 238.1C518.3 115.5 410.9 32 288 32S57.69 115.6 3.469 238.1C1.563 243.4 0 251 0 256c0 4.977 1.562 12.6 3.469 17.03C57.72 396.5 165.1 480 288 480s230.3-83.58 284.5-206.1C574.4 268.6 576 260.1 576 256C576 251 574.4 243.4 572.5 238.1zM432 256c0 79.45-64.47 144-143.9 144C208.6 400 144 335.5 144 256S208.5 112 288 112S432 176.5 432 256zM288 160C285.7 160 282.4 160.4 279.5 160.8C284.8 170 288 180.6 288 192c0 35.35-28.65 64-64 64C212.6 256 201.1 252.7 192.7 247.5C192.4 250.5 192 253.6 192 256c0 52.1 43 96 96 96s96-42.99 96-95.99S340.1 160 288 160z"></path></svg><!-- <i class="fas fa-eye"></i> Font Awesome fontawesome.com -->
+                            </button>
+                        
+            </td>
+        </tr><tr>
+            <td>DNI del padrino o madrina</td>
+            <td>
+                <input id="null" name="null" required="" type="file" class="form-control" accept="image/*,application/pdf">
+            </td>
+            <td>
+                <input type="checkbox" name="null" id="null" required="">
+                <label for="">Validado</label>
+            </td>
+            <td>
+                
+                            <button type="button" class="btn btn-primary btn-sm" title="Ver" onclick="visualizar('null')">
+                                <svg class="svg-inline--fa fa-eye" aria-hidden="true" focusable="false" data-prefix="fas" data-icon="eye" role="img" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 576 512" data-fa-i2svg=""><path fill="currentColor" d="M572.5 238.1C518.3 115.5 410.9 32 288 32S57.69 115.6 3.469 238.1C1.563 243.4 0 251 0 256c0 4.977 1.562 12.6 3.469 17.03C57.72 396.5 165.1 480 288 480s230.3-83.58 284.5-206.1C574.4 268.6 576 260.1 576 256C576 251 574.4 243.4 572.5 238.1zM432 256c0 79.45-64.47 144-143.9 144C208.6 400 144 335.5 144 256S208.5 112 288 112S432 176.5 432 256zM288 160C285.7 160 282.4 160.4 279.5 160.8C284.8 170 288 180.6 288 192c0 35.35-28.65 64-64 64C212.6 256 201.1 252.7 192.7 247.5C192.4 250.5 192 253.6 192 256c0 52.1 43 96 96 96s96-42.99 96-95.99S340.1 160 288 160z"></path></svg><!-- <i class="fas fa-eye"></i> Font Awesome fontawesome.com -->
+                            </button>
+                        
+            </td>
+        </tr><tr>
+            <td>Sede donde se realizara</td>
+            <td>
+                <input id="null" name="null" value="Sede Central" type="text" class="form-control" placeholder="Ingrese texto" disabled="">
+            </td>
+            <td>
+                <input type="checkbox" name="null" id="null" required="">
+                <label for="">Validado</label>
+            </td>
+            <td>
+                    
+            </td>
+        </tr><tr>
+            <td>Charla de preparación</td>
+            <td>
+                <div id="rnull"></div>
+            </td>
+            <td>
+                <input type="checkbox" name="null" id="null" required="">
+                <label for="">Validado</label>
+            </td>
+            <td>
+                
+                        <button class="btn btn-primary" type="button" onclick="visualizar_calendario('null')">
+                            <i class="bi bi-calendar3"></i>
+                        </button>
+                    
+            </td>
+        </tr>
+    `;
+
+
+
+    document.addEventListener('DOMContentLoaded', function() {
+        listar_solicitudes();
+    });
+
+
+    function exportarTablaPDF() {
+        const tabla = document.getElementById('miTabla');
+        const tabla2 = tabla.cloneNode(true); // Clona la tabla existente
+        tabla2.id = 'miTablaClonada';
+
+        html2pdf(tabla2, {
+            margin: 1,
+            filename: 'tabla_excluyendo_columna.pdf',
+            image: { type: 'jpeg', quality: 1 },
+            html2canvas: { scale: 2 },
+            jsPDF: { unit: 'cm', format: 'a4', orientation: 'portrait' }
+        });
+    }
+
+    function validar_fecha(fecha, estado ){
+        var fecha_hora = document.getElementById(fecha); 
+        var st = document.getElementById(estado);
+        if (fecha_hora.value.length == 0){
+            alert("Registre una fecha válida");
+            st.checked = false;
+        }else{
+            if (st.checked){
+                fetch(`/verificar_fecha/${fecha_hora.value}`)
+                .then(response => {return response.json()})
+                .then(item => {
+                    if (item.estado == "Aceptado"){
+                        st.checked = true;
+                        fecha_hora.disabled = true;
+                    }else{
+                        st.checked = false;
+                        fecha_hora.disabled = false
+                        alert("Fecha y hora ya reservada, ingrese otra");
                     }
-                    document.getElementById()
                 })
-                .catch(error => {
-                    console.error("Error al obtener charlas:", error);
-                });
-            return `<div id="r${id}">${html_opcionescharla}</div>`;
-
-        default:
-            var sede = document.getElementById('sede').value;
-            return `<input id="${id}" name="${id}" value="${sede}"  type="text" class="form-control" placeholder="Ingrese texto" disabled>`;
-    }
-}
-function enviar_datos(event){
-    const form = document.getElementById('formulario_solicitud');
-    const formData = new FormData(form);
-    var boton = document.getElementById('registrar').textContent;
-    var pago = document.getElementById('pago');
-    var formulario_solicitud = document.getElementById('div_sol');
-    if (form.checkValidity() === false) {
-        return;
-    }
-    event.preventDefault();
-
-    if (boton == "Registrar"){
-        pago.classList.remove('d-none')
-        formulario_solicitud.classList.add('d-none');
-        completar_pago();
-    }else{
-
-    }
-}
-function mostrar_img(tipo){
-    var imagen = document.getElementById('imagen_qr');
-    var metodo = document.getElementById('metodo');
-    switch (tipo) {
-        case 'yape':
-                metodo.textContent = "yape";
-                imagen.src = "/static/img/yape_qr.jpg";
-            break;
-        case 'plin':
-                metodo.textContent = "plin";
-                imagen.src = "/static/img/QR_plin.jpg";
-            break;
-        case 'tarjeta':
-            metodo.textContent = "tarjeta";
-            imagen.src = "g";
-        break;
-        default:
-                metodo.textContent = "efectivo";
-                imagen.src = "";
-            break;
-    }
-    
-}
-function desabilitar(elemento){
-    document.getElementById(elemento).checked = false;
-}
-function validar_dni(input,estado){
-    var dni = document.getElementById(input);
-    var estado = document.getElementById(estado)
-    if (estado.checked == true){
-        fetch(`/validar_dni/${dni.value}`)
-        .then(response => {return response.json()})
-        .then(element => {
-            if(element.estado == "si"){
-                dni.disabled = true;
-                document.getElementById(`Feligres${dni.id}`).value = element.nombre;
             }else{
-                alert("No existe ese feligres");
-                dni.disabled = false;
-                document.getElementById(`Feligres${dni.id}`).value = "";
-                estado.checked = false;
+                fecha_hora.disabled = false
             }
         }
-        )
-    }else{
-        dni.disabled = false;
-        document.getElementById(dni).value = "";
-    }
-}
-function completar_pago(){
-    var responsable = document.getElementById('responsable');
-    var acto = document.getElementById('acto_seleccionado');
-    if(acto.selectedOptions[0].text == "Matrimonio"){
-        var dni_novio = document.getElementById('dni_novio');
-        var dni_novia = document.getElementById('dni_novia');
-        var novio = document.getElementById('Feligresdni_novio');
-        var novia = document.getElementById('Feligresdni_novia');
-        responsable.innerHTML = `
-            <option value="${dni_novio.value}">${novio.value}</option>
-            <option value="${dni_novia.value}">${novia.value}</option>
-        `;    
-    }
-}
-function precio(){
-    var pagos= document.getElementById('pagos');
-    var monto = document.getElementById('amount');
-    var acto = document.getElementById('acto_seleccionado');
-    var acto_liturgico = acto.selectedOptions[0].text;
-    var sede = document.getElementById('sede').value;
-    var responsable = document.getElementById('responsable').value;
-    if(acto_liturgico == 'Matrimonio'){
-        var dni1 = document.getElementById('dni_novio').value;
-        var dni2 = document.getElementById('dni_novia').value;
-        pagos.disabled = true;
-        pagos.innerHTML = `
-            <span class="spinner-border spinner-border-sm" aria-hidden="true"></span>
-            <span class="ms-2">Calculando...</span>
-        `;
 
-    fetch(`/monto_acto/${acto_liturgico}/${sede}/${responsable}/${dni1}/${dni2}`)
-        .then(response => response.json())
-        .then(element => {
-            datos_pago = element;
+    }
 
-            if (element.estado == "si") {
-                let total = (parseFloat(element.datos.pf_acto) || 0) + 
-                            (parseFloat(element.datos.pf_sede) || 0) + 
-                            (parseFloat(element.datos.pf_traslado) || 0);
-                monto.value = total;
+
+    function visualizar_calendario(id_fecha) {
+        var tbody = document.getElementById('calendario_cuerpo');
+        var id_charla = document.getElementById(id_fecha).value;
+        fetch(`/calendario_solicitud/${id_charla}`)
+            .then(data => data.json())
+            .then(item => {
+                tbody.innerHTML = '';
+                item.forEach(elemento => {
+                    var tr = document.createElement('tr');
+
+                    var tdId = document.createElement('td');
+                    tdId.textContent = elemento.id;
+                    tdId.classList.add('ocultar');
+                    tr.appendChild(tdId);
+
+                    var tdDescripcion = document.createElement('td');
+                    tdDescripcion.textContent = elemento.descripcion;
+                    tr.appendChild(tdDescripcion);
+
+                    var tdFecha = document.createElement('td');
+                    tdFecha.textContent = elemento.fecha;
+                    tr.appendChild(tdFecha);
+
+                    var tdHoraInicio = document.createElement('td');
+                    tdHoraInicio.textContent = elemento.hora_inicio;
+                    tr.appendChild(tdHoraInicio);
+
+                    var tdHoraFin = document.createElement('td');
+                    tdHoraFin.textContent = elemento.hora_fin;
+                    tr.appendChild(tdHoraFin);
+
+                    tbody.appendChild(tr);
+                });
+            })
+
+        document.getElementById('requi_actos').classList.add("d-none");
+        document.getElementById('contenido_calendario_celebracion').classList.remove("d-none");
+    }
+    function retornar(){
+        document.getElementById('contenido_calendario_celebracion').classList.add("d-none");
+        document.getElementById('requi_actos').classList.remove("d-none");
+    }
+    const acordeon = document.getElementById('requi_actos');
+
+    function verificar() {
+        var selectElement = document.getElementById('acto_seleccionado');
+        var selectedOption = selectElement.options[selectElement.selectedIndex];
+        var textoSeleccionado = selectedOption.text;
+        var requi_actos = document.getElementById('datos_solicitud');
+        requi_actos.textContent = "";
+        var estadog = document.getElementById('estado_general');
+        estadog.checked = false;
+
+        var formulario = document.getElementById('requi_actos');
+        formulario.classList.remove('d-none');
+        if (textoSeleccionado == 'Matrimonio'){
+            acordeon.classList.add('show');
+            acordeon.setAttribute('aria-expanded', 'true');
+            requi_actos.innerHTML = plantilla_matrimonio;
+        }else if (textoSeleccionado == 'Bautismo'){
+            acordeon.classList.add('show');
+            acordeon.setAttribute('aria-expanded', 'true');
+            requi_actos.innerHTML = plantilla_bautismo;
+        }else if (textoSeleccionado == 'Primera comunion'){
+            acordeon.classList.add('show');
+            acordeon.setAttribute('aria-expanded', 'true');
+            requi_actos.innerHTML = primera_comunion;
+        }else{
+            acordeon.classList.remove('show');
+            acordeon.setAttribute('aria-expanded', 'false');
+            formulario.classList.add('d-none');
+        }
+
+
+    }
+
+    function visualizar(id_archivo) {
+        const archivo_formulario = document.getElementById(id_archivo).files[0];
+        const modal_contenido = document.getElementById('modal_contenido'); // Contenedor del contenido en el modal
+
+        if (archivo_formulario && archivo_formulario.name.length > 0) {
+            const objUrl = URL.createObjectURL(archivo_formulario);
+            modal_contenido.innerHTML = "";
+            if (archivo_formulario.type === 'application/pdf') {
+                modal_contenido.innerHTML = `<iframe src="${objUrl}" width="100%" height="800px" style="border:none;"></iframe>`;
+            } else if (archivo_formulario.type.startsWith('image/')) {
+                modal_contenido.innerHTML = `<img src="${objUrl}" class="img-fluid formulario_imagenes" alt="Previsualización de la imagen">`;
+            } else {
+                modal_contenido.innerHTML = "Tipo de archivo no soportado.";
             }
-            pagos.innerHTML = '';
-            pagos.textContent = 'Confirmar pago';
-            pagos.disabled = false;
+            var myModal = new bootstrap.Modal(document.getElementById('myModal'));
+            myModal.show();
+        }
+    }
+
+
+    let html_opcionescharla = [];
+
+    function enviar_datos(event){
+        const form = document.getElementById('formulario_solicitud');
+        const formData = new FormData(form);
+        var boton = document.getElementById('registrar').textContent;
+        var pago = document.getElementById('pago');
+        var formulario_solicitud = document.getElementById('div_sol');
+        if (form.checkValidity() === false) {
+            return;
+        }
+        event.preventDefault();
+
+        if (boton == "Registrar"){
+            pago.classList.remove('d-none')
+            formulario_solicitud.classList.add('d-none');
+            completar_pago();
+        }else{
+
+        }
+    }
+    function mostrar_img(tipo){
+        var imagen = document.getElementById('imagen_qr');
+        var metodo = document.getElementById('metodo');
+        switch (tipo) {
+            case 'yape':
+                    metodo.textContent = "yape";
+                    imagen.src = "/static/img/yape_qr.jpg";
+                break;
+            case 'plin':
+                    metodo.textContent = "plin";
+                    imagen.src = "/static/img/QR_plin.jpg";
+                break;
+            case 'tarjeta':
+                metodo.textContent = "tarjeta";
+                imagen.src = "g";
+            break;
+            default:
+                    metodo.textContent = "efectivo";
+                    imagen.src = "";
+                break;
+        }
+        
+    }
+    function desabilitar(elemento){
+        document.getElementById(elemento).checked = false;
+    }
+    function validar_dni(input,estado,mostrar){
+        var dni = document.getElementById(input);
+        var estado = document.getElementById(estado);
+        var mostrar = document.getElementById(mostrar);
+        if (estado.checked == true && dni.value.length == 8){
+            fetch(`/validar_dni/${dni.value}`)
+            .then(response => {return response.json()})
+            .then(element => {
+                if(element.estado == "si"){
+                    dni.disabled = true;
+                    mostrar.value = element.nombre; 
+                }else{
+                    alert("No existe ese feligres");
+                    dni.disabled = false;
+                    mostrar.value = ""; 
+                    estado.checked = false;
+                }
+            }
+            )
+        }else if (dni.value.length== 0 || dni.value.length <9){
+            alert("Ingrese el dni completo ");
+            dni.disabled = false;
+            mostrar.value = ""; 
+            estado.checked = false;
+        }else{
+            dni.disabled = false;
+            mostrar.value = ""; 
+            estado.checked = false;
+        }
+    }
+    function completar_pago(){
+        var responsable = document.getElementById('responsable');
+        var acto = document.getElementById('acto_seleccionado');
+        if(acto.selectedOptions[0].text == "Matrimonio"){
+            var dni_novio = document.getElementById('dni_novio');
+            var dni_novia = document.getElementById('dni_novia');
+            var novio = document.getElementById('Feligresdni_novio');
+            var novia = document.getElementById('Feligresdni_novia');
+            responsable.innerHTML = `
+                <option value=""></option>
+                <option value="${dni_novio.value}">${novio.value}</option>
+                <option value="${dni_novia.value}">${novia.value}</option>
+            `;    
+        }else if(acto.selectedOptions[0].text == "Bautismo"){
+            var dni_tutor = document.getElementById('dni_tutor').value;
+            var tutor = document.getElementById('nombre_tutor').value;
+            responsable.innerHTML = `
+                <option value="${dni_tutor}">${tutor}</option>
+            `
+            precio();
+        }
+    }
+    function precio(){
+        var pagos= document.getElementById('pagos');
+        var monto = document.getElementById('amount');
+        var acto = document.getElementById('acto_seleccionado');
+        var acto_liturgico = acto.selectedOptions[0].text;
+        var sede = document.getElementById('sede').value;
+        var responsable = document.getElementById('responsable').value;
+        if(acto_liturgico == 'Matrimonio'){
+            var dni1 = document.getElementById('dni_novio').value;
+            var dni2 = document.getElementById('dni_novia').value;
+            pagos.disabled = true;
+            pagos.innerHTML = `
+                <span class="spinner-border spinner-border-sm" aria-hidden="true"></span>
+                <span class="ms-2">Calculando...</span>
+            `;
+
+            fetch(`/monto_acto/${acto_liturgico}/${sede}/${responsable}/${dni1}/${dni2}`)
+                .then(response => response.json())
+                .then(element => {
+                    datos_pago = element;
+
+                    if (element.estado == "si") {
+                        let total = (parseFloat(element.datos.pf_acto) || 0) + 
+                                    (parseFloat(element.datos.pf_sede) || 0) + 
+                                    (parseFloat(element.datos.pf_traslado) || 0);
+                        monto.value = total;
+                    }
+                    pagos.innerHTML = '';
+                    pagos.textContent = 'Confirmar pago';
+                    pagos.disabled = false;
+                })
+                .catch(error => {
+                    console.error('Error:', error);
+                    monto.value = '';
+                    pagos.innerHTML = '';
+                    pagos.disabled = false;
+                    pagos.textContent = 'Error al calcular';
+            });
+        }else if (acto_liturgico == 'Bautismo'){
+            pagos.disabled = true;
+            pagos.innerHTML = `
+                <span class="spinner-border spinner-border-sm" aria-hidden="true"></span>
+                <span class="ms-2">Calculando...</span>
+            `;
+            fetch(`/montobautismo/${sede}`)
+            .then(response => response.json())
+            .then(element => {
+                if (element.estado == "si"){
+                    monto.value = element.datos;
+                }
+                pagos.innerHTML = '';
+                pagos.textContent = 'Confirmar pago';
+                pagos.disabled = false;
+            })
+            .catch(error => {
+                console.error('Error:', error);
+                monto.value = '';
+                pagos.innerHTML = '';
+                pagos.disabled = false;
+                pagos.textContent = 'Error al calcular';
+            });
+        }
+    }
+
+    function grabar_solicitud() {
+        var id_acto = document.getElementById('acto_seleccionado').value;
+        var acto_selecionado = document.getElementById('responsable').value;
+        var acto = array_matrimonio();
+        var formData = new FormData();
+        var pagos = document.getElementById('pagos');
+
+        if (acto_selecionado.length == 0){
+            alert('Ingrese al feligres responsable');
+            pagos.disabled = true;
+            return ;
+        }
+
+        for (var key in acto) {
+            formData.append(key, acto[key]);  // Aquí se añaden tanto archivos como datos de texto
+        }
+        Swal.fire({
+            title: 'Procesando solicitud',
+            text: 'Por favor espera un momento...',
+            icon: 'info',
+            showConfirmButton: false,
+            allowOutsideClick: false, // Evita que el usuario cierre la alerta manualmente
+            didOpen: () => {
+                Swal.showLoading(); // Muestra un spinner de carga
+            }
+        });
+        fetch(`/registrarsolicitud/${id_acto}`, {
+            method: 'POST',
+            body: formData  // Aquí no se establecen los headers manualmente
+        })
+        .then(response => {
+            return response.json();
+        })
+        .then(data => {
+            Swal.close();
+            
+            if (data.estado == "Correcto"){
+                Swal.fire({
+                    title: "Solicitud aceptada!!",
+                    text: "Se agrego correctamente la solicitud!!",
+                    icon: "success"
+                }).then(() => {
+                    location.reload();
+                });
+            }else{
+                Swal.fire({
+                    title: "Cancelado",
+                    text: "La operación ha sido cancelada.",
+                    icon: "error", // Cambia a 'error' para mostrar un ícono de error
+                    confirmButtonText: "Aceptar" // Texto del botón de confirmación
+                });
+                pagos.disabled = true;
+            }
         })
         .catch(error => {
-            console.error('Error:', error);
-            pagos.innerHTML = '';
-            pagos.textContent = 'Error al calcular';
-        });}
-}
-
-function grabar_solicitud() {
-    var id_acto = document.getElementById('acto_seleccionado').value;
-    var acto = array_matrimonio();
-    var formData = new FormData();
-
-    for (var key in acto) {
-        formData.append(key, acto[key]);  // Aquí se añaden tanto archivos como datos de texto
-    }
-    var pagos = document.getElementById('pagos');
-
-    fetch(`/registrarsolicitud/${id_acto}`, {
-        method: 'POST',
-        body: formData  // Aquí no se establecen los headers manualmente
-    })
-    .then(response => {
-        return response.json();
-    })
-    .then(data => {
-        if (data.estado == "Correcto"){
-            Swal.fire({
-                title: "Good job!",
-                text: "You clicked the button!",
-                icon: "success"
-            }).then(() => {
-                location.reload();
-            });
-        }else{
             Swal.fire({
                 title: "Cancelado",
                 text: "La operación ha sido cancelada.",
@@ -349,102 +1071,202 @@ function grabar_solicitud() {
                 confirmButtonText: "Aceptar" // Texto del botón de confirmación
             });
             pagos.disabled = true;
-        }
-    })
-    .catch(error => {
-        Swal.fire({
-            title: "Cancelado",
-            text: "La operación ha sido cancelada.",
-            icon: "error", // Cambia a 'error' para mostrar un ícono de error
-            confirmButtonText: "Aceptar" // Texto del botón de confirmación
-          });
+        });
         pagos.disabled = true;
-    });
-    pagos.disabled = true;
-}
+    }
 
 
-function array_matrimonio() {
-    var array = {
-        'copia_dninovio': document.getElementById('copia_dninovio').files[0],  // Archivo
-        'dni_novio': document.getElementById('dni_novio').value,              // Valor de texto
-        'copia_dninovia': document.getElementById('copia_dninovia').files[0],  // Archivo
-        'dni_novia': document.getElementById('dni_novia').value,              // Valor de texto
-        'dni_testigo1': document.getElementById('dni_testigo1').value,        // Valor de texto
-        'dni_testigo2': document.getElementById('dni_testigo2').value,        // Valor de texto
-        'sede': document.getElementById('sede').value,                        // Valor de texto
-        'f_matrimonio': document.getElementById('f_matrimonio').value,        // Valor de texto
-        'consb_novio': document.getElementById('consb_novio').files[0],      // Archivo
-        'consc_novio': document.getElementById('consc_novio').files[0],      // Archivo
-        'consb_novia': document.getElementById('consb_novia').files[0],      // Archivo
-        'consc_novia': document.getElementById('consc_novia').files[0],      // Archivo
-        'fc_novio': document.getElementById('fc_novio').files[0],            // Archivo
-        'fc_novia': document.getElementById('fc_novia').files[0],            // Archivo
-        'fvih_novio': document.getElementById('fvih_novio').files[0],        // Archivo
-        'fvih_novia': document.getElementById('fvih_novia').files[0],        // Archivo
-        'charlas': document.getElementById('charlas').value,                  // Valor de texto
-        //aca empieza lo de divertido los paguitos
-        'responsable' : document.getElementById('responsable').value,
-        'metodo': document.getElementById('metodo').textContent,
-        'sede': document.getElementById('sede').value,
-        'es_copia_dninovio': document.getElementById('es_copia_dninovio').checked ? 'V' : 'F',
-        'es_dni_novio': document.getElementById('es_dni_novio').checked ? 'V' : 'F',
-        'es_copia_dninovia': document.getElementById('es_copia_dninovia').checked ? 'V' : 'F',
-        'es_dni_novia': document.getElementById('es_dni_novia').checked ? 'V' : 'F',
-        'es_dni_testigo1': document.getElementById('es_dni_testigo1').checked ? 'V' : 'F',
-        'es_dni_testigo2': document.getElementById('es_dni_testigo2').checked ? 'V' : 'F',
-        'es_sede': document.getElementById('es_sede').checked ? 'V' : 'F',
-        'es_f_matrimonio': document.getElementById('es_f_matrimonio').checked ? 'V' : 'F',
-        'es_consb_novio': document.getElementById('es_consb_novio').checked ? 'V' : 'F',
-        'es_consc_novio': document.getElementById('es_consc_novio').checked ? 'V' : 'F',
-        'es_consb_novia': document.getElementById('es_consb_novia').checked ? 'V' : 'F',
-        'es_consc_novia': document.getElementById('es_consc_novia').checked ? 'V' : 'F',
-        'es_fc_novio': document.getElementById('es_fc_novio').checked ? 'V' : 'F',
-        'es_fc_novia': document.getElementById('es_fc_novia').checked ? 'V' : 'F',
-        'es_fvih_novio': document.getElementById('es_fvih_novio').checked ? 'V' : 'F',
-        'es_fvih_novia': document.getElementById('es_fvih_novia').checked ? 'V' : 'F',
-        'es_charlas': document.getElementById('es_charlas').checked ? 'V' : 'F'
-    };
-    return array;
-}
+    function array_matrimonio() {
+        var metodo = document.getElementById('metodo');
+        var mt = metodo.textContent;
+        var array = {
+            'copia_dninovio': document.getElementById('copia_dninovio').files[0],  // Archivo
+            'dni_novio': document.getElementById('dni_novio').value,              // Valor de texto
+            'copia_dninovia': document.getElementById('copia_dninovia').files[0],  // Archivo
+            'dni_novia': document.getElementById('dni_novia').value,              // Valor de texto
+            'dni_testigo1': document.getElementById('dni_testigo1').value,        // Valor de texto
+            'dni_testigo2': document.getElementById('dni_testigo2').value,        // Valor de texto
+            'sede': document.getElementById('sede').value,                        // Valor de texto
+            'f_matrimonio': document.getElementById('f_matrimonio').value,        // Valor de texto
+            'consb_novio': document.getElementById('consb_novio').files[0],      // Archivo
+            'consc_novio': document.getElementById('consc_novio').files[0],      // Archivo
+            'consb_novia': document.getElementById('consb_novia').files[0],      // Archivo
+            'consc_novia': document.getElementById('consc_novia').files[0],      // Archivo
+            'fc_novio': document.getElementById('fc_novio').files[0],            // Archivo
+            'fc_novia': document.getElementById('fc_novia').files[0],            // Archivo
+            'fvih_novio': document.getElementById('fvih_novio').files[0],        // Archivo
+            'fvih_novia': document.getElementById('fvih_novia').files[0],        // Archivo
+            //aca empieza lo de divertido los paguitos
+            'responsable' : document.getElementById('responsable').value,
+            'metodo': mt,
+            'sede': document.getElementById('sede').value,
+            'es_copia_dninovio': document.getElementById('es_copia_dninovio').checked ? 'V' : 'F',
+            'es_dni_novio': document.getElementById('es_dni_novio').checked ? 'V' : 'F',
+            'es_copia_dninovia': document.getElementById('es_copia_dninovia').checked ? 'V' : 'F',
+            'es_dni_novia': document.getElementById('es_dni_novia').checked ? 'V' : 'F',
+            'es_dni_testigo1': document.getElementById('es_dni_testigo1').checked ? 'V' : 'F',
+            'es_dni_testigo2': document.getElementById('es_dni_testigo2').checked ? 'V' : 'F',
+            'es_sede': document.getElementById('es_sede').checked ? 'V' : 'F',
+            'es_f_matrimonio': document.getElementById('es_f_matrimonio').checked ? 'V' : 'F',
+            'es_consb_novio': document.getElementById('es_consb_novio').checked ? 'V' : 'F',
+            'es_consc_novio': document.getElementById('es_consc_novio').checked ? 'V' : 'F',
+            'es_consb_novia': document.getElementById('es_consb_novia').checked ? 'V' : 'F',
+            'es_consc_novia': document.getElementById('es_consc_novia').checked ? 'V' : 'F',
+            'es_fc_novio': document.getElementById('es_fc_novio').checked ? 'V' : 'F',
+            'es_fc_novia': document.getElementById('es_fc_novia').checked ? 'V' : 'F',
+            'es_fvih_novio': document.getElementById('es_fvih_novio').checked ? 'V' : 'F',
+            'es_fvih_novia': document.getElementById('es_fvih_novia').checked ? 'V' : 'F',
+            'es_charlas': document.getElementById('es_charlas').checked ? 'V' : 'F'
+        };
+        return array;
+    }
 
-function listar_solicitudes() {
-    fetch('/listar_solicitudes')
-        .then(response => response.json())  // Parseamos la respuesta como JSON
-        .then(data => {
-            const tbody = document.getElementById('solicitud');
-            tbody.innerHTML = '';  // Limpiar el contenido actual del tbody
+    function listar_solicitudes() {
+        fetch('/listar_solicitudes')
+            .then(response => response.json())  // Parseamos la respuesta como JSON
+            .then(data => {
+                const tbody = document.getElementById('solicitud');
+                tbody.innerHTML = '';  // Limpiar el contenido actual del tbody
 
-            if (data.data) {
-                // Si hay datos, los insertamos en la tabla
-                data.data.forEach(solicitud => {
+                if (data.data) {
+                    // Si hay datos, los insertamos en la tabla
+                    data.data.forEach(solicitud => {
+                        const row = document.createElement('tr');
+
+                        // Creamos celdas para cada campo de la solicitud
+                        row.innerHTML = `
+                            <td class="text-center">${solicitud.id_solicitud}</td>
+                            <td class="text-center">${solicitud.fecha}</td>
+                            <td class="text-center">${solicitud.nombre_sede}</td>
+                            <td class="text-center">${solicitud.nombre_liturgia}</td>
+                            <td class="text-center">${solicitud.nombres}</td>
+                            <td class="text-center">
+                                <button class="btn btn-primary btn-sm">
+                                    <i class="bi bi-check2-circle"></i>
+                                </button>
+                                <button class="btn btn-secondary btn-sm" onclick="asistencias(${solicitud.id_solicitud}, '${solicitud.nombre_liturgia}')">
+                                    <i class="bi bi-calendar3"></i>
+                                </button>
+                            </td>
+                        `;
+                        tbody.appendChild(row);  // Añadimos la fila a la tabla
+                    });
+                } else {
+                    // Si no hay datos, podemos agregar un mensaje o manejar el error
                     const row = document.createElement('tr');
+                    row.innerHTML = '<td colspan="6">No se encontraron solicitudes</td>';
+                    tbody.appendChild(row);
+                }
+            })
+            .catch(error => {
+                console.error('Error al obtener solicitudes:', error);
+            });
+    }
 
-                    // Creamos celdas para cada campo de la solicitud
-                    row.innerHTML = `
-                        <td>${solicitud.id_solicitud}</td>
-                        <td>${solicitud.nombre_sede}</td>
-                        <td>${solicitud.nombre_liturgia}</td>
-                        <td>${solicitud.nombres}</td>
-                        <td>
-                            <button class="btn btn-primary">
-                                <i class="bi bi-check2-circle"></i>
-                            </button>
-                            <button class="btn btn-secondary">
-                                <i class="bi bi-calendar3"></i>
-                            </button>
-                        </td>
-                    `;
-                    tbody.appendChild(row);  // Añadimos la fila a la tabla
-                });
+    function validarNombre(inputId, checkboxId) {
+        const input = document.getElementById(inputId);
+        const checkbox = document.getElementById(checkboxId);
+        const valor = input.value.trim();
+        const palabras = valor.split(/\s+/);
+    
+        // Validación del número de palabras
+        if (checkbox.checked) {
+            if (palabras.length < 3 || palabras.length > 5) {
+                alert("Debe ingresar correctamente el nombre");
+                checkbox.checked = false; // Desmarca el checkbox si la validación falla
             } else {
-                // Si no hay datos, podemos agregar un mensaje o manejar el error
-                const row = document.createElement('tr');
-                row.innerHTML = '<td colspan="6">No se encontraron solicitudes</td>';
-                tbody.appendChild(row);
+                input.disabled = true; 
+            }
+        } else {
+            input.disabled = false;
+        }
+    }
+   
+
+    var md_asistencias = new bootstrap.Modal(document.getElementById('modal_asistencia'));
+    function asistencias(id,acto){
+        md_asistencias.show();
+        //limpiamos
+        var tbody = document.getElementById('cu_cuerpo');
+        var uno = document.getElementById('uno');
+        var dos = document.getElementById('dos');
+        uno.textContent = acto;
+        dos.textContent = id;
+
+        tbody.innerHTML = "";
+
+        fetch(`/asistencias_solicitud/${id}`)
+        .then(response => response.json())
+        .then(item => {
+            if (item.estado == "si"){
+                item.data.forEach(dt => {
+                    var tr = document.createElement('tr');
+                    tr.innerHTML = 
+                        `
+                        <td> ${dt.id_asistencia} </td>
+                        <td> ${dt.descripcion}  </td>
+                        <td> ${dt.fecha}  </td>
+                        <td> ${dt.rol}  </td>
+                        <td> ${dt.dni}  </td>
+                        <td> ${dt.nombre}  </td>
+                        <td>
+                        <input class="me-1" id="${dt.id_asistencia}" 
+                            type="checkbox" 
+                            ${dt.estado == 1 ? 'checked disabled' : `onclick="agregar_asistencia(${dt.id_asistencia})"`}>
+                        <label for="">${ dt.estado == 1 ? '(Asistió)' : '(Falto)' }</label>
+                        </td>
+                    `
+                    tbody.appendChild(tr);
+                });
+            }else{
+                alert("No se encontro las asistencias para esa solicitud");
             }
         })
-        .catch(error => {
-            console.error('Error al obtener solicitudes:', error);
+    }
+
+    function estado_generales() {
+        var check = document.getElementById('estado_general');
+        var che = document.querySelectorAll('input[type="checkbox"]:not(#estado_general)');
+        var estado = check.checked;
+
+        che.forEach(input => {
+            input.checked = estado;
         });
-}
+    }
+    
+
+    function agregar_asistencia(id){
+        var seleccion = document.getElementById(id);
+        if (seleccion.checked == true){
+            seleccion = 1
+        }else{
+            seleccion = 0;
+        }
+        fetch(`/check_asistencia/${id}/${seleccion}`)
+        .then(response => response.json())
+        .then(item =>{
+            if (item.estado == "correcto"){
+                Toastify({
+                    text: "Se modifico la asistencia!!",
+                    duration: 2000,
+                    close: true,
+                    backgroundColor: "--bs-primary",
+                    gravity: "bottom",
+                    position: "right",
+                }).showToast();
+            }else{
+                Toastify({
+                    text: "No se pudo modificar la asistencia!!",
+                    duration: 2000,
+                    close: true,
+                    backgroundColor: "#dc3545;",
+                    gravity: "bottom",
+                    position: "right",
+                }).showToast();
+            }
+        })
+
+    }
+
+
+

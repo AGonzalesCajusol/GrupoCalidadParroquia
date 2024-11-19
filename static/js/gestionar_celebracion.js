@@ -75,8 +75,7 @@ document.addEventListener('DOMContentLoaded', function () {
     });
 
     calendar.render();  // Renderizar el calendario
-
-    // Cuando se cambia el año en el select
+    
     yearSelect.addEventListener('change', function () {
         var selectedYear = yearSelect.value;
         var newDate = new Date(selectedYear, 0, 1);  // Cambiar a enero 1 del año seleccionado

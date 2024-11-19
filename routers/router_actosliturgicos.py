@@ -3,6 +3,7 @@ import controladores.controlador_actosliturgicos as cal
 import json
 import urllib.parse
 import envio_correo 
+from routers.router_main import requerido_login
 
 def registrar_rutas(app):
     @app.route("/gestionar_actosliturgicos", methods=["GET"])

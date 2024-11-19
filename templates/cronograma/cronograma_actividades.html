@@ -1,0 +1,46 @@
+{% extends 'index.html' %}
+
+{% block title %}Cronograma de Actividades{% endblock %}
+
+{% block cuerpo %}
+<div class="container mt-4">
+    <h1 class="text-center">Cronograma de Actividades</h1>
+    <div id="calendar" style="max-width: 100%; margin: 0 auto;"></div>
+</div>
+
+<!-- FullCalendar CSS y JS -->
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/fullcalendar@5.11.0/main.min.css">
+<script src="https://cdn.jsdelivr.net/npm/fullcalendar@5.11.0/main.min.js"></script>
+
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    var calendarEl = document.getElementById('calendar');
+    var calendar = new FullCalendar.Calendar(calendarEl, {
+        initialView: 'dayGridMonth',
+        locale: 'es',
+        headerToolbar: {
+            left: 'prev,next today',
+            center: 'title',
+            right: 'dayGridMonth,timeGridWeek,timeGridDay'
+        },
+        events: '/api/obtener_actividades',
+        height: 'auto',
+    });
+
+    calendar.render();
+});
+</script>
+
+<style>
+#calendar {
+    background-color: white;
+    border-radius: 8px;
+    padding: 10px;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+    margin-bottom: 20px;
+}
+.fc-header-toolbar {
+    margin-bottom: 20px;
+}
+</style>
+{% endblock %}

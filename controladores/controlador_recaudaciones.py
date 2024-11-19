@@ -165,7 +165,12 @@ def obtener_tipos_recaudacion():
     try:
         with conexion.cursor() as cursor:
             # Solo selecciona los tipos de recaudación donde estado = 1
-            cursor.execute("SELECT id_tipo_recaudacion, nombre_recaudacion FROM tipo_recaudacion WHERE estado = 1")
+            cursor.execute("""
+                SELECT DISTINCT tr.id_tipo_recaudacion, tr.nombre_recaudacion 
+                FROM recaudacion r
+                JOIN tipo_recaudacion tr ON r.id_tipo_recaudacion = tr.id_tipo_recaudacion
+                WHERE tr.estado = 1
+            """)
             tipos_recaudacion = cursor.fetchall()
         return tipos_recaudacion
     except Exception as e:

@@ -87,9 +87,8 @@ $(document).ready(function () {
         },
         initComplete: function () {
             // Agregar botones para agregar y exportar recaudaciones
-            $("div.button-section").html('<button type="button" class="btn btn-success btn-lg custom-btn ml-3 btn-agregar-recaudacion" data-bs-toggle="modal" onclick="abrirModalRecaudacion(\'add\')"><i class="bi bi-person-plus"></i> Agregar recaudación</button>');
-            $("div.button-section").append('<button type="button" onclick="exportarTablaPDF()" class="btn btn-success btn-lg custom-btn ml-3" data-bs-toggle="modal" data-bs-target="#exportModal"><i class="bi bi-file-earmark-arrow-down"></i> Exportar recaudaciones</button>');
-            
+            $("div.button-section").html('<button type="button" margin-left: auto; class="btn btn-success btn-lg custom-btn ml-3 btn-agregar-recaudacion" data-bs-toggle="modal" onclick="abrirModalRecaudacion(\'add\')"><i class="bi bi-person-plus"></i> Agregar recaudación</button>');
+            $("div.button-section").append('<button type="button"margin-left: auto; onclick="exportarTablaPDF()" class="btn btn-success btn-lg custom-btn ml-3" data-bs-toggle="modal" data-bs-target="#exportModal"><i class="bi bi-file-earmark-arrow-down"></i> Exportar recaudaciones</button>');
             // Opciones para el filtro de año
             let opcionesAño = '<option value="">Todos</option>';
             fetch("/apiaños")
@@ -101,14 +100,27 @@ $(document).ready(function () {
 
                     // Insertar el selector de año en el DOM
                     $("div.dataTables_filter").addClass("d-flex align-items-center");
-                    $("div.dataTables_filter").prepend(`
+                    $("div.dataTables_filter").html(`
                         <div class="d-flex align-items-center me-2">
                             <label for="filtroAño" class="me-2">Año:</label>
                             <select id="filtroAño" class="form-select" style="width: auto;" onchange="filtrarPorAño()">
                                 ${opcionesAño}
                             </select>
                         </div>
+                        <div class="d-flex align-items-center me-2">
+                            <label for="filtroTipo" class="me-2">Tipo:</label>
+                            <select id="filtroTipo" class="form-select" style="width: auto;" onchange="filtrarPorTipo()">
+                                ${opcionesTipo}
+                            </select>
+                        </div>
+                        <div class="d-flex align-items-center">
+                        <label for="buscar" class="me-2">Buscar:</label>
+                        <input type="search" id="buscar" style="flex-grow: 1; max-width: 200px; height: 37.5px; padding: 5px;" placeholder="" aria-controls="recaudacionesTable">
+                        </div>
                     `);
+                    $('#buscar').on('keyup', function() {
+                        table.search(this.value).draw();
+                    });
                 })
                 .catch(error => {
                     console.error("Error al cargar los años:", error);
@@ -119,20 +131,14 @@ $(document).ready(function () {
             fetch("/api/tipos")
                 .then(response => response.json())
                 .then(response => {
-                    response.data.forEach(element => {
-                        const tipoNombre = element.tipo[1];  // Solo usa el nombre, ignorando el ID
-                        opcionesTipo += `<option value="${tipoNombre}">${tipoNombre}</option>`;
-                    });
-
-                    // Insertar el selector de tipo en el DOM después del filtro de año
-                    $("div.dataTables_filter").append(`
-                        <div class="d-flex align-items-center me-2">
-                            <label for="filtroTipo" class="me-2">Tipo:</label>
-                            <select id="filtroTipo" class="form-select" style="width: auto;" onchange="filtrarPorTipo()">
-                                ${opcionesTipo}
-                            </select>
-                        </div>
-                    `);
+                    if (response.data) {
+                        response.data.forEach(element => {
+                            opcionesTipo += `<option value="${element.tipo}">${element.tipo}</option>`;
+                        });
+            
+                        // Insertar las opciones en el select ya existente
+                        $('#filtroTipo').html(opcionesTipo);
+                    }
                 })
                 .catch(error => {
                     console.error("Error al cargar los tipos:", error);
@@ -140,6 +146,7 @@ $(document).ready(function () {
         }
     });
 });
+
 
 // Función para filtrar por año en el combo
 function filtrarPorAño() {

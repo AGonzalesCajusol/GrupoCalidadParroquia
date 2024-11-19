@@ -9,7 +9,7 @@ $(document).ready(function () {
         //dom: '<"d-flex justify-content-between align-items-center mb-3"<"d-flex"l<"d-flex justify-content-between align-items-center"f<"ml-3 button-section">>>rt<"bottom"p>',
         initComplete: function () {
             // Insertar el botón "Agregar ministro" dentro del div y alinearlo a la derecha
-            $("div.button-section").html('<button type="button" class="btn btn-success btn-lg custom-btn ml-3 btn-agregar-ministro" data-bs-toggle="modal" data-bs-target="#agregarModal" onclick="abirC()"><i class="bi bi-person-plus"></i> Agregar Congregación </button>');
+            $("div.button-section").html('<button type="button" class="btn btn-success btn-lg custom-btn ml-3 btn-agregar-ministro" data-bs-toggle="modal" data-bs-target="#agregarModal" onclick="abirC()"><i class="bi bi-person-plus"></i> Agregar congregación </button>');
         }
     });
 });
@@ -32,7 +32,7 @@ function abirC() {
     const submitBtn = document.getElementById('submitBtn');
     const formCongregacion = document.getElementById('formCongregacion'); // Obtener el formulario
 
-    modalTitle.textContent = 'Agregar Congregación';
+    modalTitle.textContent = 'Agregar congregación';
     submitBtn.textContent = 'Guardar';
 
     // Cambiar el action del formulario para que apunte a la ruta de inserción
@@ -58,7 +58,7 @@ function abrirModalEditarC(id, nombre, estado) {
     const submitBtn = document.getElementById('submitBtn');
     const formCongregacion = document.getElementById('formCongregacion');
 
-    modalTitle.textContent = 'Editar Congregación';
+    modalTitle.textContent = 'Editar congregación';
     submitBtn.textContent = 'Guardar cambios';
 
     // Cambia el evento de envío para usar AJAX en lugar del envío tradicional
@@ -102,7 +102,7 @@ function abrirModalVerC(id, nombre, estado) {
     const modalTitle = document.getElementById('ModalCongregacionLabel');
     const submitBtn = document.getElementById('submitBtn');
 
-    modalTitle.textContent = 'Ver Congregación';
+    modalTitle.textContent = 'Ver congregación';
     submitBtn.style.display = 'none'; // Ocultar el botón de Guardar
 
     document.getElementById('congregacionId').value = id;
@@ -173,7 +173,7 @@ function actualizarTablaCongregacion(congregacion) {
         row.innerHTML = `
             <td class="text-center border">${Congre.id}</td>
             <td>${Congre.nombre_congregacion}</td>
-            <td>${Congre.estado == '1' ? 'Activo' : 'Inactivo'}</td>
+            <td class="text-center">${Congre.estado == '1' ? 'Activo' : 'Inactivo'}</td>
             <td class="text-center border">
                 <button class="btn btn-primary btn-sm" title="Ver"
                     onclick="abrirModalVerC('${Congre.id}','${Congre.nombre_congregacion}','${Congre.estado}')">
@@ -204,4 +204,71 @@ function actualizarTablaCongregacion(congregacion) {
     table.rows.add($(tbody).find('tr'));
     table.draw(false);
     table.page(currentPage).draw(false);
+}
+
+function eliminarCongre(event, id) {
+    event.preventDefault();
+
+    if (confirm("¿Estás seguro de que deseas eliminar esta congregación?")) {
+        fetch("/eliminar_congregacion", {
+            method: "POST",
+            headers: {
+                "Content-Type": "application/x-www-form-urlencoded"
+            },
+            body: `id=${encodeURIComponent(id)}`
+        })
+        .then(response => response.json())
+        .then(data => {
+            if (data.success) {
+                mostrarAlerta("success", data.message);
+                actualizarTablaCongregacion();
+            } else {
+                mostrarAlerta("danger", data.message);
+            }
+        })
+        .catch(error => {
+            console.error("Error en la solicitud de eliminación:", error);
+            mostrarAlerta("danger", "Hubo un error al intentar eliminar la congregación.");
+        });
+    }
+}
+
+// Función para mostrar notificaciones
+function mostrarAlerta(tipo, mensaje) {
+    const alertaDiv = document.getElementById('alerta');
+    alertaDiv.innerHTML = `
+        <div class="alert alert-${tipo} alert-dismissible fade show" role="alert">
+            ${mensaje}
+            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+        </div>
+    `;
+    alertaDiv.style.display = "block";
+    //alertaDiv.scrollIntoView({ behavior: "smooth" });
+    setTimeout(() => {
+        alertaDiv.style.display = "none";
+    }, 5000);
+}
+
+function actualizarTablaCongregacion() {
+    const table = $('#sedeTable').DataTable();
+    const currentPage = table.page(); // Guardar la página actual
+
+    fetch("/gestionar_congregacion")
+        .then(response => response.text())
+        .then(html => {
+            const parser = new DOMParser();
+            const doc = parser.parseFromString(html, "text/html");
+            const nuevaTabla = doc.querySelector("#sedeTable tbody");
+
+            // Actualizar el cuerpo de la tabla
+            const tbody = document.querySelector("#sedeTable tbody");
+            tbody.innerHTML = nuevaTabla.innerHTML;
+
+            // Volver a inicializar DataTables y mantener la página actual
+            table.clear().rows.add($(tbody).find('tr')).draw(false);
+            table.page(currentPage).draw(false);
+        })
+        .catch(error => {
+            console.error("Error al actualizar la tabla:", error);
+        });
 }

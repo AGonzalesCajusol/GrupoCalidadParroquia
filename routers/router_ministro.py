@@ -4,6 +4,8 @@ from controladores.controlador_ministro import *
 from controladores.controlador_cargo import *
 from controladores.controlador_tipo_ministro import *
 import hashlib
+from routers.router_main import requerido_login
+
 
 # Función para encriptar contraseñas usando SHA-256
 def encriptar_contraseña(contraseña):

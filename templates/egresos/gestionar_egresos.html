@@ -2,54 +2,52 @@
 {% block title %}Gestión de Egresos{% endblock %}
 {% block cuerpo %}
 
+<style>
+    .dataTables_filter label input {
+    width: 325px !important;
+}
+</style>
 
 <div class="container mt-4">
     <h1 class="titulo-gestion">Gestión de Egresos</h1>
 
     <div>
-        <!-- Tabla de egresos -->
+        <!-- DataTable para la gestión de egresos -->
         <table id="egresosTable" class="table table-hover table-striped">
             <thead>
-                <tr>
-                    <th style="vertical-align: middle; text-align: center;">ID Egreso</th>
-                    <th style="vertical-align: middle; text-align: center;">Nombre Sede</th>
-                    <th style="vertical-align: middle; text-align: center;">Monto</th>
-                    <th style="vertical-align: middle; text-align: center;">Descripción</th>
+                <tr class="text-center">
+                    <th style="vertical-align: middle; text-align: center;">ID</th>
+                    <th style="vertical-align: middle; text-align: center;">Sede</th>
+                    <th style="vertical-align: middle; text-align: center;">Descripciones</th> <!-- Cambiado a Observaciones -->
                     <th style="vertical-align: middle; text-align: center;">Fecha</th>
                     <th style="vertical-align: middle; text-align: center;">Hora</th>
-                    <th class="text-center" style="width: 200px;">Acciones</th>
+                    <th style="vertical-align: middle; text-align: center;width: 100px">Monto</th>
+                    <th style="vertical-align: middle; text-align: center; width: 100px;">Acciones</th>
                 </tr>
             </thead>
             <tbody>
                 {% for egreso in egresos %}
                 <tr>
-                    <th class="text-center">{{ egreso[0] }}</td>
-                    <th class="text-center">{{ egreso[1] }}</td>
-                    <td style="vertical-align: middle; text-align: center; padding-left: 45px;">{{ egreso[2] }}</td>
-                    <th>{{ egreso[3] }}</td>
-                    <th>{{ egreso[4] }}</td>
-                    <th>{{ egreso[5] }}</td>
+                    <td class="text-center">{{ egreso[0] }}</td> <!-- ID de la recaudación -->
+                    <td>{{ egreso[1] }}</td> <!-- Nombre de la sede -->
+                    <td>{{ egreso[2] }}</td> <!-- Descripcion -->  
+                    <td>{{ egreso[3].strftime('%d-%m-%Y') }}</td> <!-- Formateo de la fecha -->
+                    <td>{{ egreso[4] }}</td> <!-- Hora -->
+                    <td style="vertical-align: middle; text-align: center; padding-left: 45px;">{{ egreso[5] }}</td> <!-- Monto -->
                     <td class="text-center">
-                        <button class="btn btn-primary btn-sm" title="Ver"
-                            onclick="abrirModalVer('{{ egreso[0] }}', '{{ egreso[1] }}', '{{ egreso[2] }}', '{{ egreso[3] }}', '{{ egreso[4] }}', '{{ egreso[5] }}')">
+                    <!-- Botón para ver detalles -->
+                        <button class="btn btn-primary btn-sm" title="view"
+                            onclick="abrirModalEgreso('view', '{{ egreso[0] }}', '{{ egreso[1] }}', '{{ egreso[2] }}', '{{ egreso[3] }}', '{{ egreso[4] }}', '{{ egreso[5] }}')">
                             <i class="fas fa-eye"></i>
                         </button>
 
-                        <button class="btn btn-warning btn-sm"
-                            onclick="abrirModalEditar('{{ egreso[0] }}', '{{ egreso[1] }}', '{{ egreso[2] }}', '{{ egreso[3] }}', '{{ egreso[4] }}', '{{ egreso[5] }}')"><i
-                                class="fas fa-edit"></i></button>
+                        <!-- Botón para editar -->
+                        <button class="btn btn-warning btn-sm" title="edit"
+                            onclick="abrirModalEgreso('edit', '{{ egreso[0] }}', '{{ egreso[1] }}', '{{ egreso[2] }}', '{{ egreso[3] }}', '{{ egreso[4] }}', '{{ egreso[5] }}')">
+                            <i class="fas fa-edit"></i>
+                        </button>
 
-                        <!-- Comentario 
-                    <button type="button" class="btn btn-secondary btn-sm" title="Dar de baja" onclick="mostrarAlertaBaja()">
-                        <i class="fas fa-ban"></i>
-                    </button>
-                    <form action="{{ url_for('eliminar_egreso') }}" method="POST" style="display:inline-block;">
-                        <input type="hidden" name="id_egreso" value="{{ egreso[0] }}">
-                        <button type="button" class="btn btn-danger btn-sm" title="Eliminar" onclick="abrirModalEliminar('{{ egreso[0] }}')">
-                            <i class="fas fa-trash-alt"></i>
-                        </button>                        
-                    </form>
-                    -->
+                        
                     </td>
                 </tr>
                 {% endfor %}
@@ -58,163 +56,76 @@
     </div>
 </div>
 
-<!-- Modal para agregar -->
-<div class="modal fade" id="agregarModal" tabindex="-1" aria-labelledby="agregarModalLabel" aria-hidden="true">
+<!-- Modal para Agregar/Ver/Editar Egreso-->
+<div class="modal fade" id="egresoModal" tabindex="-1" aria-labelledby="egresoModalLabel" aria-hidden="true">
     <div class="modal-dialog">
         <div class="modal-content">
-            <form action="{{ url_for('insertar_egreso') }}" method="POST">
+            <form id="egresoForm" action="{{ url_for('procesar_insertar_egreso') }}" method="POST">
+                <input type="hidden" id="egresoId" name="id">
+                <!-- Campo oculto para el ID de la sede -->
+                <input type="hidden" id="sede_id" name="sede_id" value="{{ request.cookies.get('sede') }}">
+                
                 <div class="modal-header">
-                    <h5 class="modal-title" id="agregarModalLabel">Registrar Egreso</h5>
+                    <h5 class="modal-title" id="egresoModalLabel">Detalles de Egreso</h5>
                     <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
                 </div>
+                
                 <div class="modal-body">
-                    <!-- <div class="mb-3">
-                        <label for="id_sede" class="form-label">Sede</label>
-                        <select class="form-select" id="agregarSede" name="id_sede" required>
-                            {% if sede %}
-                                <option value="{{ sede[0] }}" selected>{{ sede[1] }}</option>
-                            {% else %}
-                                {% for sede in sedes %}
-                                <option value="{{ sede[0] }}">{{ sede[1] }}</option>
-                                {% endfor %}
-                            {% endif %}
-                        </select>
-                    </div> -->
+                    <!-- Campo de solo lectura para mostrar el nombre de la sede -->
+                    <div class="mb-3">
+                        <label for="sede_nombre" class="form-label">Sede</label>
+                        <input type="text" class="form-control" id="sede_nombre" name="sede_nombre" readonly disabled tabindex="-1">
+                    </div>
+                            
                     <div class="mb-3">
                         <label for="monto" class="form-label">Monto</label>
-                        <input type="number" step="0.01" class="form-control" name="monto" required>
+                        <input type="text" class="form-control" id="monto" name="monto" required>
                     </div>
+                    
                     <div class="mb-3">
-                        <label for="descripcion" class="form-label">Descripción</label>
-                        <input type="text" class="form-control" name="descripcion" required>
+                        <label for="descripcion" class="form-label">Descripcion</label>
+                        <input type="text" class="form-control" id="descripcion" name="descripcion" required>
                     </div>
-                </div>
-                <div class="modal-footer">
-                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
-                    <button type="submit" class="btn btn-primary">Guardar</button>
-                </div>
-            </form>
-        </div>
-    </div>
-</div>
-
-
-
-<!-- Modal para ver -->
-<div class="modal fade" id="verModal" tabindex="-1" aria-labelledby="verModalLabel" aria-hidden="true">
-    <div class="modal-dialog">
-        <div class="modal-content">
-            <div class="modal-header">
-                <h5 class="modal-title" id="verModalLabel">Detalles del Egreso</h5>
-                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-            </div>
-            <div class="modal-body">
-                <div class="mb-3">
-                    <label class="form-label">ID Egreso</label>
-                    <input type="text" class="form-control" id="verId" disabled>
-                </div>
-                <div class="mb-3">
-                    <label class="form-label">Nombre Sede</label>
-                    <input type="text" class="form-control" id="verSede" disabled>
-                </div>
-                <div class="mb-3">
-                    <label class="form-label">Monto</label>
-                    <input type="text" class="form-control" id="verMonto" disabled>
-                </div>
-                <div class="mb-3">
-                    <label class="form-label">Descripción</label>
-                    <textarea class="form-control" id="verDescripcion" disabled></textarea>
-                </div>
-                <div class="mb-3">
-                    <label class="form-label">Fecha</label>
-                    <input type="text" class="form-control" id="verFecha" disabled>
-                </div>
-                <div class="mb-3">
-                    <label class="form-label">Hora</label>
-                    <input type="text" class="form-control" id="verHora" disabled>
-                </div>
-            </div>
-            <div class="modal-footer">
-                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cerrar</button>
-            </div>
-        </div>
-    </div>
-</div>
-
-
-<!-- Modal para editar --->
-<div class="modal fade" id="editarModal" tabindex="-1" aria-labelledby="editarModalLabel" aria-hidden="true">
-    <div class="modal-dialog">
-        <div class="modal-content">
-            <form action="{{ url_for('actualizar_egreso') }}" method="POST">
-                <input type="hidden" id="editarId" name="id_egreso">
-                <div class="modal-header">
-                    <h5 class="modal-title" id="editarModalLabel">Modificar Egreso</h5>
-                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-                </div>
-                <div class="modal-body">
-                    <div class="mb-3">
-                        <label for="id_sede" class="form-label">Sede</label>
-                        <select class="form-select" id="editarSede" name="id_sede" required>
-                            {% for sede in sedes %}
-                            <option value="{{ sede[0] }}" {% if sede[1]==nombre_sede %}selected{% endif %}>{{ sede[1] }}
-                            </option>
-                            {% endfor %}
-                        </select>
-                    </div>
-                    <div class="mb-3">
-                        <label for="monto" class="form-label">Monto</label>
-                        <input type="number" step="0.01" class="form-control" id="editarMonto" name="monto" required>
-                    </div>
-                    <div class="mb-3">
-                        <label for="descripcion" class="form-label">Descripción</label>
-                        <textarea class="form-control" id="editarDescripcion" name="descripcion" required></textarea>
-                    </div>
-                    <div class="mb-3">
+                    <div class="mb-3" id="fechaContainer" style="display: none;">
                         <label for="fecha" class="form-label">Fecha</label>
-                        <input type="date" class="form-control" id="editarFecha" name="fecha" disabled>
+                        <input type="text" class="form-control" id="fecha" name="fecha" readonly>
                     </div>
-                    <div class="mb-3">
+                    
+                    <div class="mb-3" id="horaContainer" style="display: none;">
                         <label for="hora" class="form-label">Hora</label>
-                        <input type="time" class="form-control" id="editarHora" name="hora" disabled>
+                        <input type="text" class="form-control" id="hora" name="hora" readonly>
                     </div>
                 </div>
+                
                 <div class="modal-footer">
-                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
-                    <button type="submit" class="btn btn-primary">Guardar cambios</button>
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cerrar</button>
+                    <button type="submit" class="btn btn-primary" id="submitBtn">Guardar</button>
                 </div>
             </form>
         </div>
     </div>
 </div>
 
-
-
-<!-- Modal de confirmación para eliminar
-<div class="modal fade" id="confirmarEliminarModal" tabindex="-1" aria-labelledby="confirmarEliminarLabel" aria-hidden="true">
-    <div class="modal-dialog">
-        <div class="modal-content">
-            <div class="modal-header">
-                <h5 class="modal-title" id="confirmarEliminarLabel">Confirmar Eliminación</h5>
-                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-            </div>
-            <div class="modal-body">
-                <p>¿Estás seguro de que deseas eliminar este egreso?</p>
-            </div>
-            <div class="modal-footer">
-                <form id="formEliminar" action="{{ url_for('eliminar_egreso') }}" method="POST">
-                    <input type="hidden" name="id_egreso" id="eliminarId">
-                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
-                    <button type="submit" class="btn btn-danger">Eliminar</button>
-                </form>
-            </div>
-        </div>
-    </div>
+<!-- Parte mensajes-->
+<div class="container mt-3" id="mensaje-container">
+    {% with messages = get_flashed_messages(with_categories=True) %}
+      {% if messages %}
+        {% for category, message in messages %}
+          <div class="alert alert-{{ category }} alert-dismissible fade show" role="alert">
+            {{ message }}
+            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+          </div>
+        {% endfor %}
+      {% endif %}
+    {% endwith %}
 </div>
-----Comentario Fin -->
-
 <script src="/static/js/egresos.js"></script>
-
+<script type="text/javascript">
+    const urlInsertarEgreso = "{{ url_for('procesar_insertar_egreso') }}";
+    const urlActualizarEgreso = "{{ url_for('procesar_actualizar_egreso') }}";
+</script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.4.0/jspdf.umd.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf-autotable/3.5.14/jspdf.plugin.autotable.min.js"></script>
 
 
 

@@ -14,6 +14,7 @@ from controladores.controlador_recaudaciones import (
     actualizar_recaudacion,
     eliminar_recaudacion
 )
+from routers.router_main import requerido_login
 
 def registrar_rutas(app):
     # Ruta para gestionar recaudaciones
@@ -144,8 +145,8 @@ def registrar_rutas(app):
     @app.route("/api/tipos", methods=["GET"])
     def api_tipos():
         try:
-            tipos = obtener_tipos_recaudacion()  # Esta función debe devolver una lista de tipos
-            lista_tipos = [{"tipo": tipo} for tipo in tipos]  # Asegúrate de que 'tipos' esté en el formato correcto
+            tipos = obtener_tipos_recaudacion()
+            lista_tipos = [{"tipo": tipo[1]} for tipo in tipos]  # Asegúrate de que 'tipos' sea una lista de tuplas (id, nombre)
             return jsonify({"data": lista_tipos})
         except Exception as e:
             print(f"Error al obtener tipos de recaudación: {e}")

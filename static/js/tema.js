@@ -1,14 +1,3 @@
-const diasSemana = {
-    1: 'Lunes',
-    2: 'Martes',
-    3: 'Miércoles',
-    4: 'Jueves',
-    5: 'Viernes',
-    6: 'Sábado',
-    7: 'Domingo'
-};
-
-
 function listarTemas() {
     const tbody = document.getElementById('temasTableBody');
 
@@ -21,10 +10,8 @@ function listarTemas() {
 
                 const temas = data.temas.map(tema => [
                     tema.id_tema,
-                    tema.descripcion,
                     tema.nombre_actoliturgico,
-                    diasSemana[tema.dias_semana] || 'Desconocido', 
-                    tema.hora_inicio,
+                    tema.descripcion,                    
                     tema.duracion,
                     tema.orden,
                     `<button class="btn btn-primary btn-sm" title="Ver" onclick="openModal('view', ${tema.id_tema})">
@@ -68,21 +55,20 @@ function openModal(type, id_tema) {
     if (type === 'edit') {
         modalTitle.textContent = 'Editar Tema';
         saveButton.textContent = 'Actualizar';
-        saveButton.onclick = actualizarTema;  // Asignar la función de actualización
-        temaIdInput.value = id_tema;  // Asignar el ID del tema a editar
-        cargarTema(id_tema);  // Cargar los datos del tema en el modal
+        saveButton.onclick = actualizarTema; 
+        temaIdInput.value = id_tema;  
+        cargarTema(id_tema);  
     } else if (type === 'add') {
         modalTitle.textContent = 'Agregar Tema';
         saveButton.textContent = 'Guardar';
-        saveButton.onclick = insertarTema;  // Asignar la función de inserción
-        limpiarModal();  // Limpiar los campos del formulario
+        saveButton.onclick = insertarTema;  
+        limpiarModal(); 
     }
 
     let modalElement = new bootstrap.Modal(document.getElementById('temaModal'));
     modalElement.show();
 }
 
-// Función para cargar los datos de un tema en el modal
 function cargarTema(id_tema) {
     fetch(`/api/obtener_tema/${id_tema}`)
         .then(response => response.json())
@@ -90,10 +76,8 @@ function cargarTema(id_tema) {
             if (data.success) {
                 const tema = data.tema;
                 document.getElementById('temaId').value = tema.id_tema;
-                document.getElementById('descripcion').value = tema.descripcion;
                 document.getElementById('id_actoliturgico').value = tema.id_actoliturgico;
-                document.getElementById('dias_semana').value = tema.dias_semana;
-                document.getElementById('hora_inicio').value = tema.hora_inicio && tema.hora_inicio !== 'None' ? tema.hora_inicio : '';
+                document.getElementById('descripcion').value = tema.descripcion;                                                
                 document.getElementById('duracion').value = tema.duracion && tema.duracion !== 'None' ? tema.duracion : '';
                 document.getElementById('orden').value = tema.orden;
             } else {
@@ -106,19 +90,15 @@ function cargarTema(id_tema) {
 // Función para actualizar un tema
 function actualizarTema() {
     const id_tema = document.getElementById('temaId').value;
-    const descripcion = document.getElementById('descripcion').value;
     const id_actoliturgico = document.getElementById('id_actoliturgico').value;
-    const dias_semana = document.getElementById('dias_semana').value;
-    const hora_inicio = document.getElementById('hora_inicio').value;
+    const descripcion = document.getElementById('descripcion').value;
     const duracion = document.getElementById('duracion').value;
     const orden = document.getElementById('orden').value;
 
     const formData = new FormData();
     formData.append('id_tema', id_tema);
-    formData.append('descripcion', descripcion);
     formData.append('id_actoliturgico', id_actoliturgico);
-    formData.append('dias_semana', dias_semana);
-    formData.append('hora_inicio', hora_inicio);
+    formData.append('descripcion', descripcion);    
     formData.append('duracion', duracion);
     formData.append('orden', orden);
 
@@ -130,9 +110,9 @@ function actualizarTema() {
     .then(data => {
         if (data.success) {
             alert('Tema actualizado exitosamente');
-            listarTemas();  // Actualizar la tabla con el tema editado
+            listarTemas();  
             let modalElement = bootstrap.Modal.getInstance(document.getElementById('temaModal'));
-            modalElement.hide();  // Cerrar el modal
+            modalElement.hide();  
         } else {
             alert(data.message);
         }
@@ -142,10 +122,8 @@ function actualizarTema() {
 
 // Función para limpiar los campos del modal
 function limpiarModal() {
-    document.getElementById('descripcion').value = '';
     document.getElementById('id_actoliturgico').value = '';
-    document.getElementById('dias_semana').value = '1';
-    document.getElementById('hora_inicio').value = '';
+    document.getElementById('descripcion').value = '';    
     document.getElementById('duracion').value = '';
     document.getElementById('orden').value = '';
 }
@@ -153,19 +131,15 @@ function limpiarModal() {
 // Función para insertar un nuevo tema
 function insertarTema() {
     // Recoger los datos del formulario
-    const descripcion = document.getElementById('descripcion').value;
     const id_actoliturgico = parseInt(document.getElementById('id_actoliturgico').value, 10);
-    const dias_semana = document.getElementById('dias_semana').value;
-    const hora_inicio = document.getElementById('hora_inicio').value;
+    const descripcion = document.getElementById('descripcion').value;
     const duracion = document.getElementById('duracion').value;
     const orden = document.getElementById('orden').value;
     console.log(document.getElementById('id_actoliturgico').value);
     // Crear el objeto FormData
     const formData = new FormData();
-    formData.append('descripcion', descripcion);
     formData.append('id_actoliturgico', id_actoliturgico);
-    formData.append('dias_semana', dias_semana);
-    formData.append('hora_inicio', hora_inicio);
+    formData.append('descripcion', descripcion);    
     formData.append('duracion', duracion);
     formData.append('orden', orden);
 
@@ -178,9 +152,9 @@ function insertarTema() {
     .then(data => {
         if (data.success) {
             alert('Tema agregado exitosamente');
-            listarTemas(); // Actualizar la tabla con el nuevo tema
+            listarTemas(); 
             let modalElement = bootstrap.Modal.getInstance(document.getElementById('temaModal'));
-            modalElement.hide(); // Cerrar el modal
+            modalElement.hide();
         } else {
             alert('Error al agregar el tema: ' + data.message);
         }

@@ -13,7 +13,7 @@ document.addEventListener("DOMContentLoaded", function () {
     });
 });
 
-function openModal(type, dni = '', apellidos = '', nombres = '', fecha_nacimiento = '', estado_civil = '', sexo = '', id_sede = '') {
+function openModal(type, dni = '', apellidos = '', nombres = '', fecha_nacimiento = '', estado_civil = '', sexo = '', id_sede = '', correo = '') {
     let modalTitle;
     let formAction;
     let isReadOnly = false;
@@ -38,6 +38,7 @@ function openModal(type, dni = '', apellidos = '', nombres = '', fecha_nacimient
     document.getElementById('apellidos').value = apellidos;
     document.getElementById('nombres').value = nombres;
     document.getElementById('fecha_nacimiento').value = fecha_nacimiento;
+    document.getElementById('email').value = correo;
 
     // Seleccionar el valor de Estado Civil, Sexo y Sede si existe
     const estadoCivilSelect = document.getElementById('estado_civil');
@@ -90,25 +91,25 @@ function enviarFormulario(url, type) {
         method: 'POST',
         body: formData
     })
-    .then(response => response.json())
+    .then(response => {
+        if (!response.ok) {
+            console.error(`HTTP error! status: ${response.status}`);
+            throw new Error('Error al procesar la solicitud.');
+        }
+        return response.json();
+    })
     .then(data => {
         if (data.success) {
             alert(type === 'edit' ? 'Feligrés actualizado exitosamente' : 'Feligrés agregado exitosamente');
-            if (type === 'add') {
-                agregarFeligresATabla(data.feligres);
-                limpiarModal();
-                
-                // Cerrar el modal después de agregar
-                const feligresModal = bootstrap.Modal.getInstance(document.getElementById('feligresModal'));
-                if (feligresModal) feligresModal.hide();
-            } else {
-                location.reload();
-            }
+            location.reload();
         } else {
             alert(data.message);
         }
     })
-    .catch(error => console.error('Error:', error));
+    .catch(error => {
+        console.error('Error en la respuesta del servidor:', error);
+        alert('Hubo un error al procesar la solicitud. Revisa la consola para más detalles.');
+    });
 }
 
 function agregarFeligresATabla(feligres) {
@@ -126,8 +127,9 @@ function agregarFeligresATabla(feligres) {
         feligres.estado_civil,
         feligres.sexo,
         feligres.sede,
-        `<button class="btn btn-primary btn-sm" title="Ver" onclick="openModal('view', '${feligres.dni}', '${feligres.apellidos}', '${feligres.nombres}', '${feligres.fecha_nacimiento}', '${feligres.estado_civil}', '${feligres.sexo}', '${feligres.sede}')"><i class="fas fa-eye"></i></button>
-         <button class="btn btn-warning btn-sm" title="Editar" onclick="openModal('edit', '${feligres.dni}', '${feligres.apellidos}', '${feligres.nombres}', '${feligres.fecha_nacimiento}', '${feligres.estado_civil}', '${feligres.sexo}', '${feligres.sede}')"><i class="fas fa-edit"></i></button>
+        feligres.correo,
+        `<button class="btn btn-primary btn-sm" title="Ver" onclick="openModal('view', '${feligres.dni}', '${feligres.apellidos}', '${feligres.nombres}', '${feligres.fecha_nacimiento}', '${feligres.estado_civil}', '${feligres.sexo}', '${feligres.sede}','${feligres.correo}')"><i class="fas fa-eye"></i></button>
+         <button class="btn btn-warning btn-sm" title="Editar" onclick="openModal('edit', '${feligres.dni}', '${feligres.apellidos}', '${feligres.nombres}', '${feligres.fecha_nacimiento}', '${feligres.estado_civil}', '${feligres.sexo}', '${feligres.sede}', '${feligres.correo}')"><i class="fas fa-edit"></i></button>
          <form action="${urlEliminarFeligres}" method="POST" style="display:inline-block;">
             <input type="hidden" name="dni" value="${feligres.dni}">
             <button type="submit" class="btn btn-danger btn-sm" title="Eliminar" onclick="return confirm('¿Estás seguro de que deseas eliminar este feligrés?');"><i class="fas fa-trash-alt"></i></button>
@@ -143,4 +145,5 @@ function limpiarModal() {
     document.getElementById('estado_civil').value = '';
     document.getElementById('sexo').value = '';
     document.getElementById('id_sede').value = '';
+    document.getElementById('email').value = '';
 }

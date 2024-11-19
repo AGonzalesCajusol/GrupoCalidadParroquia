@@ -1,5 +1,8 @@
 from flask import render_template, request, jsonify
 from controladores.controlador_tipo_ministro import *
+from routers.router_main import requerido_login
+
+
 
 def registrar_rutas(app):
     # Ruta para la página principal de gestión de tipos de ministros

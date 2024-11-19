@@ -8,6 +8,9 @@ from controladores.controlador_gestionar_intencionactos import (
     eliminar_intencion,
     obtener_actos_liturgicos  # Importamos la función para obtener actos litúrgicos
 )
+from routers.router_main import requerido_login
+
+
 
 def registrar_rutas(app):
     # Ruta para gestionar intenciones

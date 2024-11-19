@@ -114,20 +114,23 @@ def eliminar_tipo_recaudacion(id_tipo_recaudacion):
     
     return None 
 
-# Función para dar de baja un tipo de recaudación (cambiar estado a "Inactivo")
-def dar_baja_tipo_recaudacion(id_tipo_recaudacion):
+
+def cambiar_estado_tipo_recaudacion(id_tipo_recaudacion, nuevo_estado):
     conexion = obtener_conexion()
     try:
         with conexion.cursor() as cursor:
-            # Cambiar el estado a inactivo (0)
             cursor.execute("""
                 UPDATE tipo_recaudacion 
-                SET estado = %s
+                SET estado = %s 
                 WHERE id_tipo_recaudacion = %s
-            """, (False, id_tipo_recaudacion))  # False representa inactivo
+            """, (nuevo_estado, id_tipo_recaudacion))
         conexion.commit()
     except Exception as e:
-        print(f"Error al dar de baja el tipo de recaudación: {e}")
         conexion.rollback()
+        print(f"Error al cambiar el estado del tipo de recaudación: {e}")
+        return False, f"Error: {str(e)}"
     finally:
         conexion.close()
+
+    return True, "El estado del tipo de recaudación fue actualizado exitosamente"
+

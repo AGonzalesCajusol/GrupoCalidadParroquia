@@ -25,12 +25,13 @@ from controladores.controlador_diocesis import (
 from controladores.controlador_actosliturgicos import(
     listar_actosLit
 )
+from routers.router_main import requerido_login
 
 def registrar_rutas(app):
     # Ruta para gestionar sede
     @app.route("/gestionar_sede", methods=["GET"])
     def gestionar_sede():
-        sede = obtener_sede()  # Asegúrate de que esta función esté devolviendo los datos correctamente
+        sede = obtener_sede()
         congregacion = obtener_congregacion()
         diosesis = obtener_diocesis() 
         actoliturgico = listar_actosLit()
@@ -149,10 +150,8 @@ def registrar_rutas(app):
     @app.route("/eliminar_sede", methods=["POST"])
     def procesar_eliminar_sede():
         id = request.form["id"]  # Captura el ID desde el formulario
-        eliminar_sede(id)  # Llama a la función que elimina en la base de datos
-        flash("La sede fue eliminada exitosamente")
-        return redirect(url_for("gestionar_sede"))
-
+        resultado = eliminar_sede(id)  # Llama a la función que elimina en la base de datos
+        return jsonify(resultado)
 
     @app.route("/darBaja_sede", methods=["POST"])
     def procesar_darBaja_sede():

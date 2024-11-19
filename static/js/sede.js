@@ -9,7 +9,7 @@ $(document).ready(function () {
         //dom: '<"d-flex justify-content-between align-items-center mb-3"<"d-flex"l<"d-flex justify-content-between align-items-center"f<"ml-3 button-section">>>rt<"bottom"p>',
         initComplete: function () {
             // Insertar el botón "Agregar sede" dentro del div y alinearlo a la derecha
-            $("div.button-section").html('<button type="button" class="btn btn-success btn-lg custom-btn ml-3 btn-agregar-ministro" data-bs-toggle="modal" data-bs-target="#agregarModal" onclick="abir()"><i class="bi bi-building"></i> Agregar Sede </button>');
+            $("div.button-section").html('<button type="button" class="btn btn-success btn-lg custom-btn ml-3 btn-agregar-ministro" data-bs-toggle="modal" data-bs-target="#agregarModal" onclick="abir()"><i class="bi bi-building"></i> Agregar sede </button>');
         }
     });
 });
@@ -263,7 +263,7 @@ function abrirModalVer(id, nombre, direccion, creacion, telefono, correo, monto,
     const modalTitle = document.getElementById('modalSedeLabel');
     const submitBtn = document.getElementById('submitBtn'); // Botón de submit
 
-    modalTitle.textContent = 'Ver Sede';
+    modalTitle.textContent = 'Ver sede';
     submitBtn.style.display = 'none'; // Ocultar el botón de Guardar
 
 
@@ -402,7 +402,7 @@ function actualizarTablaSede(sedes) {
             <td>${sede.direccion}</td>
             <td>${sede.telefono}</td>
             <td>${sede.correo}</td>
-            <td>${sede.estado == '1' ? 'Activo' : 'Inactivo'}</td>
+            <td class="text-center">${sede.estado == '1' ? 'Activo' : 'Inactivo'}</td>
             <td class="text-center border">
                 <button class="btn btn-primary btn-sm" title="Ver"
                     onclick="abrirModalVer('${sede.id}','${sede.nombre_sede}','${sede.direccion}','${sede.creacion}','${sede.telefono}','${sede.correo}','${sede.monto}','${sede.estado}','${sede.id_congregacion}','${sede.id_diosesis}','${sede.monto_traslado}')">
@@ -417,9 +417,8 @@ function actualizarTablaSede(sedes) {
                     ${sede.estado == "0" ? 'disabled' : ''}>
                     <i class="fas fa-ban"></i>
                 </button>
-                <form style="display:inline-block;" onsubmit="eliminarSede(event, '${sede.id}')">
-                    <button type="submit" class="btn btn-danger btn-sm"
-                            onclick="return confirm('¿Estás seguro de que deseas eliminar esta sede?');">
+                <form style="display:inline-block;" onsubmit="eliminarSede(event, '${sede.id}')" title="Eliminar">
+                    <button type="submit" class="btn btn-danger btn-sm">
                         <i class="fas fa-trash-alt"></i>
                     </button>
                 </form>
@@ -434,3 +433,71 @@ function actualizarTablaSede(sedes) {
     table.draw(false);
     table.page(currentPage).draw(false);
 }
+
+function eliminarSede(event, id) {
+    event.preventDefault();
+
+    if (confirm("¿Estás seguro de que deseas eliminar esta sede?")) {
+        fetch("/eliminar_sede", {
+            method: "POST",
+            headers: {
+                "Content-Type": "application/x-www-form-urlencoded"
+            },
+            body: `id=${encodeURIComponent(id)}`
+        })
+        .then(response => response.json())
+        .then(data => {
+            if (data.success) {
+                mostrarAlerta("success", data.message);
+                actualizarTablaSede();
+            } else {
+                mostrarAlerta("danger", data.message);
+            }
+        })
+        .catch(error => {
+            console.error("Error en la solicitud de eliminación:", error);
+            mostrarAlerta("danger", "Hubo un error al intentar eliminar la sede.");
+        });
+    }
+}
+
+// Función para mostrar notificaciones
+function mostrarAlerta(tipo, mensaje) {
+    const alertaDiv = document.getElementById('alerta');
+    alertaDiv.innerHTML = `
+        <div class="alert alert-${tipo} alert-dismissible fade show" role="alert">
+            ${mensaje}
+            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+        </div>
+    `;
+    alertaDiv.style.display = "block";
+    //alertaDiv.scrollIntoView({ behavior: "smooth" });
+    setTimeout(() => {
+        alertaDiv.style.display = "none";
+    }, 5000);
+}
+
+function actualizarTablaSede() {
+    const table = $('#sedeTable').DataTable();
+    const currentPage = table.page(); // Guardar la página actual
+
+    fetch("/gestionar_sede")
+        .then(response => response.text())
+        .then(html => {
+            const parser = new DOMParser();
+            const doc = parser.parseFromString(html, "text/html");
+            const nuevaTabla = doc.querySelector("#sedeTable tbody");
+
+            // Actualizar el cuerpo de la tabla
+            const tbody = document.querySelector("#sedeTable tbody");
+            tbody.innerHTML = nuevaTabla.innerHTML;
+
+            // Volver a inicializar DataTables y mantener la página actual
+            table.clear().rows.add($(tbody).find('tr')).draw(false);
+            table.page(currentPage).draw(false);
+        })
+        .catch(error => {
+            console.error("Error al actualizar la tabla:", error);
+        });
+}
+

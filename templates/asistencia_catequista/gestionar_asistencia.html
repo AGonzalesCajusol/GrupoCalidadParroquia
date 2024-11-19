@@ -1,0 +1,73 @@
+{% extends "index.html" %}
+{% block title %}Gestión de Asistencia{% endblock %}
+{% block cuerpo %}
+
+
+<div class="container mt-4">
+    <h1 class="titulo-gestion">Gestión de Asistencia</h1>
+    <div id="alerta" class="mt-3"></div>
+    <table id="asistenciaTable" class="table table-hover table-striped">
+        <thead class="table-light">
+            <tr class="text-center">
+                <th style="vertical-align: middle; text-align: center;">ID</th>
+                <th style="vertical-align: middle; text-align: center;">Programacion</th>
+                <th style="vertical-align: middle; text-align: center;">DNI feligres</th>
+                <th style="vertical-align: middle; text-align: center;">Nombres</th>
+                <th style="vertical-align: middle; text-align: center;">Apellidos</th>
+                <th style="vertical-align: middle; text-align: center;">Solicitud</th>
+                <th style="vertical-align: middle; text-align: center;">Estado</th>
+                <th style="vertical-align: middle; text-align: center;">Fecha</th>
+                <th style="vertical-align: middle; text-align: center; width: 80px;">Asistencia</th>
+
+            </tr>
+        </thead>
+        <tbody>
+            {% for asist in asistencia %}
+            <tr>
+                <td class="text-center border">{{ asist[0] }}</td> <!-- ID del Asistencia -->
+                <td class="text-center border">{{ asist[1] }}</td><!-- ID programacion -->
+                <td class="text-center border">{{ asist[2] }}</td><!-- DNI -->
+                <td class="text-center border">{{ asist[4] }}</td><!-- apellidos -->
+                <td class="text-center border">{{ asist[3] }}</td><!-- nombres -->
+                <td class="text-center border">{{ asist[5] }}</td><!-- ID solicitud -->
+                <td style="vertical-align: middle; text-align: center">
+                    {% if asist[6] == 1 or asist[6] == '1' %}
+                        Asistió
+                    {% else %}
+                        Faltó
+                    {% endif %}
+                </td><!-- estado -->
+                <td class="text-center border">{{ asist[7] }}</td><!-- fecha -->
+                <td class="text-center border">
+                    <input type="checkbox" class="form-check-input asistencia-checkbox" 
+                        data-id="{{ asist[0] }}"
+                        title="Marcar asistencia"
+                        style="border-color: greenyellow; font-size: 20px; align-items: center;" 
+                        {% if asist[6] == 1 or asist[6] == '1' %} checked disabled {% endif %}>
+                </td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+</div>
+
+<!-- Modal para Agregar o Editar -->
+
+
+<script src="/static/js/asistencia.js"></script>
+
+<script>
+    const actualizarURL = "{{ url_for('actualizar_asistencia_route') }}";
+</script>
+
+<style>
+    .dataTables_filter input {
+        width: 150px !important;
+        /* Ajusta el ancho aquí según tu preferencia */
+        display: inline-block;
+        margin-left: 10px;
+    }
+</style>
+
+
+{% endblock %}

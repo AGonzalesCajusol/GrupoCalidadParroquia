@@ -39,10 +39,11 @@
                         <!-- Botón para eliminar -->
                         <form action="{{ url_for('procesar_eliminar_diocesis') }}" method="POST" style="display:inline-block;">
                             <input type="hidden" name="id" value="{{ diocesis[0] }}">
-                            <button type="submit" class="btn btn-danger btn-sm" title="Eliminar"
-                                onclick="return confirm('¿Estás seguro de que deseas eliminar esta diócesis?');">
-                                <i class="fas fa-trash-alt"></i>
-                            </button>
+                            <button class="btn btn-danger btn-sm" title="Eliminar"
+                            onclick="eliminarDiocesis('{{ diocesis[0] }}')">
+                        <i class="fas fa-trash-alt"></i>
+                    </button>
+                    
                         </form>
                     </td>
                 </tr>
@@ -72,7 +73,7 @@
                         <label for="id_departamento" class="form-label">Departamento</label>
                         <select class="form-select" id="id_departamento" name="id_departamento" required>
                             {% for departamento in departamento %}
-                            <option value="{{ departamento[0] }}">{{ departamento[1] }}</option>
+                            <option value="{{ departamento[1] }}">{{ departamento[1] }}</option>
                             {% endfor %}
                         </select>
                     </div>
@@ -80,7 +81,7 @@
                         <label for="id_provincia" class="form-label">Provincia</label>
                         <select class="form-select" id="id_provincia" name="id_provincia" required>
                             {% for provincia in provincia %}
-                            <option value="{{ provincia[0] }}">{{ provincia[1] }}</option>
+                            <option value="{{ provincia[1] }}">{{ provincia[1] }}</option>
                             {% endfor %}
                         </select>
                     </div>
@@ -99,6 +100,7 @@
 <script type="text/javascript">
     const urlInsertarDiocesis = "{{ url_for('procesar_insertar_diocesis') }}";
     const urlActualizarDiocesis = "{{ url_for('procesar_actualizar_diocesis') }}";
+    const urlEliminarDiocesis = "{{ url_for('procesar_eliminar_diocesis') }}";
 </script>
 
 {% endblock %}

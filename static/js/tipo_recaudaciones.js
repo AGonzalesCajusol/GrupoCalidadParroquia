@@ -133,7 +133,6 @@ document.getElementById('formRecaudacion').addEventListener('submit', function(e
     });
 });
 
-// Función para actualizar la tabla con los nuevos datos, manteniendo el formato original y la paginación
 function actualizarTabla(tiposRecaudacion) {
     const tbody = document.querySelector('#tipoRecaudacionTable tbody');
     const table = $('#tipoRecaudacionTable').DataTable();
@@ -145,6 +144,11 @@ function actualizarTabla(tiposRecaudacion) {
     // Recorrer los datos de tipos de recaudación y crear las filas
     tiposRecaudacion.forEach(tipo => {
         const row = document.createElement('tr');
+        
+        // Determinar el estado y el ícono para el botón de estado
+        const estadoTexto = tipo.estado === "Activo" ? "Dar de baja" : "Activar";
+        const estadoClase = tipo.estado === "Activo" ? "btn-secondary" : "btn-success";
+        const estadoIcono = tipo.estado === "Activo" ? "fas fa-ban" : "fas fa-check";
 
         // Crear las celdas y botones con eventos
         row.innerHTML = `
@@ -161,10 +165,9 @@ function actualizarTabla(tiposRecaudacion) {
                     onclick="abrirModalTipoRecaudacion('editar', '${tipo.id}', '${tipo.nombre}', '${tipo.tipo}', '${tipo.estado}')">
                     <i class="fas fa-edit"></i>
                 </button>
-                <button class="btn btn-secondary btn-sm" title="Dar de baja"
-                    onclick="darBajaTipoRecaudacion('${tipo.id}', '${tipo.estado === "Activo" ? 1 : 0}')"
-                    ${tipo.estado === "Inactivo" ? 'disabled' : ''}>
-                    <i class="fas fa-ban"></i>
+                <button class="btn ${estadoClase} btn-sm estado-btn" title="${estadoTexto}" 
+                    onclick="cambiarEstadoTipoRecaudacion(this)" data-id="${tipo.id}" data-estado="${tipo.estado === 'Activo' ? 1 : 0}">
+                    <i class="${estadoIcono}"></i>
                 </button>
                 <form style="display:inline-block;" onsubmit="eliminarTipoRecaudacion(event, '${tipo.id}')">
                     <button type="submit" class="btn btn-danger btn-sm"
@@ -243,37 +246,44 @@ function mostrarMensaje(mensaje, tipo) {
         setTimeout(() => alertContainer.remove(), 500);
     }, 3000);
 }
-function darBajaTipoRecaudacion(id, estado) {
-    if (estado === false || estado === 'false' || estado === '0') {
-        mostrarMensaje('El tipo de recaudación ya está dado de baja.', 'warning');
-        return;
-    }
 
-    if (confirm("¿Estás seguro de que deseas dar de baja este tipo de recaudación?")) {
-        const table = $('#tipoRecaudacionTable').DataTable();
-        const currentPage = table.page();
+function cambiarEstadoTipoRecaudacion(button) {
+    const id = button.getAttribute("data-id");
+    const estadoActual = button.getAttribute("data-estado") === "1";
 
-        fetch("/dar_baja_tipo_recaudacion", {
-            method: "POST",
-            headers: {
-                "Content-Type": "application/x-www-form-urlencoded",
-            },
-            body: `id=${encodeURIComponent(id)}`
-        })
-        .then(response => response.json())
-        .then(data => {
-            if (data.success) {
-                actualizarTabla(data.tipos_recaudacion);
-                mostrarMensaje(data.message, "success"); // Mensaje de éxito
-                table.page(currentPage).draw(false);
-            } else {
-                mostrarMensaje(data.message, "danger"); // Mensaje de error
-            }
-        })
-        .catch(error => {
-            console.error("Error:", error);
-            mostrarMensaje("Ocurrió un error al intentar dar de baja el tipo de recaudación.", "danger");
-        });
-    }
+    // Confirma la acción con el usuario
+    const confirmacion = estadoActual 
+        ? "¿Estás seguro de que deseas dar de baja este tipo de recaudación?" 
+        : "¿Estás seguro de que deseas activar este tipo de recaudación?";
+    if (!confirm(confirmacion)) return;
+
+    // Define la nueva ruta y el nuevo estado a enviar
+    const nuevoEstado = estadoActual ? 0 : 1;
+
+    // Enviar la solicitud de actualización de estado al backend
+    fetch("/dar_baja_tipo_recaudacion", {
+        method: "POST",
+        headers: {
+            "Content-Type": "application/x-www-form-urlencoded",
+        },
+        body: `id=${encodeURIComponent(id)}&estado=${nuevoEstado}`
+    })
+    .then(response => response.json())
+    .then(data => {
+        if (data.success) {
+            // Actualizar el botón de estado y el ícono dinámicamente
+            button.setAttribute("data-estado", nuevoEstado);
+            button.setAttribute("title", nuevoEstado ? "Dar de baja" : "Activar");
+            button.innerHTML = `<i class="${nuevoEstado ? 'fas fa-ban' : 'fas fa-check'}"></i>`;
+            mostrarMensaje(data.message, "success");
+            actualizarTabla(data.tipos_recaudacion);
+        } else {
+            mostrarMensaje(data.message, "danger");
+        }
+    })
+    .catch(error => {
+        console.error("Error:", error);
+        mostrarMensaje("Ocurrió un error al cambiar el estado del tipo de recaudación.", "danger");
+    });
 }
 

@@ -9,6 +9,8 @@
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet"
         integrity="sha384-QWTKZyjpPEjISv5WaRU9OFeRpok6YctnYmDr5pNlyT2bRjXh0JMhjY6hW+ALEwIH" crossorigin="anonymous">
 
+    <link href="https://cdn.jsdelivr.net/npm/toastify-js@1.12.0/src/toastify.min.css" rel="stylesheet">
+    <script src="https://cdn.jsdelivr.net/npm/toastify-js@1.12.0/src/toastify.min.js"></script>
 
 
     <link rel="stylesheet" href="static/css/inicio_sesion.css" />
@@ -34,8 +36,7 @@
     }
 
     #miTablaClonada .ocultar {
-        display: none;
-        /* Oculta los elementos con la clase "ocultar" */
+        display: none;    
     }
     .navbar {
         --bs-navbar-padding-x: unset;
@@ -49,8 +50,7 @@
 <body class="hidden">
     <div id="spinner" class="spinner-overlay ">
         <div class="spinner"></div>
-    </div>
-    <!-- Sidenav -->
+    </div>    
     <div class="layout">
         <header class="navbar navbar-expand-lg  shadow-sm w-100 position-fixed align-items-center" id="head_ind">
             <div class="container-fluid">
@@ -61,15 +61,8 @@
                     <input type="text" id="sede" value="{{ request.cookies.get('sede') }}" hidden>
                 </a>
                 <div class="collapse navbar-collapse justify-content-end ms-4" id="navbarNav">
-      
                     <div class="d-flex align-items-center mt-1">
-                        <button type="button" class="btn btn-link position-relative text-black me-4">
-                            <i class="bi bi-bell"></i>
-                            <span
-                                class="position-absolute top-0 start-100 translate-middle badge rounded-pill bg-danger">
-                                3 <span class="visually-hidden">nuevas notificaciones</span>
-                            </span>
-                        </button>
+
                         {% if request.cookies.get('nombre') %}
                         <a onclick="finalizar_sesion()" class="text-decoration-none text-black btn"><span
                                 class="me-3"><i class="bi bi-door-closed-fill"></i><strong> Salir</strong></span></a>
@@ -84,8 +77,10 @@
             </div>
 
         </header>
-        <div id="mySidenav" class="sidenav">
 
+
+        
+        <div id="mySidenav" class="sidenav">
             <div>
 
                 <!------------------------- Modulo de seguridad 
@@ -126,10 +121,6 @@
                     <a href="{{ url_for('solicitudes') }}" class="btn btn-outline-primary">
 
                         <i class="bi bi-arrow-return-right"></i> Solicitudes
-                        <span class="ms-4 mt-1 translate-middle badge rounded-pill bg-danger">
-                            99+
-                            <span class="visually-hidden">unread messages</span>
-                        </span>
                     </a>
 
                 </div>
@@ -140,14 +131,14 @@
                 </a>
                 <div class="collapse ms-4 mt-2" id="moduloCatequesis">
                     <a href="{{ url_for('gestionar_actos') }}" class="btn btn-outline-primary mt-2">
-                        <i class="bi bi-arrow-return-right"></i> Gestion Actos liturgicos
+                        <i class="bi bi-arrow-return-right"></i> Actos liturgicos
                     </a>
                     <a href="{{ url_for('gestionar_requisitosactos') }}" class="btn btn-outline-primary mt-2">
-                        <i class="bi bi-arrow-return-right"></i> Gestion de requisitos de actos litúrgico
+                        <i class="bi bi-arrow-return-right"></i> Requisitos de actos litúrgico
                     </a>
 
                     <a href="{{ url_for('gestionar_intenciones') }}" class="btn btn-outline-primary mt-2">
-                        <i class="bi bi-arrow-return-right"></i> Gestion de registrar las intención de los actos litúrgicos
+                        <i class="bi bi-arrow-return-right"></i> Registrar las intención de los actos litúrgicos
                     </a>
 
                     <a href="{{ url_for('requisitosXactoliturgico') }}" class="btn btn-outline-primary mt-2">
@@ -155,10 +146,13 @@
                     </a>
 
                     <a href="{{ url_for('gestionar_tema') }}" class="btn btn-outline-primary mt-2">
-                        <i class="bi bi-arrow-return-right"></i> Gestion de temas
+                        <i class="bi bi-arrow-return-right"></i> Temas
                     </a>
-                    <a href="{{ url_for('gestionar_charlas') }}" class="btn btn-outline-primary mt-2">
-                        <i class="bi bi-arrow-return-right"></i> Gestión de charlas
+                    <a href="{{ url_for('gestionar_programacionActo') }}" class="btn btn-outline-primary mt-2">
+                        <i class="bi bi-arrow-return-right"></i> Programacion de charlas
+                    </a>
+                    <a href="{{ url_for('gestionar_asistencia') }}" class="btn btn-outline-primary mt-2">
+                        <i class="bi bi-arrow-return-right"></i> Asistencia
                     </a>
                 </div>
 
@@ -200,17 +194,34 @@
                         <i class="bi bi-arrow-return-right"></i> Egresos
                     </a>
                 </div>
+                <a class="btn btn-primary  mt-2" data-bs-toggle="collapse" href="#moduloReportes" role="button"
+                    aria-expanded="false" aria-controls="moduloReportes">
+                    <i class="bi bi-bar-chart-line"></i> Reportes
+                </a>
+
+                <div class="collapse ms-4 mt-2" id="moduloReportes">
+                    <a href="{{ url_for('cronograma_actividades') }}" class="btn btn-outline-primary">
+                        <i class="bi bi-arrow-return-right"></i> Cronograma de actividades
+                    </a>
+
+                    <a href="{{ url_for('gestionar_tipo_recaudacion') }}" class="btn btn-outline-primary">
+                        <i class="bi bi-arrow-return-right"></i> Reporte 2
+                    </a>
+                    <a href="{{ url_for('gestionar_egresos') }}" class="btn btn-outline-primary">
+                        <i class="bi bi-arrow-return-right"></i> Reporte 3
+                    </a>
+                </div>
+                
             </div>
         </div>
         <div class="main-content me-5" style="max-height: 400px;">
             {% block cuerpo %}
-
             {% endblock %}
         </div>
-        
-
     </div>
 </body>
 <script src="{{ url_for('static', filename = '/js/defecto.js')}}"></script>
+<script>
 
+</script>
 </html>

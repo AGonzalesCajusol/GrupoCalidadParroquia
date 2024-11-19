@@ -1,182 +1,240 @@
 {% extends "index.html" %}
-{% block title %}Gestión de charlas{% endblock %}
+{% block title %}Gestión de Programación de Charlas{% endblock %}
 {% block cuerpo %}
-<style>
-    table, table input[type="date"], table input[type="time"], table input[type="text"], table button {
-        font-size: 13px;
-    }
+<div class="container mt-4">
+    <!-- Título -->
+    <h1 class="titulo-gestion">Gestión de Programación de Charlas</h1>
 
-    th, td {
-        text-align: center;
-    }
-
-    th:nth-child(1), td:nth-child(1) { width: 150px; }
-    th:nth-child(2), td:nth-child(2) { width: 120px; }
-    th:nth-child(3), td:nth-child(3) { width: 90px; }
-    th:nth-child(4), td:nth-child(4) { width: 90px; }
-    th:nth-child(5), td:nth-child(5) { width: 100px; }
-    th:nth-child(6), td:nth-child(6) { width: 120px; }
-    th:nth-child(7), td:nth-child(7) { width: 120px; }
-    th:nth-child(8), td:nth-child(8) { width: 200px; }
-
-    th:nth-child(1) {
-        text-align: center;
-    }
-
-    td:nth-child(1) {
-        text-align: left;
-    }
-</style>
-
-<div>
-    <h1 class="titulo-gestion">Gestión de programación de charlas</h1>
-    <div class="row">
-        <div class="d-flex justify-content-between align-items-center mb-3">
-            <button type="button" class="btn btn-success btn-lg custom-btn ml-3"
-                onclick="window.location.href = '/gestionar_charlas'">
-                <i class="bi bi-arrow-left"></i> Retornar
-            </button>
-            <!-- <button class="btn btn-success btn-lg custom-btn ml-3">
-                <i class="bi bi-save"></i> Registrara Programación
-            </button>             -->
-            
+    <!-- Filtro y botón de registrar -->
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <!-- Combo Box para seleccionar Acto Litúrgico -->
+        <div class="d-flex align-items-center">
+            <label for="selectActoLiturgico" class="form-label me-3">Seleccione un acto litúrgico:</label>
+            <select id="selectActoLiturgico" class="form-select me-3" style="width: 300px;"
+                onchange="verificarProgramacionActo()">
+                <option value="">Seleccione un acto</option>
+            </select>
         </div>
+        <input type="hidden" id="hiddenIdMinistro">
+        <input type="hidden" id="hiddenIdSede">
+
+
+        <button type="button" class="btn btn-success btn-lg custom-btn" id="btnRegistrar"
+            onclick="registrarProgramacion()" style="display: none;">
+            <i class="bi bi-save"></i> Registrar programación
+        </button>
+
 
     </div>
 
-    <div id="formulario_temas_sacramento">
-    </div>
-
-    <div>
-        <table>
-            
+    <!-- Tabla de Programación -->
+    <div class="table-responsive">
+        <table id="tablaProgramacion" class="table table-striped align-middle">
+            <thead>
+                <tr>
+                    <th>Tema</th>
+                    <th>Hora de inicio</th>
+                    <th>Días de la semana</th>
+                    <th>Ministro</th>
+                    <th>Sede</th>
+                    <th>Acciones</th>
+                </tr>
+            </thead>
+            <tbody id="temasTableBody">
+                <!-- Aquí se cargarán los temas dinámicamente -->
+            </tbody>
         </table>
     </div>
+</div>
 
-    <div class="modal fade" id="modalVer" tabindex="-1" aria-labelledby="modalTitle" aria-hidden="true">
-        <div class="modal-dialog">
-            <div class="modal-content">
+<div class="modal fade" id="modalVerProgramacion" tabindex="-1" aria-labelledby="verProgramacionLabel"
+    aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <form id="programacionForm" action="" method="POST">
                 <div class="modal-header">
-                    <h5 class="modal-title" id="modalTitle">Editar Programación</h5>
+                    <h5 class="modal-title" id="verProgramacionLabel">Detalles de la Programación</h5>
                     <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
                 </div>
                 <div class="modal-body">
-                    <form id="modalVerForm">
-                        <div class="mb-3">
-                            <label class="form-label">Tema</label>
-                            <input type="text" class="form-control" id="modalTema" readonly>
+                    <div class="mb-3">
+                        <label for="modalDescripcion" class="form-label">Tema</label>
+                        <input type="text" id="modalDescripcion" class="form-control" disabled>
+                    </div>
+                    <div class="mb-3">
+                        <label for="modalHoraInicio" class="form-label">Hora de Inicio</label>
+                        <input type="time" id="modalHoraInicio" class="form-control" disabled>
+                    </div>
+                    <div class="mb-3">
+                        <label for="modalDiasSemana" class="form-label">Días de la Semana</label>
+                        <input type="text" id="modalDiasSemana" class="form-control" disabled>
+                    </div>
+                    <div class="mb-3">
+                        <label for="modalMinistro" class="form-label">Ministro</label>
+                        <div class="input-group">
+                            <input type="text" id="modalMinistro" class="form-control" disabled>
+                            <button type="button" class="btn btn-secondary" disabled>Seleccionar</button>
                         </div>
-                        <div class="mb-3">
-                            <label class="form-label">Fecha</label>
-                            <input type="date" class="form-control" id="modalFecha">
+                    </div>
+
+
+                    <div class="mb-3">
+                        <label for="modalSede" class="form-label">Sede</label>                        
+                        <div class="input-group">
+                            <input type="text" id="modalSede" class="form-control" disabled>
+                            <button type="button" class="btn btn-secondary" disabled>Seleccionar</button>
                         </div>
-                        <div class="mb-3">
-                            <label class="form-label">Hora Inicio</label>
-                            <input type="time" class="form-control" id="modalHoraInicio">
-                        </div>
-                        <div class="mb-3">
-                            <label class="form-label">Hora Fin</label>
-                            <input type="time" class="form-control" id="modalHoraFin">
-                        </div>
-                        <div class="mb-3">
-                            <label class="form-label">Estado</label>
-                            <select class="form-control" id="modalEstado">
-                                <option value="P">Pendiente</option>
-                                <option value="R">Realizado</option>
-                                <option value="I">Inactivo</option>
-                            </select>
-                        </div>
-                        <div class="mb-3">
-                            <label class="form-label">Ministro</label>
-                            <div class="input-group">
-                                <input type="text" class="form-control" id="modalMinistro" readonly>
-                                <button type="button" class="btn btn-outline-secondary" id="btnSeleccionMinistro" onclick="abrirModalSeleccionMinistro()">Seleccionar</button>
-                            </div>
-                        </div>
-                        <div class="mb-3">
-                            <label class="form-label">Sede</label>
-                            <div class="input-group">
-                                <input type="text" class="form-control" id="modalSede" readonly>
-                                <button type="button" class="btn btn-outline-secondary" id="btnSeleccionSede" onclick="abrirModalSeleccionSede()">Seleccionar</button>
-                            </div>
-                        </div>
-                        
-                    </form>
+                    </div>                    
                 </div>
+
                 <div class="modal-footer">
                     <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cerrar</button>
-                    <button type="button" class="btn btn-primary" id="btnGuardarCambios" onclick="guardarCambiosEdicion()">Guardar cambios</button>
+                    <!-- Botón "Guardar" oculto por defecto -->
+                    <button type="submit" class="btn btn-primary" id="btnGuardar"
+                        style="display: none;">Guardar</button>
                 </div>
-            </div>
+            </form>
         </div>
     </div>
-    
-    <div class="modal fade" id="modalSeleccionMinistro" tabindex="-1" aria-labelledby="modalSeleccionMinistroLabel" aria-hidden="true">
-        <div class="modal-dialog">
-            <div class="modal-content">
+</div>
+
+
+<!-- Modal para Editar Programación -->
+<div class="modal fade" id="modalEditarProgramacion" tabindex="-1" aria-labelledby="editarProgramacionLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <form id="editarProgramacionForm" method="POST">
+                <input type="hidden" id="editarIdProgramacion"> <!-- Campo oculto para el ID -->
+                
                 <div class="modal-header">
-                    <h5 class="modal-title">Seleccionar Ministro</h5>
+                    <h5 class="modal-title" id="editarProgramacionLabel">Editar Programación</h5>
                     <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
                 </div>
+                
                 <div class="modal-body">
-                    <input type="text" id="buscarMinistro" class="form-control mb-3" placeholder="Buscar Ministro..." oninput="cargarListaMinistros()">
-                    <table class="table table-hover">
-                        <thead>
-                            <tr>
-                                <th>ID</th>
-                                <th>Nombre</th>
-                                <th>Sede</th>
-                            </tr>
-                        </thead>
-                        <tbody id="listaMinistros">
-                            <!-- Los datos de ministros se cargarán aquí dinámicamente -->
-                        </tbody>
-                    </table>
-                    <div id="paginacionMinistro" class="d-flex justify-content-center mt-3">
-                        <button onclick="paginaAnterior('ministro')" class="btn btn-outline-primary btn-sm me-2">Anterior</button>
-                        <span id="paginaActualMinistro">1</span>
-                        <button onclick="paginaSiguiente('ministro')" class="btn btn-outline-primary btn-sm ms-2">Siguiente</button>
+                    <!-- Campo: Tema (Solo Lectura) -->
+                    <div class="mb-3">
+                        <label for="editarTema" class="form-label">Tema</label>
+                        <input type="text" id="editarTema" class="form-control" readonly>
+                    </div>
+
+                    <!-- Campo: Hora de Inicio -->
+                    <div class="mb-3">
+                        <label for="editarHoraInicio" class="form-label">Hora de Inicio</label>
+                        <input type="time" id="editarHoraInicio" class="form-control">
+                    </div>
+
+                    <!-- Campo: Día de la Semana -->
+                    <div class="mb-3">
+                        <label for="editarDiaSemana" class="form-label">Día de la Semana</label>
+                        <select id="editarDiaSemana" class="form-select">
+                            <option value="">Seleccione un día</option>
+                            <option value="1">Lunes</option>
+                            <option value="2">Martes</option>
+                            <option value="3">Miércoles</option>
+                            <option value="4">Jueves</option>
+                            <option value="5">Viernes</option>
+                            <option value="6">Sábado</option>
+                            <option value="7">Domingo</option>
+                        </select>
+                    </div>
+
+                    <!-- Campo: Ministro (con Modal) -->
+                    <div class="mb-3">
+                        <label for="editarMinistro" class="form-label">Ministro</label>
+                        <div class="input-group">
+                            <input type="text" id="editarMinistro" class="form-control" readonly>
+                            <button type="button" class="btn btn-secondary" onclick="abrirModalMinistro()">Seleccionar</button>
+                        </div>
+                    </div>
+
+                    <!-- Campo: Sede (con Modal) -->
+                    <div class="mb-3">
+                        <label for="editarSede" class="form-label">Sede</label>
+                        <div class="input-group">
+                            <input type="text" id="editarSede" class="form-control" readonly>
+                            <button type="button" class="btn btn-secondary" onclick="abrirModalSede()">Seleccionar</button>
+                        </div>
                     </div>
                 </div>
+                
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cerrar</button>
+                    <button type="button" class="btn btn-primary" onclick="guardarCambiosProgramacion()">Guardar Cambios</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+
+<!-- Modal para Seleccionar Ministro -->
+<div class="modal fade" id="modalSeleccionarMinistro" tabindex="-1" aria-labelledby="seleccionarMinistroLabel" aria-hidden="true">
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">Seleccionar Ministro</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <!-- Campo de búsqueda -->
+                <input type="text" id="buscarMinistro" class="form-control mb-3" placeholder="Buscar por nombre o documento...">
+                
+                <!-- Tabla de ministros con ID -->
+                <table id="tablaMinistros" class="table table-striped">
+                    <thead>
+                        <tr>
+                            <th>Nombre</th>
+                            <th>Documento</th>
+                            <th>Sede</th>
+                            <th>Acción</th>
+                        </tr>
+                    </thead>
+                    <tbody id="tablaMinistrosBody">
+                        <!-- Aquí se cargarán los ministros dinámicamente -->
+                    </tbody>
+                </table>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cerrar</button>
             </div>
         </div>
     </div>
+</div>
 
-
-    <div class="modal fade" id="modalSeleccionSede" tabindex="-1" aria-labelledby="modalSeleccionSedeLabel" aria-hidden="true">
-        <div class="modal-dialog">
-            <div class="modal-content">
-                <div class="modal-header">
-                    <h5 class="modal-title">Seleccionar Sede</h5>
-                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-                </div>
-                <div class="modal-body">
-                    <input type="text" id="buscarSede" class="form-control mb-3" placeholder="Buscar Sede..." oninput="cargarListaSedes()">
-                    <table class="table table-hover">
-                        <thead>
-                            <tr>
-                                <th>ID</th>
-                                <th>Nombre de Sede</th>
-                                <th>Dirección</th>
-                            </tr>
-                        </thead>
-                        <tbody id="listaSedes">
-                            <!-- Los datos de sedes se cargarán aquí dinámicamente -->
-                        </tbody>
-                    </table>
-                    <div id="paginacionSede" class="d-flex justify-content-center mt-3">
-                        <button onclick="paginaAnterior('sede')" class="btn btn-outline-primary btn-sm me-2">Anterior</button>
-                        <span id="paginaActualSede">1</span>
-                        <button onclick="paginaSiguiente('sede')" class="btn btn-outline-primary btn-sm ms-2">Siguiente</button>
-                    </div>
-                </div>
+<!-- Modal para Seleccionar Sede -->
+<div class="modal fade" id="modalSeleccionarSede" tabindex="-1" aria-labelledby="seleccionarSedeLabel" aria-hidden="true">
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">Seleccionar Sede</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <!-- Campo de búsqueda -->
+                <input type="text" id="buscarSede" class="form-control mb-3" placeholder="Buscar por nombre o dirección...">
+                
+                <!-- Tabla de sedes -->
+                <table id="tablaSedes" class="table table-striped">
+                    <thead>
+                        <tr>
+                            <th>Nombre</th>
+                            <th>Dirección</th>
+                            <th>Acción</th>
+                        </tr>
+                    </thead>
+                    <tbody id="tablaSedesBody">
+                        <!-- Aquí se cargarán las sedes dinámicamente -->
+                    </tbody>
+                </table>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cerrar</button>
             </div>
         </div>
     </div>
-    
-    
+</div>
 
-    
+<script src="/static/js/programacion.js"></script>
 
-    <script src="/static/js/programacion.js"></script>
-    {% endblock %}
+{% endblock %}

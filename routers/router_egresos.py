@@ -1,132 +1,136 @@
-from flask import render_template, request, redirect, url_for, flash
-from bd import obtener_conexion  # Asegúrate de que esta función esté correctamente definida
-from datetime import datetime
+from flask import jsonify, render_template, request, redirect, url_for,flash,send_file
+import traceback
+from datetime import datetime, timedelta
+from routers.router_main import requerido_login
+
 
 from controladores.controlador_egresos import (
-    listar_egresos,
-    agregar_egreso,
-    actualizar_egreso,
-    eliminar_egreso,
-    obtener_id_sede_por_nombre
+    insertar_egreso,
+    obtener_egresos,
+    obtener_rango_de_años,
+    obtener_id_sede_por_nombre,
+    obtener_egresos_por_año,
+    actualizar_egreso
+
 )
 
 def registrar_rutas(app):
-    # Ruta para gestionar los egresos
-    @app.route('/gestionar_egresos', methods=['GET'])
+    # Ruta para gestionar egresos
+    @app.route("/gestionar_egresos", methods=["GET"])
     def gestionar_egresos():
-        sede_usuario = request.cookies.get('sede')
-        conexion = obtener_conexion()
-        with conexion.cursor() as cursor:
-            cursor.execute("""
-                SELECT e.id_egreso, s.nombre_sede AS nombre_sede, e.monto, e.descripcion, e.fecha, e.hora
-                FROM egreso e
-                JOIN sede s ON e.id_sede = s.id_sede
-                WHERE s.nombre_sede = %s
-            """,(sede_usuario))
-            egresos = cursor.fetchall()
-        conexion.close()
-        return render_template('egresos/gestionar_egresos.html', egresos=egresos)
-
-
-    # Ruta para agregar un egreso
-    @app.route('/insertar_egreso', methods=['POST'])
-    def insertar_egreso():
-        id_sede = obtener_id_sede_por_nombre(request.cookies.get("sede"))
-        monto = request.form['monto']
-        descripcion = request.form['descripcion']
-        fecha_hora_actual = datetime.now()
-
-        # Formatear la fecha en "YYYY-MM-DD"
-        fecha_actual = fecha_hora_actual.strftime("%Y-%m-%d")
-        # Formatear la hora en "HH:MM:SS"
-        hora_actual = fecha_hora_actual.strftime("%H:%M:%S")
-
-        conexion = obtener_conexion()
-        with conexion.cursor() as cursor:
-            cursor.execute("""
-                INSERT INTO egreso (id_sede, monto, descripcion, fecha, hora)
-                VALUES (%s, %s, %s, %s, %s)
-            """, (id_sede, monto, descripcion, fecha_actual, hora_actual))
-        conexion.commit()
-        conexion.close()
-
-        flash("Egreso registrado correctamente")
-        return redirect(url_for('gestionar_egresos'))
-
-    def obtener_sede_usuario(user_id):
-        conexion = obtener_conexion()
-        with conexion.cursor() as cursor:
-            cursor.execute("""
-                SELECT s.id_sede, s.nombre_sede 
-                FROM sede s 
-                JOIN cuenta c ON s.id_sede = c.id_sede 
-                WHERE c.id = %s
-            """, (user_id,))
-            sede = cursor.fetchone()
-        conexion.close()
-        return sede
-
-
+        egresos = obtener_egresos()
+        años = obtener_rango_de_años()  # Obtenemos el rango de años disponibles en la BD
+        return render_template("egresos/gestionar_egresos.html", egresos=egresos, años=años)
+    
     # Ruta para modificar un egreso
-    @app.route('/actualizar_egreso', methods=['POST'])
-    def actualizar_egreso():
+    @app.route('/procesar_actualizar_egreso', methods=['POST'])
+    def procesar_actualizar_egreso():
         try:
-            id_egreso = request.form['id_egreso']
-            id_sede = request.form['id_sede']
-            monto = request.form['monto']
-            descripcion = request.form['descripcion']
-            fecha = request.form['fecha']
-            hora = request.form['hora']
+            # Obtener datos del formulario
+            id_egreso = request.form["id"]
+            monto = request.form["monto"]
+            descripcion = request.form["descripcion"]
+            
+            # Obtener nombre de la sede desde las cookies
+            nombre_sede = request.cookies.get("sede")
+            if not nombre_sede:
+                return jsonify(success=False, message="No se pudo obtener el nombre de la sede del usuario.")
 
-            conexion = obtener_conexion()
-            with conexion.cursor() as cursor:
-                # Verificar si el id_sede existe
-                cursor.execute("SELECT COUNT(*) FROM sede WHERE id_sede = %s", (id_sede,))
-                sede_existe = cursor.fetchone()[0]
+            # Obtener ID de la sede usando el nombre
+            id_sede = obtener_id_sede_por_nombre(nombre_sede)
+            if not id_sede:
+                return jsonify(success=False, message="La sede especificada no se encuentra en la base de datos.")
 
-                if sede_existe:
-                    # Actualizar el egreso si la sede existe
-                    cursor.execute(
-                        """
-                        UPDATE egreso 
-                        SET id_sede = %s, monto = %s, descripcion = %s, fecha = %s, hora = %s
-                        WHERE id_egreso = %s
-                        """,
-                        (id_sede, monto, descripcion, fecha, hora, id_egreso)
-                    )
-                    conexion.commit()
-                    flash("Egreso actualizado correctamente")
-                else:
-                    flash(f"Error: El id_sede {id_sede} no existe.", "error")
-
-            conexion.close()
-            return redirect(url_for('gestionar_egresos'))
-
+            # Llamar a la función para actualizar el egreso en la base de datos
+            success = actualizar_egreso(monto, descripcion, id_egreso, id_sede)
+            if success:
+                # Obtener los egresos actualizados
+                egresos = obtener_egresos()
+                egresos_data = [
+                    {
+                        "id": egr[0],
+                        "sede": egr[1],
+                        "descripcion": egr[2],
+                        "fecha": egr[3].strftime('%Y-%m-%d') if isinstance(egr[3], datetime) else str(egr[3]),
+                        "hora": str(egr[4]) if isinstance(egr[4], timedelta) else egr[4],
+                        "monto": egr[5],
+                    }
+                    for egr in egresos
+                ]
+                return jsonify(success=True, egresos=egresos_data, message="Egreso actualizado exitosamente")
+            else:
+                return jsonify(success=False, message="Error al actualizar el egreso")
         except Exception as e:
-            conexion.rollback()  # Revertir cambios si ocurre un error
-            flash(f"Ocurrió un error al actualizar el egreso: {str(e)}", "error")
-            return redirect(url_for('gestionar_egresos'))
-
-    def mostrar_formulario_agregar():
-        user_id = request.cookies.get('user_id')  # O utiliza 'session' si estás utilizando sesiones
-        sede = obtener_sede_usuario(user_id) if user_id else None
-
-        # Obtenemos todas las sedes para la lista desplegable si es necesario
-        #sedes = obtener_todas_las_sedes()
-
-        return render_template('egresos/gestionar_egresos.html', sede=sede, sedes=sedes)
+            traceback.print_exc()
+            return jsonify(success=False, message="Error al actualizar el  egreso: {str(e)}"), 400
 
 
-    # Ruta para eliminar un egreso
-    @app.route('/eliminar_egreso', methods=['POST'])
-    def eliminar_egreso():
-        id_egreso = request.form['id_egreso']
+    @app.route("/insertar_egreso", methods=["POST"])
+    def procesar_insertar_egreso():
+        try:
+            # Obtener datos del formulario
+            monto = request.form["monto"]
+            descripcion = request.form["descripcion"]
+          
+            # Obtener nombre de la sede desde las cookies
+            nombre_sede = request.cookies.get("sede")
+            if not nombre_sede:
+                flash("No se pudo obtener el nombre de la sede del usuario.", "error")
+                return redirect(url_for("gestionar_egresos"))
 
-        conexion = obtener_conexion()
-        with conexion.cursor() as cursor:
-            cursor.execute("DELETE FROM egreso WHERE id_egreso = %s", (id_egreso,))
-        conexion.commit()
-        conexion.close()
+            # Obtener el ID de la sede usando el nombre
+            id_sede = obtener_id_sede_por_nombre(nombre_sede)
+            if not id_sede:
+                flash("La sede especificada no se encuentra en la base de datos.", "error")
+                return redirect(url_for("gestionar_egresos"))
 
-        flash("Egreso eliminado correctamente")
-        return redirect(url_for('gestionar_egresos'))
+            # Llamar a la función para insertar egreso en la base de datos
+            nuevo_id = insertar_egreso(monto, descripcion, id_sede)
+            if nuevo_id is None:
+                return jsonify(success=False, message="Error al insertar el egreso")
+
+            # Obtener los egresos actualizadas después de la inserción
+            egresos = obtener_egresos()
+            egresos_data = [
+                {
+                        "id": egr[0],
+                        "sede": egr[1],
+                        "descripcion": egr[2],
+                        "fecha": egr[3].strftime('%Y-%m-%d') if isinstance(egr[3], datetime) else str(egr[3]),
+                        "hora": str(egr[4]) if isinstance(egr[4], timedelta) else egr[4],
+                        "monto": egr[5],
+                    }
+                    for egr in egresos
+            ]
+
+            return jsonify({
+                "success": True,
+                "message": "Egreso agregado exitosamente.",
+                "egresos": egresos_data
+            })
+        except Exception as e:
+            traceback.print_exc()
+            return jsonify(success=False, message=f"Error al insertar egreso: {str(e)}"), 400
+    @app.route("/apiaños", methods=["GET"])
+    def api_años():
+        try:
+            años = obtener_rango_de_años()  # Esta función debería devolver una lista de años, por ejemplo [(2021,), (2022,), ...]
+            lista_años = [{'año': año[0]} for año in años]  # Convertir a formato de diccionario
+            return jsonify({'data': lista_años})
+        except Exception as e:
+            print(f"Error al obtener años: {e}")
+            return jsonify({"error": "Error al obtener los años"}), 500
+
+#   @app.route("/apiaños", methods=["GET"])
+#    def apiaños():
+#        try:
+#            años = obtener_rango_de_años()  # Asegúrate de que esta función retorne una lista de años
+#            lista_años = []
+#           for an in años:
+#                    lista_años.append ({
+#                        'año':an	
+#                    })
+#            return jsonify({'data':lista_años})
+#        except Exception as e:
+#            print(f"Error al obtener años: {e}")
+#           return jsonify({"error": "Error al obtener los años"}), 500

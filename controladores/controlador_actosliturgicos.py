@@ -169,6 +169,7 @@ def eliminaracto_requisitos(id):
         return False
     finally:
         conexion.close()
+
 def obtener_acto():
     conexion = obtener_conexion()
     with conexion.cursor() as cursor:
@@ -199,6 +200,28 @@ def listar_actosLit():
         raise("Error en la consulta")
     finally:
         conexion.close()  
+
+def listar_actosxsede(nombre_sede):
+    conexion = obtener_conexion()
+    try:
+        with conexion.cursor() as cursor:
+            cursor.execute('''
+                SELECT al.* 
+                FROM actoliturgico AS al
+                left JOIN sede_acto_liturgico AS sdal
+                    ON al.id_actoliturgico = sdal.id_actoliturgico
+                left JOIN sede AS sd
+                    ON sd.id_sede = sdal.id_sede
+                WHERE sd.nombre_sede = %s;
+            ''', nombre_sede)
+            valores = cursor.fetchall()
+        return valores
+    except Exception as e:  
+        raise("Error en la consulta")
+    finally:
+        conexion.close()  
+
+
 
 def insertar_acto(acto,tipo,monto,estado):
     conexion = obtener_conexion()

@@ -82,10 +82,41 @@ def actualizar_sede(nombre_sede,direccion,creacion,telefono,correo,monto,estado,
 
 def eliminar_sede(id):
     conexion = obtener_conexion()
-    with conexion.cursor() as cursor:
-        cursor.execute("DELETE FROM sede WHERE id_sede = %s", (id,))
-    conexion.commit()
-    conexion.close()
+    try:
+        with conexion.cursor() as cursor:
+            # Verificar si el id_sede está en uso en las diferentes tablas
+            tablas_a_verificar = [
+                ("sede_acto_liturgico", "id_sede"),
+                ("programacion_charlas", "id_sede"),
+                ("celebracion", "id_sede"),
+                ("comprobante", "id_sede"),
+                ("egreso", "id_sede"),
+                ("feligres", "id_sede"),
+                ("ministro", "id_sede"),
+                ("recaudacion", "id_sede"),
+                ("solicitud", "id_sede")
+            ]
+
+            # Revisar cada tabla para ver si existe una referencia
+            for tabla, columna in tablas_a_verificar:
+                cursor.execute(f"SELECT COUNT(*) FROM {tabla} WHERE {columna} = %s", (id,))
+                en_uso = cursor.fetchone()[0]
+                if en_uso > 0:
+                    mensaje_error = f"No se puede eliminar la sede porque está en uso en la tabla '{tabla}'."
+                    print(mensaje_error)
+                    return {"success": False, "message": mensaje_error}
+            
+            # Si no hay dependencias, proceder con la eliminación
+            cursor.execute("DELETE FROM sede WHERE id_sede = %s", (id,))
+        conexion.commit()
+        return {"success": True, "message": "Sede eliminada correctamente."}
+    except Exception as e:
+        print(f"Error al eliminar la sede: {e}")
+        conexion.rollback()
+        return {"success": False, "message": "Error al intentar eliminar la sede."}
+    finally:
+        conexion.close()
+
 
 def darBaja_sede(id):
     conexion = obtener_conexion()
