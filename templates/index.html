@@ -219,10 +219,11 @@
                 
             </div>
         </div>
-        <div class="main-content me-5" style="max-height: 400px;">
+        <div class="main-content me-0" style="max-height: 100vh; overflow-y: auto; width: 100%;">
             {% block cuerpo %}
             {% endblock %}
         </div>
+        
     </div>
 </body>
 <script src="{{ url_for('static', filename = '/js/defecto.js')}}"></script>
