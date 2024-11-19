@@ -75,26 +75,25 @@ async function obtenerDatos(year, month) {
     }
 }
 
-// Función para crear o actualizar el gráfico
 async function crearGrafico(year, month) {
     const data = await obtenerDatos(year, month);
     const noDataMessage = document.getElementById('noDataMessage');
     const chartContainer = document.getElementById('chartContainer');
     const ctx = document.getElementById('actosLiturgicosChart').getContext('2d');
 
-    // Verificar si hay datos para mostrar en el gráfico
+    const labels = data.length > 0 ? data.map(d => d.acto_liturgico) : ['No hay datos'];
+    const valores = data.length > 0 ? data.map(d => d.num_celebraciones) : [0];
+
+    // Mostrar mensaje si no hay datos
     if (data.length === 0) {
         noDataMessage.style.display = 'block';
-        chartContainer.style.display = 'none';
-        return;
-    } else {
-        noDataMessage.style.display = 'none';
-        chartContainer.style.display = 'block';
+        // Ocultar el mensaje después de 3 segundos
+        setTimeout(() => {
+            noDataMessage.style.display = 'none';
+        }, 3000);
     }
 
-    const labels = data.map(d => d.acto_liturgico);
-    const valores = data.map(d => d.num_celebraciones);
-
+    // Asegurarse de que el gráfico se renderice incluso si no hay datos
     if (window.chartInstance) {
         window.chartInstance.destroy();
     }
@@ -127,7 +126,7 @@ async function crearGrafico(year, month) {
                         display: true,
                         text: 'Número de Celebraciones'
                     },
-                    max: Math.max(10, ...valores)
+                    max: Math.max(10, ...valores) // Asegura un rango adecuado
                 }
             },
             plugins: {
@@ -142,3 +141,4 @@ async function crearGrafico(year, month) {
         }
     });
 }
+
