@@ -4,6 +4,11 @@ import json
 import urllib.parse
 import envio_correo 
 from routers.router_main import requerido_login
+from controladores.controlador_actosliturgicos import (
+obtener_celebraciones_por_fecha,
+obtener_anos
+)
+
 
 def registrar_rutas(app):
     @app.route("/gestionar_actosliturgicos", methods=["GET"])
@@ -332,3 +337,25 @@ def registrar_rutas(app):
             return jsonify({'estado': 'Correcto'})  # Respuesta exitosa
         except Exception as e:
             return jsonify({'estado': 'Error', 'mensaje': str(e)}), 500
+
+    @app.route("/numero_actos_liturgicos", methods=["GET"])
+    def numero_actos_liturgicos():
+        años = obtener_anos()
+        return render_template("reportes/numeroActosLiturgicosAño.html", años=años)
+
+    @app.route("/api/celebraciones_por_fecha", methods=["GET"])
+    def api_celebraciones_por_fecha():
+        year = request.args.get('year')
+        month = request.args.get('month')
+        celebraciones = obtener_celebraciones_por_fecha(year, month)
+        return jsonify(celebraciones)
+
+    @app.route("/api/obtener_anos", methods=["GET"])
+    def api_obtener_anos():
+        try:
+            años = obtener_anos()
+            lista_años = [{'año': int(an[0])} for an in años]
+            return jsonify({'data': lista_años})
+        except Exception as e:
+            print(f"Error al obtener años: {e}")
+            return jsonify({"error": "Error al obtener los años"}), 500

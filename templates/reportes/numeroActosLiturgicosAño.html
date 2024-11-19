@@ -1,0 +1,65 @@
+{% extends 'index.html' %}
+
+{% block title %}Reporte de Actos Litúrgicos{% endblock %}
+
+{% block cuerpo %}
+<div class="container mt-4">
+    <!-- Título fuera de la tarjeta -->
+    <h1  class="titulo-gestion">Reporte de número de celebraciones por actos litúrgicos por mes y año</h1>
+    <!-- Card de Bootstrap para contener filtros y gráfico -->
+    <div class="card">
+        <div class="card-header">
+            <div class="d-flex justify-content-between align-items-center flex-wrap">
+                <!-- Filtros en la cabecera de la tarjeta -->
+                <div>
+                    <span><strong>Año:</strong></span>
+                    <div id="yearFilters" class="btn-group btn-group-sm" role="group">
+                        <!-- Aquí se cargarán dinámicamente los botones de año -->
+                    </div>
+                </div>
+                <div>
+                    <span><strong>Mes:</strong></span>
+                    <div id="monthFilters" class="btn-group btn-group-sm" role="group">
+                        <button type="button" class="btn btn-outline-secondary" data-month="">Todos</button>
+                        <button type="button" class="btn btn-outline-secondary" data-month="1">Enero</button>
+                        <button type="button" class="btn btn-outline-secondary" data-month="2">Febrero</button>
+                        <button type="button" class="btn btn-outline-secondary" data-month="3">Marzo</button>
+                        <button type="button" class="btn btn-outline-secondary" data-month="4">Abril</button>
+                        <button type="button" class="btn btn-outline-secondary" data-month="5">Mayo</button>
+                        <button type="button" class="btn btn-outline-secondary" data-month="6">Junio</button>
+                        <button type="button" class="btn btn-outline-secondary" data-month="7">Julio</button>
+                        <button type="button" class="btn btn-outline-secondary" data-month="8">Agosto</button>
+                        <button type="button" class="btn btn-outline-secondary" data-month="9">Septiembre</button>
+                        <button type="button" class="btn btn-outline-secondary" data-month="10">Octubre</button>
+                        <button type="button" class="btn btn-outline-secondary" data-month="11">Noviembre</button>
+                        <button type="button" class="btn btn-outline-secondary" data-month="12">Diciembre</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="card-body">
+            <!-- Mensaje de no hay datos dentro del card-body -->
+            <div id="noDataMessage" class="alert alert-info text-center" style="display: none;">
+                No hay datos disponibles para el año y mes seleccionados. Se muestra un gráfico vacío.
+            </div>
+
+            <!-- Contenedor del gráfico dentro del card-body -->
+            <div id="chartContainer" class="chart-container" style="position: relative; height:400px; width:100%">
+                <canvas id="actosLiturgicosChart"></canvas>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Script de Chart.js y archivo JavaScript personalizado -->
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<script src="/static/js/numeroActosLiturgicosAño.js"></script>
+
+<!-- Agregar estilo para asegurar el desplazamiento cuando se hace zoom -->
+<style>
+    body {
+        overflow-y: auto;
+    }
+</style>
+{% endblock %}
