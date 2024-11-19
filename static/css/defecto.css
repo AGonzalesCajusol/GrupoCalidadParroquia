@@ -145,10 +145,8 @@ body {
     bottom: 0;
     z-index: 1;
     color: #033D8EBF;
-    overflow-y: auto;
-    border-right: 5px solid #ECEADE;
-    padding-right: 10px;
-    height: calc(100vh - 56px);
+    overflow-y: auto;    
+    padding-right: 10px
 }
 
 .layout {
@@ -311,18 +309,6 @@ th {
 
     width: 100%;
     height: 30px;
-}
-
-/* Centrar todo en las celdas de la tabla */
-.dataTable td, 
-.dataTable th {
-    text-align: center;
-    vertical-align: middle;
-}
-
-.dataTable thead th {
-    text-align: center !important; 
-    vertical-align: middle !important;
 }
 
 .titulo-gestion {
