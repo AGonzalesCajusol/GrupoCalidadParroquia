@@ -58,7 +58,7 @@ function abrirModalIntencion(tipo, id, nombre, descripcion, idActo) {
     if (id) document.getElementById("intencionId").value = id;
     if (nombre) document.getElementById("nombre_intencion").value = nombre;
     if (descripcion) document.getElementById("descripcion").value = descripcion;
-    //if (idActo) document.getElementById("id_actoliturgico").value = idActo;
+    if (idActo) document.getElementById("id_actoliturgico").value = idActo;
     const select = document.getElementById('id_actoliturgico');
             if (!select.querySelector(`option[value="${idActo}"]`)) {
                 select.innerHTML += `<option value="${idActo}">${idActo}</option>`;
