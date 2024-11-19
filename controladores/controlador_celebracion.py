@@ -97,3 +97,60 @@ def eliminar_celebracion(id_celebracion):
     finally:
         conexion.close()
 
+def obtener_celebraciones_desde_bd():
+    conexion = obtener_conexion()
+    cursor = conexion.cursor()
+    cursor.execute("""
+        SELECT id_celebracion, fecha, hora_inicio, hora_fin, estado, id_sede, id_actoliturgico 
+        FROM celebracion 
+        WHERE estado = 'R'
+    """)
+    celebraciones = cursor.fetchall()
+    conexion.close()
+    return [
+        {
+            'id_celebracion': c[0],
+            'fecha': c[1],
+            'hora_inicio': c[2],
+            'hora_fin': c[3],
+            'estado': c[4],
+            'id_sede': c[5],
+            'id_actoliturgico': c[6]
+        }
+        for c in celebraciones
+    ]
+
+
+
+
+def obtener_solicitudes_por_celebracion(id_celebracion):
+    conexion = obtener_conexion()
+    cursor = conexion.cursor()
+    cursor.execute("""
+        SELECT id_solicitud,id_actoliturgico, id_celebracion, dni_feligres, estado, asistencia
+        FROM solicitud
+        WHERE id_celebracion = %s
+    """, (id_celebracion,))
+    solicitudes = cursor.fetchall()
+    conexion.close()
+    return [
+        {
+            'id_solicitud': s[0],
+            'id_actoliturgico' : s[1],
+            'id_celebracion': s[2],
+            'dni_feligres': s[3],
+            'estado': s[4],
+            'asistencia': s[5]
+        }
+        for s in solicitudes
+    ]
+
+
+def actualizar_asistencia_en_bd(id_solicitud, asistencia):
+    conexion = obtener_conexion()
+    cursor = conexion.cursor()
+    cursor.execute("""
+        UPDATE solicitud SET asistencia = %s WHERE id_solicitud = %s
+    """, (asistencia, id_solicitud))
+    conexion.commit()
+    conexion.close()

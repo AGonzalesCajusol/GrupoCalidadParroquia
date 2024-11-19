@@ -170,6 +170,23 @@ def eliminaracto_requisitos(id):
     finally:
         conexion.close()
 
+def obtener_actos_liturgicos():
+    conexion = obtener_conexion()
+    try:
+        with conexion.cursor() as cursor:
+            cursor.execute("""
+                SELECT id_actoliturgico, nombre_liturgia
+                FROM actoliturgico
+                WHERE estado = '1'
+            """)
+            actos = cursor.fetchall()
+        return actos
+    except Exception as e:
+        print(f"Error al obtener actos litúrgicos: {e}")
+        return []
+    finally:
+        conexion.close()
+
 def obtener_acto():
     conexion = obtener_conexion()
     with conexion.cursor() as cursor:
@@ -496,6 +513,62 @@ def listar_sacramentos():
             cursor.execute("SELECT id_actoliturgico ,nombre_liturgia FROM actoliturgico WHERE es_sacramento = 'S'")
             sacramentos = cursor.fetchall()
             return sacramentos
+    finally:
+        conexion.close()
+
+def obtener_celebraciones_por_fecha(year, month=None):
+    conexion = obtener_conexion()
+    try:
+        query = '''
+            SELECT
+                al.nombre_liturgia AS acto_liturgico,
+                COUNT(c.id_celebracion) AS num_celebraciones
+            FROM
+                celebracion c
+            JOIN
+                actoliturgico al ON c.id_actoliturgico = al.id_actoliturgico
+            WHERE
+                EXTRACT(YEAR FROM c.fecha) = %s
+        '''
+        params = [year]
+
+        if month:
+            query += ' AND EXTRACT(MONTH FROM c.fecha) = %s'
+            params.append(month)
+
+        query += '''
+            GROUP BY
+                al.nombre_liturgia
+            ORDER BY
+                al.nombre_liturgia;
+        '''  # Cambié 'al.nombre_liturgica' a 'al.nombre_liturgia'
+
+        with conexion.cursor() as cursor:
+            cursor.execute(query, params)
+            resultados = cursor.fetchall()
+            celebraciones = [{'acto_liturgico': row[0], 'num_celebraciones': row[1]} for row in resultados]
+        return celebraciones
+    except Exception as e:
+        print(f"Error al obtener celebraciones por fecha: {e}")
+        return []
+    finally:
+        conexion.close()
+
+
+def obtener_anos():
+    conexion = obtener_conexion()
+    try:
+        with conexion.cursor() as cursor:
+            cursor.execute('''
+                SELECT DISTINCT EXTRACT(YEAR FROM fecha) AS year
+                FROM celebracion
+                ORDER BY year
+            ''')
+            resultados = cursor.fetchall()
+            return resultados if resultados else []
+    except Exception as e:
+        print(f"Error al obtener años: {e}")
+        return []
     finally:
         conexion.close()
 

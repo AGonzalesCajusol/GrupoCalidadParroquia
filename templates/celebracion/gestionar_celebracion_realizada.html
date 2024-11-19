@@ -1,0 +1,45 @@
+{% extends "index.html" %}
+{% block title %}Gestión de Celebraciones{% endblock %}
+{% block cuerpo %}
+
+<div class="container mt-4">
+    <h1>Gestión de Celebraciones</h1>
+    <table id="celebracionesTable" class="table table-hover table-striped">
+        <thead>
+            <tr>
+                <th>ID Celebración</th>
+                <th>Fecha</th>
+                <th>Hora Inicio</th>
+                <th>Hora Fin</th>
+                <th>Estado</th>
+                <th>ID Sede</th>
+                <th>ID Acto Litúrgico</th>
+                <th>Acciones</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for celebracion in celebraciones %}
+            <tr>
+                <td>{{ celebracion.id_celebracion }}</td>
+                <td>{{ celebracion.fecha }}</td>
+                <td>{{ celebracion.hora_inicio }}</td>
+                <td>{{ celebracion.hora_fin }}</td>
+                <td>{{ celebracion.estado }}</td>
+                <td>{{ celebracion.id_sede }}</td>
+                <td >{{ celebracion.id_actoliturgico }}</td>
+                
+                <td class="text-center">
+                    <a href="{{ url_for('gestionar_asistencia_celebracion', id_celebracion=celebracion.id_celebracion) }}"
+                       class="btn-asistencia" title="Gestionar Asistencias">
+                        <i class="fas fa-user-check"></i>
+                    </a>
+                </td>
+                
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+</div>
+
+<script src="/static/js/gestionar_celebraciones_realizadas.js"></script>
+{% endblock %}
