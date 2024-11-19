@@ -46,6 +46,22 @@ def obtener_sede():
     conexion.close()
     return sede
 
+
+def obtener_sedes_celebracion():
+    """Obtiene todas las sedes con su ID y nombre."""
+    conexion = obtener_conexion()
+    try:
+        with conexion.cursor() as cursor:
+            cursor.execute("SELECT id_sede, nombre_sede FROM sede")
+            sedes = cursor.fetchall()            
+            return sedes
+    except Exception as e:
+        print(f"Error al obtener sedes: {e}")
+        return []
+    finally:
+        conexion.close()
+
+
 def obtener_sedeparacuenta():
     conexion = obtener_conexion()
     with conexion.cursor() as cursor:

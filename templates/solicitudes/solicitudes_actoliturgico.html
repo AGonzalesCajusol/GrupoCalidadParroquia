@@ -67,12 +67,12 @@
                         {% endfor %}
                     </select>
 
-                    <button class="btn btn-success " onclick="verificar()">
+                    <button class="btn btn-success" id="bbb"  onclick="verificar()">
                         <i class="bi bi-plus-circle-fill me-2"></i>Nuevo
                     </button>
                 </div>
                 <!---------   Esta es la tabla donde se muestran los requisitos    ----------->
-                <div class="accordion mt-3" id="accordionRequisitos">
+                <div class="accordion mt-3" id="accordionRequisitos" >
                     <div class="accordion-item">
                         <h2 class="accordion-header" id="headingRequisito">
                             <button class="accordion-button" type="button" data-bs-toggle="collapse"
@@ -117,7 +117,6 @@
                     </div>
                 </div>
 
-                <!---------   Esta es la tabla donde se muestran el horarios escogido por el feligres   ----------->
                 <div class="mt-2 d-none" id="contenido_calendario_celebracion">
                     <div class="d-flex justify-content-end">
                         <button type="button" class="btn btn-danger " onclick="exportarTablaPDF()"><i
@@ -125,11 +124,33 @@
                         <button type="button" class="btn btn-primary " onclick="retornar()"><i
                                 class="bi bi-arrow-left-circle-fill"></i></button>
                     </div>
-
+                    <div id="tablapdf" class="mt-3">
+                        <table id="miTabla" class="table">
+                            <thead>
+                                <tr>
+                                    <th>
+                                       Tema 
+                                    </th>
+                                    <th>
+                                        Fecha
+                                    </th>
+                                    <th>
+                                        Hora inicio
+                                    </th>
+                                    <th>
+                                        Hora fin
+                                    </th>
+                                </tr>
+                            </thead>
+                            <tbody id="cu_tablapdf">
+        
+                            </tbody>
+                        </table>
+                    </div>
                 </div>
 
                 <!----- Tabla solicitudes ------>
-                <div class="mt-3">
+                <div class="mt-3" id="aaa">
                     <h6><strong>Tabla solicitudes:</strong></h6>
                     <!-- Contenedor con scroll -->
                     <div class="table-responsive" style="max-height: 500px; overflow-y: auto;">
@@ -150,8 +171,6 @@
                         </table>
                     </div>
                 </div>
-                
-
 
             </div>
         </div>

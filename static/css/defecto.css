@@ -313,6 +313,17 @@ th {
     height: 30px;
 }
 
+/* Centrar todo en las celdas de la tabla */
+.dataTable td, 
+.dataTable th {
+    text-align: center;
+    vertical-align: middle;
+}
+
+.dataTable thead th {
+    text-align: center !important; 
+    vertical-align: middle !important;
+}
 
 .titulo-gestion {
     font-size: 1.8rem;

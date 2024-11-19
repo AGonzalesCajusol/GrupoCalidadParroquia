@@ -141,3 +141,25 @@ def registrar_rutas(app):
         except Exception as e:
             print(f"Error al obtener tipos de recaudación: {e}")
             return jsonify({"error": "Error al obtener los tipos de recaudación"}), 500
+    #Endpoint para obtener todos los tipos (activos e inactivos)
+    @app.route("/api/tipos_todos", methods=["GET"])
+    def api_tipos_todos():
+        try:
+            tipos = obtener_todos_los_tipos_recaudacion()
+            lista_tipos = [{"tipo": tipo[1]} for tipo in tipos]
+            return jsonify({"data": lista_tipos})
+        except Exception as e:
+            print(f"Error al obtener todos los tipos de recaudación: {e}")
+            return jsonify({"error": "Error al obtener los tipos de recaudación"}), 500
+    #Endpoint para obtener solo los tipos activos
+    @app.route("/api/tipos_activos", methods=["GET"])
+    def api_tipos_activos():
+        try:
+            tipos = obtener_tipos_recaudacion_activos()
+            lista_tipos = [{"tipo": tipo[1]} for tipo in tipos]
+            return jsonify({"data": lista_tipos})
+        except Exception as e:
+            print(f"Error al obtener tipos de recaudación activos: {e}")
+            return jsonify({"error": "Error al obtener los tipos de recaudación activos"}), 500
+
+

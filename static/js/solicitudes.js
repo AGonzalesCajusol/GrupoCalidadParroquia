@@ -3,7 +3,7 @@
         <tr>
                         <td>Copia del DNI del novio</td>
                         <td>
-                            <input id="copia_dninovio" name="copia_dninovio" type="file" class="form-control" accept="image/*,application/pdf" >
+                            <input id="copia_dninovio" name="copia_dninovio" type="file" class="form-control" accept="image/*,application/pdf" required>
                         </td>
                         <td>
                             <input type="checkbox" name="es_copia_dninovio" id="es_copia_dninovio">
@@ -276,16 +276,16 @@
                             <label for="">Validado</label>
                         </td>
                         <td>
-                            
-                                    <button class="btn btn-primary btn-sm" type="button" onclick="visualizar_calendario('charlas')">
-                                        <i class="bi bi-calendar3"></i>
-                                    </button>
+                
+                        <button  id="charlas" class="btn btn-primary btn-sm" type="button" onclick="visualizar_calendario('charlas')">
+                            <i class="bi bi-calendar3"></i>
+                        </button>
                                 
                         </td>
                     </tr>
     `;
     var plantilla_bautismo  =
-    `
+`
     <tr>
         <td>DNI del padrino</td>
         <td>
@@ -442,10 +442,10 @@
     </tr><tr>
         <td>Sede a realizarse el acto litúrgico	</td>
         <td>
-            <input id="null" name="null" value="Sede Central" type="text" class="form-control" placeholder="Ingrese texto" disabled="">
+            <input id="sedebau" name="sedebau" value="Sede Central" type="text" class="form-control" placeholder="Ingrese texto" disabled="">
         </td>
         <td>
-            <input type="checkbox" name="null" id="null" required="">
+            <input type="checkbox" name="es_sedebau" id="es_sedebau" required="">
             <label for="">Validado</label>
         </td>
         <td>
@@ -454,15 +454,17 @@
     </tr><tr>
         <td>Charla de preparación para padres y padrinos	</td>
         <td>
-            <div id="rnull"></div>
+            <select class="form-select" name="cha" id="cha">
+            </select>
         </td>
+
         <td>
-            <input type="checkbox" name="null" id="null" required="">
+            <input type="checkbox" name="es_charlas" id="es_charlas" required="">
             <label for="">Validado</label>
         </td>
         <td>
             
-                    <button class="btn btn-primary" type="button" onclick="visualizar_calendario('null')">
+                    <button class="btn btn-primary" type="button" onclick="ver_fechas()">
                         <i class="bi bi-calendar3"></i>
                     </button>
                 
@@ -602,9 +604,7 @@
                     </tr>
                     <tr>
                         <td>charlas preparación</td>
-                        <td>
-                            <div id="rnull"></div>
-                        </td>
+
                         <td>
                             <input type="checkbox" name="null" id="null" required="">
                             <label for="">Validado</label>
@@ -750,51 +750,18 @@
     }
 
 
-    function visualizar_calendario(id_fecha) {
-        var tbody = document.getElementById('calendario_cuerpo');
-        var id_charla = document.getElementById(id_fecha).value;
-        fetch(`/calendario_solicitud/${id_charla}`)
-            .then(data => data.json())
-            .then(item => {
-                tbody.innerHTML = '';
-                item.forEach(elemento => {
-                    var tr = document.createElement('tr');
-
-                    var tdId = document.createElement('td');
-                    tdId.textContent = elemento.id;
-                    tdId.classList.add('ocultar');
-                    tr.appendChild(tdId);
-
-                    var tdDescripcion = document.createElement('td');
-                    tdDescripcion.textContent = elemento.descripcion;
-                    tr.appendChild(tdDescripcion);
-
-                    var tdFecha = document.createElement('td');
-                    tdFecha.textContent = elemento.fecha;
-                    tr.appendChild(tdFecha);
-
-                    var tdHoraInicio = document.createElement('td');
-                    tdHoraInicio.textContent = elemento.hora_inicio;
-                    tr.appendChild(tdHoraInicio);
-
-                    var tdHoraFin = document.createElement('td');
-                    tdHoraFin.textContent = elemento.hora_fin;
-                    tr.appendChild(tdHoraFin);
-
-                    tbody.appendChild(tr);
-                });
-            })
-
-        document.getElementById('requi_actos').classList.add("d-none");
-        document.getElementById('contenido_calendario_celebracion').classList.remove("d-none");
-    }
     function retornar(){
+        document.getElementById('accordionRequisitos').classList.remove("d-none");
+        document.getElementById('aaa').classList.remove("d-none");
+        document.getElementById('bbb').disabled = false;
         document.getElementById('contenido_calendario_celebracion').classList.add("d-none");
-        document.getElementById('requi_actos').classList.remove("d-none");
     }
     const acordeon = document.getElementById('requi_actos');
 
     function verificar() {
+        document.getElementById('estado_general').disabled = false;
+        var btn = document.getElementById('registrar').classList.remove('d-none');
+
         var selectElement = document.getElementById('acto_seleccionado');
         var selectedOption = selectElement.options[selectElement.selectedIndex];
         var textoSeleccionado = selectedOption.text;
@@ -813,6 +780,27 @@
             acordeon.classList.add('show');
             acordeon.setAttribute('aria-expanded', 'true');
             requi_actos.innerHTML = plantilla_bautismo;
+            var select = document.getElementById('cha');
+            
+            fetch('/fcelebraciones/2')
+            .then(data =>  data.json())
+            .then( item => {
+                if(item == "Error"){
+                    Toastify({
+                        text: "No existen charlas programadas!!",
+                        duration: 2000,
+                        close: true,
+                        backgroundColor: "#dc3545",
+                        gravity: "bottom",
+                        position: "right",
+                    }).showToast();
+                }else{
+                    item.data.forEach(v => {
+                        select.innerHTML += `<option value="${v.id_charla}">${v.charla}</option>`;
+                    });
+                }
+            })            
+
         }else if (textoSeleccionado == 'Primera comunion'){
             acordeon.classList.add('show');
             acordeon.setAttribute('aria-expanded', 'true');
@@ -828,8 +816,8 @@
 
     function visualizar(id_archivo) {
         const archivo_formulario = document.getElementById(id_archivo).files[0];
-        const modal_contenido = document.getElementById('modal_contenido'); // Contenedor del contenido en el modal
 
+        const modal_contenido = document.getElementById('modal_contenido'); // Contenedor del contenido en el modal
         if (archivo_formulario && archivo_formulario.name.length > 0) {
             const objUrl = URL.createObjectURL(archivo_formulario);
             modal_contenido.innerHTML = "";
@@ -842,7 +830,28 @@
             }
             var myModal = new bootstrap.Modal(document.getElementById('myModal'));
             myModal.show();
+        }else{
+            const src = document.getElementById(id_archivo).name; // Usar el src desde el atributo name
+        
+            if (src) {
+                // Verifica si es una imagen
+                if (src.endsWith('.jpg') || src.endsWith('.jpeg') || src.endsWith('.png') || src.endsWith('.gif')) {
+                    modal_contenido.innerHTML = `<img src="${src}" class="img-fluid formulario_imagenes" alt="Imagen referenciada">`;
+                }
+                // Verifica si es un PDF
+                else if (src.endsWith('.pdf')) {
+                    modal_contenido.innerHTML = `<iframe src="${src}" width="100%" height="800px" style="border:none;"></iframe>`;
+                } 
+                else {
+                    modal_contenido.innerHTML = "Tipo de archivo no soportado.";
+                }
+    
+                var myModal = new bootstrap.Modal(document.getElementById('myModal'));
+                myModal.show();
+            }
         }
+        
+        
     }
 
 
@@ -1010,9 +1019,9 @@
     }
 
     function grabar_solicitud() {
+        var acto = "";
         var id_acto = document.getElementById('acto_seleccionado').value;
         var acto_selecionado = document.getElementById('responsable').value;
-        var acto = array_matrimonio();
         var formData = new FormData();
         var pagos = document.getElementById('pagos');
 
@@ -1020,17 +1029,22 @@
             alert('Ingrese al feligres responsable');
             pagos.disabled = true;
             return ;
+        }else if(id_acto== 1){
+             acto = array_matrimonio();
+        }else if(id_acto == 2){
+             acto = array_bautismo();
         }
 
         for (var key in acto) {
             formData.append(key, acto[key]);  // Aquí se añaden tanto archivos como datos de texto
         }
+
         Swal.fire({
             title: 'Procesando solicitud',
             text: 'Por favor espera un momento...',
             icon: 'info',
             showConfirmButton: false,
-            allowOutsideClick: false, // Evita que el usuario cierre la alerta manualmente
+            allowOutsideClick: false,
             didOpen: () => {
                 Swal.showLoading(); // Muestra un spinner de carga
             }
@@ -1120,6 +1134,35 @@
         };
         return array;
     }
+    function array_bautismo() {
+        var metodo = document.getElementById('metodo');
+        var mt = metodo.textContent;
+        var array = {
+            'dni_padrino' : document.getElementById('dni_padrino').value,
+            'dni_madrina': document.getElementById('dni_madrina').value,
+            'co_dniactan': document.getElementById('co_dniactan').files[0],
+            'nom_niño': document.getElementById('nom_niño').value,
+            'cop_dni_padres': document.getElementById('cop_dni_padres').files[0],
+            'cop_agualuz': document.getElementById('cop_agualuz').files[0],
+            'cop_conspadrino': document.getElementById('cop_conspadrino').files[0],
+            'cop_consmadrina': document.getElementById('cop_consmadrina').files[0],
+            'dni_tutor': document.getElementById('dni_tutor').value,
+            'sedebau': document.getElementById('sedebau').value,
+            'charlas': "",
+            'es_dni_padrino':  document.getElementById('es_dni_padrino').checked ? 'V' : 'F',
+            'es_dni_madrina':  document.getElementById('es_dni_madrina').checked ? 'V' : 'F',
+            'es_co_dniactan':  document.getElementById('es_co_dniactan').checked ? 'V' : 'F',
+            'es_niño':  document.getElementById('es_niño').checked ? 'V' : 'F',
+            'es_cop_dni_padres':  document.getElementById('es_cop_dni_padres').checked ? 'V' : 'F',
+            'es_cop_agualuz':  document.getElementById('es_cop_agualuz').checked ? 'V' : 'F',
+            'es_cop_conspadrino':  document.getElementById('es_cop_conspadrino').checked ? 'V' : 'F',
+            'es_cop_consmadrina':  document.getElementById('es_cop_consmadrina').checked ? 'V' : 'F',
+            'es_dni_tutor':  document.getElementById('es_dni_tutor').checked ? 'V' : 'F',
+            'es_sedebau':  document.getElementById('es_sedebau').checked ? 'V' : 'F',
+            'charlas': document.getElementById('es_charlas').checked ? 'V' : 'F'
+        };
+        return array;
+    }
 
     function listar_solicitudes() {
         fetch('/listar_solicitudes')
@@ -1141,7 +1184,7 @@
                             <td class="text-center">${solicitud.nombre_liturgia}</td>
                             <td class="text-center">${solicitud.nombres}</td>
                             <td class="text-center">
-                                <button class="btn btn-primary btn-sm">
+                                <button class="btn btn-primary btn-sm" onclick="rellenar_formulario(${solicitud.id_solicitud}, '${solicitud.nombre_liturgia}')">
                                     <i class="bi bi-check2-circle"></i>
                                 </button>
                                 <button class="btn btn-secondary btn-sm" onclick="asistencias(${solicitud.id_solicitud}, '${solicitud.nombre_liturgia}')">
@@ -1234,6 +1277,83 @@
         });
     }
     
+    function ver_fechas(){
+        var valor_s = document.getElementById('cha').value;
+        var tbody = document.getElementById('cu_tablapdf');
+        if (valor_s.length == 0){
+            alert("Seleecione una opcion!!");
+        }else{
+            fetch(`datos_charlas/${valor_s}`)
+            .then(valor => valor.json())
+            .then(item => {
+                if(item.mensaje == "Error"){
+                    Toastify({
+                        text: "No se pudo obtener las asistencias",
+                        duration: 2000,
+                        close: true,
+                        backgroundColor: "#dc3545;",
+                        gravity: "bottom",
+                        position: "right",
+                    }).showToast();
+                }else{
+                    tbody.innerHTML = `
+                        <tr>
+                            <td>${item.data[0].descripcion}</td>
+                            <td>${item.data[0].fecha}</td>
+                            <td>${item.data[0].hora_inicio}</td>
+                            <td>${item.data[0].hora_fin}</td>
+                        </tr>
+                    `;
+
+                }
+
+            })
+
+        }
+        document.getElementById('accordionRequisitos').classList.add("d-none");
+        document.getElementById('aaa').classList.add("d-none");
+        document.getElementById('bbb').disabled = true;
+        document.getElementById('contenido_calendario_celebracion').classList.remove("d-none");
+    }
+    
+    function visualizar_calendario(id_fecha) {
+        var tbody = document.getElementById('calendario_cuerpo');
+        var id_charla = document.getElementById(id_fecha).value;
+        fetch(`/calendario_solicitud/${id_charla}`)
+            .then(data => data.json())
+            .then(item => {
+                tbody.innerHTML = '';
+                item.forEach(elemento => {
+                    var tr = document.createElement('tr');
+
+                    var tdId = document.createElement('td');
+                    tdId.textContent = elemento.id;
+                    tdId.classList.add('ocultar');
+                    tr.appendChild(tdId);
+
+                    var tdDescripcion = document.createElement('td');
+                    tdDescripcion.textContent = elemento.descripcion;
+                    tr.appendChild(tdDescripcion);
+
+                    var tdFecha = document.createElement('td');
+                    tdFecha.textContent = elemento.fecha;
+                    tr.appendChild(tdFecha);
+
+                    var tdHoraInicio = document.createElement('td');
+                    tdHoraInicio.textContent = elemento.hora_inicio;
+                    tr.appendChild(tdHoraInicio);
+
+                    var tdHoraFin = document.createElement('td');
+                    tdHoraFin.textContent = elemento.hora_fin;
+                    tr.appendChild(tdHoraFin);
+
+                    tbody.appendChild(tr);
+                });
+            })
+
+
+    }
+
 
     function agregar_asistencia(id){
         var seleccion = document.getElementById(id);
@@ -1268,5 +1388,63 @@
 
     }
 
+
+    function rellenar_formulario(id,acto){
+        document.getElementById('acto_seleccionado').value = 1;
+        verificar();
+        var btn = document.getElementById('registrar').classList.add('d-none');
+        fetch(`/datos_solicitud/${id}`)
+        .then(data => data.json())
+        .then(item => {
+            if (item.estado === "Correcto") {
+                item.data.forEach(v => {
+                    var st = false;
+                    if (v.estado == "V"){
+                        st = true;
+                    }
+                    document.getElementById('estado_general').disabled = true;
+                    document.getElementById(`${v.campo1}`).disabled = true;
+                    document.getElementById(`${v.campo2}`).disabled = true;
+                    switch (v.tipo) {
+                        case 'Charla':
+                            document.getElementById(`${v.campo1}`).disabled = false;
+                            document.getElementById(`${v.campo1}`).onclick = function() {
+                                asistencias(id,'Matrimonio');
+                            };
+
+                        case 'Imagen':
+                            document.getElementById(`${v.campo1}`).name = v.valor;
+                            document.getElementById(`${v.campo2}`).checked = st;
+                            break;
+                        case 'Sede':
+                        case 'FechaHora':
+                        case 'Dni':
+                            document.getElementById(`${v.campo1}`).value = v.valor;
+                            document.getElementById(`${v.campo2}`).checked = st;
+                            break;
+                        default:
+                            break;
+                    }
+                });
+            } else {
+                Toastify({
+                    text: "No se pudo extraer los datos de la solicitud!!",
+                    duration: 2000,
+                    close: true,
+                    backgroundColor: "#dc3545",
+                    gravity: "bottom",
+                    position: "right",
+                }).showToast();
+            }
+            var che = document.querySelectorAll('input[type="checkbox"]:not(#estado_general):not(#es_f_matrimonio)');
+            che.forEach(input => {
+            if (input.checked) {
+                input.onclick();
+            }
+            });
+        })
+
+
+    }
 
 

@@ -3,9 +3,8 @@ import controladores.controlador_actosliturgicos as cactos
 import controladores.controlador_programacion as ccharla
 import controladores.controlador_feligres as cfel
 import controladores.controladro_solicitud as csoli
-import os
+import os, base64
 from routers.router_main import requerido_login
-
 
 
 def registrar_rutas(app):
@@ -105,10 +104,48 @@ def registrar_rutas(app):
                 })
             return jsonify({'data': lista_charlas})
         return jsonify({'data': 'Error'})
+    
 
-    @app.route('/registrarsolicitud/<int:acto_liturgico>', methods=['POST'])
+    @app.route('/fcelebraciones/<int:acto>', methods=['GET'])
+    def fcelebraciones(acto):
+        sede = request.cookies.get('sede')
+        charlas = csoli.fcelebraciones(acto,sede)
+        lista_charlas = []
+        if charlas is not  None:
+            for ch in charlas:
+                lista_charlas.append({
+                    'id_charla': ch[0],
+                    'charla': ch[1]
+                })
+            return jsonify({'data': lista_charlas})
+        return jsonify({'data': 'Error'})
+    
+    @app.route('/horario_cl/<int:id>', methods=['GET','POST'])
+    def horario_cl(id):
+        datos = csoli.horario_cl(id)
+        lista_datos = []
+
+        if datos == 0:
+            return jsonify({"mensaje": "Error"}), 500
+        else:
+            for data in datos:
+                lista_datos.append({
+                    'descripcion': data[0],
+                    'fecha': str(data[1]),
+                    'hora_inicio': str(data[2]),
+                    'hora_fin': str(data[3]),
+                })
+            print(data)
+            return jsonify({'mensaje': "OK",
+                           'data': lista_datos})
+
+
+    @app.route('/registrarsolicitud/<int:acto_liturgico>', methods=['GET','POST'])
     def registrarsolicitud(acto_liturgico):
         #Insertamos si es matrimonio
+        print(request.form)
+        print(request.files)
+
         if acto_liturgico == 1:
             requisitos_data = {
                 'id_acto' : 1,
@@ -151,6 +188,40 @@ def registrar_rutas(app):
             }
             try:
                 estado = csoli.insertar_solicitudMatrimonio(requisitos_data) 
+                if estado:
+                    return jsonify({'estado': 'Correcto'})
+                else:
+                    return jsonify({'estado': 'Error'})
+            except Exception as e:
+                return jsonify({'estado': 'Error'})
+        else:
+            requisitos_bautismo = {
+                'id_acto' : 2,
+                'dni_padrino' : request.form.get('dni_padrino'),
+                'dni_madrina': request.form.get('dni_madrina'),
+                'co_dniactan': request.files.get('co_dniactan'),
+                'nom_niño': request.form.get('nom_niño'),
+                'cop_dni_padres': request.files.get('cop_dni_padres'),
+                'cop_agualuz': request.files.get('cop_agualuz'),
+                'cop_conspadrino': request.files.get('cop_conspadrino'),
+                'cop_consmadrina': request.files.get('cop_consmadrina'),
+                'dni_tutor': request.form.get('dni_tutor'),
+                'sedebau': request.form.get('sedebau'),
+                'charlas': "",
+                'es_dni_padrino':  request.form.get('es_dni_padrino'),
+                'es_dni_madrina':  request.form.get('es_dni_madrina'),
+                'es_co_dniactan':  request.form.get('es_co_dniactan'),
+                'es_niño':  request.form.get('es_niño'),
+                'es_cop_dni_padres':  request.form.get('es_cop_dni_padres'),
+                'es_cop_agualuz':  request.form.get('es_cop_agualuz'),
+                'es_cop_conspadrino':  request.form.get('es_cop_conspadrino'),
+                'es_cop_consmadrina':  request.form.get('es_cop_consmadrina'),
+                'es_dni_tutor':  request.form.get('es_dni_tutor'),
+                'es_sedebau':  request.form.get('es_sedebau'),
+                'charlas': request.form.get('es_charlas')
+            }
+            try:
+                #estado = csoli.insertar_solicitudMatrimonio(requisitos_data) 
                 if estado:
                     return jsonify({'estado': 'Correcto'})
                 else:
@@ -209,3 +280,43 @@ def registrar_rutas(app):
             return jsonify({'estado': 'correcto'})
         else:
             return jsonify({'estado': 'incorrecto'})
+        
+    @app.route('/datos_solicitud/<int:id>', methods=['GET'])
+    def datos_solicitud(id):
+        valores = csoli.datos_soliictud_matrimonio(id)
+        data = []
+
+        if valores == 0:
+            return jsonify({'estado': 'incorrecto'})
+        else:
+            for v in valores:
+                data.append({
+                    'campo1': v[0],
+                    'campo2': v[1],
+                    'id': v[2],
+                    'estado': v[3],
+                    'valor': str(v[4]),
+                    'tipo': v[5]
+                })
+
+            return jsonify({'estado': 'Correcto',
+                            'data': data})
+        
+    @app.route('/datos_charlas/<int:id>', methods=['GET'])
+    def datos_charlas(id):
+        valores = csoli.viww(id)
+        lista_datos = []
+
+        if valores == 0:
+            return jsonify({'estado': 'incorrecto'})
+        else:
+            for data  in valores:
+                lista_datos.append({
+                    'descripcion': data[0],
+                    'fecha': str(data[1]),
+                    'hora_inicio': str(data[2]),
+                    'hora_fin': str(data[3]),
+                })
+            print(lista_datos)
+            return jsonify({'estado': 'Correcto',
+                            'data': lista_datos})
