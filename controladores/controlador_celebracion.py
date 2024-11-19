@@ -102,9 +102,9 @@ def obtener_celebraciones_desde_bd():
     conexion = obtener_conexion()
     cursor = conexion.cursor()
     cursor.execute("""
-        SELECT id_celebracion, fecha, hora_inicio, hora_fin, estado, id_sede, id_actoliturgico 
-        FROM celebracion 
-        WHERE estado = 'R'
+        SELECT id_celebracion, fecha, hora_inicio, hora_fin, c.estado, s.nombre_sede , at.nombre_liturgia 
+        FROM celebracion c inner join sede s on s.id_sede=c.id_sede inner join actoliturgico at on at.id_actoliturgico=c.id_actoliturgico 
+        WHERE c.estado = 'R'
     """)
     celebraciones = cursor.fetchall()
     conexion.close()

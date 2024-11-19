@@ -1,44 +1,55 @@
 {% extends "index.html" %}
 {% block title %}Gestión de Celebraciones{% endblock %}
-{% block cuerpo %}
 
+{% block cuerpo %}
 <div class="container mt-4">
-    <h1>Gestión de Celebraciones</h1>
-    <table id="celebracionesTable" class="table table-hover table-striped">
-        <thead>
-            <tr>
-                <th>ID Celebración</th>
-                <th>Fecha</th>
-                <th>Hora Inicio</th>
-                <th>Hora Fin</th>
-                <th>Estado</th>
-                <th>ID Sede</th>
-                <th>ID Acto Litúrgico</th>
-                <th>Acciones</th>
-            </tr>
-        </thead>
-        <tbody>
-            {% for celebracion in celebraciones %}
-            <tr>
-                <td>{{ celebracion.id_celebracion }}</td>
-                <td>{{ celebracion.fecha }}</td>
-                <td>{{ celebracion.hora_inicio }}</td>
-                <td>{{ celebracion.hora_fin }}</td>
-                <td>{{ celebracion.estado }}</td>
-                <td>{{ celebracion.id_sede }}</td>
-                <td >{{ celebracion.id_actoliturgico }}</td>
-                
-                <td class="text-center">
-                    <a href="{{ url_for('gestionar_asistencia_celebracion', id_celebracion=celebracion.id_celebracion) }}"
-                       class="btn-asistencia" title="Gestionar Asistencias">
-                        <i class="fas fa-user-check"></i>
-                    </a>
-                </td>
-                
-            </tr>
+    <h1 class="titulo-gestion">Gestión de Asistencias a Celebraciones</h1>
+
+    <!-- Filtro de Acto Litúrgico -->
+    <div class="mb-3 d-flex align-items-center">
+        <label for="filtroActo" class="me-2">Acto Litúrgico:</label>
+        <select id="filtroActo" class="form-select" style="width: auto;" onchange="filtrarPorActo()">
+            <option value="">Todos</option>
+            {% for acto in actos_liturgicos %}
+            <option value="{{ acto.nombre }}">{{ acto.nombre }}</option>
             {% endfor %}
-        </tbody>
-    </table>
+        </select>
+    </div>
+
+    <!-- Tabla de Celebraciones -->
+    <div>
+        <table id="celebracionesTable" class="table table-hover table-striped">
+            <thead>
+                <tr class="text-center">
+                    <th style="vertical-align: middle; text-align: center;width: 50px">ID</th>
+                    <th style="vertical-align: middle; text-align: center">Fecha</th>
+                    <th style="vertical-align: middle; text-align: center">Hora Inicio</th>
+                    <th style="vertical-align: middle; text-align: center">Hora Fin</th>
+                    <th style="vertical-align: middle; text-align: center">Sede</th>
+                    <th style="vertical-align: middle; text-align: center">Acto Litúrgico</th>
+                    <th style="vertical-align: middle; text-align: center; width: 100px">Acciones</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for celebracion in celebraciones %}
+                <tr>
+                    <td class="text-center">{{ celebracion.id_celebracion }}</td>
+                    <td>{{ celebracion.fecha }}</td>
+                    <td>{{ celebracion.hora_inicio }}</td>
+                    <td>{{ celebracion.hora_fin }}</td>
+                    <td>{{ celebracion.id_sede }}</td>
+                    <td class="acto-liturgico">{{ celebracion.id_actoliturgico }}</td>
+                    <td class="text-center">
+                        <a href="{{ url_for('gestionar_asistencia_celebracion', id_celebracion=celebracion.id_celebracion) }}"
+                            class="btn-asistencia" title="Gestionar Asistencias">
+                            <i class="fas fa-user-check"></i>
+                        </a>
+                    </td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
 </div>
 
 <script src="/static/js/gestionar_celebraciones_realizadas.js"></script>

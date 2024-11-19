@@ -3,17 +3,7 @@ import traceback
 from datetime import datetime,timedelta
 
 
-from controladores.controlador_recaudaciones import (
-    insertar_recaudacion,
-    obtener_recaudaciones,
-    obtener_rango_de_años,
-    obtener_tipos_recaudacion,
-    obtener_id_sede_por_nombre,
-    obtener_recaudaciones_por_año,
-    obtener_id_tipoR_por_nombre,
-    actualizar_recaudacion,
-    eliminar_recaudacion
-)
+from controladores.controlador_recaudaciones import *
 from routers.router_main import requerido_login
 
 def registrar_rutas(app):

@@ -1,43 +1,56 @@
 {% extends "index.html" %}
-{% block title %}Gestión de Celebraciones{% endblock %}
+
+{% block title %}Gestión de Asistencias{% endblock %}
+
 {% block cuerpo %}
-
 <div class="container mt-4">
-    <h1>Marcar Asistencia por Acto Litúrgico</h1>
-    
-    <!-- Botón para seleccionar/deseleccionar todas las asistencias -->
-    <button class="btn btn-primary mb-3" onclick="toggleAllCheckboxes()">Seleccionar/Deseleccionar Todos</button>
+    <h1 class="titulo-gestion">Marcar Asistencia por Acto Litúrgico</h1>
 
-    <form id="asistenciaForm">
-        <table class="table table-hover table-striped">
-            <thead>
-                <tr>
-                    <th>ID Solicitud</th>
-                    <th>ID Celebración</th>
-                    <th>DNI Feligres</th>
-                    <th>Estado</th>
-                    <th>Asistencia</th>
-                </tr>
-            </thead>
-            <tbody>
-                {% for solicitud in solicitudes %}
-                <tr>
-                    <td>{{ solicitud.id_solicitud }}</td>
-                    <td>{{ solicitud.id_celebracion }}</td>
-                    <td>{{ solicitud.dni_feligres }}</td>
-                    <td>{{ solicitud.estado }}</td>
-                    <td>
-                        <input type="checkbox" class="asistencia-checkbox" 
-                               data-id="{{ solicitud.id_solicitud }}" 
-                               {% if solicitud.asistencia == 1 %}checked{% endif %}>
-                    </td>
-                </tr>
-                {% endfor %}
-            </tbody>
-        </table>
-        <button type="button" class="btn btn-success" onclick="guardarAsistencias()">Guardar Asistencias</button>
-    </form>
+    <!-- Contenedor de botones -->
+    <div class="d-flex justify-content-between mb-3">
+        <!-- Botón para seleccionar/deseleccionar todas las asistencias -->
+        <button class="btn btn-primary" onclick="toggleAllCheckboxes()">Seleccionar/Deseleccionar Todos</button>
+
+        <!-- Botón para guardar las asistencias -->
+<!-- Botón para guardar las asistencias -->
+        <button id="guardarAsistenciasButton" class="btn btn-success" onclick="guardarAsistencias()" title="Guardar">
+            <i class="fas fa-save"></i> <!-- Ícono de guardar -->
+        </button>
+    </div>
+
+    <!-- Tabla de asistencias -->
+    <table id="asistenciasTable" class="table table-hover table-striped">
+        <thead>
+            <tr class="text-center">
+                <th>ID Solicitud</th>
+                <th>ID Acto Litúrgico</th>
+                <th>ID Celebración</th>
+                <th>DNI Feligres</th>
+                <th>Estado</th>
+                <th>Asistencia</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for solicitud in solicitudes %}
+            <tr>
+                <td class="text-center">{{ solicitud.id_solicitud }}</td>
+                <td class="text-center">{{ solicitud.id_actoliturgico }}</td>
+                <td class="text-center">{{ solicitud.id_celebracion }}</td>
+                <td class="text-center">{{ solicitud.dni_feligres }}</td>
+                <td class="text-center">{{ solicitud.estado }}</td>
+                <td class="text-center">
+                    <input 
+                        type="checkbox" 
+                        class="asistencia-checkbox" 
+                        data-id="{{ solicitud.id_solicitud }}" 
+                        {% if solicitud.asistencia == '1' %}checked{% endif %}>
+                </td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
 </div>
 
 <script src="/static/js/gestionar_asistencias_celebracion.js"></script>
+
 {% endblock %}

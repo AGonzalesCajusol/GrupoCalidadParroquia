@@ -1,3 +1,19 @@
+$(document).ready(function () {
+    // Inicializar DataTable para la tabla de asistencias
+    $('#asistenciasTable').DataTable({
+        pageLength: 8,
+        dom: '<"d-flex justify-content-between align-items-center mb-3"<"d-flex"><"d-flex justify-content-end button-section">>rt<"bottom"p>',
+        language: {
+            search: "Buscar:",
+            paginate: {
+                previous: "Anterior",
+                next: "Siguiente"
+            },
+            lengthMenu: "Mostrar _MENU_ entradas"
+        }
+    });
+});
+
 // Función para seleccionar/deseleccionar todos los checkboxes
 function toggleAllCheckboxes() {
     const checkboxes = document.querySelectorAll('.asistencia-checkbox');
@@ -7,6 +23,9 @@ function toggleAllCheckboxes() {
 
 // Función para guardar las asistencias marcadas
 function guardarAsistencias() {
+    const guardarButton = document.querySelector('#guardarAsistenciasButton'); // Botón de guardar
+    guardarButton.disabled = true; // Deshabilitar el botón mientras se procesa
+
     const checkboxes = document.querySelectorAll('.asistencia-checkbox');
     const asistenciaData = [];
 
@@ -21,16 +40,27 @@ function guardarAsistencias() {
         headers: {
             'Content-Type': 'application/json'
         },
-        body: JSON.stringify({ asistencias: asistenciaData })
+        body: JSON.stringify({ asistencias: asistenciaData }) // Enviar datos en formato JSON
     })
-    .then(response => response.json())
+    .then(response => {
+        if (!response.ok) {
+            throw new Error(`Error en la solicitud: ${response.statusText}`);
+        }
+        return response.json();
+    })
     .then(data => {
         if (data.success) {
             alert(data.message);
-            location.reload();
+            location.reload(); // Recargar la página después de guardar
         } else {
             alert('Error: ' + data.message);
         }
     })
-    .catch(error => console.error('Error:', error));
+    .catch(error => {
+        console.error('Error:', error);
+        alert('Hubo un problema al guardar las asistencias. Inténtalo nuevamente.');
+    })
+    .finally(() => {
+        guardarButton.disabled = false; // Rehabilitar el botón después de procesar
+    });
 }
