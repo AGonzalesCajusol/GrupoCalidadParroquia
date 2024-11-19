@@ -20,12 +20,12 @@ import routers.router_charlas
 import routers.router_programacion
 import routers.router_asistencia
 import routers.router_cronograma
-<<<<<<< HEAD
 
-=======
+
+
 import routers.router_celebracion_crud
 import routers.router_celebracionesR
->>>>>>> 5873c7084705f70b92068b4a67061e2a0f254265
+
 app = Flask(__name__)
 app.secret_key = 'super-secret'
 

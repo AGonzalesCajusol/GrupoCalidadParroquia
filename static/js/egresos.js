@@ -130,16 +130,16 @@ function exportarTablaPDF() {
 }
 
 //Para validar monto decimal
-//document.getElementById('monto').addEventListener('input', function () {
-//    const valoracionInput = this.value;
+document.getElementById('monto').addEventListener('input', function () {
+    const valoracionInput = this.value;
 
-    // Expresión regular que permite solo números positivos con hasta dos decimales
-//    const isValid = /^[0-9]*\.?[0-9]{0,2}$/.test(valoracionInput);
+//Expresión regular que permite solo números positivos con hasta dos decimales
+    const isValid = /^[0-9]*\.?[0-9]{0,2}$/.test(valoracionInput);
     
-//    if (!isValid) {
-//        this.value = valoracionInput.slice(0, -1);  // Elimina el último carácter ingresado si es inválido
-//    }
-//});
+    if (!isValid) {
+        this.value = valoracionInput.slice(0, -1);  // Elimina el último carácter ingresado si es inválido
+    }
+});
 
 //Para validar texto
 //document.getElementById('descripcion').addEventListener('input', function () {
