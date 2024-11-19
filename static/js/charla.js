@@ -8,7 +8,7 @@ $(document).ready(function () {
         },
         initComplete: function () {
             // Insertar el botón "Agregar charla" dentro del div y alinearlo a la derecha
-            $("div.button-section").html('<button type="button" class="btn btn-success btn-lg custom-btn ml-3" data-bs-toggle="modal" data-bs-target="#modalCharla" onclick="abrirModalAgregar()"><i class="bi bi-plus-circle"></i> Agregar Charla</button>');
+            $("div.button-section").html('<button type="button" class="btn btn-success btn-lg custom-btn ml-3" data-bs-toggle="modal" data-bs-target="#modalCharla" onclick="abrirModalAgregar()"><i class="bi bi-plus-circle"></i> Agregar charla</button>');
         }
     });
 });

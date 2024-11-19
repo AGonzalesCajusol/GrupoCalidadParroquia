@@ -8,7 +8,7 @@ $(document).ready(function () {
         },
         initComplete: function () {
             // Insertar el botón "Agregar Tipo"
-            $("div.button-section").html('<button type="button" class="btn btn-success btn-lg custom-btn ml-3 btn-agregar-tipo" data-bs-toggle="modal" onclick="openModal(\'add\')"><i class="bi bi-person-plus"></i> Agregar Tipo</button>');
+            $("div.button-section").html('<button type="button" class="btn btn-success btn-lg custom-btn ml-3 btn-agregar-tipo" data-bs-toggle="modal" onclick="openModal(\'add\')"><i class="bi bi-person-plus"></i> Agregar tipo</button>');
         }
     });
 });

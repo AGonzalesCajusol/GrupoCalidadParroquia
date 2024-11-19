@@ -20,12 +20,13 @@ import routers.router_charlas
 import routers.router_programacion
 import routers.router_asistencia
 import routers.router_cronograma
-<<<<<<< HEAD
-
-=======
 import routers.router_celebracion_crud
 import routers.router_celebracionesR
->>>>>>> 5873c7084705f70b92068b4a67061e2a0f254265
+
+
+import routers.router_celebracion_crud
+import routers.router_celebracionesR
+
 app = Flask(__name__)
 app.secret_key = 'super-secret'
 
@@ -70,7 +71,6 @@ routers.router_ministro.registrar_rutas(app)
 
 routers.router_cargo.registrar_rutas(app)
 routers.router_actosliturgicos.registrar_rutas(app)
-
 routers.router_feligres.registrar_rutas(app)
 
 routers.router_tema.registrar_rutas(app)

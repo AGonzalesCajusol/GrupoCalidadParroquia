@@ -8,7 +8,7 @@ $(document).ready(function () {
         },
         initComplete: function () {
             // Insertar el botón "Agregar Cargo"
-            $("div.button-section").html('<button type="button" class="btn btn-success btn-lg custom-btn ml-3 btn-agregar-cargo" data-bs-toggle="modal" onclick="openModal(\'add\')"><i class="bi bi-person-plus"></i> Agregar Cargo</button>');
+            $("div.button-section").html('<button type="button" class="btn btn-success btn-lg custom-btn ml-3 btn-agregar-cargo" data-bs-toggle="modal" onclick="openModal(\'add\')"><i class="bi bi-person-plus"></i> Agregar cargo</button>');
         }
     });
 });

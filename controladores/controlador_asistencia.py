@@ -1,4 +1,5 @@
 from flask import request, jsonify
+from datetime import datetime, timedelta
 from bd import obtener_conexion
 
 ## select * from asistencia (id_asistencia, id_programacion, dni_feligres, id_solicitud, estado, fecha)
@@ -11,12 +12,11 @@ def obtener_asistencia():
     conexion = obtener_conexion()
     with conexion.cursor() as cursor:
         cursor.execute("""
-            SELECT asist.id_asistencia, prgCH.id_programacion, fe.dni, fe.apellidos, fe.nombres, asist.id_solicitud, asist.estado, asist.fecha
-            FROM asistencia asist 
+            SELECT asist.id_asistencia, asist.fecha, prgCH.id_programacion, fe.dni, CONCAT(fe.apellidos, ' ', fe.nombres) AS nombre_completo, asist.id_solicitud, asist.estado FROM asistencia asist
             INNER JOIN feligres fe ON asist.dni_feligres = fe.dni
             INNER JOIN programacion_charlas prgCH ON asist.id_programacion = prgCH.id_programacion
             INNER JOIN solicitud solst ON asist.id_solicitud = solst.id_solicitud
-            ORDER BY 8 asc
+            ORDER BY asist.fecha ASC, prgCH.id_programacion ASC;
         """)
         sede = cursor.fetchall()
     conexion.close()
@@ -51,6 +51,31 @@ def obtener_solicitud():
     conexion.close()
     return sede
 
+def obtener_calendario():
+    conexion = obtener_conexion()
+    with conexion.cursor() as cursor:
+        cursor.execute("""
+            SELECT DISTINCT prgCH.id_programacion, prgCH.hora_inicio, tm.descripcion, asist.fecha
+            FROM asistencia asist
+            INNER JOIN programacion_charlas prgCH ON asist.id_programacion = prgCH.id_programacion
+            INNER JOIN tema tm ON prgCH.id_tema = tm.id_tema
+        """)
+        data = cursor.fetchall()
+
+    conexion.close()
+
+    eventos = []
+    for row in data:
+        eventos.append({
+            "title": f"{row[1]} - {row[2]}",  # Hora-tema
+            "start": row[3].strftime('%Y-%m-%d'),
+            "extendedProps": {
+                "id_programacion": row[0],
+                "hora_tema": f"{row[1]} - {row[2]}"
+            }
+        })
+
+    return eventos
 
 
 def actualizar_asistencia():

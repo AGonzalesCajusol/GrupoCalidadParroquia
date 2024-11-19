@@ -10,7 +10,7 @@ $(document).ready(function () {
             // Agregar botón para añadir una nueva intención
             $("div.button-section").html(`
                 <button type="button" class="btn btn-success btn-lg custom-btn ml-3 btn-agregar-intencion" data-bs-toggle="modal" onclick="abrirModalIntencion('add')">
-                    <i class="bi bi-plus-circle"></i> Agregar Intención
+                    <i class="bi bi-plus-circle"></i> Agregar intención
                 </button>
             `);
         }
