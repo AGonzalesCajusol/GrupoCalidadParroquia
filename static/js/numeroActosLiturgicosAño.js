@@ -3,12 +3,19 @@ document.addEventListener('DOMContentLoaded', async function() {
 
     let selectedYear = null;
     let selectedMonth = null;
+    const monthFiltersContainer = document.getElementById('monthFiltersContainer'); // Contenedor de meses
 
     // Manejar la selección de año
     document.getElementById('yearFilters').addEventListener('click', function(event) {
         if (event.target.tagName === 'BUTTON') {
             selectedYear = event.target.getAttribute('data-year');
             marcarSeleccion('yearFilters', selectedYear, 'data-year');
+
+            // Mostrar el contenedor de meses cuando se seleccione un año
+            if (selectedYear) {
+                monthFiltersContainer.style.display = 'block';
+            }
+
             crearGrafico(selectedYear, selectedMonth);  // Actualizar el gráfico al seleccionar año
         }
     });
@@ -22,6 +29,7 @@ document.addEventListener('DOMContentLoaded', async function() {
         }
     });
 });
+
 
 // Función para marcar la selección en los botones
 function marcarSeleccion(containerId, value, dataAttr) {
@@ -86,11 +94,16 @@ async function crearGrafico(year, month) {
 
     // Mostrar mensaje si no hay datos
     if (data.length === 0) {
-        noDataMessage.style.display = 'block';
-        // Ocultar el mensaje después de 3 segundos
+        noDataMessage.style.display = 'block'; // Asegurarse de que se muestre
+        noDataMessage.style.opacity = '1';    // Restablecer la opacidad inicial
+
+        // Ocultar con una transición suave después de 3 segundos
         setTimeout(() => {
-            noDataMessage.style.display = 'none';
-        }, 3000);
+            noDataMessage.style.opacity = '0'; // Desvanece el mensaje
+            setTimeout(() => {
+                noDataMessage.style.display = 'none'; // Lo oculta completamente después del desvanecimiento
+            }, 1000); // 1 segundo para coincidir con la transición CSS
+        }, 3000); // Esperar 3 segundos antes de comenzar a desvanecer
     }
 
     // Asegurarse de que el gráfico se renderice incluso si no hay datos
@@ -141,4 +154,3 @@ async function crearGrafico(year, month) {
         }
     });
 }
-

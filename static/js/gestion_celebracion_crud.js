@@ -68,7 +68,7 @@ $(document).ready(function () {
             // Insertar el botón "Agregar Celebración"
             $("div.button-section").html(`
                 <button type="button" class="btn btn-success btn-lg custom-btn ml-3" onclick="openModal('add')">
-                    <i class="bi bi-plus-circle"></i> Agregar Celebración
+                    <i class="bi bi-plus-circle"></i> Agregar celebración
                 </button>
             `);
         }

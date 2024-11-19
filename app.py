@@ -20,7 +20,8 @@ import routers.router_charlas
 import routers.router_programacion
 import routers.router_asistencia
 import routers.router_cronograma
-
+import routers.router_celebracion_crud
+import routers.router_celebracionesR
 
 
 import routers.router_celebracion_crud
@@ -70,7 +71,6 @@ routers.router_ministro.registrar_rutas(app)
 
 routers.router_cargo.registrar_rutas(app)
 routers.router_actosliturgicos.registrar_rutas(app)
-
 routers.router_feligres.registrar_rutas(app)
 
 routers.router_tema.registrar_rutas(app)

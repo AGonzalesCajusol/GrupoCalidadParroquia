@@ -69,12 +69,31 @@ async function cargarTemasPorActo() {
         const idMinistro = document.getElementById('hiddenIdMinistro').value;
         const idSede = document.getElementById('hiddenIdSede').value;
 
-        // Verificar si la respuesta tiene éxito y contiene la clave "temas"
-        if (!data.success || !Array.isArray(data.temas)) {
-            console.warn("No se encontraron temas para el acto seleccionado.");
+         // Elemento donde se mostrará el mensaje
+         const mensajeNoTemas = document.getElementById('mensajeNoTemas');
+         if (mensajeNoTemas) mensajeNoTemas.remove(); // Limpia mensajes anteriores
+        
+        const btnRegistrar = document.getElementById('btnRegistrar');
+        if (btnRegistrar) btnRegistrar.style.display = 'none';
+         if (!data.success || !Array.isArray(data.temas) || data.temas.length === 0) {
+             console.warn("No se encontraron temas para el acto seleccionado.");
+ 
+             // Mostrar mensaje si no hay temas
+             const tablaContainer = document.querySelector('.table-responsive');
+             const mensaje = document.createElement('div');
+             mensaje.id = 'mensajeNoTemas';
+             mensaje.className = 'alert alert-warning text-center mt-3';
+             mensaje.textContent = "No hay temas disponibles para este acto litúrgico.";
+             tablaContainer.appendChild(mensaje);
+ 
+             setTimeout(() => {
+                mensaje.remove();
+            }, 1000);
+
             temasTable.draw();
             return;
         }
+
 
         // Llenar la tabla con los temas disponibles
         data.temas.forEach(tema => {
