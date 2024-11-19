@@ -20,104 +20,139 @@
     <div id="calendar" style="max-width: 100%; margin: 0 auto;"></div>
 </div>
 
+<!-- Modal para ver detalles de la actividad -->
+<div class="modal fade" id="celebracionModal" tabindex="-1" aria-labelledby="celebracionModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="modalTitulo">Datos de la Actividad</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <form>
+                    <input type="hidden" id="celebracionId">
+                    <div class="mb-3">
+                        <label for="titulo" class="form-label">Título</label>
+                        <input type="text" class="form-control" id="titulo" readonly>
+                    </div>
+                    <div class="mb-3">
+                        <label for="fecha_inicio" class="form-label">Fecha de Inicio</label>
+                        <input type="date" class="form-control" id="fecha_inicio" readonly>
+                    </div>
+                    <div class="mb-3">
+                        <label for="hora_inicio" class="form-label">Hora de Inicio</label>
+                        <input type="time" class="form-control" id="hora_inicio" readonly>
+                    </div>
+                    <div class="mb-3">
+                        <label for="fecha_fin" class="form-label">Fecha de Fin</label>
+                        <input type="date" class="form-control" id="fecha_fin" readonly>
+                    </div>
+                    <div class="mb-3">
+                        <label for="hora_fin" class="form-label">Hora de Fin</label>
+                        <input type="time" class="form-control" id="hora_fin" readonly>
+                    </div>
+                    <div class="mb-3">
+                        <label for="sede" class="form-label">Sede</label>
+                        <select class="form-select" id="sede" disabled>
+                            <option value="Sede Central">Sede Central</option>
+                            <option value="Sede 1">Sede 1</option>
+                            <option value="Sede 2">Sede 2</option>
+                        </select>
+                    </div>
+                </form>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cerrar</button>
+            </div>
+        </div>
+    </div>
+</div>
+
 <!-- FullCalendar CSS y JS -->
 <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/fullcalendar@5.11.0/main.min.css">
 <script src="https://cdn.jsdelivr.net/npm/fullcalendar@5.11.0/main.min.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/fullcalendar@5.11.0/locales/es.js"></script>
 
-<script>
-document.addEventListener('DOMContentLoaded', function() {
-    var calendarEl = document.getElementById('calendar');
-    var yearSelect = document.getElementById('yearSelect');
-    
-    // Inicializar el calendario
-    var calendar = new FullCalendar.Calendar(calendarEl, {
-        initialView: 'dayGridMonth',
-        locale: 'es', // Cambiar idioma a español
-        headerToolbar: {
-            left: 'prev,next today',
-            center: 'title',
-            right: 'dayGridMonth,timeGridWeek,timeGridDay'
-        },
-        events: function(fetchInfo, successCallback, failureCallback) {
-            // Lógica para filtrar eventos por el año seleccionado
-            var selectedYear = yearSelect.value;
-            fetch('/api/obtener_actividades?year=' + selectedYear) // Ajusta esta URL según tu API
-                .then(response => response.json())
-                .then(events => successCallback(events))
-                .catch(error => failureCallback(error));
-        },
-        height: 'auto',
-    });
-
-    // Renderizar el calendario
-    calendar.render();
-
-    // Cambiar el año y recargar eventos
-    yearSelect.addEventListener('change', function() {
-        calendar.refetchEvents(); // Recargar los eventos en función del nuevo año
-    });
-});
-</script>
+<!-- Script específico para el cronograma -->
+<script src="{{ url_for('static', filename='js/gestionar_cronograma.js') }}"></script>
 
 <style>
-/* Estilos adicionales */
-#calendar {
-    background-color: white;
-    border-radius: 8px;
-    padding: 10px;
-    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
-    margin-bottom: 20px;
-}
+        /* Cambiar color del encabezado del calendario */
+    .fc-toolbar {
+        background-color: #007bff !important; /* Fondo azul */
+        color: white !important;             /* Texto blanco */
+        border-radius: 8px;
+        padding: 5px;
+    }
 
-.fc-toolbar {
-    background-color: #007bff !important;
-    color: white !important;
-    border-radius: 8px;
-    padding: 5px;
-}
+    /* Encabezados de los días (lun, mar, ...) */
+    .fc-col-header-cell {
+        background-color: #007bff !important; /* Fondo azul */
+        color: white !important;             /* Texto blanco */
+        font-weight: bold;
+    }
 
-.fc-col-header-cell {
-    background-color: #007bff !important;
-    color: white !important;
-}
+    /* Botones de navegación y vista (Mes, Semana, Día) */
+    .fc-button {
+        background-color: #007bff !important; /* Fondo azul */
+        border-color: #007bff !important;
+        color: white !important;             /* Texto blanco */
+    }
 
-.fc-daygrid-day {
-    border-color: #007bff !important;
-}
+    .fc-button:hover {
+        background-color: #0056b3 !important; /* Azul más oscuro */
+    }
 
-.fc-header-toolbar .fc-button {
-    background-color: #007bff !important;
-    border-color: #007bff !important;
-    color: white !important;
-}
+    .fc-button-active {
+        background-color: #0056b3 !important; /* Azul más oscuro */
+        border-color: #0056b3 !important;
+        color: white !important;             /* Texto blanco */
+    }
 
-.fc-header-toolbar .fc-button:hover {
-    background-color: #0056b3 !important;
-    border-color: #0056b3 !important;
-}
+    /* Cambiar color del texto de los días */
+    .fc-daygrid-day-number {
+        color: black !important; /* Texto negro */
+    }
 
-.fc-button-active {
-    background-color: #0056b3 !important;
-    border-color: #0056b3 !important;
-    color: white !important;
-}
+    /* Día actual */
+    .fc-day-today {
+        background-color: rgba(51, 181, 229, 0.3) !important; /* Azul claro */
+        color: black !important;                            /* Texto negro */
+    }
 
-.fc-event {
-    background-color: #007bff !important;
-    border-color: #0056b3 !important;
-    color: white !important;
-}
+    /* Días fuera del mes actual */
+    .fc-day-other {
+        color: gray !important; /* Texto gris */
+    }
 
-.fc-day-today {
-    background-color: rgba(0, 123, 255, 0.2) !important;
-    border-color: #007bff !important;
-    color: black !important;
-}
+    /* Cambiar color de los eventos */
+    .fc-event {
+        background-color: #007bff !important; /* Fondo azul */
+        border-color: #0056b3 !important;     /* Azul más oscuro */
+        color: white !important;              /* Texto blanco */
+    }
 
-.fc-day-other {
-    background-color: #f0f0f0 !important;
-    color: #6c757d !important;
-}
-</style>
+    /* Cambiar color del texto de los días */
+    .fc-daygrid-day-top {
+        color: white !important; /* Texto blanco */
+        font-weight: bold;
+    }
+
+    /* Cambiar el color de fondo del botón 'Hoy' a azul claro */
+    .fc-button.fc-button-today {
+        background-color: #33b5e5 !important; /* Azul claro */
+        border-color: #33b5e5 !important;
+        color: white !important; /* Texto blanco */
+    }
+
+    /* Para asegurarnos de que el botón de hoy se vea bien cuando está activo */
+    .fc-button.fc-button-today:hover,
+    .fc-button.fc-button-today:active {
+        background-color: #0099cc !important; /* Azul más oscuro */
+        border-color: #0099cc !important;
+        color: white !important; /* Texto blanco */
+    }
+
+    </style>
+
 {% endblock %}
