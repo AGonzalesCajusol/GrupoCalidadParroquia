@@ -22,7 +22,7 @@ function openModal(type, id = null, nombre = '', documento = '', nacimiento = ''
     var isReadOnly = false;
 
     if (type === 'add') {
-        modalTitle = 'Agregar Ministro';
+        modalTitle = 'Agregar ministro';
         formAction = '/insertar_ministro';
         limpiarModal();
         // Mostrar los campos de contraseña al agregar
@@ -31,7 +31,7 @@ function openModal(type, id = null, nombre = '', documento = '', nacimiento = ''
         document.getElementById('password').required = true;
         document.getElementById('confirmPassword').required = true;
     } else if (type === 'edit') {
-        modalTitle = 'Editar Ministro';
+        modalTitle = 'Editar ministro';
         formAction = '/procesar_actualizar_ministro';
         document.getElementById('ministroId').value = id;
         document.getElementById('nombre').value = nombre;
@@ -49,7 +49,7 @@ function openModal(type, id = null, nombre = '', documento = '', nacimiento = ''
         document.getElementById('password').required = false;
         document.getElementById('confirmPassword').required = false;
     } else if (type === 'view') {
-        modalTitle = 'Ver Ministro';
+        modalTitle = 'Ver ministro';
         formAction = '';
         isReadOnly = true;
         document.getElementById('ministroId').value = id;
