@@ -454,9 +454,12 @@
     </tr><tr>
         <td>Charla de preparación para padres y padrinos	</td>
         <td>
-            <select class="form-select" name="cha" id="cha">
-            </select>
+            <div id="rcharlas">
+                <select class="form-select" name="cha" id="cha">
+                </select>
+            </div>
         </td>
+
 
         <td>
             <input type="checkbox" name="es_charlas" id="es_charlas" required="">
@@ -464,7 +467,7 @@
         </td>
         <td>
             
-                    <button class="btn btn-primary" type="button" onclick="ver_fechas()">
+                    <button  id="charbau" class="btn btn-primary" type="button" onclick="ver_fechas()">
                         <i class="bi bi-calendar3"></i>
                     </button>
                 
@@ -622,84 +625,95 @@
 
     var confirmacion = 
     `
-    <tr>
+        <tr>
             <td>Constancia de bautizo</td>
             <td>
-                <input id="null" name="null" required="" type="file" class="form-control" accept="image/*,application/pdf">
+                <input id="const_bautizo" name="const_bautizo" required type="file" class="form-control" accept="image/*,application/pdf">
             </td>
             <td>
-                <input type="checkbox" name="null" id="null" required="">
+                <input type="checkbox" name="es_const_bautizo" id="es_const_bautizo" required>
                 <label for="">Validado</label>
             </td>
             <td>
-                
-                            <button type="button" class="btn btn-primary btn-sm" title="Ver" onclick="visualizar('null')">
-                                <svg class="svg-inline--fa fa-eye" aria-hidden="true" focusable="false" data-prefix="fas" data-icon="eye" role="img" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 576 512" data-fa-i2svg=""><path fill="currentColor" d="M572.5 238.1C518.3 115.5 410.9 32 288 32S57.69 115.6 3.469 238.1C1.563 243.4 0 251 0 256c0 4.977 1.562 12.6 3.469 17.03C57.72 396.5 165.1 480 288 480s230.3-83.58 284.5-206.1C574.4 268.6 576 260.1 576 256C576 251 574.4 243.4 572.5 238.1zM432 256c0 79.45-64.47 144-143.9 144C208.6 400 144 335.5 144 256S208.5 112 288 112S432 176.5 432 256zM288 160C285.7 160 282.4 160.4 279.5 160.8C284.8 170 288 180.6 288 192c0 35.35-28.65 64-64 64C212.6 256 201.1 252.7 192.7 247.5C192.4 250.5 192 253.6 192 256c0 52.1 43 96 96 96s96-42.99 96-95.99S340.1 160 288 160z"></path></svg><!-- <i class="fas fa-eye"></i> Font Awesome fontawesome.com -->
-                            </button>
-                        
-            </td>
-        </tr><tr>
-            <td>DNI del confirmando</td>
-            <td>
-                <input id="null" name="null" required="" type="file" class="form-control" accept="image/*,application/pdf">
-            </td>
-            <td>
-                <input type="checkbox" name="null" id="null" required="">
-                <label for="">Validado</label>
-            </td>
-            <td>
-                
-                            <button type="button" class="btn btn-primary btn-sm" title="Ver" onclick="visualizar('null')">
-                                <svg class="svg-inline--fa fa-eye" aria-hidden="true" focusable="false" data-prefix="fas" data-icon="eye" role="img" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 576 512" data-fa-i2svg=""><path fill="currentColor" d="M572.5 238.1C518.3 115.5 410.9 32 288 32S57.69 115.6 3.469 238.1C1.563 243.4 0 251 0 256c0 4.977 1.562 12.6 3.469 17.03C57.72 396.5 165.1 480 288 480s230.3-83.58 284.5-206.1C574.4 268.6 576 260.1 576 256C576 251 574.4 243.4 572.5 238.1zM432 256c0 79.45-64.47 144-143.9 144C208.6 400 144 335.5 144 256S208.5 112 288 112S432 176.5 432 256zM288 160C285.7 160 282.4 160.4 279.5 160.8C284.8 170 288 180.6 288 192c0 35.35-28.65 64-64 64C212.6 256 201.1 252.7 192.7 247.5C192.4 250.5 192 253.6 192 256c0 52.1 43 96 96 96s96-42.99 96-95.99S340.1 160 288 160z"></path></svg><!-- <i class="fas fa-eye"></i> Font Awesome fontawesome.com -->
-                            </button>
-                        
-            </td>
-        </tr><tr>
-            <td>DNI del padrino o madrina</td>
-            <td>
-                <input id="null" name="null" required="" type="file" class="form-control" accept="image/*,application/pdf">
-            </td>
-            <td>
-                <input type="checkbox" name="null" id="null" required="">
-                <label for="">Validado</label>
-            </td>
-            <td>
-                
-                            <button type="button" class="btn btn-primary btn-sm" title="Ver" onclick="visualizar('null')">
-                                <svg class="svg-inline--fa fa-eye" aria-hidden="true" focusable="false" data-prefix="fas" data-icon="eye" role="img" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 576 512" data-fa-i2svg=""><path fill="currentColor" d="M572.5 238.1C518.3 115.5 410.9 32 288 32S57.69 115.6 3.469 238.1C1.563 243.4 0 251 0 256c0 4.977 1.562 12.6 3.469 17.03C57.72 396.5 165.1 480 288 480s230.3-83.58 284.5-206.1C574.4 268.6 576 260.1 576 256C576 251 574.4 243.4 572.5 238.1zM432 256c0 79.45-64.47 144-143.9 144C208.6 400 144 335.5 144 256S208.5 112 288 112S432 176.5 432 256zM288 160C285.7 160 282.4 160.4 279.5 160.8C284.8 170 288 180.6 288 192c0 35.35-28.65 64-64 64C212.6 256 201.1 252.7 192.7 247.5C192.4 250.5 192 253.6 192 256c0 52.1 43 96 96 96s96-42.99 96-95.99S340.1 160 288 160z"></path></svg><!-- <i class="fas fa-eye"></i> Font Awesome fontawesome.com -->
-                            </button>
-                        
-            </td>
-        </tr><tr>
-            <td>Sede donde se realizara</td>
-            <td>
-                <input id="null" name="null" value="Sede Central" type="text" class="form-control" placeholder="Ingrese texto" disabled="">
-            </td>
-            <td>
-                <input type="checkbox" name="null" id="null" required="">
-                <label for="">Validado</label>
-            </td>
-            <td>
-                    
-            </td>
-        </tr><tr>
-            <td>Charla de preparación</td>
-            <td>
-                <div id="rnull"></div>
-            </td>
-            <td>
-                <input type="checkbox" name="null" id="null" required="">
-                <label for="">Validado</label>
-            </td>
-            <td>
-                
-                        <button class="btn btn-primary" type="button" onclick="visualizar_calendario('null')">
-                            <i class="bi bi-calendar3"></i>
-                        </button>
-                    
+                <button type="button" class="btn btn-primary btn-sm" title="Ver" onclick="visualizar('const_bautizo')">
+                    <i class="bi bi-eye"></i>
+                </button>
             </td>
         </tr>
-    `;
+        <tr>
+            <td>DNI del confirmado</td>
+            <td>
+                <input id="dni_confirmado" name="dni_confirmado" required type="number" class="form-control" placeholder="Ingrese el DNI" min="10000000" max="99999999">
+            </td>
+            <td>
+                <input type="checkbox" name="es_dni_confirmado" id="es_dni_confirmado" required>
+                <label for="">Validado</label>
+            </td>
+            <td></td>
+        </tr>
+        <tr>
+            <td>DNI del padrino o madrina</td>
+            <td>
+                <input id="dni_padrino_madrina" name="dni_padrino_madrina" required type="number" class="form-control" placeholder="Ingrese el DNI" min="10000000" max="99999999">
+            </td>
+            <td>
+                <input type="checkbox" name="es_dni_padrino_madrina" id="es_dni_padrino_madrina" required>
+                <label for="">Validado</label>
+            </td>
+            <td></td>
+        </tr>
+        <tr>
+            <td>Sede donde se realizará</td>
+            <td>
+                <input id="sede" name="sede" value="Sede Central" type="text" class="form-control" disabled>
+            </td>
+            <td>
+                <input type="checkbox" name="es_sede" id="es_sede" required>
+                <label for="">Validado</label>
+            </td>
+            <td></td>
+        </tr>
+        <tr>
+            <td>DNI responsable</td>
+            <td>
+                <input id="dni_responsable" name="dni_responsable" required type="number" class="form-control" placeholder="Ingrese el DNI" min="10000000" max="99999999">
+            </td>
+            <td>
+                <input type="checkbox" name="es_dni_responsable" id="es_dni_responsable" required>
+                <label for="">Validado</label>
+            </td>
+            <td></td>
+        </tr>
+        <tr>
+            <td>DNI de los padres</td>
+            <td>
+                <input id="dni_padres" name="dni_padres" required type="number" class="form-control" placeholder="Ingrese el DNI" min="10000000" max="99999999">
+            </td>
+            <td>
+                <input type="checkbox" name="es_dni_padres" id="es_dni_padres" required>
+                <label for="">Validado</label>
+            </td>
+            <td></td>
+        </tr>
+
+        <tr>
+            <td>Charla de preparación</td>
+            <td>
+                <div id="charla_prep"></div>
+            </td>
+            <td>
+                <input type="checkbox" name="es_charla_prep" id="es_charla_prep" required>
+                <label for="">Validado</label>
+            </td>
+            <td>
+                <button class="btn btn-primary" type="button" onclick="visualizar_calendario('charla_prep')">
+                    <i class="bi bi-calendar3"></i>
+                </button>
+            </td>
+        </tr>
+    
+    `
+    ;
 
 
 
@@ -805,8 +819,13 @@
             acordeon.classList.add('show');
             acordeon.setAttribute('aria-expanded', 'true');
             requi_actos.innerHTML = primera_comunion;
+        }else if(textoSeleccionado == 'Confirmacion'){
+            acordeon.classList.add('show');
+            acordeon.setAttribute('aria-expanded', 'true');
+            requi_actos.innerHTML = confirmacion;
+
         }else{
-            acordeon.classList.remove('show');
+                        acordeon.classList.remove('show');
             acordeon.setAttribute('aria-expanded', 'false');
             formulario.classList.add('d-none');
         }
@@ -921,8 +940,15 @@
                 }
             }
             )
-        }else if (dni.value.length== 0 || dni.value.length <9){
-            alert("Ingrese el dni completo ");
+        }else if (estado.checked == true && (dni.value.length== 0 || dni.value.length <9)){
+            Toastify({
+                text: "Ingrese los valores en el campo dni!!",
+                duration: 2000,
+                close: true,
+                backgroundColor: "#dc3545",
+                gravity: "bottom",
+                position: "right",
+            }).showToast();
             dni.disabled = false;
             mostrar.value = ""; 
             estado.checked = false;
@@ -1206,8 +1232,14 @@
         // Validación del número de palabras
         if (checkbox.checked) {
             if (palabras.length < 3 || palabras.length > 5) {
-                alert("Debe ingresar correctamente el nombre");
-                checkbox.checked = false; // Desmarca el checkbox si la validación falla
+                Toastify({
+                    text: "Ingrese correctamente el nombre!",
+                    duration: 2000,
+                    close: true,
+                    backgroundColor: "#dc3545",
+                    gravity: "bottom",
+                    position: "right",
+                }).showToast();                checkbox.checked = false; // Desmarca el checkbox si la validación falla
             } else {
                 input.disabled = true; 
             }
@@ -1216,6 +1248,7 @@
         }
     }
    
+    
 
     var md_asistencias = new bootstrap.Modal(document.getElementById('modal_asistencia'));
     function asistencias(id,acto){
@@ -1265,6 +1298,9 @@
 
         che.forEach(input => {
             input.checked = estado;
+            if (input.onclick) {
+                input.onclick();
+            }
         });
     }
     
@@ -1400,15 +1436,15 @@
                         st = true;
                     }
                     document.getElementById('estado_general').disabled = true;
-                    document.getElementById(`${v.campo1}`).disabled = true;
+                    document.getElementById(`${v.campo1}`).disabled = `${v.campo1}` !== 'charbau';
+                    if (`${v.campo1}` == 'charbau'){
+                        document.getElementById('cha').classList.add('d-none');
+
+                    }
+
+
                     document.getElementById(`${v.campo2}`).disabled = true;
                     switch (v.tipo) {
-                        case 'Charla':
-                            document.getElementById(`${v.campo1}`).disabled = false;
-                            document.getElementById(`${v.campo1}`).onclick = function() {
-                                asistencias(id,'Matrimonio');
-                            };
-
                         case 'Imagen':
                             document.getElementById(`${v.campo1}`).name = v.valor;
                             document.getElementById(`${v.campo2}`).checked = st;
@@ -1419,7 +1455,17 @@
                             document.getElementById(`${v.campo1}`).value = v.valor;
                             document.getElementById(`${v.campo2}`).checked = st;
                             break;
+                        case 'Texto':
+                            document.getElementById(`${v.campo1}`).value = v.valor;
+                            document.getElementById(`${v.campo1}`).disabled = true;
+                            document.getElementById(`${v.campo2}`).checked = st;
+                            break;
                         default:
+                            document.getElementById(`${v.campo1}`).disabled = false;
+                            document.getElementById(`${v.campo2}`).checked = st;
+                            document.getElementById(`${v.campo1}`).onclick = function() {
+                                asistencias(id,acto);
+                            };
                             break;
                     }
                 });
@@ -1433,15 +1479,19 @@
                     position: "right",
                 }).showToast();
             }
-            var che = document.querySelectorAll('input[type="checkbox"]:not(#estado_general):not(#es_f_matrimonio)');
-            che.forEach(input => {
-            if (input.checked) {
-                input.onclick();
+            var lugar = document.getElementById('formulario_solicitud');
+            if (lugar) {
+                var che = lugar.querySelectorAll('input[type="checkbox"]:not(#estado_general):not(#es_f_matrimonio)');
+                che.forEach(input => {
+                    if (typeof input.onclick === "function") {
+                        input.onclick(); // Ejecuta el evento onclick de cada checkbox
+                    }
+                });
+            } else {
+                console.error('Formulario no encontrado.');
             }
-            });
+            
         })
 
 
     }
-
-
