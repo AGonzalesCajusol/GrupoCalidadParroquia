@@ -377,7 +377,7 @@ function cambiarEstadoSede(id, estadoActual) {
 
                 // Mostrar mensaje de éxito con Toastify
                 Toastify({
-                    text: `La sede se a ${accion.toLowerCase()} correctamente.`,
+                    text: `El estado de la sede se a actualizado correctamente.`,
                     duration: 2000,
                     close: true,
                     backgroundColor: "#28a745", // Verde para éxito

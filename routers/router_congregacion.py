@@ -6,7 +6,7 @@ from controladores.controlador_congregacion import (
     obtener_congregacion_por_id,
     actualizar_congregacion,
     eliminar_congregacion,
-    darBaja_congregacion
+    actualizar_estado_congregacion
 )
 from routers.router_main import requerido_login
 
@@ -79,19 +79,31 @@ def registrar_rutas(app):
         resultado = eliminar_congregacion(id)  # Llama a la función que elimina en la base de datos
         return jsonify(resultado)
 
-    @app.route("/darBaja_congregacion", methods=["POST"])
-    def procesar_darBaja_congregacion():
+    @app.route("/cambiar_estado_congregacion", methods=["POST"])
+    def cambiar_estado_congregacion():
         id = request.form.get('id')
+        nuevo_estado = int(request.form.get('estado'))  # Convertir el estado a entero (1 o 0)
+
         try:
-            darBaja_congregacion(id)
+            # Llama a la función que actualiza el estado en la base de datos
+            actualizar_estado_congregacion(id, nuevo_estado)
+
+            # Obtener todas las congregaciones actualizadas
             congregacion = obtener_congregacion()
-            return jsonify({"success": True, "congregacion": [{
-                "id": c[0],
-                "nombre_congregacion": c[1],
-                "estado": c[2]} 
-                for c in congregacion]})
+            return jsonify({
+                "success": True,
+                "congregacion": [
+                    {
+                        "id": c[0],
+                        "nombre_congregacion": c[1],
+                        "estado": c[2],
+                    }
+                    for c in congregacion
+                ],
+            })
         except Exception as e:
-            print(f"Error al dar de baja la congregación: {e}")
-            return jsonify({"success": False, "message": "Error al dar de baja la congregación"})
+            print(f"Error al cambiar el estado de la congregación: {e}")
+            return jsonify({"success": False, "message": "Error al cambiar el estado de la congregación"})
+
 
     

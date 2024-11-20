@@ -91,9 +91,18 @@ def obtener_id_diosesis_por_nombre(nombre):
         conexion.close()
         return id_diosesis
 
-def darBaja_congregacion(id):
+def actualizar_estado_congregacion(id_congregacion, nuevo_estado):
     conexion = obtener_conexion()
-    with conexion.cursor() as cursor:
-        cursor.execute("UPDATE congregacion set estado = %s WHERE id_congregacion = %s", (0,id,))
-    conexion.commit()
-    conexion.close()
+    try:
+        with conexion.cursor() as cursor:
+            cursor.execute(
+                "UPDATE congregacion SET estado = %s WHERE id_congregacion = %s",
+                (nuevo_estado, id_congregacion)
+            )
+        conexion.commit()
+    except Exception as e:
+        conexion.rollback()
+        print(f"Error al actualizar estado de la congregación: {e}")
+        raise
+    finally:
+        conexion.close()
