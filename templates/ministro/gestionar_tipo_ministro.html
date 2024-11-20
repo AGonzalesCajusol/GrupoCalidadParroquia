@@ -21,21 +21,23 @@
 
                     <td class="text-center">
                         <button class="btn btn-primary btn-sm" title="Ver"
-                            onclick="openModal('view', '{{ tipo[0] }}', '{{ tipo[1] }}', '{{ tipo[2] }}')">
+                            onclick="abrirModalTipoMinistro('view', '{{ tipo[0] }}', '{{ tipo[1] }}', '{{ tipo[2] }}')">
                             <i class="fas fa-eye"></i>
                         </button>
 
                         <button class="btn btn-warning btn-sm" title="Editar"
-                            onclick="openModal('edit', '{{ tipo[0] }}', '{{ tipo[1] }}', '{{ tipo[2] }}')">
+                            onclick="abrirModalTipoMinistro('edit', '{{ tipo[0] }}', '{{ tipo[1] }}', '{{ tipo[2] }}')">
                             <i class="fas fa-edit"></i>
                         </button>
 
-                        <button class="btn btn-secondary btn-sm estado-btn" title="Dar de baja" 
+                        <button class="btn {{ 'btn-secondary' if tipo[2] == 1 else 'btn-success' }} btn-sm estado-btn" 
+                        title="{{ 'Dar de baja' if tipo[2] == 1 else 'Activar' }}" 
                         data-id="{{ tipo[0] }}" 
                         data-estado="{{ tipo[2] }}"
                         onclick="cambiarEstadoTipoMinistro(this)">
-                        <i class="fas fa-ban"></i>
+                        <i class="{{ 'fas fa-ban' if tipo[2] == 1 else 'fas fa-check' }}"></i>
                         </button>
+                    
                     
                         <button type="button" class="btn btn-danger btn-sm" title="Eliminar"
                             onclick="eliminarTipoMinistro('{{ tipo[0] }}')">
