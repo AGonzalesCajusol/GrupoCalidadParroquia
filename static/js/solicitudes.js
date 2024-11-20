@@ -1137,7 +1137,10 @@
     function array_bautismo() {
         var metodo = document.getElementById('metodo');
         var mt = metodo.textContent;
+        var id_charla = document.getElementById('cha').value;
         var array = {
+            'id_charla': id_charla,
+            'metodo': mt,
             'dni_padrino' : document.getElementById('dni_padrino').value,
             'dni_madrina': document.getElementById('dni_madrina').value,
             'co_dniactan': document.getElementById('co_dniactan').files[0],
@@ -1148,18 +1151,6 @@
             'cop_consmadrina': document.getElementById('cop_consmadrina').files[0],
             'dni_tutor': document.getElementById('dni_tutor').value,
             'sedebau': document.getElementById('sedebau').value,
-            'charlas': "",
-            'es_dni_padrino':  document.getElementById('es_dni_padrino').checked ? 'V' : 'F',
-            'es_dni_madrina':  document.getElementById('es_dni_madrina').checked ? 'V' : 'F',
-            'es_co_dniactan':  document.getElementById('es_co_dniactan').checked ? 'V' : 'F',
-            'es_niño':  document.getElementById('es_niño').checked ? 'V' : 'F',
-            'es_cop_dni_padres':  document.getElementById('es_cop_dni_padres').checked ? 'V' : 'F',
-            'es_cop_agualuz':  document.getElementById('es_cop_agualuz').checked ? 'V' : 'F',
-            'es_cop_conspadrino':  document.getElementById('es_cop_conspadrino').checked ? 'V' : 'F',
-            'es_cop_consmadrina':  document.getElementById('es_cop_consmadrina').checked ? 'V' : 'F',
-            'es_dni_tutor':  document.getElementById('es_dni_tutor').checked ? 'V' : 'F',
-            'es_sedebau':  document.getElementById('es_sedebau').checked ? 'V' : 'F',
-            'charlas': document.getElementById('es_charlas').checked ? 'V' : 'F'
         };
         return array;
     }
@@ -1390,7 +1381,13 @@
 
 
     function rellenar_formulario(id,acto){
-        document.getElementById('acto_seleccionado').value = 1;
+        var select = document.getElementById('acto_seleccionado');
+        Array.from(select.options).forEach(option => {
+            if (option.text === acto) { 
+                option.selected = true;
+            }
+        });
+
         verificar();
         var btn = document.getElementById('registrar').classList.add('d-none');
         fetch(`/datos_solicitud/${id}`)

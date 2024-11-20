@@ -81,6 +81,101 @@ def solicitudes(sede):
     finally:
         conexion.close() 
 
+def insertar_bautismo(requisitos_data):
+    id_sede = csede.obtener_id_sede_por_nombre(requisitos_data['sedebau'])
+    try:
+        conexion = obtener_conexion()
+        with conexion.cursor() as cursor:
+            cursor.execute(
+                '''
+                insert into solicitud(id_actoliturgico,id_sede,estado,id_celebracion,dni_feligres, asistencia, fecha_registro) values (%s,%s,%s,%s,%s,0, CURRENT_DATE())
+                ''',(requisitos_data['id_acto'],id_sede,'P',requisitos_data['id_charla'],requisitos_data['dni_tutor'])
+            )
+            id_solicitud = cursor.lastrowid
+
+            print(id_solicitud)
+
+            roles = ['Padrino', 'Madrina', 'Padre']
+            dnis = [requisitos_data['dni_padrino'],requisitos_data['dni_madrina'],requisitos_data['dni_tutor']]
+
+            #insertamos los implicados en ese acto como el padrino, madrina, padre
+            for dni, rol in zip(dnis, roles):
+                cursor.execute(
+                    '''
+                        insert into solicitud_feligres (dni_feligres,id_solicitud,rol) values (%s,%s,%s) '''
+                        ,(dni,id_solicitud,rol)
+                )
+                print("ok")
+ 
+            #grabamos las asistenicas de las 3 pesonas
+            datos_celebracion = viww(requisitos_data['id_charla'])[0]
+            dnis = [requisitos_data['dni_padrino'],requisitos_data['dni_madrina'],requisitos_data['dni_tutor']]
+
+            for dni in dnis:
+                cursor.execute(
+                    '''
+                    insert into asistencia(id_programacion,dni_feligres,id_solicitud,estado,fecha,hora_inicio,hora_fin) 
+                    values (%s,%s,%s,0,%s,%s,%s)
+                    ''',(datos_celebracion[4],dni,id_solicitud,datos_celebracion[1],datos_celebracion[2],datos_celebracion[3])
+                )
+
+            
+            #registramos comprobantes
+
+            monto = monto_butismo(requisitos_data['sedebau'])
+            print(monto)
+
+            cursor.execute(
+                '''
+                INSERT INTO comprobante (fecha_hora, total, tipo_comprobante, forma_pago, id_solicitud, id_sede) 
+                VALUES (CURRENT_DATE(), %s, %s, %s, %s, %s)
+                ''',
+                (monto, 'Electrónico', requisitos_data['metodo'], id_solicitud, id_sede) 
+            )
+
+
+            #ahora falta insertar el nombre de las imagenes y sus estados
+            requisitos = cactos.listar_requisitos(requisitos_data['id_acto'])
+
+            directorio = 'static/archivos_usuario/'+ str(id_solicitud) +'/'
+            print(f"Directorio donde se guardará la imagen: {directorio}")  # Imprimir para verificar
+
+            if not os.path.exists(directorio):
+                os.mkdir(directorio)
+
+            for rq in requisitos:
+                if rq[3] == "Imagen" :
+                    archivo_imagen = requisitos_data[rq[7]] 
+                    if archivo_imagen :
+                        ruta_imagen = directorio + archivo_imagen.filename 
+                        try:
+                            archivo_imagen.save(ruta_imagen)  # Guardar la imagen en el sistema de archivos
+                            enlace_imagen = ruta_imagen  # Guarda la ruta de la imagen
+                        except Exception as e:
+                            print(f"Error al guardar la imagen: {e}")  # Imprime el error si ocurre
+                            enlace_imagen = ""  # O maneja el error como consideres necesario
+                    else:
+                        enlace_imagen = ""
+                else:
+                    enlace_imagen = requisitos_data[rq[7]]
+
+                cursor.execute(
+                '''
+                    insert into aprobacionrequisitos (id_solicitud,id_requisito,estado,enlace_imagen) 
+                    values (%s,%s,%s,%s)
+                '''
+                ,(id_solicitud, rq[0],'V',enlace_imagen)
+            )
+            conexion.commit()
+
+        return 1
+    except Exception as e:
+        print(f"Error: {e}")
+        return 0
+    finally:
+        conexion.close()
+
+
 
 def insertar_solicitudMatrimonio(requisitos_data):
     try:
@@ -136,7 +231,6 @@ def insertar_solicitudMatrimonio(requisitos_data):
 
 
             monto = cactos.monto_total('Matrimonio', requisitos_data['sede'], requisitos_data['dni_responsable'], requisitos_data['dni_novio'], requisitos_data['dni_novia'])
-            print(monto)
             cursor.execute(
                 '''
                 INSERT INTO comprobante (fecha_hora, total, tipo_comprobante, forma_pago, id_solicitud, id_sede) 
@@ -235,7 +329,6 @@ def obtener_asistencias(id_solicitud):
         conexion.close()
 
 
-
 def check_asistencia(id,estado):
     try:
         conexion = obtener_conexion()
@@ -304,14 +397,14 @@ def viww(id):
                     SELECT tm.descripcion, 
                         DATE_SUB(cl.fecha, INTERVAL 1 DAY) AS fecha, 
                         pch.hora_inicio, 
-                        DATE_ADD(pch.hora_inicio, INTERVAL (HOUR(tm.duracion) * 60 + MINUTE(tm.duracion)) MINUTE) AS hora_suma
+                        DATE_ADD(pch.hora_inicio, INTERVAL (HOUR(tm.duracion) * 60 + MINUTE(tm.duracion)) MINUTE) AS hora_suma,
+                        pch.id_programacion
                     FROM tema AS tm
                     INNER JOIN celebracion AS cl
                     ON tm.id_actoliturgico = cl.id_actoliturgico 
                     INNER JOIN programacion_charlas AS pch
                     ON pch.id_tema = tm.id_tema
                     WHERE cl.id_celebracion = %s;
-
             ''',(id,))
             datos = cursor.fetchall()
             return datos

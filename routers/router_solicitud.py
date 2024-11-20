@@ -142,10 +142,6 @@ def registrar_rutas(app):
 
     @app.route('/registrarsolicitud/<int:acto_liturgico>', methods=['GET','POST'])
     def registrarsolicitud(acto_liturgico):
-        #Insertamos si es matrimonio
-        print(request.form)
-        print(request.files)
-
         if acto_liturgico == 1:
             requisitos_data = {
                 'id_acto' : 1,
@@ -196,6 +192,9 @@ def registrar_rutas(app):
                 return jsonify({'estado': 'Error'})
         else:
             requisitos_bautismo = {
+                'id_charla': request.form.get('id_charla'),
+                'charbau': request.form.get('id_charla'),
+                'metodo': request.form.get('metodo'),
                 'id_acto' : 2,
                 'dni_padrino' : request.form.get('dni_padrino'),
                 'dni_madrina': request.form.get('dni_madrina'),
@@ -207,22 +206,13 @@ def registrar_rutas(app):
                 'cop_consmadrina': request.files.get('cop_consmadrina'),
                 'dni_tutor': request.form.get('dni_tutor'),
                 'sedebau': request.form.get('sedebau'),
-                'charlas': "",
-                'es_dni_padrino':  request.form.get('es_dni_padrino'),
-                'es_dni_madrina':  request.form.get('es_dni_madrina'),
-                'es_co_dniactan':  request.form.get('es_co_dniactan'),
-                'es_niño':  request.form.get('es_niño'),
-                'es_cop_dni_padres':  request.form.get('es_cop_dni_padres'),
-                'es_cop_agualuz':  request.form.get('es_cop_agualuz'),
-                'es_cop_conspadrino':  request.form.get('es_cop_conspadrino'),
-                'es_cop_consmadrina':  request.form.get('es_cop_consmadrina'),
-                'es_dni_tutor':  request.form.get('es_dni_tutor'),
-                'es_sedebau':  request.form.get('es_sedebau'),
-                'charlas': request.form.get('es_charlas')
             }
+            
+            print(requisitos_bautismo)
             try:
-                #estado = csoli.insertar_solicitudMatrimonio(requisitos_data) 
-                if estado:
+                print("oks")
+                estado = csoli.insertar_bautismo(requisitos_bautismo) 
+                if estado == 1:
                     return jsonify({'estado': 'Correcto'})
                 else:
                     return jsonify({'estado': 'Error'})
