@@ -18,12 +18,12 @@
         <tbody>
             {% for congre in congregacion %}
             <tr>
-                <td class="text-center border">{{ congre[0] }}</td> <!-- ID del congregacion -->
-                <td>{{ congre[1] }}</td> <!-- Nombre de la congregacion -->
+                <td class="text-center">{{ congre[0] }}</td> <!-- ID del congregacion -->
+                <td class="text-start">{{ congre[1] }}</td> <!-- Nombre de la congregacion -->
                 <td style="vertical-align: middle; text-align: center">{{ 'Activo' if congre[2] == 1 else 'Inactivo' }}
                 </td>
 
-                <td class="text-center border">
+                <td class="text-center">
 
                     <button class="btn btn-primary btn-sm" title="Ver"
                         onclick="abrirModalVerC('{{ congre[0] }}', '{{ congre[1] }}', '{{ congre[2] }}')">

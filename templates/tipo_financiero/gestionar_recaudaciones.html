@@ -29,9 +29,9 @@
                 {% for recaudacion in recaudaciones %}
                 <tr>
                     <td class="text-center">{{ recaudacion[0] }}</td> <!-- ID de la recaudación -->
-                    <td>{{ recaudacion[5] }}</td> <!-- Nombre de la sede -->
-                    <td>{{ recaudacion[6] }}</td> <!-- Tipo de recaudación -->
-                    <td>{{ recaudacion[4] }}</td> <!-- Observación -->  
+                    <td class="text-start">{{ recaudacion[5] }}</td> <!-- Nombre de la sede -->
+                    <td class="text-start">{{ recaudacion[6] }}</td> <!-- Tipo de recaudación -->
+                    <td class="text-start">{{ recaudacion[4] }}</td> <!-- Observación -->  
                     <td>{{ recaudacion[1].strftime('%d-%m-%Y') }}</td> <!-- Formateo de la fecha -->
                     <td style="vertical-align: middle; text-align: center; padding-left: 45px;">{{ recaudacion[3] }}</td> <!-- Monto -->
                     <td class="text-center">
