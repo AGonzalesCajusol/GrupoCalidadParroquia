@@ -154,18 +154,22 @@ document.addEventListener('DOMContentLoaded', function () {
                 body: formData
             })
             .then(response => response.json())
+
+
             .then(data => {
+                const mensajeFlotante = document.getElementById('mensaje-flotante');
                 if (data.success) {
-                    alert('Ministro registrado exitosamente');
-                    location.reload(); // Recargar la página si el registro fue exitoso
+                    mensajeFlotante.className = 'alert alert-success';
+                    mensajeFlotante.textContent = 'Ministro registrado exitosamente';
                 } else {
-                    alert('Error al registrar ministro: ' + data.message);
+                    mensajeFlotante.className = 'alert alert-danger';
+                    mensajeFlotante.textContent = 'Error al registrar ministro: ' + data.message;
                 }
-            })
-            .catch(error => {
-                console.error('Error:', error);
-                alert('Ocurrió un error al procesar la solicitud');
+                mensajeFlotante.classList.remove('d-none');
+                setTimeout(() => mensajeFlotante.classList.add('d-none'), 3000); // Ocultar después de 3 segundos
             });
+            
+            
         });
     }
 });

@@ -327,11 +327,6 @@ table.dataTable tbody td {
     /* Asegúrate de que la altura se ajuste automáticamente */
 }
 
-.btn-agregar-ministro {
-    margin-right: 0 !important;
-    /* Elimina cualquier margen a la derecha */
-}
-
 .btn-success {
     background-color: #02BA26 !important;
     /* Color verde más claro */
@@ -458,21 +453,6 @@ table.dataTable tbody td {
 
 /* Btn agregar ministro
 
-  /* Personalización del botón "Agregar ministro" */
-.btn-agregar-ministro {
-    font-size: 15px;
-    /* Tamaño de la fuente */
-    transition: background-color 0.3s ease;
-    /* Transición suave */
-    margin-right: 35px;
-}
-
-.btn-agregar-ministro:hover {
-    background-color: #218838;
-    /* Color más oscuro al pasar el cursor */
-    border-color: #218838;
-    /* Ajuste del color del borde */
-}
 
 
 #head_ind {
