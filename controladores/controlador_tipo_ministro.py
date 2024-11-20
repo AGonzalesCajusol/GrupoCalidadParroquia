@@ -52,13 +52,24 @@ def eliminar_tipo_ministro(id):
     conexion.close()
 
 
-def dar_baja_tipo_ministro(id, estado):
+def cambiar_estado_tipo_ministro(id_tipoministro, nuevo_estado):
     conexion = obtener_conexion()
-    with conexion.cursor() as cursor:
-        # Actualizar solo el estado
-        cursor.execute("UPDATE tipo_ministro SET estado = %s WHERE id_tipoministro = %s", (estado, id))
-    conexion.commit()
-    conexion.close()
+    try:
+        with conexion.cursor() as cursor:
+            # Actualizar el estado del tipo de ministro
+            cursor.execute("""
+                UPDATE tipo_ministro 
+                SET estado = %s 
+                WHERE id_tipoministro = %s
+            """, (nuevo_estado, id_tipoministro))
+        conexion.commit()
+        return True, "El estado del tipo de ministro fue actualizado exitosamente."
+    except Exception as e:
+        conexion.rollback()
+        print(f"Error al cambiar el estado del tipo de ministro: {e}")
+        return False, f"Error: {str(e)}"
+    finally:
+        conexion.close()
 
 
 def obtener_id_tipoMinistro_por_nombre(nombre):

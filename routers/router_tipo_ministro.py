@@ -40,22 +40,33 @@ def registrar_rutas(app):
         except Exception as e:
             return jsonify(success=False, message="Error al actualizar el tipo de ministro: " + str(e))
 
+    @app.route("/actualizar_estado_tipo_ministro", methods=["POST"])
+    def actualizar_estado_tipo_ministro():
+        try:
+            # Recibir datos del formulario
+            id = request.form.get("id")
+            nuevo_estado = request.form.get("estado") == "1"  # `1` indica Activo, `0` indica Inactivo
 
+            # Llamar al controlador para cambiar el estado
+            success, message = cambiar_estado_tipo_ministro(id, nuevo_estado)
 
+            if success:
+                # Obtener los tipos de ministro actualizados
+                tipos_ministro = obtener_tipos_ministro()
+                tipos_ministro_data = [
+                    {
+                        "id": tipo[0],
+                        "nombre": tipo[1],
+                        "estado": "Activo" if tipo[2] == 1 else "Inactivo"
+                    }
+                    for tipo in tipos_ministro
+                ]
+                return jsonify({"success": True, "tipos_ministro": tipos_ministro_data, "message": message})
+            else:
+                return jsonify({"success": False, "message": message}), 500
 
-    @app.route("/procesar_dar_baja", methods=["POST"])
-    def procesar_dar_baja():
-            try:
-                data = request.json
-                id = data.get("id")
-                estado = data.get("estado", 0)  # Estado del tipo de ministro (1: activo, 0: inactivo)
-                dar_baja_tipo_ministro(id,estado)
-                return jsonify(success=True)
-            except Exception as e:
-                return jsonify(success=False, message="Error al actualizar el tipo de ministro: " + str(e))
-
-
-
+        except Exception as e:
+            return jsonify({"success": False, "message": f"Error en el servidor: {str(e)}"}), 500
 
 
     # Ruta para eliminar un tipo de ministro
