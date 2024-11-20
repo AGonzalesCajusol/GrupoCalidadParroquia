@@ -51,10 +51,12 @@
                         <i class="fas fa-edit"></i>
                     </button>
 
-                    <button type="button" class="btn btn-secondary btn-sm" title="Dar de baja"
-                        onclick="darBajaSede('{{ sed[0] }}','{{ sed[7] }}')" {% if sed[7]==0 %} disabled {% endif %}>
-                        <i class="fas fa-ban"></i>
+                    <button class="btn {{ 'btn-secondary' if sed[7] == 1 else 'btn-success' }} btn-sm"
+                    title="{{ 'Dar de baja' if sed[7] == 1 else 'Activar' }}"
+                    onclick="cambiarEstadoSede('{{ sed[0] }}', '{{ sed[7] }}')">
+                    <i class="{{ 'fas fa-ban' if sed[7] == 1 else 'fas fa-check' }}"></i>
                     </button>
+                
 
                     <form style="display:inline-block;" onsubmit="eliminarSede(event, '{{ sed[0] }}')" title="Eliminar">
                         <button type="submit" class="btn btn-danger btn-sm">
@@ -166,7 +168,6 @@
         // Definir las URLs de acción generadas por Flask
         const insertarSedeURL = "{{ url_for('procesar_insertar_sede') }}";
         const actualizarSedeURL = "{{ url_for('procesar_actualizar_sede') }}";
-        const darBajaSedeURL = "{{ url_for('procesar_darBaja_sede') }}";
     </script>
 
 
