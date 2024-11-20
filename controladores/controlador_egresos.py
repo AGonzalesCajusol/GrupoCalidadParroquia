@@ -196,4 +196,27 @@ def obtener_rango_de_años():
     finally:
         conexion.close()
 
+def obteneregresosporaño(año):
+    conexion = obtener_conexion()  # Asegúrate de que obtener_conexion() esté correctamente definido
+    try:
+        with conexion.cursor() as cursor:
+            # Consulta para obtener el mes y la suma de los montos agrupados por mes
+            cursor.execute("""
+                SELECT 
+                    MONTH(fecha) as mes, 
+                    SUM(monto) as monto_total
+                FROM egreso
+                WHERE YEAR(fecha) = %s
+                GROUP BY MONTH(fecha)
+                ORDER BY mes
+            """, (año,))
+            # Recupera los datos como una lista de diccionarios
+            resultados = cursor.fetchall()
+            return [{'mes': row[0], 'monto_total': float(row[1])} for row in resultados]
+    except Exception as e:
+        print(f"Error al obtener egresos por año: {e}")
+        return []
+    finally:
+        conexion.close()
+
 

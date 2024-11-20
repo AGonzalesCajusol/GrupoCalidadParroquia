@@ -10,7 +10,8 @@ from controladores.controlador_egresos import (
     obtener_rango_de_años,
     obtener_id_sede_por_nombre,
     obtener_egresos_por_año,
-    actualizar_egreso
+    actualizar_egreso,
+    obteneregresosporaño
 
 )
 
@@ -120,6 +121,30 @@ def registrar_rutas(app):
         except Exception as e:
             print(f"Error al obtener años: {e}")
             return jsonify({"error": "Error al obtener los años"}), 500
+    @app.route('/reporte_egresos', methods=['GET'])
+    
+    def reporte_egresos():
+        años = obtener_rango_de_años()
+        return render_template('egresos/reporte_egresos.html', años=[a[0] for a in años])
+
+
+
+    @app.route('/api/egresos_por_fecha', methods=['GET'])
+    def obtener_egresos_por_fecha():
+        year = request.args.get('year')
+        if not year:
+            return jsonify([])
+
+        try:
+            egresos = obteneregresosporaño(year)  # Cambiado aquí
+            resultados = [
+                {'mes': egreso['mes'], 'monto_total': egreso['monto_total']}
+                for egreso in egresos
+            ]
+            return jsonify(resultados)
+        except Exception as e:
+            print(f"Error al obtener egresos: {e}")
+            return jsonify([])
 
 #   @app.route("/apiaños", methods=["GET"])
 #    def apiaños():
