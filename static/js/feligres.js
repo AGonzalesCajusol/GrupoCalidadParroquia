@@ -19,16 +19,16 @@ function openModal(type, dni = '', apellidos = '', nombres = '', fecha_nacimient
     let isReadOnly = false;
 
     if (type === 'add') {
-        modalTitle = 'Agregar Feligrés';
+        modalTitle = 'Agregar feligrés';
         formAction = urlInsertarFeligres;
         limpiarModal();
         document.getElementById('saveChanges').style.display = 'block';
     } else if (type === 'edit') {
-        modalTitle = 'Editar Feligrés';
+        modalTitle = 'Editar feligrés';
         formAction = urlActualizarFeligres;
         document.getElementById('saveChanges').style.display = 'block';
     } else if (type === 'view') {
-        modalTitle = 'Ver Feligrés';
+        modalTitle = 'Ver feligrés';
         isReadOnly = true;
         document.getElementById('saveChanges').style.display = 'none';
     }

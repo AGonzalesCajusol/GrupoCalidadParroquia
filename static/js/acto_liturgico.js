@@ -98,7 +98,7 @@ function abrir(accion, id, nombre, requisito, monto) {
 
     if (accion === "nuevo") {
         myModal.show();
-        titulo.textContent = "Agrega y Asigna los actos litúrgicos";
+        titulo.textContent = "Agrega y asigna los actos litúrgicos";
         boton_modal.textContent = "Guardar";
     } else if (accion === "modificar") {
         myModal.show();
@@ -128,11 +128,25 @@ function abrir(accion, id, nombre, requisito, monto) {
             fetch(`/eliminaracto_requisitos/${id}`)
                 .then(response => response.json())
                 .then(data => {
-                    if (data.resultado) {
-                        alert("Se eliminó correctamente");
+                    if (data.resultado) {                        
+                        Toastify({
+                            text: "Se eliminó correctamente",
+                            duration: 2000,
+                            close: true,
+                            backgroundColor: "--bs-primary",
+                            gravity: "bottom",
+                            position: "right",
+                        }).showToast();
                         listar();
-                    } else {
-                        alert("No se pudo eliminar debido a relaciones existentes");
+                    } else {                        
+                        Toastify({
+                            text: "No se pudo eliminar debido a relaciones existentes",
+                            duration: 2000,
+                            close: true,
+                            backgroundColor: "#dc3545",
+                            gravity: "bottom",
+                            position: "right",
+                        }).showToast();
                     }
                 });
         }
@@ -199,21 +213,30 @@ function validar_envio(boton) {
             return response.json()
         }).then(response => {
 
-            if (response.estado == true){
-                var alerta = document.getElementById('alert-ok');
-                alerta.style.display = "block";
+            if (response.estado == true) {
+                // Mostrar el Toast de éxito
+                Toastify({
+                    text: "Se registro correctamente",
+                    duration: 2000,
+                    close: true,
+                    backgroundColor: "--bs-primary", // Esto puede ser cambiado a un color hexadecimal si es necesario
+                    gravity: "bottom", // Posición de la notificación
+                    position: "right", // Posición a la derecha
+                }).showToast();
                 limpiar();
                 listar();
-                setTimeout(function() {
-                    alerta.style.display = "none";
-                }, 3000);
-            }else{
-                var alerta = document.getElementById('alert-no');
-                alerta.style.display = "block";
-                setTimeout(function() {
-                    alerta.style.display = "none";
-                }, 3000);
+            } else {
+                // Mostrar el Toast de error
+                Toastify({
+                    text: "No se pudo registrar correctamente",
+                    duration: 2000,
+                    close: true,
+                    backgroundColor: "#dc3545", // Color rojo para el error
+                    gravity: "bottom", // Posición de la notificación
+                    position: "right", // Posición a la derecha
+                }).showToast();
             }
+            
         })
         .catch(error => {
             div_mensaje1.textContent = "";
@@ -238,26 +261,34 @@ function validar_envio(boton) {
         }).then(response => {
             return response.json()
         }).then(response => {
-            if (response){
-                var alerta = document.getElementById('alert-ok');
-                var mensaje = document.getElementById('mensaje_ok');
-                mensaje = "Se modifico correctamente"
-                alerta.style.display = "block";
+            if (response) {
+                // Mostrar el Toast de éxito
+                Toastify({
+                    text: "Se modificó correctamente",
+                    duration: 2000,
+                    close: true,
+                    backgroundColor: "--bs-primary", 
+                    gravity: "bottom", 
+                    position: "right", 
+                }).showToast();        
+                
                 limpiar();
                 listar();
+            
+                // Cerrar el modal
                 $('#acciones').modal('hide');
-                setTimeout(function() {
-                    alerta.style.display = "none";
-                }, 3000);
-            }else{
-                var mensaje = document.getElementById('mensaje_no');
-                mensaje = "No se pudo modificar"
-                var alerta = document.getElementById('alert-no')
-                alerta.style.display = "block"
-                setTimeout(function() {
-                    alerta.style.display = "none";
-                }, 3000);
+            } else {
+                // Mostrar el Toast de error
+                Toastify({
+                    text: "No se pudo modificar",
+                    duration: 2000,
+                    close: true,
+                    backgroundColor: "#dc3545", 
+                    gravity: "bottom", 
+                    position: "right", 
+                }).showToast();
             }
+            
         })
         .catch(error => {
 

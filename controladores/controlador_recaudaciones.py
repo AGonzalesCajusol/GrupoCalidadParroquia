@@ -336,3 +336,34 @@ def obtener_rango_de_años():
 #         año_minimo, año_maximo = rango_años
 #         return list(range(año_minimo, año_maximo + 1))
 #     return []
+
+def obtener_recaudaciones_por_mes(año):
+    conexion = obtener_conexion()
+    try:
+        with conexion.cursor() as cursor:
+            cursor.execute("""
+                SELECT 
+                    MONTH(r.fecha) as mes,
+                    SUM(r.monto) as monto_total
+                FROM recaudacion r
+                WHERE YEAR(r.fecha) = %s
+                GROUP BY MONTH(r.fecha)
+                ORDER BY mes
+            """, (año,))
+            resultados = cursor.fetchall()
+            
+            # Convertir los resultados a un formato JSON serializable
+            datos_por_mes = [
+                {
+                    "mes": mes,
+                    "monto_total": float(monto_total)  # Convertir a float para serialización JSON
+                }
+                for mes, monto_total in resultados
+            ]
+            
+            return datos_por_mes
+    except Exception as e:
+        print(f"Error al obtener recaudaciones por mes: {e}")
+        return []
+    finally:
+        conexion.close()

@@ -6,8 +6,12 @@ function listar() {
     const tbody = document.getElementById('cuerpo_actos');
     
     if ($.fn.dataTable.isDataTable('#tablas')) {
-        $('#tablas').DataTable().clear().destroy();
+        $('#tablas').DataTable().clear(); 
+        $('#tablas').DataTable().destroy(); 
     }
+    
+
+    
     fetch('/Apilistaactos')
         .then(response => {
             return response.json();
@@ -39,11 +43,12 @@ function listar() {
                 `;
                 tbody.appendChild(tr);
             });
-            console.log('Tabla antes de destruir:', $.fn.dataTable.isDataTable('#tablas')); // Verifica si es DataTable
+            console.log('Tabla antes de destruir:', $.fn.dataTable.isDataTable('#tablas'));
 
 
 
             $('#tablas').DataTable({
+                destroy:    true,
                 pageLength: 8,
                 dom: '<"d-flex justify-content-between align-items-center mb-3"<"d-flex"f><"d-flex justify-content-end button-section">>rt<"bottom"p>',
                 language: {
@@ -109,12 +114,26 @@ function enviar_datos(event){
             return response.json()
         })
         .then(data => {
-            if (data.estado == 'Correcto'){
-                alert('Se registro correctamente!');
+            if (data.estado == 'Correcto'){                
+                Toastify({
+                    text: "Se registro correctamente!",
+                    duration: 2000,
+                    close: true,
+                    backgroundColor: "--bs-primary",
+                    gravity: "bottom",
+                    position: "right",
+                }).showToast();
                 modal.hide();
                 listar();
-            }else{
-                alert('Ya existe ese acto litúrgico!');
+            }else{                
+                Toastify({
+                    text: "Ya existe ese acto litúrgico!",
+                    duration: 2000,
+                    close: true,
+                    backgroundColor: "#dc3545",
+                    gravity: "bottom",
+                    position: "right",
+                }).showToast();
             }
         });
     }else if (boton == "Modificar"){
@@ -126,12 +145,28 @@ function enviar_datos(event){
             return response.json()
         })
         .then(data => {
-            if (data.estado == 'Correcto'){
-                alert('Se modifico correctamente!');
+            if (data.estado == 'Correcto'){                
+                Toastify({
+                    text: "Se modifico correctamente!",
+                    duration: 2000,
+                    close: true,
+                    backgroundColor: "--bs-primary",
+                    gravity: "bottom",
+                    position: "right",
+                }).showToast();
                 modal.hide();
                 listar();
-            }else{
-                alert('No se pudo modificar ese acto!');
+                modal.hide();
+                listar();
+            }else{                
+                Toastify({
+                    text: "No se pudo modificar ese acto!",
+                    duration: 2000,
+                    close: true,
+                    backgroundColor: "#dc3545",
+                    gravity: "bottom",
+                    position: "right",
+                }).showToast();
             }
         });
     }
@@ -146,11 +181,25 @@ function eliminar(id){
         .then(response => response.json())
         .then(data => {
             if (data.estado == 'Correcto') {
-                listar();  
-                alert('Se eliminó el acto litúrgico.');
+                listar();                  
+                Toastify({
+                    text: "Se eliminó el acto litúrgico",
+                    duration: 2000,
+                    close: true,
+                    backgroundColor: "--bs-primary",
+                    gravity: "bottom",
+                    position: "right",
+                }).showToast();
 
-            } else {
-                alert('No se pudo eliminar el acto litúrgico.');
+            } else {                
+                Toastify({
+                    text: "No se pudo eliminar el acto litúrgico",
+                    duration: 2000,
+                    close: true,
+                    backgroundColor: "#dc3545",
+                    gravity: "bottom",
+                    position: "right",
+                }).showToast();
             }
         });
         
@@ -162,10 +211,24 @@ function darbaja(id){
     .then(response => response.json())
     .then(data => {
         if (data.estado === 'Correcto') {
-            listar();
-            alert('Se dio de baja correctamente el acto litúrgico.');
-        } else {
-            alert('No se pudo dar de baha el acto litúrgico.');
+            listar();            
+            Toastify({
+                text: "Se dio de baja correctamente el acto litúrgico",
+                duration: 2000,
+                close: true,
+                backgroundColor: "--bs-primary",
+                gravity: "bottom",
+                position: "right",
+            }).showToast();
+        } else {            
+            Toastify({
+                text: "No se pudo dar de baha el acto litúrgico",
+                duration: 2000,
+                close: true,
+                backgroundColor: "#dc3545",
+                gravity: "bottom",
+                position: "right",
+            }).showToast();
         }
     });   
 }
