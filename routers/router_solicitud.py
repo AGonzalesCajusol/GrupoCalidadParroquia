@@ -190,7 +190,7 @@ def registrar_rutas(app):
                     return jsonify({'estado': 'Error'})
             except Exception as e:
                 return jsonify({'estado': 'Error'})
-        else:
+        elif acto_liturgico == 2:
             requisitos_bautismo = {
                 'id_charla': request.form.get('id_charla'),
                 'charbau': request.form.get('id_charla'),
@@ -208,7 +208,6 @@ def registrar_rutas(app):
                 'sedebau': request.form.get('sedebau'),
             }
             
-            print(requisitos_bautismo)
             try:
                 print("oks")
                 estado = csoli.insertar_bautismo(requisitos_bautismo) 
@@ -218,7 +217,53 @@ def registrar_rutas(app):
                     return jsonify({'estado': 'Error'})
             except Exception as e:
                 return jsonify({'estado': 'Error'})
-            
+        elif acto_liturgico == 3:
+
+            requisitos_confirmacion = {
+                'id_acto' : 3,
+                'id_charla': request.form.get('id_charla'),
+                'charlas': request.form.get('id_charla'),
+                'const_bautizo': request.files.get('const_bautizo'),
+                'dni_confirmado': request.form.get('dni_confirmado'),
+                'dni_padrino_madrina': request.form.get('dni_padrino_madrina'),
+                'sede':request.form.get('sede'),
+                'metodo': request.form.get('metodo')
+            }
+                     
+            print(requisitos_confirmacion)
+            try:
+                estado = csoli.insertar_confirmacion(requisitos_confirmacion)
+                if estado == 1:
+                    return jsonify({'estado': 'Correcto'})
+                else:
+                    return jsonify({'estado': 'Error'})
+            except Exception as e:
+                return jsonify({'estado':'Error'})
+        elif acto_liturgico == 6:
+            requisitos_confirmacion = {
+                'id_acto' : 6,
+                'id_charla': request.form.get('id_charla'),
+                'charlas': request.form.get('id_charla'),
+                'dni_pri_responsable':request.form.get('dni_pri_responsable'),
+                'dni_pri_celebrante':request.files.get('dni_pri_celebrante'),
+                'dni_pradri_madri':request.files.get('dni_pradri_madri'), 
+                'constan_bau_celebrante':request.files.get('constan_bau_celebrante'),
+                'cosntan_estudios': request.files.get('cosntan_estudios'),
+                'cop_luz_agua': request.files.get('cop_luz_agua'),
+                'dni_celebrante': request.form.get('dni_celebrante'),
+                'sede': request.form.get('sede'),
+                'metodo': request.form.get('metodo')
+            }
+                     
+            print(requisitos_confirmacion)
+            try:
+                estado = csoli.primeracomu(requisitos_confirmacion)
+                if estado == 1:
+                    return jsonify({'estado': 'Correcto'})
+                else:
+                    return jsonify({'estado': 'Error'})
+            except Exception as e:
+                return jsonify({'estado':'Error'}) 
     
     @app.route('/verificar_fecha/<string:fecha>', methods=['GET', 'POST'])
     def verificar_fecha(fecha):
@@ -234,6 +279,30 @@ def registrar_rutas(app):
     @app.route('/montobautismo/<string:sede>', methods=['GET'])
     def montobautismo(sede):
         monto = csoli.monto_butismo(sede)
+        
+        # Imprimir el monto total
+        print("Monto Total:", monto)
+
+        if monto == 0:
+            return jsonify({'estado': 'no'}) 
+        else:
+            return jsonify({'estado': 'si', 'datos': monto})
+        
+    @app.route('/confirmado/<string:sede>', methods=['GET'])
+    def confirmado(sede):
+        monto = csoli.monto_confirmacion(sede)
+        
+        # Imprimir el monto total
+        print("Monto Total:", monto)
+
+        if monto == 0:
+            return jsonify({'estado': 'no'}) 
+        else:
+            return jsonify({'estado': 'si', 'datos': monto})
+        
+    @app.route('/primeracm/<string:sede>', methods=['GET'])
+    def primeracm(sede):
+        monto = csoli.monto_primera(sede)
         
         # Imprimir el monto total
         print("Monto Total:", monto)
@@ -295,6 +364,48 @@ def registrar_rutas(app):
     @app.route('/datos_charlas/<int:id>', methods=['GET'])
     def datos_charlas(id):
         valores = csoli.viww(id)
+        lista_datos = []
+
+        if valores == 0:
+            return jsonify({'estado': 'incorrecto'})
+        else:
+            for data  in valores:
+                lista_datos.append({
+                    'descripcion': data[0],
+                    'fecha': str(data[1]),
+                    'hora_inicio': str(data[2]),
+                    'hora_fin': str(data[3]),
+                })
+            print(lista_datos)
+            return jsonify({'estado': 'Correcto',
+                            'data': lista_datos})
+        
+    @app.route('/datos_charlas_confirmacion/<int:id>', methods=['GET'])
+    def datos_charlas_confirmacion(id):
+        sede = request.cookies.get('sede')
+        id_acto = 3
+        valores = csoli.ch_confir(sede,id_acto,id)
+        lista_datos = []
+
+        if valores == 0:
+            return jsonify({'estado': 'incorrecto'})
+        else:
+            for data  in valores:
+                lista_datos.append({
+                    'descripcion': data[0],
+                    'fecha': str(data[1]),
+                    'hora_inicio': str(data[2]),
+                    'hora_fin': str(data[3]),
+                })
+            print(lista_datos)
+            return jsonify({'estado': 'Correcto',
+                            'data': lista_datos})
+        
+    @app.route('/datos_charlas_comunion/<int:id>', methods=['GET'])
+    def datos_charlas_comunion(id):
+        sede = request.cookies.get('sede')
+        id_acto = 6
+        valores = csoli.ch_comunion(sede,id_acto,id)
         lista_datos = []
 
         if valores == 0:

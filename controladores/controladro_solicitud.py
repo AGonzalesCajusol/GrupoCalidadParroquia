@@ -175,6 +175,182 @@ def insertar_bautismo(requisitos_data):
     finally:
         conexion.close()
 
+def insertar_confirmacion(requisitos_data):
+    id_sede = csede.obtener_id_sede_por_nombre(requisitos_data['sede'])
+    try:
+        conexion = obtener_conexion()
+        with conexion.cursor() as cursor:
+            cursor.execute(
+                '''
+                insert into solicitud(id_actoliturgico,id_sede,estado,id_celebracion,dni_feligres, asistencia, fecha_registro) values (%s,%s,%s,%s,%s,0, CURRENT_DATE())
+                ''',(requisitos_data['id_acto'],id_sede,'P',requisitos_data['id_charla'],requisitos_data['dni_confirmado'])
+            )
+            id_solicitud = cursor.lastrowid
+
+            print(id_solicitud)
+
+            roles = ['confirmandos']
+            dnis = [requisitos_data['dni_confirmado']]
+
+            #insertamos los implicados en ese acto como el padrino, madrina, padre
+            for dni, rol in zip(dnis, roles):
+                cursor.execute(
+                    '''
+                        insert into solicitud_feligres (dni_feligres,id_solicitud,rol) values (%s,%s,%s) '''
+                        ,(dni,id_solicitud,rol)
+                )
+                print("ok")
+ 
+            cursor.execute(
+            '''
+                CALL GenerarAsistenciasPorSolicitud(%s);
+            ''',(id_solicitud)
+            )
+            print("ok")
+    
+
+            #registramos comprobantes
+
+            monto = monto_confirmacion(requisitos_data['sede'])
+            print(monto)
+
+            cursor.execute(
+                '''
+                INSERT INTO comprobante (fecha_hora, total, tipo_comprobante, forma_pago, id_solicitud, id_sede) 
+                VALUES (CURRENT_DATE(), %s, %s, %s, %s, %s)
+                ''',
+                (monto, 'Electrónico', requisitos_data['metodo'], id_solicitud, id_sede) 
+            )
+
+
+            requisitos = cactos.listar_requisitos(requisitos_data['id_acto'])
+
+            directorio = 'static/archivos_usuario/'+ str(id_solicitud) +'/'
+            print(f"Directorio donde se guardará la imagen: {directorio}")  # Imprimir para verificar
+
+            if not os.path.exists(directorio):
+                os.mkdir(directorio)
+
+            for rq in requisitos:
+                if rq[3] == "Imagen" :
+                    archivo_imagen = requisitos_data[rq[7]] 
+                    if archivo_imagen :
+                        ruta_imagen = directorio + archivo_imagen.filename 
+                        try:
+                            archivo_imagen.save(ruta_imagen)  # Guardar la imagen en el sistema de archivos
+                            enlace_imagen = ruta_imagen  # Guarda la ruta de la imagen
+                        except Exception as e:
+                            print(f"Error al guardar la imagen: {e}")  # Imprime el error si ocurre
+                            enlace_imagen = ""  # O maneja el error como consideres necesario
+                    else:
+                        enlace_imagen = ""
+                else:
+                    enlace_imagen = requisitos_data[rq[7]]
+
+                cursor.execute(
+                '''
+                    insert into aprobacionrequisitos (id_solicitud,id_requisito,estado,enlace_imagen) 
+                    values (%s,%s,%s,%s)
+                '''
+                ,(id_solicitud, rq[0],'V',enlace_imagen)
+            )
+            conexion.commit()
+
+        return 1
+    except Exception as e:
+        print(f"Error: {e}")
+        return 0
+    finally:
+        conexion.close()
+
+def primeracomu(requisitos_data):
+    id_sede = csede.obtener_id_sede_por_nombre(requisitos_data['sede'])
+    try:
+        conexion = obtener_conexion()
+        with conexion.cursor() as cursor:
+            cursor.execute(
+                '''
+                insert into solicitud(id_actoliturgico,id_sede,estado,id_celebracion,dni_feligres, asistencia, fecha_registro) values (%s,%s,%s,%s,%s,0, CURRENT_DATE())
+                ''',(requisitos_data['id_acto'],id_sede,'P',requisitos_data['id_charla'],requisitos_data['dni_pri_responsable'])
+            )
+            id_solicitud = cursor.lastrowid
+
+            print(id_solicitud)
+
+            roles = ['comulgantes']
+            dnis = [requisitos_data['dni_celebrante']]
+
+            #insertamos los implicados en ese acto como el padrino, madrina, padre
+            for dni, rol in zip(dnis, roles):
+                cursor.execute(
+                    '''
+                        insert into solicitud_feligres (dni_feligres,id_solicitud,rol) values (%s,%s,%s) '''
+                        ,(dni,id_solicitud,rol)
+                )
+                print("ok")
+ 
+            cursor.execute(
+            '''
+                CALL GenerarAsistenciasPorSolicitud(%s);
+            ''',(id_solicitud)
+            )
+            print("ok")
+    
+
+            #registramos comprobantes
+
+            monto = monto_primera(requisitos_data['sede'])
+            print(monto)
+
+            cursor.execute(
+                '''
+                INSERT INTO comprobante (fecha_hora, total, tipo_comprobante, forma_pago, id_solicitud, id_sede) 
+                VALUES (CURRENT_DATE(), %s, %s, %s, %s, %s)
+                ''',
+                (monto, 'Electrónico', requisitos_data['metodo'], id_solicitud, id_sede) 
+            )
+
+
+            requisitos = cactos.listar_requisitos(requisitos_data['id_acto'])
+
+            directorio = 'static/archivos_usuario/'+ str(id_solicitud) +'/'
+            print(f"Directorio donde se guardará la imagen: {directorio}")  # Imprimir para verificar
+
+            if not os.path.exists(directorio):
+                os.mkdir(directorio)
+
+            for rq in requisitos:
+                if rq[3] == "Imagen" :
+                    archivo_imagen = requisitos_data[rq[7]] 
+                    if archivo_imagen :
+                        ruta_imagen = directorio + archivo_imagen.filename 
+                        try:
+                            archivo_imagen.save(ruta_imagen)  # Guardar la imagen en el sistema de archivos
+                            enlace_imagen = ruta_imagen  # Guarda la ruta de la imagen
+                        except Exception as e:
+                            print(f"Error al guardar la imagen: {e}")  # Imprime el error si ocurre
+                            enlace_imagen = ""  # O maneja el error como consideres necesario
+                    else:
+                        enlace_imagen = ""
+                else:
+                    enlace_imagen = requisitos_data[rq[7]]
+
+                cursor.execute(
+                '''
+                    insert into aprobacionrequisitos (id_solicitud,id_requisito,estado,enlace_imagen) 
+                    values (%s,%s,%s,%s)
+                '''
+                ,(id_solicitud, rq[0],'V',enlace_imagen)
+            )
+            conexion.commit()
+
+        return 1
+    except Exception as e:
+        print(f"Error: {e}")
+        return 0
+    finally:
+        conexion.close()
+
 
 
 def insertar_solicitudMatrimonio(requisitos_data):
@@ -305,6 +481,40 @@ def monto_butismo(sede):
     finally:
         conexion.close()
 
+def monto_confirmacion(sede):
+    try:
+        conexion = obtener_conexion()
+        with conexion.cursor() as cursor:
+            cursor.execute(
+                '''
+                    select (select monto from actoliturgico as al 
+                    where id_actoliturgico = 3) + (select monto from sede where nombre_sede = %s) as monto
+                ''',(sede)
+            )
+            monto = cursor.fetchone()[0]
+            return monto
+    except:
+        return 0
+    finally:
+        conexion.close()
+
+def monto_primera(sede):
+    try:
+        conexion = obtener_conexion()
+        with conexion.cursor() as cursor:
+            cursor.execute(
+                '''
+                    select (select monto from actoliturgico as al 
+                    where id_actoliturgico = 6) + (select monto from sede where nombre_sede = %s) as monto
+                ''',(sede)
+            )
+            monto = cursor.fetchone()[0]
+            return monto
+    except:
+        return 0
+    finally:
+        conexion.close()
+
 
 def obtener_asistencias(id_solicitud):
     try:
@@ -406,6 +616,59 @@ def viww(id):
                     ON pch.id_tema = tm.id_tema
                     WHERE cl.id_celebracion = %s;
             ''',(id,))
+            datos = cursor.fetchall()
+            return datos
+    except:
+        return 0
+    finally:
+        conexion.close()
+
+def ch_confir(sede,id_acto,id):
+    try:
+        id_sede = csede.obtener_id_sede_por_nombre(sede)
+        conexion = obtener_conexion()
+        with conexion.cursor() as cursor:
+            cursor.execute('''
+                SELECT 
+                    tm.descripcion AS tema,
+                    DATE_ADD(cl.fecha, INTERVAL ((tm.orden - 1) * 7 + 7) DAY) AS fecha_asistencia,
+                    pch.hora_inicio AS hora_inicio,
+                    ADDTIME(pch.hora_inicio, tm.duracion) AS hora_fin,
+                    tm.orden AS orden_tema,
+                    pch.dias_semana AS dias_programados
+                FROM celebracion AS cl
+                JOIN tema AS tm ON tm.id_actoliturgico = cl.id_actoliturgico
+                JOIN programacion_charlas AS pch ON pch.id_tema = tm.id_tema
+                WHERE cl.id_actoliturgico = %s AND cl.id_sede = %s and cl.id_celebracion = %s
+                ORDER BY tm.orden ASC;
+            ''',(id_acto,id_sede,id))
+            datos = cursor.fetchall()
+            return datos
+    except:
+        return 0
+    finally:
+        conexion.close()
+
+
+def ch_comunion(sede,id_acto,id):
+    try:
+        id_sede = csede.obtener_id_sede_por_nombre(sede)
+        conexion = obtener_conexion()
+        with conexion.cursor() as cursor:
+            cursor.execute('''
+                SELECT 
+                    tm.descripcion AS tema,
+                    DATE_ADD(cl.fecha, INTERVAL ((tm.orden - 1) * 7 + 7) DAY) AS fecha_asistencia,
+                    pch.hora_inicio AS hora_inicio,
+                    ADDTIME(pch.hora_inicio, tm.duracion) AS hora_fin,
+                    tm.orden AS orden_tema,
+                    pch.dias_semana AS dias_programados
+                FROM celebracion AS cl
+                JOIN tema AS tm ON tm.id_actoliturgico = cl.id_actoliturgico
+                JOIN programacion_charlas AS pch ON pch.id_tema = tm.id_tema
+                WHERE cl.id_actoliturgico = %s AND cl.id_sede = %s and cl.id_celebracion = %s
+                ORDER BY tm.orden ASC;
+            ''',(id_acto,id_sede,id))
             datos = cursor.fetchall()
             return datos
     except:
