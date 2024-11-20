@@ -26,6 +26,10 @@ def registrar_rutas(app):
         tipos = obtener_tipos_recaudacion()  # Obtén los tipos de recaudación
         años = obtener_rango_de_años()  # Obtenemos el rango de años disponibles en la BD
         return render_template("tipo_financiero/gestionar_recaudaciones.html", recaudaciones=recaudaciones, tipos=tipos, años=años)
+    @app.route('/reporte_recaudaciones', methods=['GET'])
+    def reporte_recaudaciones():
+        # Tu lógica para generar el reporte
+        return render_template('tipo_financiero/reporte_recaudaciones.html')
 
 
     @app.route("/procesar_actualizar_recaudacion", methods=["POST"])
@@ -173,5 +177,10 @@ def registrar_rutas(app):
         except Exception as e:
             print(f"Error al obtener tipos de recaudación activos: {e}")
             return jsonify({"error": "Error al obtener los tipos de recaudación activos"}), 500
+    @app.route('/api/recaudaciones_por_fecha', methods=['GET'])
+    def obtener_recaudaciones_por_fecha():
+        year = request.args.get('year')
+        recaudaciones = obtener_recaudaciones_por_año(year)  # Función que obtiene los datos de la base de datos
+        return jsonify(recaudaciones)
 
 
