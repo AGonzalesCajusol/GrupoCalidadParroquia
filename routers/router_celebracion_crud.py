@@ -12,6 +12,7 @@ import controladores.controlador_actosliturgicos as cacto
 
 def registrar_rutas(app):
     @app.route('/gestionar_celebracion_crud', methods=['GET'])
+    @requerido_login
     def gestionar_celebracion_crud():
         try:
             sedes = csede.obtener_sedes_celebracion()
@@ -21,6 +22,7 @@ def registrar_rutas(app):
             return jsonify({"error": str(e)})
 
     @app.route('/listar_celebraciones_crud', methods=['GET'])
+    @requerido_login
     def listar_celebraciones():        
         try:
             celebraciones = obtener_celebraciones_crud()
@@ -29,6 +31,7 @@ def registrar_rutas(app):
             return jsonify({"error": str(e)})
         
     @app.route('/insertar_celebracion_crud', methods=['POST'])
+    @requerido_login
     def insertar_celebracion():
         try:
             # Obtener los datos del formulario
@@ -50,6 +53,7 @@ def registrar_rutas(app):
         
 
     @app.route('/eliminar_celebracion_crud', methods=['POST'])
+    @requerido_login
     def eliminar_celebracion():
         try:
             # Obtener el ID desde la solicitud JSON
@@ -66,6 +70,7 @@ def registrar_rutas(app):
 
 
     @app.route('/editar_celebracion_crud', methods=['POST'])
+    @requerido_login
     def editar_celebracion():
         try:
             # Obtener los datos del formulario
@@ -88,6 +93,7 @@ def registrar_rutas(app):
 
 
     @app.route('/dar_de_baja_celebracion', methods=['POST'])
+    @requerido_login
     def dar_de_baja_celebracion():
         try:
             # Obtener el ID desde la solicitud JSON
