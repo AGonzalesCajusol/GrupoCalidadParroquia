@@ -134,12 +134,23 @@ def eliminar_sede(id):
         conexion.close()
 
 
-def darBaja_sede(id):
+def actualizar_estado_sede(id_sede, nuevo_estado):
     conexion = obtener_conexion()
-    with conexion.cursor() as cursor:
-        cursor.execute("UPDATE sede set estado = %s WHERE id_sede = %s", (0,id,))
-    conexion.commit()
-    conexion.close()
+    try:
+        with conexion.cursor() as cursor:
+            cursor.execute(
+                "UPDATE sede SET estado = %s WHERE id_sede = %s",
+                (nuevo_estado, id_sede)
+            )
+        conexion.commit()
+    except Exception as e:
+        conexion.rollback()
+        print(f"Error al actualizar estado de la sede: {e}")
+        raise
+    finally:
+        conexion.close()
+
+
 
 def obtener_id_sede_por_nombre(nombre):
         conexion = obtener_conexion()

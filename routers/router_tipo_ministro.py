@@ -7,6 +7,7 @@ from routers.router_main import requerido_login
 def registrar_rutas(app):
     # Ruta para la página principal de gestión de tipos de ministros
     @app.route("/gestionar_tipo_ministro", methods=["GET"])
+    @requerido_login
     def gestionar_tipo_ministro():
         try:
             tipos = obtener_tipos_ministro()
@@ -14,53 +15,84 @@ def registrar_rutas(app):
         except Exception as e:
             return jsonify(success=False, message="Error al cargar la página: " + str(e))
 
-    # Ruta para insertar un nuevo tipo de ministro
-    @app.route("/insertar_tipo_ministro", methods=["POST"])
+    @app.route("/procesar_insertar_tipo_ministro", methods=["POST"])
+    @requerido_login
     def procesar_insertar_tipo_ministro():
         try:
             nombre = request.form["tipo"]
-            estado = request.form.get("estado", default="1")  # Estado activo por defecto
+            estado = int(request.form.get("estado", 1))
             insertar_tipo_ministro(nombre, estado)
-            return jsonify(success=True)
-        except Exception as e:
-            return jsonify(success=False, message="Error al insertar tipo de ministro: " + str(e))
 
-    # Ruta para actualizar un tipo de ministro existente
+            # Actualizar la tabla
+            tipos_ministro = obtener_tipos_ministro()
+            tipos_ministro_data = [
+                {"id": tipo[0], "nombre": tipo[1], "estado": "Activo" if tipo[2] == 1 else "Inactivo"}
+                for tipo in tipos_ministro
+            ]
+            return jsonify({"success": True, "message": "Tipo de Ministro agregado exitosamente.", "tipos_ministro": tipos_ministro_data})
+
+        except Exception as e:
+            return jsonify({"success": False, "message": f"Error al insertar: {str(e)}"})
+
+
     @app.route("/procesar_actualizar_tipo_ministro", methods=["POST"])
+    @requerido_login
     def procesar_actualizar_tipo_ministro():
         try:
-            data = request.json
-            id = data.get("id")
-            nombre = data.get("tipo", None)  # El nombre puede o no cambiar
-            estado = data.get("estado", 1)  # Estado del tipo de ministro (1: activo, 0: inactivo)
-            actualizar_tipo_ministro(id, nombre, estado)
-            return jsonify(success=True)
+            id = request.form["id"]
+            nombre = request.form["tipo"]
+            estado = int(request.form.get("estado", 1))
+            actualizar_tipo_ministro(nombre, estado, id)
+
+            # Actualizar la tabla
+            tipos_ministro = obtener_tipos_ministro()
+            tipos_ministro_data = [
+                {"id": tipo[0], "nombre": tipo[1], "estado": "Activo" if tipo[2] == 1 else "Inactivo"}
+                for tipo in tipos_ministro
+            ]
+            return jsonify({"success": True, "message": "Tipo de Ministro actualizado exitosamente.", "tipos_ministro": tipos_ministro_data})
+
         except Exception as e:
-            return jsonify(success=False, message="Error al actualizar el tipo de ministro: " + str(e))
+            return jsonify({"success": False, "message": f"Error al actualizar: {str(e)}"})
 
 
-
-    @app.route("/procesar_dar_baja", methods=["POST"])
-    def procesar_dar_baja():
-            try:
-                data = request.json
-                id = data.get("id")
-                estado = data.get("estado", 0)  # Estado del tipo de ministro (1: activo, 0: inactivo)
-                dar_baja_tipo_ministro(id,estado)
-                return jsonify(success=True)
-            except Exception as e:
-                return jsonify(success=False, message="Error al actualizar el tipo de ministro: " + str(e))
-
-
-
-
-
-    # Ruta para eliminar un tipo de ministro
     @app.route("/eliminar_tipo_ministro", methods=["POST"])
+    @requerido_login
     def procesar_eliminar_tipo_ministro():
         try:
             id = request.json["id"]
             eliminar_tipo_ministro(id)
-            return jsonify(success=True)
+
+            # Actualizar la tabla
+            tipos_ministro = obtener_tipos_ministro()
+            tipos_ministro_data = [
+                {"id": tipo[0], "nombre": tipo[1], "estado": "Activo" if tipo[2] == 1 else "Inactivo"}
+                for tipo in tipos_ministro
+            ]
+            return jsonify({"success": True, "message": "Tipo de Ministro eliminado exitosamente.", "tipos_ministro": tipos_ministro_data})
+
         except Exception as e:
-            return jsonify(success=False, message="Error al eliminar el tipo de ministro: " + str(e))
+            return jsonify({"success": False, "message": f"Error al eliminar: {str(e)}"})
+
+    @app.route("/actualizar_estado_tipo_ministro", methods=["POST"])
+    @requerido_login
+    def actualizar_estado_tipo_ministro():
+        try:
+            id = request.form.get("id")
+            nuevo_estado = request.form.get("estado") == "1"
+            success, message = cambiar_estado_tipo_ministro(id, nuevo_estado)
+            if success:
+                tipos_ministro = obtener_tipos_ministro()
+                tipos_ministro_data = [
+                    {
+                        "id": tipo[0],
+                        "nombre": tipo[1],
+                        "estado": "Activo" if tipo[2] == 1 else "Inactivo"
+                    }
+                    for tipo in tipos_ministro
+                ]
+                return jsonify({"success": True, "tipos_ministro": tipos_ministro_data, "message": message})
+            else:
+                return jsonify({"success": False, "message": message}), 400
+        except Exception as e:
+            return jsonify({"success": False, "message": f"Error en el servidor: {str(e)}"}), 500

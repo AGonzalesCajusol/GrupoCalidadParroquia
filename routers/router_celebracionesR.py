@@ -1,14 +1,14 @@
 
 from flask import render_template, request, jsonify
 from controladores.controlador_celebracion import *
+from routers.router_main import requerido_login
+
 from controladores.controlador_actosliturgicos import *
 
 def registrar_rutas(app):
 
-
-
-
     @app.route("/gestionar_celebracionR", methods=["GET"])
+    @requerido_login
     def gestionar_celebracionR():
         try:
             # Obtener las celebraciones con estado 'R'
@@ -26,6 +26,12 @@ def registrar_rutas(app):
 
         
 
+    @app.route("/gestionar_asistencia_celebracion/<int:id_celebracion>", methods=["GET"])
+    @requerido_login
+    def gestionar_asistencia_celebracion(id_celebracion):
+    
+        try:
+            # Obtener solicitudes para el acto litúrgico específico
     @app.route("/gestionar_asistencia_celebracion", methods=["GET", "POST"])
     def gestionar_asistencia_celebracion():
         if request.method == "POST":
@@ -47,6 +53,7 @@ def registrar_rutas(app):
 
 
     @app.route('/actualizar_asistencias', methods=['POST'])
+    @requerido_login
     def actualizar_asistencias():
         try:
             # Obtener datos del cuerpo de la solicitud

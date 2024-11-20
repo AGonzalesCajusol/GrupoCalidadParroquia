@@ -11,6 +11,7 @@ from routers.router_main import requerido_login
 
 def registrar_rutas(app):
     @app.route("/gestionar_asistencia", methods=["GET"])
+    @requerido_login
     def gestionar_asistencia():
         asistencia = obtener_asistencia()
         programacion = obtener_programacion()
@@ -19,11 +20,13 @@ def registrar_rutas(app):
         return render_template("asistencia_catequista/gestionar_asistencia.html", asistencia=asistencia, programacion=programacion, feligres=feligres, solicitud=solicitud)
 
     @app.route("/registrar_asistencia", methods=["GET"])
+    @requerido_login
     def formulario_registrar_asistencia():
         return render_template("asistencia/registrar_asistencia.html")
      
         
     @app.route("/apiprogramacion", methods=["GET"])
+    @requerido_login
     def api_programacion():
         try:
             programacion = obtener_programacion()
@@ -37,6 +40,7 @@ def registrar_rutas(app):
             return jsonify({"error": "Error al obtener la programación de charlas"}), 500
         
     @app.route("/apicalendar", methods=["GET"])
+    @requerido_login
     def api_calendar():
         try:
             programCal = obtener_calendario()
@@ -47,5 +51,6 @@ def registrar_rutas(app):
             return jsonify({"error": "Error al obtener la programación del calendario"}), 500
 
     @app.route("/actualizar_asistencia", methods=["POST"])
+    @requerido_login
     def actualizar_asistencia_route():
         return actualizar_asistencia_controlador()

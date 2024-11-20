@@ -12,17 +12,20 @@ import controladores.controlador_actosliturgicos as cacto
 def registrar_rutas(app):
     
     @app.route("/gestionar_celebracion", methods=["GET"])
+    @requerido_login
     def gestionar_celebracion():
         sedes = csede.obtener_sede()
         return render_template("celebracion/gestionar_celebracion.html",sedes = sedes)
 
     # Ruta para obtener las celebraciones en formato JSON
     @app.route("/api/obtener_celebraciones", methods=["GET"])
+    @requerido_login
     def api_obtener_celebraciones():
         return obtener_celebraciones()
 
     # Ruta para insertar una nueva celebración
     @app.route("/api/insertar_celebracion", methods=["POST"])
+    @requerido_login
     def api_insertar_celebracion():
         data = request.get_json()
         titulo = data.get('titulo')
@@ -35,6 +38,7 @@ def registrar_rutas(app):
 
     # Ruta para actualizar una celebración
     @app.route("/api/actualizar_celebracion", methods=["POST"])
+    @requerido_login
     def api_actualizar_celebracion():
         data = request.get_json()
         id_celebracion = data.get('id')
@@ -48,6 +52,7 @@ def registrar_rutas(app):
 
     # Ruta para eliminar una celebración
     @app.route("/api/eliminar_celebracion", methods=["POST"])
+    @requerido_login
     def api_eliminar_celebracion():
         id_celebracion = request.form["id"]
         return eliminar_celebracion(id_celebracion)

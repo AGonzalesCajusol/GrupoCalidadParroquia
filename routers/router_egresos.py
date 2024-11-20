@@ -10,13 +10,15 @@ from controladores.controlador_egresos import (
     obtener_rango_de_años,
     obtener_id_sede_por_nombre,
     obtener_egresos_por_año,
-    actualizar_egreso
+    actualizar_egreso,
+    obteneregresosporaño
 
 )
 
 def registrar_rutas(app):
     # Ruta para gestionar egresos
     @app.route("/gestionar_egresos", methods=["GET"])
+    @requerido_login
     def gestionar_egresos():
         egresos = obtener_egresos()
         años = obtener_rango_de_años()  # Obtenemos el rango de años disponibles en la BD
@@ -24,6 +26,7 @@ def registrar_rutas(app):
     
     # Ruta para modificar un egreso
     @app.route('/procesar_actualizar_egreso', methods=['POST'])
+    @requerido_login
     def procesar_actualizar_egreso():
         try:
             # Obtener datos del formulario
@@ -66,6 +69,7 @@ def registrar_rutas(app):
 
 
     @app.route("/insertar_egreso", methods=["POST"])
+    @requerido_login
     def procesar_insertar_egreso():
         try:
             # Obtener datos del formulario
@@ -111,7 +115,9 @@ def registrar_rutas(app):
         except Exception as e:
             traceback.print_exc()
             return jsonify(success=False, message=f"Error al insertar egreso: {str(e)}"), 400
+        
     @app.route("/apiaños", methods=["GET"])
+    @requerido_login
     def api_años():
         try:
             años = obtener_rango_de_años()  # Esta función debería devolver una lista de años, por ejemplo [(2021,), (2022,), ...]
@@ -120,6 +126,31 @@ def registrar_rutas(app):
         except Exception as e:
             print(f"Error al obtener años: {e}")
             return jsonify({"error": "Error al obtener los años"}), 500
+        
+    @app.route('/reporte_egresos', methods=['GET'])
+    @requerido_login
+    def reporte_egresos():
+        años = obtener_rango_de_años()
+        return render_template('egresos/reporte_egresos.html', años=[a[0] for a in años])
+
+
+    @app.route('/api/egresos_por_fecha', methods=['GET'])
+    @requerido_login
+    def obtener_egresos_por_fecha():
+        year = request.args.get('year')
+        if not year:
+            return jsonify([])
+
+        try:
+            egresos = obteneregresosporaño(year)  # Cambiado aquí
+            resultados = [
+                {'mes': egreso['mes'], 'monto_total': egreso['monto_total']}
+                for egreso in egresos
+            ]
+            return jsonify(resultados)
+        except Exception as e:
+            print(f"Error al obtener egresos: {e}")
+            return jsonify([])
 
 #   @app.route("/apiaños", methods=["GET"])
 #    def apiaños():

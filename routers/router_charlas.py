@@ -13,6 +13,7 @@ import controladores.controlador_actosliturgicos as acto
 def registrar_rutas(app):
     # Ruta para gestionar charlas
     @app.route("/gestionar_charlas", methods=["GET"])
+    @requerido_login
     def gestionar_charlas():
         charlas = obtener_charlas()  
         actos = acto.listar_nombres_actos()
@@ -20,12 +21,14 @@ def registrar_rutas(app):
 
     
     @app.route("/registrar_charla", methods=["GET"])
+    @requerido_login
     def formulario_registrar_charla():
         actos = acto.listar_nombres_actos()
         return render_template("charlas/registrar_charla.html", actos=actos)
 
     # Ruta para insertar una nueva charla
     @app.route("/insertar_charla", methods=["POST"])
+    @requerido_login
     def procesar_insertar_charla():
         estado = request.form["estado"]
         id_actoliturgico = request.form["id_actoliturgico"]
@@ -38,6 +41,7 @@ def registrar_rutas(app):
 
     # Ruta para mostrar el formulario de edición de una charla
     @app.route("/editar_charla/<int:id>", methods=["GET"])
+    @requerido_login
     def formulario_editar_charla(id):
         charla = obtener_charla_por_id(id)
         actos = acto.listar_nombres_actos()  # Obtener los nombres de los actos litúrgicos
@@ -45,6 +49,7 @@ def registrar_rutas(app):
 
     # Ruta para manejar la actualización de una charla
     @app.route("/actualizar_charla", methods=["POST"])
+    @requerido_login
     def procesar_actualizar_charla():
         id_charla = request.form["id_charla"]
         estado = request.form["estado"]
@@ -58,6 +63,7 @@ def registrar_rutas(app):
 
     # Ruta para eliminar una charla
     @app.route("/eliminar_charla", methods=["POST"])
+    @requerido_login
     def procesar_eliminar_charla():
         id_charla = request.form["id_charla"]
         if eliminar_charla(id_charla):

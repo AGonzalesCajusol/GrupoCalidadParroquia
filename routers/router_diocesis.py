@@ -15,6 +15,7 @@ from routers.router_main import requerido_login
 def registrar_rutas(app):
     # Ruta para gestionar diócesis
     @app.route("/gestionar_diocesis", methods=["GET"])
+    @requerido_login
     def gestionar_diocesis():
         diocesis = obtener_diocesis()
         departamento= obtener_departamento()
@@ -22,6 +23,7 @@ def registrar_rutas(app):
         return render_template("diocesis/gestionar_diocesis.html", diocesis=diocesis, departamento = departamento, provincia = provincia)
     
     @app.route("/insertar_diocesis", methods=["POST"])
+    @requerido_login
     def procesar_insertar_diocesis():
         try:
             nombre = request.form["nombre"]
@@ -56,6 +58,7 @@ def registrar_rutas(app):
 
     # Ruta para actualizar una diócesis
     @app.route("/actualizar_diocesis", methods=["POST"])
+    @requerido_login
     def procesar_actualizar_diocesis():
         try:
             id = request.form["id"]
@@ -91,6 +94,7 @@ def registrar_rutas(app):
     
     # Ruta para eliminar una diócesis
     @app.route("/eliminar_diocesis", methods=["POST"])
+    @requerido_login
     def procesar_eliminar_diocesis():
         id = request.form["id"]
         eliminar_diocesis(id)
@@ -98,6 +102,7 @@ def registrar_rutas(app):
         return redirect(url_for("gestionar_diocesis"))
     
     @app.route("/obtener_provincias_por_departamento")
+    @requerido_login
     def obtener_provincias_por_departamento():
         nombre_departamento = request.args.get("departamento")
         

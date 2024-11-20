@@ -35,11 +35,12 @@
                         <i class="fas fa-edit"></i>
                     </button>
 
-                    <button type="button" class="btn btn-secondary btn-sm" title="Dar de baja"
-                        onclick="darBajaCongre('{{ congre[0] }}','{{ congre[2] }}')" {% if congre[2]==0 %} disabled {%
-                        endif %}>
-                        <i class="fas fa-ban"></i>
+                    <button class="btn {{ 'btn-secondary' if congre[2] == 1 else 'btn-success' }} btn-sm"
+                    title="{{ 'Dar de baja' if congre[2] == 1 else 'Activar' }}"
+                    onclick="cambiarEstadoCongregacion('{{ congre[0] }}', '{{ congre[2] }}')">
+                    <i class="{{ 'fas fa-ban' if congre[2] == 1 else 'fas fa-check' }}"></i>
                     </button>
+                
 
                     <form style="display:inline-block;" onsubmit="eliminarCongre(event, '{{ congre[0] }}')"
                         title="Eliminar">
@@ -94,7 +95,6 @@
     // Definir las URLs de acción generadas por Flask
     const insertarCongreURL = "{{ url_for('procesar_insertar_congregacion') }}";
     const actualizarCongreURL = "{{ url_for('procesar_actualizar_congregacion') }}";
-    const darBajaCongreURL = "{{ url_for('procesar_darBaja_congregacion') }}";
 </script>
 
 

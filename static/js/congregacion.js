@@ -128,37 +128,64 @@ function abrirModalVerC(id, nombre, estado) {
 }
 
 
-function darBajaCongre(id, estado) {
-    if (estado === '0' || estado === false || estado === 'false') {
-        return;
-    }
+function cambiarEstadoCongregacion(id, estadoActual) {
+    // Determinar el nuevo estado y la acción correspondiente
+    const nuevoEstado = estadoActual === '1' ? 0 : 1;
+    const accion = nuevoEstado === 1 ? 'Activar' : 'Dar de baja';
 
-    if (confirm("¿Estás seguro de que deseas dar de baja esta congregación?")) {
-        const table = $('#sedeTable').DataTable();
-        const currentPage = table.page();
-
-        fetch(darBajaCongreURL, {
+    // Confirmar la acción con el usuario
+    if (confirm(`¿Estás seguro de que deseas ${accion} esta congregación?`)) {
+        // Realizar la solicitud al backend
+        fetch("/cambiar_estado_congregacion", { // Nueva ruta
             method: "POST",
             headers: {
                 "Content-Type": "application/x-www-form-urlencoded",
             },
-            body: `id=${encodeURIComponent(id)}`
+            body: `id=${encodeURIComponent(id)}&estado=${nuevoEstado}`
         })
         .then(response => response.json())
         .then(data => {
-            console.log("Data recibida del servidor:", data); // Verificar datos recibidos
             if (data.success) {
-                actualizarTablaCongregacion(data.congregacion);  // Llamada para actualizar la tabla
-                table.page(currentPage).draw(false); // Mantener la misma página de paginación
+                // Actualizar la tabla con los datos devueltos
+                actualizarTablaCongregacion(data.congregacion);
+
+                // Mostrar mensaje de éxito con Toastify
+                Toastify({
+                    text: `Congregación ${accion.toLowerCase()} correctamente.`,
+                    duration: 2000,
+                    close: true,
+                    backgroundColor: "#28a745", // Verde para éxito
+                    gravity: "bottom",
+                    position: "right",
+                }).showToast();
             } else {
-                console.error("Error:", data.message); // Mensaje de error en consola
+                // Mostrar mensaje de error devuelto por el backend
+                Toastify({
+                    text: data.message || "Error al intentar actualizar el estado.",
+                    duration: 2000,
+                    close: true,
+                    backgroundColor: "#dc3545", // Rojo para errores
+                    gravity: "bottom",
+                    position: "right",
+                }).showToast();
             }
         })
         .catch(error => {
-            console.error("Error en la solicitud:", error);
+            console.error("Error:", error);
+
+            // Mostrar mensaje de error general
+            Toastify({
+                text: "Ocurrió un error al intentar cambiar el estado.",
+                duration: 2000,
+                close: true,
+                backgroundColor: "#dc3545", // Rojo para errores
+                gravity: "bottom",
+                position: "right",
+            }).showToast();
         });
     }
 }
+
 
 function actualizarTablaCongregacion(congregacion) {
     const tbody = document.querySelector('#sedeTable tbody');

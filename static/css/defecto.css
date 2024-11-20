@@ -11,6 +11,13 @@ body {
     /* Color de fondo */
 }
 
+html {
+    font-size: 13px !important ; /* Ajusta este valor según lo que necesites */
+}
+body{
+    font-size: 13px !important; /* Ajusta este valor según lo que necesites */
+}
+
 ::-webkit-scrollbar-thumb {
     background-color: #3498db;
     /* Color del thumb */
