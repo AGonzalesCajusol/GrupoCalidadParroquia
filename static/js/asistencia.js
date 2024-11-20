@@ -56,7 +56,9 @@ $(document).ready(function () {
         // Alternar entre mostrar y ocultar el calendario
         if (isHidden) {
             calendarContainer.show();
-            $(this).text('Minimizar Calendario');  // Cambiar texto del botón
+            $(this).text('Minimizar Calendario');
+            calendar.render();
+            calendar.updateSize();
         } else {
             calendarContainer.hide();
             $(this).text('Mostrar Calendario');  // Cambiar texto del botón
@@ -129,12 +131,23 @@ $(document).ready(function () {
             // Filtrar registros de la tabla por fecha y id_programacion
             const selectedDate = info.event.startStr.split('T')[0]; // Fecha seleccionada
             const idProgramacion = info.event.extendedProps.id_programacion; // ID de programación seleccionada
+            const horaTema = info.event.extendedProps.hora_tema;
 
             // Aplicar filtro a la tabla
             table
                 .column(0).search('^' + selectedDate + '$', true, false) // Filtro en la columna de fecha
                 .column(1).search('^' + idProgramacion + '$', true, false) // Filtro en la columna de id_programacion
                 .draw();
+
+            // Seleccionar el hora-tema en el combobox
+            let comboBox = $('#filtroProgramacion');
+            let selectedOption = comboBox.find('option').filter(function () {
+                return $(this).text() === horaTema; // Verificar si el texto del option coincide con el hora_tema
+            });
+
+            if (selectedOption.length > 0) {
+                comboBox.val(selectedOption.val()).trigger('change'); // Selecciona el valor correspondiente
+            }
         }
     });
 

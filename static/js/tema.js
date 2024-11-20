@@ -37,6 +37,9 @@ document.addEventListener("DOMContentLoaded", function() {
         pageLength: 8,
         autoWidth: false,
         dom: '<"d-flex justify-content-between align-items-center mb-3"<"d-flex"f><"d-flex justify-content-end button-section">>rt<"bottom"p>',
+        columnDefs: [
+            { targets: [0,3,4,5], className: 'text-center' }
+        ],
         language: {
             search: "Buscar:"
         },

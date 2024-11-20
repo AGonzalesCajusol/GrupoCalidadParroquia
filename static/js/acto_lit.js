@@ -51,7 +51,9 @@ function listar() {
                     searchPlaceholder: "Filtrar registros..."
                 },
                 columnDefs: [
-                    { orderable: false, targets: [5] }
+                    { orderable: false, targets: [5] },
+                    { targets: [0, 3, 5], className: 'text-center' },  // Alineación centrada
+                    { targets: [4], className: 'text-end' }
                 ],
                 initComplete: function () {
                     // Insertar el botón "Agregar" dinámicamente

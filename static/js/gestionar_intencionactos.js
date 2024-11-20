@@ -13,18 +13,36 @@ $(document).ready(function () {
                     <i class="bi bi-plus-circle"></i> Agregar intención
                 </button>
             `);
+
+            // Cargar dinámicamente las opciones del filtro de actos litúrgicos
+            let opcionesTipo = '<option value="">Todos</option>';
+            fetch("/api/tipos_actos_liturgicos")
+                .then(response => response.json())
+                .then(response => {
+                    if (response.data) {
+                        response.data.forEach(element => {
+                            opcionesTipo += `<option value="${element.id_actoliturgico}">${element.nombre_liturgia}</option>`;
+                        });
+                        $('#filtroTipo').html(opcionesTipo);
+                    }
+                })
+                .catch(error => {
+                    console.error("Error al cargar los tipos:", error);
+                });
         }
     });
 });
 
-
-function abrirModalIntencion(tipo, id, nombre, descripcion, idActo) {
+function abrirModalIntencion(tipo, id = null, nombre = '', descripcion = '', idActo = '') {
     const modal = new bootstrap.Modal(document.getElementById("intencionModal"));
     const form = document.getElementById("intencionForm");
     const modalTitle = document.getElementById("intencionModalLabel");
     const submitButton = document.getElementById("submitBtn");
 
+    // Resetear el formulario
     form.reset();
+
+    // Configurar el modal según el tipo de acción
     if (tipo === "ver") {
         modalTitle.innerText = "Ver Intención";
         form.action = "#";
@@ -32,10 +50,6 @@ function abrirModalIntencion(tipo, id, nombre, descripcion, idActo) {
             input.readOnly = true;
             input.disabled = true;
         });
-        const select = document.getElementById('id_actoliturgico');
-            if (!select.querySelector(`option[value="${idActo}"]`)) {
-                select.innerHTML += `<option value="${idActo}">${idActo}</option>`;
-              }
         submitButton.style.display = "none";
     } else if (tipo === "editar") {
         modalTitle.innerText = "Editar Intención";
@@ -44,10 +58,6 @@ function abrirModalIntencion(tipo, id, nombre, descripcion, idActo) {
             input.readOnly = false;
             input.disabled = false;
         });
-        const select = document.getElementById('id_actoliturgico');
-            if (!select.querySelector(`option[value="${idActo}"]`)) {
-                select.innerHTML += `<option value="${idActo}">${idActo}</option>`;
-              }
         submitButton.style.display = "block";
     } else {
         modalTitle.innerText = "Agregar Intención";
@@ -55,15 +65,25 @@ function abrirModalIntencion(tipo, id, nombre, descripcion, idActo) {
         submitButton.style.display = "block";
     }
 
+    // Rellenar los campos del formulario
     if (id) document.getElementById("intencionId").value = id;
     if (nombre) document.getElementById("nombre_intencion").value = nombre;
     if (descripcion) document.getElementById("descripcion").value = descripcion;
-    if (idActo) document.getElementById("id_actoliturgico").value = idActo;
-    const select = document.getElementById('id_actoliturgico');
-            if (!select.querySelector(`option[value="${idActo}"]`)) {
-                select.innerHTML += `<option value="${idActo}">${idActo}</option>`;
-              }
 
+    // Manejar el dropdown de actos litúrgicos
+    const select = document.getElementById("id_actoliturgico");
+    if (idActo) {
+        const optionExists = Array.from(select.options).some(option => option.value == idActo);
+        if (!optionExists) {
+            const newOption = document.createElement("option");
+            newOption.value = idActo;
+            newOption.text = `Acto Litúrgico ${idActo}`; // Cambia el texto según lo que necesites
+            select.appendChild(newOption);
+        }
+        select.value = idActo;
+    }
+
+    // Mostrar el modal
     modal.show();
 }
 
@@ -72,8 +92,11 @@ function eliminarIntencion(event, id) {
     if (confirm("¿Estás seguro de eliminar esta intención?")) {
         fetch(`/eliminar_intencion/${id}`, { method: "POST" })
             .then(response => {
-                if (response.ok) location.reload();
-                else alert("Error al eliminar la intención.");
+                if (response.ok) {
+                    location.reload();
+                } else {
+                    alert("Error al eliminar la intención.");
+                }
             })
             .catch(error => console.error("Error:", error));
     }

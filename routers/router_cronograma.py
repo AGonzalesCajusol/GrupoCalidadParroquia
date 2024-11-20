@@ -5,25 +5,28 @@ def registrar_rutas(app):
     # Ruta para obtener los datos del cronograma en formato JSON (API)
     @app.route('/api/obtener_actividades')
     def obtener_actividades():
-        # Obtener el nombre de la sede desde las cookies
+        year = request.args.get('year', type=int)  # Obtener el año de los parámetros
+        if not year:
+            return jsonify({"error": "Año no especificado"}), 400
+
         nombre_sede = request.cookies.get('sede')
         if not nombre_sede:
             return jsonify({"error": "Sede no especificada"}), 400
 
-        # Obtener el ID de la sede y luego las actividades
         id_sede = obtener_id_sede_por_nombre(nombre_sede)
         actividades = obtener_cronograma_actividades(id_sede)
-        
-        # Formatear las actividades para FullCalendar
-        eventos = []
-        for actividad in actividades:
-            eventos.append({
-                "title": actividad[4],  # Nombre de la actividad
-                "start": f"{actividad[0]}T{actividad[1]}",  # Fecha de inicio + hora de inicio
-                "end": f"{actividad[2]}T{actividad[3]}",    # Fecha de fin + hora de fin
-            })
+
+        eventos = [
+            {
+                "title": actividad[4],
+                "start": f"{actividad[0]}T{actividad[1]}",
+                "end": f"{actividad[2]}T{actividad[3]}"
+            }
+            for actividad in actividades if actividad[0].year == year  # Filtrar por año
+        ]
 
         return jsonify(eventos)
+
     
     # Ruta para renderizar la página HTML del cronograma
     @app.route('/cronograma_actividades')

@@ -55,6 +55,10 @@ $(document).ready(function () {
                 }
             }
         ],
+        columnDefs: [
+            { targets: [0, 1, 2, 3, 4], className: 'text-center' },  // Alineación centrada
+            { targets: [5, 6], className: 'text-start' }
+        ],
         language: {
             search: "Buscar:",
             lengthMenu: "Mostrar _MENU_ entradas",

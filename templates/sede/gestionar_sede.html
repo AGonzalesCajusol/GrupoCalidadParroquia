@@ -26,9 +26,9 @@
         <tbody>
             {% for sed in sede %}
             <tr>
-                <td class="text-center border">{{ sed[0] }}</td> <!-- ID del sede -->
-                <td>{{ sed[1] }}</td> <!-- Nombre de la sede -->
-                <td>{{ sed[2] }}</td> <!-- dirección -->
+                <td class="text-center">{{ sed[0] }}</td> <!-- ID del sede -->
+                <td class="text-start">{{ sed[1] }}</td> <!-- Nombre de la sede -->
+                <td class="text-start">{{ sed[2] }}</td> <!-- dirección -->
                 <!-- <td>{{ sed[3] }}</td> creación -->
                 <td>{{ sed[4] }}</td> <!-- telefono -->
                 <td>{{ sed[5] }}</td> <!-- correo -->
@@ -40,7 +40,7 @@
                 <!-- <td>{{ sed[9] }}</td> id diosesis-->
                 <!-- <td>{{ sed[10] }}</td> monto_traslado -->
 
-                <td class="text-center border">
+                <td class="text-center">
                     <button class="btn btn-primary btn-sm" title="Ver"
                         onclick="abrirModalVer('{{ sed[0] }}', '{{ sed[1] }}', '{{ sed[2] }}', '{{ sed[3] }}', '{{ sed[4] }}', '{{ sed[5] }}', '{{ sed[6] }}', '{{ sed[7] }}', '{{ sed[8] }}','{{ sed[9] }}','{{ sed[10] }}')">
                         <i class="fas fa-eye"></i>

@@ -5,8 +5,9 @@ import urllib.parse
 import envio_correo 
 from routers.router_main import requerido_login
 from controladores.controlador_actosliturgicos import (
-obtener_celebraciones_por_fecha,
-obtener_anos
+    obtener_celebraciones_por_fecha,
+    obtener_anos,
+    listar_actos
 )
 
 
@@ -340,22 +341,49 @@ def registrar_rutas(app):
 
     @app.route("/numero_actos_liturgicos", methods=["GET"])
     def numero_actos_liturgicos():
-        años = obtener_anos()
-        return render_template("reportes/numeroActosLiturgicosAño.html", años=años)
-
-    @app.route("/api/celebraciones_por_fecha", methods=["GET"])
-    def api_celebraciones_por_fecha():
-        year = request.args.get('year')
-        month = request.args.get('month')
-        celebraciones = obtener_celebraciones_por_fecha(year, month)
-        return jsonify(celebraciones)
-
+        try:
+            años = obtener_anos()  # Función que obtiene los años
+            actos = listar_actos()  # Función que obtiene los actos litúrgicos
+            return render_template(
+                "reportes/numeroActosLiturgicosAño.html",
+                años=[int(an[0]) for an in años],  # Convertir los años a una lista de enteros
+                actos=actos  # Lista de actos litúrgicos
+            )
+        except Exception as e:
+            print(f"Error al cargar datos para la vista: {e}")
+            return render_template(
+                "reportes/numeroActosLiturgicosAño.html",
+                años=[],
+                actos=[]
+            )
     @app.route("/api/obtener_anos", methods=["GET"])
     def api_obtener_anos():
         try:
-            años = obtener_anos()
+            años = obtener_anos()  # Llama al controlador
             lista_años = [{'año': int(an[0])} for an in años]
             return jsonify({'data': lista_años})
         except Exception as e:
             print(f"Error al obtener años: {e}")
             return jsonify({"error": "Error al obtener los años"}), 500
+
+    @app.route("/api/listar_actos", methods=["GET"])
+    def api_listar_actos():
+        try:
+            actos = listar_actos()  # Llama al controlador
+            return jsonify(actos)
+        except Exception as e:
+            print(f"Error al listar actos litúrgicos: {e}")
+            return jsonify({"error": "Error al listar los actos litúrgicos"}), 500
+
+    # Ruta para obtener las celebraciones filtradas por año, mes y tipo de acto
+    @app.route("/api/celebraciones_por_fecha", methods=["GET"])
+    def api_celebraciones_por_fecha():
+        year = request.args.get('year')
+        month = request.args.get('month')
+        acto = request.args.get('acto')  # Nuevo filtro por tipo de acto litúrgico
+        try:
+            celebraciones = obtener_celebraciones_por_fecha(year, month, acto)
+            return jsonify(celebraciones)
+        except Exception as e:
+            print(f"Error al obtener celebraciones por fecha: {e}")
+            return jsonify({"error": "Error al obtener los datos"}), 500

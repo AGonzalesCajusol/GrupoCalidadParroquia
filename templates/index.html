@@ -232,6 +232,20 @@
 </body>
 <script src="{{ url_for('static', filename = '/js/defecto.js')}}"></script>
 <script>
-
+    $.extend(true, $.fn.dataTable.defaults, {
+        language: {
+            search: "Buscar:",
+            lengthMenu: "Mostrar _MENU_ registros por página",
+            info: "Mostrando página _PAGE_ de _PAGES_",
+            infoEmpty: "No hay registros disponibles",
+            infoFiltered: "(filtrado de _MAX_ registros)",
+            paginate: {
+                first: "Primera",
+                previous: "Anterior",
+                next: "Siguiente",
+                last: "Última"
+            }
+        }
+    });
 </script>
 </html>

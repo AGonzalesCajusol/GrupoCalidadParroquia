@@ -29,8 +29,8 @@
                 {% for egreso in egresos %}
                 <tr>
                     <td class="text-center">{{ egreso[0] }}</td> <!-- ID de la recaudación -->
-                    <td>{{ egreso[1] }}</td> <!-- Nombre de la sede -->
-                    <td>{{ egreso[2] }}</td> <!-- Descripcion -->  
+                    <td class="text-start">{{ egreso[1] }}</td> <!-- Nombre de la sede -->
+                    <td class="text-start">{{ egreso[2] }}</td> <!-- Descripcion -->  
                     <td>{{ egreso[3].strftime('%d-%m-%Y') }}</td> <!-- Formateo de la fecha -->
                     <td>{{ egreso[4] }}</td> <!-- Hora -->
                     <td style="vertical-align: middle; text-align: center; padding-left: 45px;">{{ egreso[5] }}</td> <!-- Monto -->

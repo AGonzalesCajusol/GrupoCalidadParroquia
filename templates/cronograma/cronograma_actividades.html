@@ -5,42 +5,162 @@
 {% block cuerpo %}
 <div class="container mt-4">
     <h1 class="text-center">Cronograma de Actividades</h1>
+
+    <!-- Filtro de selección de año -->
+    <div class="mb-4 text-center">
+        <label for="yearSelect">Seleccionar Año:</label>
+        <select id="yearSelect" class="form-control d-inline-block" style="width: 150px;">
+            <option value="2023">2023</option>
+            <option value="2024" selected>2024</option>
+            <option value="2025">2025</option>
+        </select>
+    </div>
+
+    <!-- Contenedor del calendario -->
     <div id="calendar" style="max-width: 100%; margin: 0 auto;"></div>
+</div>
+
+<!-- Modal para ver detalles de la actividad -->
+<div class="modal fade" id="celebracionModal" tabindex="-1" aria-labelledby="celebracionModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="modalTitulo">Datos de la Actividad</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <form>
+                    <input type="hidden" id="celebracionId">
+                    <div class="mb-3">
+                        <label for="titulo" class="form-label">Título</label>
+                        <input type="text" class="form-control" id="titulo" readonly>
+                    </div>
+                    <div class="mb-3">
+                        <label for="fecha_inicio" class="form-label">Fecha de Inicio</label>
+                        <input type="date" class="form-control" id="fecha_inicio" readonly>
+                    </div>
+                    <div class="mb-3">
+                        <label for="hora_inicio" class="form-label">Hora de Inicio</label>
+                        <input type="time" class="form-control" id="hora_inicio" readonly>
+                    </div>
+                    <div class="mb-3">
+                        <label for="fecha_fin" class="form-label">Fecha de Fin</label>
+                        <input type="date" class="form-control" id="fecha_fin" readonly>
+                    </div>
+                    <div class="mb-3">
+                        <label for="hora_fin" class="form-label">Hora de Fin</label>
+                        <input type="time" class="form-control" id="hora_fin" readonly>
+                    </div>
+                    <div class="mb-3">
+                        <label for="sede" class="form-label">Sede</label>
+                        <select class="form-select" id="sede" disabled>
+                            <option value="Sede Central">Sede Central</option>
+                            <option value="Sede 1">Sede 1</option>
+                            <option value="Sede 2">Sede 2</option>
+                        </select>
+                    </div>
+                </form>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cerrar</button>
+            </div>
+        </div>
+    </div>
 </div>
 
 <!-- FullCalendar CSS y JS -->
 <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/fullcalendar@5.11.0/main.min.css">
 <script src="https://cdn.jsdelivr.net/npm/fullcalendar@5.11.0/main.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/fullcalendar@5.11.0/locales/es.js"></script>
 
-<script>
-document.addEventListener('DOMContentLoaded', function() {
-    var calendarEl = document.getElementById('calendar');
-    var calendar = new FullCalendar.Calendar(calendarEl, {
-        initialView: 'dayGridMonth',
-        locale: 'es',
-        headerToolbar: {
-            left: 'prev,next today',
-            center: 'title',
-            right: 'dayGridMonth,timeGridWeek,timeGridDay'
-        },
-        events: '/api/obtener_actividades',
-        height: 'auto',
-    });
-
-    calendar.render();
-});
-</script>
+<!-- Script específico para el cronograma -->
+<script src="{{ url_for('static', filename='js/gestionar_cronograma.js') }}"></script>
 
 <style>
-#calendar {
-    background-color: white;
-    border-radius: 8px;
-    padding: 10px;
-    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
-    margin-bottom: 20px;
-}
-.fc-header-toolbar {
-    margin-bottom: 20px;
-}
+    /* Cambiar color de fondo para los botones 'Mes', 'Semana', 'Día' */
+    .fc-button {
+        background-color: #33b5e5 !important; /* Azul claro */
+        border-color: #33b5e5 !important;
+        color: white !important; /* Texto blanco */
+    }
+
+    /* Fondo azul más oscuro cuando un botón está activo */
+    .fc-button-active, .fc-button.fc-button-active {
+        background-color: #0099cc !important; /* Azul más oscuro */
+        border-color: #0099cc !important;
+        color: white !important; /* Texto blanco */
+    }
+
+    /* Estilo específico para el botón 'Mes' */
+    .fc-button-month {
+        background-color: #33b5e5 !important; /* Azul claro */
+        border-color: #33b5e5 !important;
+        color: white !important; /* Texto blanco */
+    }
+
+    /* Estilo específico para el botón 'Semana' */
+    .fc-button-agendaWeek {
+        background-color: #33b5e5 !important; /* Azul claro */
+        border-color: #33b5e5 !important;
+        color: white !important; /* Texto blanco */
+    }
+
+    /* Estilo específico para el botón 'Día' */
+    .fc-button-agendaDay {
+        background-color: #33b5e5 !important; /* Azul claro */
+        border-color: #33b5e5 !important;
+        color: white !important; /* Texto blanco */
+    }
+
+    /* Cambiar el color del fondo de la barra de herramientas */
+    .fc-toolbar {
+        background-color: #33b5e5 !important; /* Azul claro */
+        color: white !important; /* Texto blanco */
+        border-radius: 8px;
+        padding: 5px;
+    }
+
+    /* Estilo para el encabezado de los días (lun, mar, ...) */
+    .fc-col-header-cell {
+        background-color: #33b5e5 !important; /* Azul claro */
+        color: white !important; /* Texto blanco */
+        font-weight: bold;
+    }
+
+    /* Forzar texto blanco en los encabezados de los días */
+    .fc-col-header-cell span {
+        color: white !important;  /* Cambiar el color del texto dentro de los días de la semana */
+    }
+
+    /* Fondo del botón 'Hoy' */
+    .fc-button-today {
+        background-color: #33b5e5 !important; /* Azul claro */
+        border-color: #33b5e5 !important;
+        color: white !important; /* Texto blanco */
+    }
+
+    /* Fondo del botón 'Hoy' cuando es activado */
+    .fc-button-today:hover {
+        background-color: #0099cc !important; /* Azul más oscuro */
+        border-color: #0099cc !important;
+    }
+
+    /* Día actual */
+    .fc-day-today {
+        background-color: rgba(51, 181, 229, 0.3) !important; /* Azul claro de fondo */
+        color: black !important; /* Texto negro */
+    }
+
+    /* Días fuera del mes actual */
+    .fc-day-other {
+        color: gray !important; /* Texto gris */
+    }
+
+    /* Cambiar el color de las letras en el encabezado de los días (lun, mar, ...) */
+    .fc-col-header-cell span {
+        color: white !important;  /* Cambiar el color del texto dentro de los días de la semana */
+    }
 </style>
+
+
 {% endblock %}
