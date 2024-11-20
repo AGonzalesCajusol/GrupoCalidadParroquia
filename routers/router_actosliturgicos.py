@@ -13,11 +13,13 @@ from controladores.controlador_actosliturgicos import (
 
 def registrar_rutas(app):
     @app.route("/gestionar_actosliturgicos", methods=["GET"])
+    @requerido_login
     def gestionar_actosliturgicos():
        
         return render_template("/actos_liturgicos/gestionar_actoliturgico.html")
     
     @app.route("/modificarActoPrerequisito", methods=["POST"])
+    @requerido_login
     def modificarActoPrerequisito():
         id = request.json['id']
         actoliturgico = request.json['acto']
@@ -50,6 +52,7 @@ def registrar_rutas(app):
             return jsonify({'estado': False})
         
     @app.route("/registrarActoLiturgico_Requisitos", methods=["POST"])
+    @requerido_login
     def registrarActoLiturgico_Requisitos():
         actoliturgico = request.json['acto']
         requisitos = request.json['requisitos']
@@ -58,6 +61,7 @@ def registrar_rutas(app):
         return jsonify({'estado': estado})
         
     @app.route("/lista_actos_requisitos", methods=["GET"])
+    @requerido_login
     def lista_actos_requisitos():
         lista = cal.listar_actos_requisitos()
         resultado = []
@@ -73,6 +77,7 @@ def registrar_rutas(app):
         return jsonify(resultado)
     
     @app.route("/actoporid/<int:id>", methods=["GET"])
+    @requerido_login
     def actoporid(id):
         lista = cal.listar_actos_requisitosXid(id)
         requisitos = []
@@ -93,11 +98,13 @@ def registrar_rutas(app):
 
 
     @app.route("/duplicidad/<string:nombre>", methods=["GET"])
+    @requerido_login
     def duplicidad(nombre):
         lista = cal.duplicidad(nombre)
         return jsonify({'existe': lista})
     
     @app.route("/requisitosXactoliturgico", methods=["GET"])  # Sin barra final
+    @requerido_login
     def requisitosXactoliturgico():
         lista = cal.listar_nombres_actos()
         requisitos = cal.listar_actos_requisitos()
@@ -105,6 +112,7 @@ def registrar_rutas(app):
         return render_template('/actos_liturgicos/requisitos_actoliturgico.html', lista=lista, requisitos= requisitos)
 
     @app.route("/filtrorequisitosxacto/<string:acto>", methods=["GET"]) 
+    @requerido_login
     def filtrorequisitosxacto(acto):
         lista_actos = []
         if(acto == "todos"):
@@ -133,6 +141,7 @@ def registrar_rutas(app):
         return jsonify({'data': lista_actos})
     
     @app.route('/enviar', methods=['POST'])
+    @requerido_login
     def enviar():
         data = request.get_json()  # Extrae los datos de la solicitud
         texto = data.get('text')
@@ -145,20 +154,24 @@ def registrar_rutas(app):
         
 
     @app.route("/eliminaracto_requisitos/<int:id>", methods=["GET"])
+    @requerido_login
     def eliminaracto_requisitos(id):
         resultado = cal.eliminaracto_requisitos(id)
         return jsonify({'estado': resultado})
     
     @app.route("/gestionar_requisitosactos", methods=["GET"])
+    @requerido_login
     def gestionar_requisitosactos():
         actos = cal.listar_actosLit()
         return render_template('/actos_liturgicos/gestionar_requisitosactoliturgico.html', actos=actos)
     
     @app.route("/gestionar_actos", methods=["GET"])
+    @requerido_login
     def gestionar_actos():
         return render_template('/actos_liturgicos/gestionar_liturgicoacto.html')
     
     @app.route("/registraractoliturgico1", methods=["POST"])
+    @requerido_login
     def registraractoliturgico1():
         try:
             acto = request.form.get('nombreLiturgico')
@@ -185,6 +198,7 @@ def registrar_rutas(app):
             return jsonify({'estado': 'Error', 'mensaje': str(e)}), 500
 
     @app.route("/Apilistaactos", methods=["GET"])
+    @requerido_login
     def Apilistaactos():
         actos = cal.listar_actosLit()
         lista_actos = []
@@ -208,6 +222,7 @@ def registrar_rutas(app):
         return jsonify(lista_actos)
 
     @app.route('/eliminar_acto/<int:id>', methods=["GET"])
+    @requerido_login
     def eliminar_acto(id):
         if cal.eliminar_acto(id):
             return jsonify({'estado': 'Correcto'})
@@ -215,6 +230,7 @@ def registrar_rutas(app):
             return jsonify({'estado': 'Incorrecto'})
         
     @app.route('/darbaja_acto/<int:id>', methods=["GET"])
+    @requerido_login
     def darbaja_acto(id):
         try:
             if cal.darbaja_acto(id):
@@ -226,6 +242,7 @@ def registrar_rutas(app):
         
 
     @app.route("/modificaracto1", methods=["POST"])
+    @requerido_login
     def modificaracto1():
         try:
             id = request.form.get('id_f')
@@ -247,6 +264,7 @@ def registrar_rutas(app):
             return jsonify({'estado': 'Error', 'mensaje': str(e)}), 500
 
     @app.route("/Apilistarrequisitos", methods=["GET"])
+    @requerido_login
     def Apilistarrequisitos():
         actos = cal.listar_requisitosLit()
         lista_actos = []
@@ -275,6 +293,7 @@ def registrar_rutas(app):
         return jsonify(lista_actos)
 
     @app.route("/registrarrequisito", methods=["POST"])
+    @requerido_login
     def registrarrequisito():
         try:
             acto = request.form.get('nombreLiturgico')
@@ -299,6 +318,7 @@ def registrar_rutas(app):
             return jsonify({'estado': 'Error', 'mensaje': str(e)}), 500
 
     @app.route('/darbaja_requisito/<int:id>/<int:id_requi>', methods=["GET"])
+    @requerido_login
     def darbaja_requisito(id,id_requi):
         try:
             if cal.darbaja_requisito(id, id_requi):
@@ -309,6 +329,7 @@ def registrar_rutas(app):
             return jsonify({'estado': 'Error', 'mensaje': str(e)}), 500  # Error del servidor
         
     @app.route('/eliminar_requisito/<int:id_actoliturgico>/<int:id_requisito>', methods=["GET"])
+    @requerido_login
     def eliminar_requisito(id_actoliturgico, id_requisito):
         try:
             if cal.eliminar_requisito(id_actoliturgico, id_requisito):
@@ -319,6 +340,7 @@ def registrar_rutas(app):
             return jsonify({'estado': 'Error', 'mensaje': str(e)}), 500  # Error del servidor
 
     @app.route("/modificar_requisito", methods=["POST"])
+    @requerido_login
     def modificar_requisito():
         try:
             id_requisito = request.form.get('id_r')
@@ -340,6 +362,7 @@ def registrar_rutas(app):
             return jsonify({'estado': 'Error', 'mensaje': str(e)}), 500
 
     @app.route("/numero_actos_liturgicos", methods=["GET"])
+    @requerido_login
     def numero_actos_liturgicos():
         try:
             años = obtener_anos()  # Función que obtiene los años
@@ -357,6 +380,7 @@ def registrar_rutas(app):
                 actos=[]
             )
     @app.route("/api/obtener_anos", methods=["GET"])
+    @requerido_login
     def api_obtener_anos():
         try:
             años = obtener_anos()  # Llama al controlador
@@ -367,6 +391,7 @@ def registrar_rutas(app):
             return jsonify({"error": "Error al obtener los años"}), 500
 
     @app.route("/api/listar_actos", methods=["GET"])
+    @requerido_login
     def api_listar_actos():
         try:
             actos = listar_actos()  # Llama al controlador
@@ -377,6 +402,7 @@ def registrar_rutas(app):
 
     # Ruta para obtener las celebraciones filtradas por año, mes y tipo de acto
     @app.route("/api/celebraciones_por_fecha", methods=["GET"])
+    @requerido_login
     def api_celebraciones_por_fecha():
         year = request.args.get('year')
         month = request.args.get('month')

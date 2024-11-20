@@ -12,6 +12,7 @@ from routers.router_main import requerido_login
 def registrar_rutas(app):
     # Ruta para la página principal de gestión de cargos
     @app.route("/gestionar_cargo", methods=["GET"])
+    @requerido_login
     def gestionar_cargo():
         try:
             # Obtener la lista de cargos para la tabla
@@ -21,6 +22,7 @@ def registrar_rutas(app):
             return jsonify(success=False, message="Error al cargar la página: " + str(e))
 
     @app.route("/insertar_cargo", methods=["POST"])
+    @requerido_login
     def procesar_insertar_cargo():
         try:
             nombre = request.form["nombre"]
@@ -33,6 +35,7 @@ def registrar_rutas(app):
 
 
     @app.route("/procesar_actualizar_cargo", methods=["POST"])
+    @requerido_login
     def procesar_actualizar_cargo():
         try:
             data = request.json
@@ -46,6 +49,7 @@ def registrar_rutas(app):
 
     # Ruta para eliminar un cargo
     @app.route("/eliminar_cargo", methods=["POST"])
+    @requerido_login
     def procesar_eliminar_cargo():
         try:
             id = request.json["id"]

@@ -1753,3 +1753,31 @@ function array_comunion() {
 
 
     }
+    document.addEventListener('DOMContentLoaded', function () {
+        document.addEventListener('click', function () {
+            const inputFecha = document.querySelector('#f_matrimonio');
+    
+            if (inputFecha) {
+                const today = new Date();
+                today.setMonth(today.getMonth() + 4);
+                const minDate = today.toISOString().split('T')[0];
+                inputFecha.setAttribute('min', `${minDate}T14:00`);
+                
+                inputFecha.addEventListener('keydown', function (e) {
+                    e.preventDefault();
+                });
+    
+                inputFecha.addEventListener('input', function () {
+                    const [fecha, hora] = this.value.split('T');
+                    const [horas, minutos] = hora ? hora.split(':').map(Number) : [0, 0];
+    
+                    if (new Date(fecha) < today || horas < 14 || horas >= 20) {
+                        this.setCustomValidity('Seleccione una fecha válida (al menos 7 meses desde hoy) y una hora entre las 14:00 y las 20:00.');
+                        this.value = '';
+                    } else {
+                        this.setCustomValidity('');
+                    }
+                });
+            }
+        });
+    });

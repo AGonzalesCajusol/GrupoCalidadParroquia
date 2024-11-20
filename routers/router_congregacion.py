@@ -13,17 +13,20 @@ from routers.router_main import requerido_login
 def registrar_rutas(app):
     # Ruta para gestionar congregación
     @app.route("/gestionar_congregacion", methods=["GET"])
+    @requerido_login
     def gestionar_congregacion():
         congregacion = obtener_congregacion()  # Asegúrate de que esta función esté devolviendo los datos correctamente
         return render_template("congregacion/gestionar_congregacion.html", congregacion=congregacion)
 
     # Ruta para mostrar el formulario de registro de una nueva congregación
     @app.route("/registrar_congregacion", methods=["GET"])
+    @requerido_login
     def formulario_registrar_congregacion():
         return render_template("congregacion/registrar_congregacion.html")
 
     # Ruta para insertar una nueva congregación
     @app.route("/insertar_congregacion", methods=["POST"])
+    @requerido_login
     def procesar_insertar_congregacion():
         try:
             nombre = request.form["nombre_congregacion"]
@@ -43,12 +46,14 @@ def registrar_rutas(app):
 
     # Ruta para mostrar el formulario de edición de una congregación
     @app.route("/editar_congregacion/<int:id>", methods=["GET"])
+    @requerido_login
     def formulario_editar_congregacion(id):
         congregacion = obtener_congregacion_por_id(id)
         return render_template("congregacion/editar_congregacion.html", congregacion=congregacion)
 
     # Ruta para manejar la actualización de una congregación
     @app.route("/actualizar_congregacion", methods=["POST"])
+    @requerido_login
     def procesar_actualizar_congregacion():
         try:
             id = request.form["id"]  # Captura el ID desde el formulario
@@ -74,12 +79,14 @@ def registrar_rutas(app):
 
     # **Ruta para eliminar una congregación**
     @app.route("/eliminar_congregacion", methods=["POST"])
+    @requerido_login
     def procesar_eliminar_congregacion():
         id = request.form["id"]  # Captura el ID desde el formulario
         resultado = eliminar_congregacion(id)  # Llama a la función que elimina en la base de datos
         return jsonify(resultado)
 
     @app.route("/cambiar_estado_congregacion", methods=["POST"])
+    @requerido_login
     def cambiar_estado_congregacion():
         id = request.form.get('id')
         nuevo_estado = int(request.form.get('estado'))  # Convertir el estado a entero (1 o 0)

@@ -1,9 +1,11 @@
 from flask import jsonify, request, render_template
 from controladores.controlador_cronograma import obtener_cronograma_actividades, obtener_id_sede_por_nombre
+from routers.router_main import requerido_login
 
 def registrar_rutas(app):
     # Ruta para obtener los datos del cronograma en formato JSON (API)
     @app.route('/api/obtener_actividades')
+    @requerido_login
     def obtener_actividades():
         year = request.args.get('year', type=int)  # Obtener el año de los parámetros
         if not year:
@@ -30,5 +32,6 @@ def registrar_rutas(app):
     
     # Ruta para renderizar la página HTML del cronograma
     @app.route('/cronograma_actividades')
+    @requerido_login
     def cronograma_actividades():
         return render_template('cronograma/cronograma_actividades.html')
