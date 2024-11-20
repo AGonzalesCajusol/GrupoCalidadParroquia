@@ -83,35 +83,35 @@
         border-color: #33b5e5 !important;
         color: white !important; /* Texto blanco */
     }
-    
+
     /* Fondo azul más oscuro cuando un botón está activo */
     .fc-button-active, .fc-button.fc-button-active {
         background-color: #0099cc !important; /* Azul más oscuro */
         border-color: #0099cc !important;
         color: white !important; /* Texto blanco */
     }
-    
+
     /* Estilo específico para el botón 'Mes' */
     .fc-button-month {
         background-color: #33b5e5 !important; /* Azul claro */
         border-color: #33b5e5 !important;
         color: white !important; /* Texto blanco */
     }
-    
+
     /* Estilo específico para el botón 'Semana' */
     .fc-button-agendaWeek {
         background-color: #33b5e5 !important; /* Azul claro */
         border-color: #33b5e5 !important;
         color: white !important; /* Texto blanco */
     }
-    
+
     /* Estilo específico para el botón 'Día' */
     .fc-button-agendaDay {
         background-color: #33b5e5 !important; /* Azul claro */
         border-color: #33b5e5 !important;
         color: white !important; /* Texto blanco */
     }
-    
+
     /* Cambiar el color del fondo de la barra de herramientas */
     .fc-toolbar {
         background-color: #33b5e5 !important; /* Azul claro */
@@ -119,44 +119,48 @@
         border-radius: 8px;
         padding: 5px;
     }
-    
+
     /* Estilo para el encabezado de los días (lun, mar, ...) */
     .fc-col-header-cell {
         background-color: #33b5e5 !important; /* Azul claro */
         color: white !important; /* Texto blanco */
         font-weight: bold;
     }
-    
+
+    /* Forzar texto blanco en los encabezados de los días */
+    .fc-col-header-cell span {
+        color: white !important;  /* Cambiar el color del texto dentro de los días de la semana */
+    }
+
     /* Fondo del botón 'Hoy' */
     .fc-button-today {
         background-color: #33b5e5 !important; /* Azul claro */
         border-color: #33b5e5 !important;
         color: white !important; /* Texto blanco */
     }
-    
+
     /* Fondo del botón 'Hoy' cuando es activado */
     .fc-button-today:hover {
         background-color: #0099cc !important; /* Azul más oscuro */
         border-color: #0099cc !important;
     }
-    
+
     /* Día actual */
     .fc-day-today {
         background-color: rgba(51, 181, 229, 0.3) !important; /* Azul claro de fondo */
         color: black !important; /* Texto negro */
     }
-    
+
     /* Días fuera del mes actual */
     .fc-day-other {
         color: gray !important; /* Texto gris */
     }
-    
-    /* Cambiar el color de las letras en los encabezados de los días (Lun, Mar, Mié...) */
-    .fc-col-header-cell {
-        color: white !important;  /* Cambia el color de texto a blanco */
+
+    /* Cambiar el color de las letras en el encabezado de los días (lun, mar, ...) */
+    .fc-col-header-cell span {
+        color: white !important;  /* Cambiar el color del texto dentro de los días de la semana */
     }
-    
-    </style>
-    
+</style>
+
 
 {% endblock %}
