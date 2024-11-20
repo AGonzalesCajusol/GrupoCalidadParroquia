@@ -14,7 +14,8 @@ from controladores.controlador_recaudaciones import (
     actualizar_recaudacion,
     eliminar_recaudacion,
     obtener_todos_los_tipos_recaudacion,
-    obtener_tipos_recaudacion_activos
+    obtener_tipos_recaudacion_activos,
+    obtener_recaudaciones_por_mes
 )
 from routers.router_main import requerido_login
 
@@ -26,10 +27,12 @@ def registrar_rutas(app):
         tipos = obtener_tipos_recaudacion()  # Obtén los tipos de recaudación
         años = obtener_rango_de_años()  # Obtenemos el rango de años disponibles en la BD
         return render_template("tipo_financiero/gestionar_recaudaciones.html", recaudaciones=recaudaciones, tipos=tipos, años=años)
+    
     @app.route('/reporte_recaudaciones', methods=['GET'])
     def reporte_recaudaciones():
-        # Tu lógica para generar el reporte
-        return render_template('tipo_financiero/reporte_recaudaciones.html')
+        años_tuplas = obtener_rango_de_años()
+        años = [año[0] for año in años_tuplas]  # Extraer solo el año de cada tupla
+        return render_template('tipo_financiero/reporte_recaudaciones.html', años=años)
 
 
     @app.route("/procesar_actualizar_recaudacion", methods=["POST"])
@@ -183,4 +186,45 @@ def registrar_rutas(app):
         recaudaciones = obtener_recaudaciones_por_año(year)  # Función que obtiene los datos de la base de datos
         return jsonify(recaudaciones)
 
-
+    @app.route('/api/recaudaciones_por_fecha')
+    def api_recaudaciones_por_fecha():
+        año = request.args.get('year', type=int)
+        if not año:
+            return jsonify([])
+        
+        try:
+            # Obtener las recaudaciones del año
+            recaudaciones = obtener_recaudaciones_por_año(año)
+            
+            # Crear un diccionario para agrupar por mes
+            datos_por_mes = {}
+            
+            for rec in recaudaciones:
+                # rec[1] es la fecha en formato "Fri, 10 Mar 2023 00:00:00 GMT"
+                fecha = datetime.strptime(rec[1], '%a, %d %b %Y %H:%M:%S GMT') if isinstance(rec[1], str) else rec[1]
+                mes = fecha.month
+                # rec[2] es el monto como string "400.00"
+                monto = float(rec[2]) if isinstance(rec[2], str) else float(rec[2])
+                
+                if mes not in datos_por_mes:
+                    datos_por_mes[mes] = 0
+                datos_por_mes[mes] += monto
+            
+            # Convertir a lista de diccionarios
+            resultado = [
+                {
+                    "mes": mes,
+                    "monto_total": monto
+                }
+                for mes, monto in datos_por_mes.items()
+            ]
+            
+            # Ordenar por mes
+            resultado.sort(key=lambda x: x["mes"])
+            
+            print("Datos procesados:", resultado)  # Para debug
+            return jsonify(resultado)
+        except Exception as e:
+            print(f"Error al procesar recaudaciones: {e}")
+            traceback.print_exc()  # Para ver el error completo
+            return jsonify([])

@@ -17,7 +17,9 @@ async function obtenerDatos(year) {
     try {
         const response = await fetch(url);
         if (!response.ok) throw new Error(`Error en la solicitud: ${response.statusText}`);
-        return await response.json();
+        const data = await response.json();
+        console.log("Datos recibidos:", data);  // Para debug
+        return data;
     } catch (error) {
         console.error('Error al obtener los datos:', error);
         return [];
@@ -44,17 +46,20 @@ async function crearGrafico(year) {
         noDataMessage.classList.add('d-none');
     }
 
-    const mesesData = meses.reduce((acc, mes, index) => {
-        acc[index + 1] = 0;
-        return acc;
-    }, {});
+    // Inicializar array con 12 meses en 0
+    const mesesData = Array(12).fill(0);
 
+    // Procesar los datos recibidos
     data.forEach((d) => {
-        mesesData[d.mes] = d.monto_total; // Suponiendo que la API devuelve `mes` y `monto_total` de recaudación.
+        // Obtener el mes de la fecha (formato: "Fri, 10 Mar 2023 00:00:00 GMT")
+        const fecha = new Date(d[1]);
+        const mes = fecha.getMonth(); // 0-11
+        const monto = parseFloat(d[2]);
+        mesesData[mes] = monto;
     });
 
     const labels = meses;
-    const valores = Object.values(mesesData);
+    const valores = mesesData;
 
     if (window.chartInstance) {
         window.chartInstance.destroy();
