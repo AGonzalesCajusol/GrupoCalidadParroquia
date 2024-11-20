@@ -22,7 +22,7 @@ function abrirModalTipoMinistro(accion, id = '', nombre = '', estado = true) {
     const estadoCheckbox = document.getElementById('estado');
 
     if (accion === 'add') {
-        modalTitle.textContent = 'Agregar Tipo de Ministro';
+        modalTitle.textContent = 'Agregar tipo de ministro';
         form.setAttribute('action', '/procesar_insertar_tipo_ministro');
         limpiarModal();
         submitBtn.style.display = 'block';
@@ -30,7 +30,7 @@ function abrirModalTipoMinistro(accion, id = '', nombre = '', estado = true) {
         tipoInput.disabled = false;
         estadoCheckbox.disabled = true; // Fijo al agregar
     } else if (accion === 'edit') {
-        modalTitle.textContent = 'Editar Tipo de Ministro';
+        modalTitle.textContent = 'Editar tipo de ministro';
         form.setAttribute('action', '/procesar_actualizar_tipo_ministro');
         submitBtn.style.display = 'block';
         submitBtn.textContent = 'Guardar Cambios';
@@ -40,7 +40,7 @@ function abrirModalTipoMinistro(accion, id = '', nombre = '', estado = true) {
         tipoInput.disabled = false;
         estadoCheckbox.disabled = false;
     } else if (accion === 'view') {
-        modalTitle.textContent = 'Ver Tipo de Ministro';
+        modalTitle.textContent = 'Ver tipo de ministro';
         form.setAttribute('action', '');
         submitBtn.style.display = 'none';
         document.getElementById('tipoMinistroId').value = id;
