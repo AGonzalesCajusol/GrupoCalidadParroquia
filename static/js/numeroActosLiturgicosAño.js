@@ -42,6 +42,7 @@ async function crearGrafico(year, acto) {
     if (!year || !acto) {
         noDataMessage.classList.remove('d-none');
         noDataMessage.textContent = "Seleccione un año y un tipo de acto litúrgico para ver el gráfico.";
+        renderEmptyChart(ctx);
         return;
     }
 
@@ -50,6 +51,7 @@ async function crearGrafico(year, acto) {
     if (data.length === 0) {
         noDataMessage.classList.remove('d-none');
         noDataMessage.textContent = "No hay datos disponibles para los filtros seleccionados.";
+        renderEmptyChart(ctx);
         return;
     } else {
         noDataMessage.classList.add('d-none');
@@ -109,6 +111,55 @@ async function crearGrafico(year, acto) {
                 legend: {
                     display: true,
                     position: 'top',
+                },
+            },
+        },
+    });
+}
+
+// Función para renderizar un gráfico vacío
+function renderEmptyChart(ctx) {
+    if (window.chartInstance) {
+        window.chartInstance.destroy();
+    }
+
+    window.chartInstance = new Chart(ctx, {
+        type: 'line',
+        data: {
+            labels: meses,
+            datasets: [
+                {
+                    label: 'Número de Celebraciones',
+                    data: new Array(meses.length).fill(0),
+                    borderColor: 'rgba(200, 200, 200, 0.5)',
+                    borderWidth: 1,
+                    fill: false,
+                    pointRadius: 0,
+                    pointHoverRadius: 0,
+                },
+            ],
+        },
+        options: {
+            responsive: true,
+            maintainAspectRatio: false,
+            scales: {
+                x: {
+                    title: {
+                        display: true,
+                        text: 'Mes',
+                    },
+                },
+                y: {
+                    beginAtZero: true,
+                    title: {
+                        display: true,
+                        text: 'Número de Celebraciones',
+                    },
+                },
+            },
+            plugins: {
+                legend: {
+                    display: false,
                 },
             },
         },
