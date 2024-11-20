@@ -30,11 +30,13 @@
                             <i class="fas fa-edit"></i>
                         </button>
 
-                        <button type="button" class="btn btn-secondary btn-sm" title="Dar de Baja"
-                            onclick="darDeBajaTipoMinistro('{{ tipo[0] }}')">
-                            <i class="fas fa-ban"></i>
+                        <button class="btn btn-secondary btn-sm estado-btn" title="Dar de baja" 
+                        data-id="{{ tipo[0] }}" 
+                        data-estado="{{ tipo[2] }}"
+                        onclick="cambiarEstadoTipoMinistro(this)">
+                        <i class="fas fa-ban"></i>
                         </button>
-
+                    
                         <button type="button" class="btn btn-danger btn-sm" title="Eliminar"
                             onclick="eliminarTipoMinistro('{{ tipo[0] }}')">
                             <i class="fas fa-trash-alt"></i>

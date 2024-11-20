@@ -86,6 +86,8 @@ function openModal(type, id = null, nombre = '', estado = true) {
     var tipoMinistroModal = new bootstrap.Modal(document.getElementById('tipoMinistroModal'));
     tipoMinistroModal.show();
 }
+
+
 function eliminarTipoMinistro(id) {
     if (confirm("¿Estás seguro de que deseas eliminar este tipo de ministro?")) {
         fetch('/eliminar_tipo_ministro', {
@@ -109,27 +111,69 @@ function eliminarTipoMinistro(id) {
 }
 
 
-// Función para dar de baja el tipo de ministro (cambiar estado a inactivo)
-function darDeBajaTipoMinistro(id) {
-    if (confirm("¿Estás seguro de que deseas dar de baja este tipo de ministro?")) {
-        fetch('/procesar_dar_baja', {
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/json'
-            },
-            body: JSON.stringify({ id: id, estado: 0 })  // Cambiar estado a inactivo
-        })
-        .then(response => response.json())
-        .then(data => {
-            if (data.success) {
-                alert('Tipo de Ministro dado de baja exitosamente');
-                location.reload();  // Recargar la página para reflejar los cambios
-            } else {
-                alert('Error al dar de baja el tipo de ministro: ' + data.message);
-            }
-        })
-        .catch(error => console.error('Error:', error));
-    }
+function cambiarEstadoTipoMinistro(button) {
+    const id = button.getAttribute("data-id");
+    const estadoActual = button.getAttribute("data-estado") === "1";
+
+    // Confirmar la acción con el usuario
+    const confirmacion = estadoActual 
+        ? "¿Estás seguro de que deseas dar de baja este tipo de ministro?" 
+        : "¿Estás seguro de que deseas activar este tipo de ministro?";
+    if (!confirm(confirmacion)) return;
+
+    // Definir el nuevo estado
+    const nuevoEstado = estadoActual ? 0 : 1;
+
+    // Enviar la solicitud para cambiar el estado
+    fetch("/actualizar_estado_tipo_ministro", {
+        method: "POST",
+        headers: {
+            "Content-Type": "application/x-www-form-urlencoded",
+        },
+        body: `id=${encodeURIComponent(id)}&estado=${nuevoEstado}`
+    })
+    .then(response => response.json())
+    .then(data => {
+        if (data.success) {
+            // Actualizar dinámicamente el botón
+            button.setAttribute("data-estado", nuevoEstado);
+            button.setAttribute("title", nuevoEstado ? "Dar de baja" : "Activar");
+            button.className = `btn ${nuevoEstado ? "btn-secondary" : "btn-success"} btn-sm estado-btn`;
+            button.innerHTML = `<i class="${nuevoEstado ? "fas fa-ban" : "fas fa-check"}"></i>`;
+            
+            // Mostrar mensaje de éxito con Toastify
+            Toastify({
+                text: data.message || "El estado se actualizó correctamente.",
+                duration: 3000,
+                close: true,
+                backgroundColor: nuevoEstado ? "#ffc107" : "#28a745", // Amarillo para dar de baja, verde para activar
+                gravity: "bottom", // Aparece desde abajo
+                position: "right", // Aparece en la derecha
+            }).showToast();
+        } else {
+            // Mostrar mensaje de error con Toastify
+            Toastify({
+                text: data.message || "Error al cambiar el estado.",
+                duration: 3000,
+                close: true,
+                backgroundColor: "#dc3545", // Rojo para errores
+                gravity: "bottom",
+                position: "right",
+            }).showToast();
+        }
+    })
+    .catch(error => {
+        console.error("Error:", error);
+        // Mostrar mensaje de error general con Toastify
+        Toastify({
+            text: "Ocurrió un error al cambiar el estado del tipo de ministro.",
+            duration: 3000,
+            close: true,
+            backgroundColor: "#dc3545", // Rojo para errores
+            gravity: "bottom",
+            position: "right",
+        }).showToast();
+    });
 }
 
 function limpiarModal() {
