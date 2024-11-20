@@ -8,10 +8,44 @@ $(document).ready(function () {
         },
         initComplete: function () {
             // Insertar el botón "Agregar Tipo"
-            $("div.button-section").html('<button type="button" class="btn btn-success btn-lg custom-btn ml-3 btn-agregar-tipo" data-bs-toggle="modal" onclick="openModal(\'add\')"><i class="bi bi-person-plus"></i> Agregar tipo</button>');
+            $("div.button-section").html('<button type="button" class="btn btn-success btn-lg custom-btn ml-3 btn-agregar-tipo" data-bs-toggle="modal" onclick="openModal(\'add\')"><i class="bi bi-person-plus"></i> Agregar tipo ministro</button>');
         }
     });
 });
+
+
+document.getElementById('tipoMinistroForm').addEventListener('submit', function (event) {
+    event.preventDefault(); // Evita el envío normal del formulario
+
+    const id = document.getElementById('tipoMinistroId').value;
+    const tipo = document.getElementById('tipo').value;
+    const estado = document.getElementById('estado').checked ? 1 : 0;
+
+    const action = this.action; // Obtiene la URL de acción del formulario
+
+    fetch(action, {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json' // Asegúrate de enviar datos como JSON
+        },
+        body: JSON.stringify({
+            id: id,
+            tipo: tipo,
+            estado: estado
+        })
+    })
+    .then(response => response.json())
+    .then(data => {
+        if (data.success) {
+            alert('Operación realizada con éxito');
+            location.reload(); // Recargar la página para reflejar los cambios
+        } else {
+            alert('Error: ' + data.message);
+        }
+    })
+    .catch(error => console.error('Error:', error));
+});
+
 
 function openModal(type, id = null, nombre = '', estado = true) {
     var modalTitle = '';
@@ -19,18 +53,18 @@ function openModal(type, id = null, nombre = '', estado = true) {
     var isReadOnly = false;
 
     if (type === 'add') {
-        modalTitle = 'Agregar Tipo de Ministro';
-        formAction = urlInsertarTipo;  // Asegúrate de que coincida con la ruta de Flask
+        modalTitle = 'Agregar tipo de ministro';
+        formAction = '/procesar_insertar_tipo_ministro';
         limpiarModal();
     } else if (type === 'edit') {
-        modalTitle = 'Editar Tipo de Ministro';
-        formAction = urlActualizarTipo;  // Asegúrate de que coincida con la ruta de Flask
+        modalTitle = 'Editar tipo de ministro';
+        formAction = '/procesar_actualizar_tipo_ministro';
         isReadOnly = false;
         document.getElementById('tipoMinistroId').value = id;
         document.getElementById('tipo').value = nombre;
         document.getElementById('estado').checked = estado == 1 ? true : false;
     } else if (type === 'view') {
-        modalTitle = 'Ver Tipo de Ministro';
+        modalTitle = 'Ver tipo de ministro';
         formAction = '';  // No habrá acción de envío de formulario
         isReadOnly = true;  // Marcar todos los campos como solo lectura
         document.getElementById('tipoMinistroId').value = id;
