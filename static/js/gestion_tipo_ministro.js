@@ -7,177 +7,197 @@ $(document).ready(function () {
             search: "Buscar:"
         },
         initComplete: function () {
-            // Insertar el botón "Agregar Tipo"
-            $("div.button-section").html('<button type="button" class="btn btn-success btn-lg custom-btn ml-3 btn-agregar-tipo" data-bs-toggle="modal" onclick="openModal(\'add\')"><i class="bi bi-person-plus"></i> Agregar tipo ministro</button>');
+            $("div.button-section").html('<button type="button" class="btn btn-success btn-lg custom-btn ml-3 btn-agregar-tipo" onclick="abrirModalTipoMinistro(\'add\')"><i class="bi bi-plus-circle"></i> Agregar tipo ministro</button>');
         }
     });
 });
 
+// Abrir modal
+function abrirModalTipoMinistro(accion, id = '', nombre = '', estado = true) {
+    const modal = new bootstrap.Modal(document.getElementById('tipoMinistroModal'));
+    const modalTitle = document.getElementById('tipoMinistroModalLabel');
+    const form = document.getElementById('tipoMinistroForm');
+    const submitBtn = document.getElementById('saveChanges');
+    const tipoInput = document.getElementById('tipo');
+    const estadoCheckbox = document.getElementById('estado');
 
-document.getElementById('tipoMinistroForm').addEventListener('submit', function (event) {
-    event.preventDefault(); // Evita el envío normal del formulario
-
-    const id = document.getElementById('tipoMinistroId').value;
-    const tipo = document.getElementById('tipo').value;
-    const estado = document.getElementById('estado').checked ? 1 : 0;
-
-    const action = this.action; // Obtiene la URL de acción del formulario
-
-    fetch(action, {
-        method: 'POST',
-        headers: {
-            'Content-Type': 'application/json' // Asegúrate de enviar datos como JSON
-        },
-        body: JSON.stringify({
-            id: id,
-            tipo: tipo,
-            estado: estado
-        })
-    })
-    .then(response => response.json())
-    .then(data => {
-        if (data.success) {
-            alert('Operación realizada con éxito');
-            location.reload(); // Recargar la página para reflejar los cambios
-        } else {
-            alert('Error: ' + data.message);
-        }
-    })
-    .catch(error => console.error('Error:', error));
-});
-
-
-function openModal(type, id = null, nombre = '', estado = true) {
-    var modalTitle = '';
-    var formAction = '';
-    var isReadOnly = false;
-
-    if (type === 'add') {
-        modalTitle = 'Agregar tipo de ministro';
-        formAction = '/procesar_insertar_tipo_ministro';
+    if (accion === 'add') {
+        modalTitle.textContent = 'Agregar Tipo de Ministro';
+        form.setAttribute('action', '/procesar_insertar_tipo_ministro');
         limpiarModal();
-    } else if (type === 'edit') {
-        modalTitle = 'Editar tipo de ministro';
-        formAction = '/procesar_actualizar_tipo_ministro';
-        isReadOnly = false;
+        submitBtn.style.display = 'block';
+        submitBtn.textContent = 'Guardar';
+        tipoInput.disabled = false;
+        estadoCheckbox.disabled = true; // Fijo al agregar
+    } else if (accion === 'edit') {
+        modalTitle.textContent = 'Editar Tipo de Ministro';
+        form.setAttribute('action', '/procesar_actualizar_tipo_ministro');
+        submitBtn.style.display = 'block';
+        submitBtn.textContent = 'Guardar Cambios';
         document.getElementById('tipoMinistroId').value = id;
-        document.getElementById('tipo').value = nombre;
-        document.getElementById('estado').checked = estado == 1 ? true : false;
-    } else if (type === 'view') {
-        modalTitle = 'Ver tipo de ministro';
-        formAction = '';  // No habrá acción de envío de formulario
-        isReadOnly = true;  // Marcar todos los campos como solo lectura
+        tipoInput.value = nombre;
+        estadoCheckbox.checked = estado == 1;
+        tipoInput.disabled = false;
+        estadoCheckbox.disabled = false;
+    } else if (accion === 'view') {
+        modalTitle.textContent = 'Ver Tipo de Ministro';
+        form.setAttribute('action', '');
+        submitBtn.style.display = 'none';
         document.getElementById('tipoMinistroId').value = id;
-        document.getElementById('tipo').value = nombre;
-        document.getElementById('estado').checked = estado == 1 ? true : false;
+        tipoInput.value = nombre;
+        estadoCheckbox.checked = estado == 1;
+        tipoInput.disabled = true;
+        estadoCheckbox.disabled = true;
     }
-
-    // Configurar el modal
-    document.getElementById('tipoMinistroModalLabel').innerText = modalTitle;
-    document.getElementById('tipoMinistroForm').action = formAction;
-
-    // Hacer todos los campos de solo lectura si es el modo "Ver"
-    document.querySelectorAll('#tipoMinistroForm input').forEach(function (input) {
-        input.readOnly = isReadOnly;
-        input.disabled = isReadOnly;
-    });
-
-    // Mostrar el modal
-    var tipoMinistroModal = new bootstrap.Modal(document.getElementById('tipoMinistroModal'));
-    tipoMinistroModal.show();
+    modal.show();
 }
 
+// Enviar el formulario
+document.getElementById('tipoMinistroForm').addEventListener('submit', function (event) {
+    event.preventDefault();
 
-function eliminarTipoMinistro(id) {
-    if (confirm("¿Estás seguro de que deseas eliminar este tipo de ministro?")) {
-        fetch('/eliminar_tipo_ministro', {
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/json'
-            },
-            body: JSON.stringify({ id: id })  // Enviando el ID del tipo de ministro a eliminar
-        })
+    const form = event.target;
+    const formData = new FormData(form);
+
+    formData.set('estado', document.getElementById('estado').checked ? '1' : '0');
+
+    const actionUrl = form.getAttribute('action');
+    const submitBtn = document.getElementById('saveChanges');
+
+    if (submitBtn.disabled) return;
+    submitBtn.disabled = true;
+
+    fetch(actionUrl, {
+        method: 'POST',
+        body: new URLSearchParams(formData),
+        headers: {
+            "Content-Type": "application/x-www-form-urlencoded",
+        }
+    })
         .then(response => response.json())
         .then(data => {
             if (data.success) {
-                alert('Tipo de Ministro eliminado exitosamente');
-                location.reload();  // Recargar la página para reflejar los cambios
+                actualizarTabla(data.tipos_ministro);
+                mostrarNotificacion(data.message, "#28a745");
+                bootstrap.Modal.getInstance(document.getElementById('tipoMinistroModal')).hide();
             } else {
-                alert('Error al eliminar el tipo de ministro: ' + data.message);
+                mostrarNotificacion(data.message, "#dc3545");
             }
         })
-        .catch(error => console.error('Error:', error));
-    }
-}
+        .catch(error => console.error("Error:", error))
+        .finally(() => {
+            submitBtn.disabled = false;
+        });
+});
 
-
-function cambiarEstadoTipoMinistro(button) {
-    const id = button.getAttribute("data-id");
-    const estadoActual = button.getAttribute("data-estado") === "1";
-
-    // Confirmar la acción con el usuario
-    const confirmacion = estadoActual 
-        ? "¿Estás seguro de que deseas dar de baja este tipo de ministro?" 
-        : "¿Estás seguro de que deseas activar este tipo de ministro?";
-    if (!confirm(confirmacion)) return;
-
-    // Definir el nuevo estado
-    const nuevoEstado = estadoActual ? 0 : 1;
-
-    // Enviar la solicitud para cambiar el estado
-    fetch("/actualizar_estado_tipo_ministro", {
-        method: "POST",
-        headers: {
-            "Content-Type": "application/x-www-form-urlencoded",
-        },
-        body: `id=${encodeURIComponent(id)}&estado=${nuevoEstado}`
-    })
-    .then(response => response.json())
-    .then(data => {
-        if (data.success) {
-            // Actualizar dinámicamente el botón
-            button.setAttribute("data-estado", nuevoEstado);
-            button.setAttribute("title", nuevoEstado ? "Dar de baja" : "Activar");
-            button.className = `btn ${nuevoEstado ? "btn-secondary" : "btn-success"} btn-sm estado-btn`;
-            button.innerHTML = `<i class="${nuevoEstado ? "fas fa-ban" : "fas fa-check"}"></i>`;
-            
-            // Mostrar mensaje de éxito con Toastify
-            Toastify({
-                text: data.message || "El estado se actualizó correctamente.",
-                duration: 3000,
-                close: true,
-                backgroundColor: nuevoEstado ? "#ffc107" : "#28a745", // Amarillo para dar de baja, verde para activar
-                gravity: "bottom", // Aparece desde abajo
-                position: "right", // Aparece en la derecha
-            }).showToast();
-        } else {
-            // Mostrar mensaje de error con Toastify
-            Toastify({
-                text: data.message || "Error al cambiar el estado.",
-                duration: 3000,
-                close: true,
-                backgroundColor: "#dc3545", // Rojo para errores
-                gravity: "bottom",
-                position: "right",
-            }).showToast();
-        }
-    })
-    .catch(error => {
-        console.error("Error:", error);
-        // Mostrar mensaje de error general con Toastify
-        Toastify({
-            text: "Ocurrió un error al cambiar el estado del tipo de ministro.",
-            duration: 3000,
-            close: true,
-            backgroundColor: "#dc3545", // Rojo para errores
-            gravity: "bottom",
-            position: "right",
-        }).showToast();
+// Actualizar la tabla
+function actualizarTabla(tiposMinistro) {
+    const table = $('#tipoMinistroTable').DataTable();
+    table.clear();
+    tiposMinistro.forEach(tipo => {
+        const estadoTexto = tipo.estado === "Activo" ? "Dar de baja" : "Activar";
+        const estadoClase = tipo.estado === "Activo" ? "btn-secondary" : "btn-success";
+        const estadoIcono = tipo.estado === "Activo" ? "fas fa-ban" : "fas fa-check";
+        const row = `
+            <tr>
+                <td class="text-center">${tipo.id}</td>
+                <td>${tipo.nombre}</td>
+                <td class="text-center">${tipo.estado}</td>
+                <td class="text-center">
+                    <button class="btn btn-primary btn-sm" title="Ver"
+                        onclick="abrirModalTipoMinistro('view', '${tipo.id}', '${tipo.nombre}', '${tipo.estado === 'Activo' ? 1 : 0}')">
+                        <i class="fas fa-eye"></i>
+                    </button>
+                    <button class="btn btn-warning btn-sm" title="Editar"
+                        onclick="abrirModalTipoMinistro('edit', '${tipo.id}', '${tipo.nombre}', '${tipo.estado === 'Activo' ? 1 : 0}')">
+                        <i class="fas fa-edit"></i>
+                    </button>
+                    <button class="btn ${estadoClase} btn-sm estado-btn" title="${estadoTexto}" 
+                        onclick="confirmarCambioEstado('${tipo.id}', '${tipo.estado}')">
+                        <i class="${estadoIcono}"></i>
+                    </button>
+                    <button class="btn btn-danger btn-sm" title="Eliminar"
+                        onclick="eliminarTipoMinistro('${tipo.id}')">
+                        <i class="fas fa-trash-alt"></i>
+                    </button>
+                </td>
+            </tr>`;
+        table.row.add($(row));
     });
+    table.draw();
 }
 
+// Confirmar cambio de estado
+function confirmarCambioEstado(id, estadoActual) {
+    const nuevoEstado = estadoActual === "Activo" ? 0 : 1;
+    const mensaje = estadoActual === "Activo"
+        ? "¿Estás seguro de que deseas dar de baja este tipo de ministro?"
+        : "¿Estás seguro de que deseas activar este tipo de ministro?";
+
+    if (!confirm(mensaje)) return;
+
+    cambiarEstadoTipoMinistro(id, nuevoEstado);
+}
+
+// Cambiar estado
+function cambiarEstadoTipoMinistro(id, nuevoEstado) {
+    fetch('/actualizar_estado_tipo_ministro', {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/x-www-form-urlencoded',
+        },
+        body: `id=${id}&estado=${nuevoEstado}`
+    })
+        .then(response => response.json())
+        .then(data => {
+            if (data.success) {
+                actualizarTabla(data.tipos_ministro);
+                mostrarNotificacion(data.message, nuevoEstado ? "#ffc107" : "#28a745");
+            } else {
+                mostrarNotificacion("Error al cambiar el estado.", "#dc3545");
+            }
+        })
+        .catch(error => console.error(error));
+}
+
+// Eliminar tipo de ministro
+function eliminarTipoMinistro(id) {
+    if (!confirm("¿Estás seguro de eliminar este tipo de ministro?")) return;
+
+    fetch('/eliminar_tipo_ministro', {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({ id: id })
+    })
+        .then(response => response.json())
+        .then(data => {
+            if (data.success) {
+                actualizarTabla(data.tipos_ministro);
+                mostrarNotificacion("Tipo de Ministro eliminado con éxito", "#dc3545");
+            } else {
+                mostrarNotificacion("Error al eliminar el tipo de ministro.", "#dc3545");
+            }
+        })
+        .catch(error => console.error(error));
+}
+
+// Mostrar notificación
+function mostrarNotificacion(mensaje, color) {
+    Toastify({
+        text: mensaje,
+        duration: 3000,
+        close: true,
+        backgroundColor: color,
+        gravity: "bottom",
+        position: "right"
+    }).showToast();
+}
+
+// Limpiar modal
 function limpiarModal() {
     document.getElementById('tipoMinistroId').value = '';
     document.getElementById('tipo').value = '';
-    document.getElementById('estado').checked = true;  // Por defecto, activo
+    document.getElementById('estado').checked = true;
 }
