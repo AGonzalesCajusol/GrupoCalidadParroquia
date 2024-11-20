@@ -22,6 +22,7 @@ from routers.router_main import requerido_login
 def registrar_rutas(app):
     # Ruta para gestionar recaudaciones
     @app.route("/gestionar_recaudaciones", methods=["GET"])
+    @requerido_login
     def gestionar_recaudaciones():
         recaudaciones = obtener_recaudaciones()
         tipos = obtener_tipos_recaudacion()  # Obtén los tipos de recaudación
@@ -29,6 +30,7 @@ def registrar_rutas(app):
         return render_template("tipo_financiero/gestionar_recaudaciones.html", recaudaciones=recaudaciones, tipos=tipos, años=años)
     
     @app.route('/reporte_recaudaciones', methods=['GET'])
+    @requerido_login
     def reporte_recaudaciones():
         años_tuplas = obtener_rango_de_años()
         años = [año[0] for año in años_tuplas]  # Extraer solo el año de cada tupla
@@ -36,6 +38,7 @@ def registrar_rutas(app):
 
 
     @app.route("/procesar_actualizar_recaudacion", methods=["POST"])
+    @requerido_login
     def procesar_actualizar_recaudacion():
         try:
             # Obtener datos del formulario
@@ -84,6 +87,7 @@ def registrar_rutas(app):
             return jsonify(success=False, message="Error al actualizar la recaudación: {str(e)}"), 400
 
     @app.route("/insertar_recaudacion", methods=["POST"])
+    @requerido_login
     def procesar_insertar_recaudacion():
         try:
             # Obtener datos del formulario
@@ -138,6 +142,7 @@ def registrar_rutas(app):
             return jsonify(success=False, message=f"Error al insertar recaudación: {str(e)}"), 400
 
     @app.route("/apiaños", methods=["GET"])
+    @requerido_login
     def apiaños():
         try:
             años = obtener_rango_de_años()  # Asegúrate de que esta función retorne una lista de años
@@ -161,7 +166,9 @@ def registrar_rutas(app):
             print(f"Error al obtener tipos de recaudación: {e}")
             return jsonify({"error": "Error al obtener los tipos de recaudación"}), 500
     #Endpoint para obtener todos los tipos (activos e inactivos)
+
     @app.route("/api/tipos_todos", methods=["GET"])
+    @requerido_login
     def api_tipos_todos():
         try:
             tipos = obtener_todos_los_tipos_recaudacion()
@@ -172,6 +179,7 @@ def registrar_rutas(app):
             return jsonify({"error": "Error al obtener los tipos de recaudación"}), 500
     #Endpoint para obtener solo los tipos activos
     @app.route("/api/tipos_activos", methods=["GET"])
+    @requerido_login
     def api_tipos_activos():
         try:
             tipos = obtener_tipos_recaudacion_activos()
@@ -180,13 +188,16 @@ def registrar_rutas(app):
         except Exception as e:
             print(f"Error al obtener tipos de recaudación activos: {e}")
             return jsonify({"error": "Error al obtener los tipos de recaudación activos"}), 500
+        
     @app.route('/api/recaudaciones_por_fecha', methods=['GET'])
+    @requerido_login
     def obtener_recaudaciones_por_fecha():
         year = request.args.get('year')
         recaudaciones = obtener_recaudaciones_por_año(year)  # Función que obtiene los datos de la base de datos
         return jsonify(recaudaciones)
 
     @app.route('/api/recaudaciones_por_fecha')
+    @requerido_login
     def api_recaudaciones_por_fecha():
         año = request.args.get('year', type=int)
         if not año:

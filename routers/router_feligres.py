@@ -16,17 +16,20 @@ import controladores.controlador_sede as csede
 def registrar_rutas(app):
     # Ruta para gestionar feligreses
     @app.route("/gestionar_feligres", methods=["GET"])
+    @requerido_login
     def gestionar_feligres():   
         feligreses = obtener_feligreses()
         sedes = csede.obtener_sede()
         return render_template("/feligres/gestionar_feligres.html", feligreses=feligreses, sedes = sedes )
 
     @app.route('/crearcuenta')
+    @requerido_login
     def crearcuenta():
         sedes = csede.obtener_sedeparacuenta()
         return render_template('crear_cuenta.html', sedes = sedes)
     
     @app.route("/registrar_feligresweb", methods=["POST"])
+    @requerido_login
     def registrar_feligresweb():
         # Obtiene los datos del formulario
         dni = request.form['dni11']
@@ -52,10 +55,12 @@ def registrar_rutas(app):
         return response
 
     @app.route("/principal", methods=["GET"])
+    @requerido_login
     def principal():
         return render_template('/principal_usuario.html')    
 
     @app.route("/insertar_feligres", methods=["POST"])
+    @requerido_login
     def procesar_insertar_feligres():
         dni = request.form["dni"]
         apellidos = request.form["apellidos"]
@@ -90,6 +95,7 @@ def registrar_rutas(app):
 
 
     @app.route("/obtener_feligres/<dni>", methods=["GET"])
+    @requerido_login
     def obtener_feligres(dni):
         feligres = obtener_feligres_por_dni(dni)
         if feligres:
@@ -98,6 +104,7 @@ def registrar_rutas(app):
             return jsonify({"error": "Feligrés no encontrado"}), 404
 
     @app.route("/actualizar_feligres", methods=["POST"])
+    @requerido_login
     def procesar_actualizar_feligres():
         try:
             dni = request.form["dni"]
@@ -117,6 +124,7 @@ def registrar_rutas(app):
 
 
     @app.route("/eliminar_feligres", methods=["POST"])
+    @requerido_login
     def procesar_eliminar_feligres():        
         dni = request.form["dni"]
         eliminar_feligres(dni)

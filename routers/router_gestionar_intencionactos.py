@@ -8,14 +8,19 @@ from controladores.controlador_gestionar_intencionactos import (
 )
 from controladores.controlador_actosliturgicos import obtener_actos_liturgicos  # Asegúrate de tener esta función
 #router_intencion = Blueprint("router_intencion", __name__)
+
+from routers.router_main import requerido_login
+
 def registrar_rutas(app):
     @app.route("/gestionar_intencionactos", methods=["GET"])
+    @requerido_login
     def gestionar_intenciones():
         intenciones = obtener_intenciones()
         tipos = obtener_tipos_actos_liturgicos()
         return render_template("actos_liturgicos/gestionar_intencionactos.html", intenciones=intenciones, tipos=tipos)
 
     @app.route("/api/tipos", methods=["GET"])
+    @requerido_login
     def api_tipos_actos_liturgicos():
         try:
             tipos = obtener_tipos_actos_liturgicos()
@@ -28,6 +33,7 @@ def registrar_rutas(app):
     #Endpoint para obtener todos los tipos (activos e inactivos)
     
     @app.route("/procesar_insertar_intencion", methods=["POST"])
+    @requerido_login
     def procesar_insertar_intencion():
         nombre_intencion = request.form.get("nombre_intencion")
         descripcion = request.form.get("descripcion")
@@ -40,6 +46,7 @@ def registrar_rutas(app):
         return redirect(url_for("gestionar_intenciones"))
 
     @app.route("/procesar_actualizar_intencion", methods=["POST"])
+    @requerido_login
     def procesar_actualizar_intencion():
         id_intencion = request.form.get("id")
         nombre_intencion = request.form.get("nombre_intencion")
@@ -53,6 +60,7 @@ def registrar_rutas(app):
         return redirect(url_for("gestionar_intenciones"))
 
     @app.route("/eliminar_intencion/<int:id_intencion>", methods=["POST"])
+    @requerido_login
     def procesar_eliminar_intencion(id_intencion):
         if eliminar_intencion(id_intencion):
             flash("Intención eliminada con éxito", "success")

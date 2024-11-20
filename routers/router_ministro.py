@@ -16,6 +16,7 @@ def encriptar_contraseña(contraseña):
 def registrar_rutas(app):
     # Ruta para gestionar ministros
     @app.route("/gestionar_ministro", methods=["GET"])
+    @requerido_login
     def gestionar_ministro():
         try:
             ministros = obtener_ministros()  
@@ -27,6 +28,7 @@ def registrar_rutas(app):
             return jsonify(success=False, message="Error al cargar la página: " + str(e))
 
     @app.route("/insertar_ministro", methods=["POST"])
+    @requerido_login
     def procesar_insertar_ministro():
         try:
             # Capturar y validar los datos del formulario
@@ -79,6 +81,7 @@ def registrar_rutas(app):
 
 
     @app.route("/procesar_actualizar_ministro", methods=["POST"])
+    @requerido_login
     def procesar_actualizar_ministro():
         try:
             # Obtener los datos del formulario
@@ -134,6 +137,7 @@ def registrar_rutas(app):
 
     # Procesar la eliminación de un ministro
     @app.route("/eliminar_ministro", methods=["POST"])
+    @requerido_login
     def procesar_eliminar_ministro():
         data = request.get_json()
         try:
@@ -145,6 +149,7 @@ def registrar_rutas(app):
 
 
     @app.route("/procesar_dar_baja_ministro", methods=["POST"])
+    @requerido_login
     def procesar_dar_baja_ministro():
             try:
                 data = request.json

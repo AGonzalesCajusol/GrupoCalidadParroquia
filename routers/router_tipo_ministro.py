@@ -7,6 +7,7 @@ from routers.router_main import requerido_login
 def registrar_rutas(app):
     # Ruta para la página principal de gestión de tipos de ministros
     @app.route("/gestionar_tipo_ministro", methods=["GET"])
+    @requerido_login
     def gestionar_tipo_ministro():
         try:
             tipos = obtener_tipos_ministro()
@@ -15,6 +16,7 @@ def registrar_rutas(app):
             return jsonify(success=False, message="Error al cargar la página: " + str(e))
 
     @app.route("/procesar_insertar_tipo_ministro", methods=["POST"])
+    @requerido_login
     def procesar_insertar_tipo_ministro():
         try:
             nombre = request.form["tipo"]
@@ -34,6 +36,7 @@ def registrar_rutas(app):
 
 
     @app.route("/procesar_actualizar_tipo_ministro", methods=["POST"])
+    @requerido_login
     def procesar_actualizar_tipo_ministro():
         try:
             id = request.form["id"]
@@ -54,6 +57,7 @@ def registrar_rutas(app):
 
 
     @app.route("/eliminar_tipo_ministro", methods=["POST"])
+    @requerido_login
     def procesar_eliminar_tipo_ministro():
         try:
             id = request.json["id"]
@@ -71,6 +75,7 @@ def registrar_rutas(app):
             return jsonify({"success": False, "message": f"Error al eliminar: {str(e)}"})
 
     @app.route("/actualizar_estado_tipo_ministro", methods=["POST"])
+    @requerido_login
     def actualizar_estado_tipo_ministro():
         try:
             id = request.form.get("id")

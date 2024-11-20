@@ -11,12 +11,14 @@ from routers.router_main import requerido_login
 
 def registrar_rutas(app):
     @app.route("/gestionar_programacionActo", methods=["GET"])
+    @requerido_login
     def gestionar_programacionActo():
         acto = contro.listar_sacramentos()
         id_actoliturgico = request.args.get('id_actoliturgico')    
         return render_template("charlas/programacion.html", acto=acto, id_actoliturgico=id_actoliturgico)
 
     @app.route('/obtener_temas_por_acto', methods=['GET'])
+    @requerido_login
     def route_obtener_temas_por_acto():
         acto_id = request.args.get('acto')
         if not acto_id:
@@ -33,6 +35,7 @@ def registrar_rutas(app):
             return jsonify({"success": False, "error": "No se encontraron temas"}), 404
 
     @app.route('/obtener_actos_liturgicos', methods=['GET'])
+    @requerido_login
     def obtener_actos_liturgicos():
         try:            
             actos = contro.listar_sacramentos()
@@ -46,6 +49,7 @@ def registrar_rutas(app):
             return jsonify({"success": False, "error": "Error al obtener actos litúrgicos"}), 500
         
     @app.route("/registrar_programacion", methods=["POST"])
+    @requerido_login
     def registrar_programacion():
         data = request.json
         programaciones = data.get("programaciones")
@@ -71,6 +75,7 @@ def registrar_rutas(app):
         return jsonify({"success": True, "message": "Programación registrada con éxito"})
 
     @app.route('/obtener_ministro_sede', methods=['GET'])
+    @requerido_login
     def ruta_obtener_ministro_sede():
         dni = request.args.get('dni')
         if not dni:
@@ -85,6 +90,7 @@ def registrar_rutas(app):
             return jsonify({"success": False, "error": "No se encontraron datos para el DNI proporcionado"}), 404
         
     @app.route('/verificar_programacion')
+    @requerido_login
     def ruta_verificar_programacion():
         id_acto = request.args.get('acto')
         if not id_acto:
@@ -98,6 +104,7 @@ def registrar_rutas(app):
             return jsonify({"success": False, "error": "Error al procesar la solicitud"}), 500
 
     @app.route('/obtener_programacion_detalle', methods=['GET'])
+    @requerido_login
     def obtener_programacion_detalle():
         id_programacion = request.args.get('id_programacion')
         if not id_programacion:
@@ -114,10 +121,12 @@ def registrar_rutas(app):
             return jsonify({"success": False, "error": "Error al obtener los detalles"}), 500
 
     @app.route('/obtener_ministros', methods=['GET'])
+    @requerido_login
     def obtener_ministros():        
         return cncha.listar_ministros_programacion()
 
     @app.route('/obtener_sedes', methods=['GET'])
+    @requerido_login
     def obtener_sedes():
         """
         Ruta para obtener la lista de sedes.
@@ -125,6 +134,7 @@ def registrar_rutas(app):
         return cncha.listar_sedes_programacion()
     
     @app.route('/actualizar_programacion', methods=['POST'])
+    @requerido_login
     def actualizar_programacion():
         data = request.json
         id_programacion = data.get("id_programacion")
@@ -140,6 +150,7 @@ def registrar_rutas(app):
         return jsonify(resultado)
 
     @app.route('/eliminar_programacion', methods=['DELETE'])
+    @requerido_login
     def eliminar_programacion():
         id_programacion = request.args.get('id_programacion')
         

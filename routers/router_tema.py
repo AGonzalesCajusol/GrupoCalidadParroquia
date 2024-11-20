@@ -13,11 +13,13 @@ from routers.router_main import requerido_login
 def registrar_rutas(app):
     
     @app.route("/gestionar_tema", methods=["GET"])
+    @requerido_login
     def gestionar_tema():        
         actos = acto.listar_nombres_actos()
         return render_template("tema/gestionar_tema.html", actos=actos)
 
     @app.route("/api/obtener_temas", methods=["GET"])
+    @requerido_login
     def obtener_temas_endpoint():
         try:
             temas = obtener_todos_los_temas()            
@@ -26,6 +28,7 @@ def registrar_rutas(app):
             return jsonify({"success": False, "message": str(e)}), 500
     
     @app.route("/insertar_tema", methods=["POST"])
+    @requerido_login
     def procesar_insertar_tema():
             id_actoliturgico = request.form.get("id_actoliturgico")
             descripcion = request.form.get("descripcion")                        
@@ -42,6 +45,7 @@ def registrar_rutas(app):
                 return jsonify({"success": False, "message": str(e)}), 500
 
     @app.route("/api/obtener_tema/<int:id_tema>", methods=["GET"])
+    @requerido_login
     def obtener_tema(id_tema):
         tema = obtener_tema_por_id(id_tema)
         if tema:
@@ -50,6 +54,7 @@ def registrar_rutas(app):
             return jsonify({"success": False, "message": "Tema no encontrado"}), 404
 
     @app.route("/actualizar_tema", methods=["POST"])
+    @requerido_login
     def procesar_actualizar_tema():
         id_tema = request.form.get("id_tema")
         id_actoliturgico = request.form.get("id_actoliturgico")
@@ -63,6 +68,7 @@ def registrar_rutas(app):
             return jsonify({"success": False, "message": "No se pudo actualizar el tema"}), 500
 
     @app.route("/eliminar_tema", methods=["POST"])
+    @requerido_login
     def procesar_eliminar_tema():
         id_tema = request.form.get("id_tema")
         if eliminar_tema_por_id(id_tema):

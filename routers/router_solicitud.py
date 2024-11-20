@@ -10,12 +10,14 @@ from routers.router_main import requerido_login
 def registrar_rutas(app):
     # Ruta para gestionar tipos de ministro
     @app.route('/solicitudes')
+    @requerido_login
     def solicitudes():
         nombre_sede = request.cookies.get('sede')
         lista_actos = cactos.listar_actosxsede(nombre_sede)
         return render_template('solicitudes/solicitudes_actoliturgico.html', lista_actos=lista_actos)
     
     @app.route('/listar_solicitudes', methods=['GET'])
+    @requerido_login
     def listar_solicitudes():
         sede = request.cookies.get('sede')
         solicitudes = csoli.solicitudes(sede)
@@ -36,6 +38,7 @@ def registrar_rutas(app):
     
 
     @app.route('/calendario_solicitud/<int:id_charla>')
+    @requerido_login
     def calendario_solicitud(id_charla):
         charlas = ccharla.charlas_acto(id_charla)
         lista_charlas = []
@@ -51,6 +54,7 @@ def registrar_rutas(app):
     
 
     @app.route('/requisitosXacto/<int:id_actoliturgico>' , methods=['GET'])
+    @requerido_login
     def requisitosXacto(id_actoliturgico):
         requisitos = cactos.listar_requisitos(id_actoliturgico)
         lista_requisitos = []
@@ -70,6 +74,7 @@ def registrar_rutas(app):
         return jsonify(lista_requisitos)
     
     @app.route('/validar_dni/<int:dni>' , methods=['GET'])
+    @requerido_login
     def validar_dni(dni):
         feligres = cfel.obtener_feligres_por_dni(dni)
         if feligres:
@@ -80,6 +85,7 @@ def registrar_rutas(app):
             return jsonify({'estado':'no'})
         
     @app.route('/monto_acto/<string:acto_liturgico>/<string:sede>/<int:dni_responsable>/<int:dni1>/<int:dni2>', methods=['GET'])
+    @requerido_login
     def monto_actos(acto_liturgico, sede, dni_responsable, dni1, dni2=''):
 
         monto = cactos.monto_total(acto_liturgico, sede, dni_responsable, dni1, dni2)
@@ -93,6 +99,7 @@ def registrar_rutas(app):
             return jsonify({'estado': 'si', 'datos': monto})
             
     @app.route('/charlas_rangoaño/<string:acto_liturgico>', methods=['GET'])
+    @requerido_login
     def charlas_rangoaño(acto_liturgico):
         charlas = csoli.charlas_rangoaño(acto_liturgico)
         lista_charlas = []
@@ -107,6 +114,7 @@ def registrar_rutas(app):
     
 
     @app.route('/fcelebraciones/<int:acto>', methods=['GET'])
+    @requerido_login
     def fcelebraciones(acto):
         sede = request.cookies.get('sede')
         charlas = csoli.fcelebraciones(acto,sede)
@@ -121,6 +129,7 @@ def registrar_rutas(app):
         return jsonify({'data': 'Error'})
     
     @app.route('/horario_cl/<int:id>', methods=['GET','POST'])
+    @requerido_login
     def horario_cl(id):
         datos = csoli.horario_cl(id)
         lista_datos = []
@@ -141,6 +150,7 @@ def registrar_rutas(app):
 
 
     @app.route('/registrarsolicitud/<int:acto_liturgico>', methods=['GET','POST'])
+    @requerido_login
     def registrarsolicitud(acto_liturgico):
         if acto_liturgico == 1:
             requisitos_data = {
@@ -266,6 +276,7 @@ def registrar_rutas(app):
                 return jsonify({'estado':'Error'}) 
     
     @app.route('/verificar_fecha/<string:fecha>', methods=['GET', 'POST'])
+    @requerido_login
     def verificar_fecha(fecha):
         sede = request.cookies.get('sede')
         valor = csoli.verificar_fecha(fecha,sede)
@@ -277,6 +288,7 @@ def registrar_rutas(app):
             return jsonify({'estado': "Rechazado"})
 
     @app.route('/montobautismo/<string:sede>', methods=['GET'])
+    @requerido_login
     def montobautismo(sede):
         monto = csoli.monto_butismo(sede)
         
@@ -289,6 +301,7 @@ def registrar_rutas(app):
             return jsonify({'estado': 'si', 'datos': monto})
         
     @app.route('/confirmado/<string:sede>', methods=['GET'])
+    @requerido_login
     def confirmado(sede):
         monto = csoli.monto_confirmacion(sede)
         
@@ -301,6 +314,7 @@ def registrar_rutas(app):
             return jsonify({'estado': 'si', 'datos': monto})
         
     @app.route('/primeracm/<string:sede>', methods=['GET'])
+    @requerido_login
     def primeracm(sede):
         monto = csoli.monto_primera(sede)
         
@@ -313,6 +327,7 @@ def registrar_rutas(app):
             return jsonify({'estado': 'si', 'datos': monto})
         
     @app.route('/asistencias_solicitud/<int:id_solicitud>', methods=['GET'])
+    @requerido_login
     def asistencias_solicitud(id_solicitud):
         asistencias = csoli.obtener_asistencias(id_solicitud)
         lista_asistencia = []
@@ -333,6 +348,7 @@ def registrar_rutas(app):
                             'data': lista_asistencia})
         
     @app.route('/check_asistencia/<int:id>/<int:estado>', methods=['GET'])
+    @requerido_login
     def check_asistencia(id,estado):
         valor = csoli.check_asistencia(id,estado)
         if valor == 1:
@@ -341,6 +357,7 @@ def registrar_rutas(app):
             return jsonify({'estado': 'incorrecto'})
         
     @app.route('/datos_solicitud/<int:id>', methods=['GET'])
+    @requerido_login
     def datos_solicitud(id):
         valores = csoli.datos_soliictud_matrimonio(id)
         data = []
@@ -362,6 +379,7 @@ def registrar_rutas(app):
                             'data': data})
         
     @app.route('/datos_charlas/<int:id>', methods=['GET'])
+    @requerido_login
     def datos_charlas(id):
         valores = csoli.viww(id)
         lista_datos = []
@@ -381,6 +399,7 @@ def registrar_rutas(app):
                             'data': lista_datos})
         
     @app.route('/datos_charlas_confirmacion/<int:id>', methods=['GET'])
+    @requerido_login
     def datos_charlas_confirmacion(id):
         sede = request.cookies.get('sede')
         id_acto = 3
@@ -402,6 +421,7 @@ def registrar_rutas(app):
                             'data': lista_datos})
         
     @app.route('/datos_charlas_comunion/<int:id>', methods=['GET'])
+    @requerido_login
     def datos_charlas_comunion(id):
         sede = request.cookies.get('sede')
         id_acto = 6
