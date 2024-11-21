@@ -466,14 +466,16 @@ table.dataTable tbody td {
     margin: auto;
 }
 .btn-asistencia {
-    background-color: transparent !important; /* Sin fondo */
-    border: none !important; /* Sin borde */
-    box-shadow: none !important; /* Sin sombra */
-    padding: 0; /* Sin relleno */
+    background-color: transparent !important;
+    border: none !important;
+    box-shadow: none !important; 
+    padding: 0;
     cursor: pointer;
 }
 
+
 .btn-asistencia i {
-    color: #28a745; /* Color del ícono */
-    font-size: 24px; /* Tamaño del ícono */
+    color: #28a745;
+    font-size: 24px; 
 }
+*/

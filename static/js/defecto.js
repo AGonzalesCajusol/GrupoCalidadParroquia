@@ -10,15 +10,15 @@ function closeNav() {
     document.querySelector('.main-content').classList.remove('shifted');
     document.getElementById('abrir').style.visibility = 'visible'; // Mostrar el botón de abrir
 }
-
 window.onload = function() {
     setTimeout(function() {
-        $('#spinner').fadeOut(); // Oculta el spinner con un efecto fadeOut después de 2 segundos
+        $('#spinner').fadeOut(); // Oculta el spinner con un efecto fadeOut después de 500 ms
         $('body').removeClass('hidden'); // Muestra el contenido eliminando la clase hidden
-    }, 500); // 2000 milisegundos = 2 segundos
-
-
+        
+        AOS.init(); // Inicializa AOS después de que todo lo anterior haya ocurrido
+    }, 500); // 500 milisegundos
 };
+
 
 //MODIFICAR >>>> onclick="return modificar()"
 function modificar(e) {
