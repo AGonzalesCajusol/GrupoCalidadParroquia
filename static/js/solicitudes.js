@@ -475,156 +475,194 @@
     </tr>
 
     `;
-    var primera_comunion = 
-`
+    var primera_comunion =
+    `
     <tr>
-                        <td>DNI responsable </td>
-                        <td>
+        <td>DNI responsable </td>
+        <td>
 
-                    <div class="d-flex">
-                        <div class="col-5">
-                            <input id="dni_pri_responsable" name="dni_pri_responsable" oninput="desabilitar('es_dni_pri_responsable')" required="" type="number" max="99999999" min="10000000" class="form-control" placeholder="Ingrese un número">
-                        </div>
-                        <div class="col-6">
-                            <input type="text" id="nombre_responsable" name="Feligresnull" class="form-control" placeholder="Nombre del responsable" readonly="" disabled="">
-                        </div>
-                    </div>
+            <div class="d-flex">
+                <div class="col-5">
+                    <input id="dni_pri_responsable" name="dni_pri_responsable" oninput="desabilitar('es_dni_pri_responsable')" required="" type="number" max="99999999" min="11111111" class="form-control" placeholder="Ingrese un número">
+                </div>
+                <div class="col-6">
+                    <input type="text" id="nombre_responsable" name="nombre_responsable" class="form-control"
+                        placeholder="Nombre del responsable" readonly="" disabled="">
+                </div>
+            </div>
 
-                        </td>
-                        <td>
-                            <input type="checkbox" onclick="validar_dni('dni_pri_responsable','es_dni_pri_responsable','nombre_responsable')" name="es_dni_pri_responsable" id="es_dni_pri_responsable" required="">
-                            <label for="">Validado</label>
-                        </td>
-                        <td>
+        </td>
+        <td>
+            <input type="checkbox" id="es_dni_pri_responsable" onclick="validar_dni('dni_pri_responsable','es_dni_pri_responsable','nombre_responsable')" name="es_dni_pri_responsable" required>
+            <label for="">Validado</label>
+        </td>
+        <td>
 
-                        </td>
-                    </tr><tr>
-                        <td>Copia del DNI celebrante</td>
-                        <td>
-                            <input id="dni_pri_celebrante" name="dni_pri_celebrante" required="" type="file" class="form-control" accept="image/*,application/pdf">
-                        </td>
-                        <td>
-                            <input type="checkbox" name="es_dni_pri_celebrante" id="es_dni_pri_celebrante" required="">
-                            <label for="">Validado</label>
-                        </td>
-                        <td>
+        </td>
+    </tr>
+    <tr>
+        <td>Copia del DNI celebrante</td>
+        <td>
+            <input id="dni_pri_celebrante" name="dni_pri_celebrante" required="" type="file" class="form-control"
+                accept="image/*,application/pdf">
+        </td>
+        <td>
+            <input type="checkbox" name="es_dni_pri_celebrante" id="es_dni_pri_celebrante" required="">
+            <label for="">Validado</label>
+        </td>
+        <td>
 
-                            <button type="button" class="btn btn-primary btn-sm" title="Ver" onclick="visualizar('dni_pri_celebrante')">
-                                <svg class="svg-inline--fa fa-eye" aria-hidden="true" focusable="false" data-prefix="fas" data-icon="eye" role="img" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 576 512" data-fa-i2svg=""><path fill="currentColor" d="M572.5 238.1C518.3 115.5 410.9 32 288 32S57.69 115.6 3.469 238.1C1.563 243.4 0 251 0 256c0 4.977 1.562 12.6 3.469 17.03C57.72 396.5 165.1 480 288 480s230.3-83.58 284.5-206.1C574.4 268.6 576 260.1 576 256C576 251 574.4 243.4 572.5 238.1zM432 256c0 79.45-64.47 144-143.9 144C208.6 400 144 335.5 144 256S208.5 112 288 112S432 176.5 432 256zM288 160C285.7 160 282.4 160.4 279.5 160.8C284.8 170 288 180.6 288 192c0 35.35-28.65 64-64 64C212.6 256 201.1 252.7 192.7 247.5C192.4 250.5 192 253.6 192 256c0 52.1 43 96 96 96s96-42.99 96-95.99S340.1 160 288 160z"></path></svg><!-- <i class="fas fa-eye"></i> Font Awesome fontawesome.com -->
-                            </button>
+            <button type="button" class="btn btn-primary btn-sm" title="Ver" onclick="visualizar('dni_pri_celebrante')">
+                <svg class="svg-inline--fa fa-eye" aria-hidden="true" focusable="false" data-prefix="fas" data-icon="eye"
+                    role="img" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 576 512" data-fa-i2svg="">
+                    <path fill="currentColor"
+                        d="M572.5 238.1C518.3 115.5 410.9 32 288 32S57.69 115.6 3.469 238.1C1.563 243.4 0 251 0 256c0 4.977 1.562 12.6 3.469 17.03C57.72 396.5 165.1 480 288 480s230.3-83.58 284.5-206.1C574.4 268.6 576 260.1 576 256C576 251 574.4 243.4 572.5 238.1zM432 256c0 79.45-64.47 144-143.9 144C208.6 400 144 335.5 144 256S208.5 112 288 112S432 176.5 432 256zM288 160C285.7 160 282.4 160.4 279.5 160.8C284.8 170 288 180.6 288 192c0 35.35-28.65 64-64 64C212.6 256 201.1 252.7 192.7 247.5C192.4 250.5 192 253.6 192 256c0 52.1 43 96 96 96s96-42.99 96-95.99S340.1 160 288 160z">
+                    </path>
+                </svg><!-- <i class="fas fa-eye"></i> Font Awesome fontawesome.com -->
+            </button>
 
-                        </td>
-                    </tr><tr>
-                        <td>Copia DNI del padrino o madrina</td>
-                        <td>
-                            <input id="dni_pradri_madri" name="dni_pradri_madri" required="" type="file" class="form-control" accept="image/*,application/pdf">
-                        </td>
-                        <td>
-                            <input type="checkbox" name="es_dni_pradri_madri" id="es_dni_pradri_madri" required="">
-                            <label for="">Validado</label>
-                        </td>
-                        <td>
+        </td>
+    </tr>
+    <tr>
+        <td>Copia DNI del padrino o madrina</td>
+        <td>
+            <input id="dni_pradri_madri" name="dni_pradri_madri" required="" type="file" class="form-control"
+                accept="image/*,application/pdf">
+        </td>
+        <td>
+            <input type="checkbox" name="es_dni_pradri_madri" id="es_dni_pradri_madri" required="">
+            <label for="">Validado</label>
+        </td>
+        <td>
 
-                            <button type="button" class="btn btn-primary btn-sm" title="Ver" onclick="visualizar('dni_pradri_madri')">
-                                <svg class="svg-inline--fa fa-eye" aria-hidden="true" focusable="false" data-prefix="fas" data-icon="eye" role="img" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 576 512" data-fa-i2svg=""><path fill="currentColor" d="M572.5 238.1C518.3 115.5 410.9 32 288 32S57.69 115.6 3.469 238.1C1.563 243.4 0 251 0 256c0 4.977 1.562 12.6 3.469 17.03C57.72 396.5 165.1 480 288 480s230.3-83.58 284.5-206.1C574.4 268.6 576 260.1 576 256C576 251 574.4 243.4 572.5 238.1zM432 256c0 79.45-64.47 144-143.9 144C208.6 400 144 335.5 144 256S208.5 112 288 112S432 176.5 432 256zM288 160C285.7 160 282.4 160.4 279.5 160.8C284.8 170 288 180.6 288 192c0 35.35-28.65 64-64 64C212.6 256 201.1 252.7 192.7 247.5C192.4 250.5 192 253.6 192 256c0 52.1 43 96 96 96s96-42.99 96-95.99S340.1 160 288 160z"></path></svg><!-- <i class="fas fa-eye"></i> Font Awesome fontawesome.com -->
-                            </button>
-                        </td>
-                    </tr><tr>
-                        <td>Copia de constancia de bautismo del celebrante</td>
-                        <td>
-                            <input id="constan_bau_celebrante" name="constan_bau_celebrante" required="" type="file" class="form-control" accept="image/*,application/pdf">
-                        </td>
-                        <td>
-                            <input type="checkbox" name="es_constan_bau_celebrante" id="es_constan_bau_celebrante" required="">
-                            <label for="">Validado</label>
-                        </td>
-                        <td>
+            <button type="button" class="btn btn-primary btn-sm" title="Ver" onclick="visualizar('dni_pradri_madri')">
+                <svg class="svg-inline--fa fa-eye" aria-hidden="true" focusable="false" data-prefix="fas" data-icon="eye"
+                    role="img" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 576 512" data-fa-i2svg="">
+                    <path fill="currentColor"
+                        d="M572.5 238.1C518.3 115.5 410.9 32 288 32S57.69 115.6 3.469 238.1C1.563 243.4 0 251 0 256c0 4.977 1.562 12.6 3.469 17.03C57.72 396.5 165.1 480 288 480s230.3-83.58 284.5-206.1C574.4 268.6 576 260.1 576 256C576 251 574.4 243.4 572.5 238.1zM432 256c0 79.45-64.47 144-143.9 144C208.6 400 144 335.5 144 256S208.5 112 288 112S432 176.5 432 256zM288 160C285.7 160 282.4 160.4 279.5 160.8C284.8 170 288 180.6 288 192c0 35.35-28.65 64-64 64C212.6 256 201.1 252.7 192.7 247.5C192.4 250.5 192 253.6 192 256c0 52.1 43 96 96 96s96-42.99 96-95.99S340.1 160 288 160z">
+                    </path>
+                </svg><!-- <i class="fas fa-eye"></i> Font Awesome fontawesome.com -->
+            </button>
+        </td>
+    </tr>
+    <tr>
+        <td>Copia de constancia de bautismo del celebrante</td>
+        <td>
+            <input id="constan_bau_celebrante" name="constan_bau_celebrante" required="" type="file" class="form-control"
+                accept="image/*,application/pdf">
+        </td>
+        <td>
+            <input type="checkbox" name="es_constan_bau_celebrante" id="es_constan_bau_celebrante" required="">
+            <label for="">Validado</label>
+        </td>
+        <td>
 
-                            <button type="button" class="btn btn-primary btn-sm" title="Ver" onclick="visualizar('constan_bau_celebrante')">
-                                <svg class="svg-inline--fa fa-eye" aria-hidden="true" focusable="false" data-prefix="fas" data-icon="eye" role="img" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 576 512" data-fa-i2svg=""><path fill="currentColor" d="M572.5 238.1C518.3 115.5 410.9 32 288 32S57.69 115.6 3.469 238.1C1.563 243.4 0 251 0 256c0 4.977 1.562 12.6 3.469 17.03C57.72 396.5 165.1 480 288 480s230.3-83.58 284.5-206.1C574.4 268.6 576 260.1 576 256C576 251 574.4 243.4 572.5 238.1zM432 256c0 79.45-64.47 144-143.9 144C208.6 400 144 335.5 144 256S208.5 112 288 112S432 176.5 432 256zM288 160C285.7 160 282.4 160.4 279.5 160.8C284.8 170 288 180.6 288 192c0 35.35-28.65 64-64 64C212.6 256 201.1 252.7 192.7 247.5C192.4 250.5 192 253.6 192 256c0 52.1 43 96 96 96s96-42.99 96-95.99S340.1 160 288 160z"></path></svg><!-- <i class="fas fa-eye"></i> Font Awesome fontawesome.com -->
-                            </button>
-                        </td>
-                    </tr><tr>
-                        <td>Constancia de estudios de 3°, 4° o 5° primaria</td>
-                        <td>
-                            <input id="cosntan_estudios" name="cosntan_estudios" type="file" class="form-control" accept="image/*,application/pdf">
-                        </td>
-                        <td>
-                            <input type="checkbox" name="es_cosntan_estudios" id="es_cosntan_estudios">
-                            <label for="">Validado</label>
-                        </td>
-                        <td>
-                            <button type="button" class="btn btn-primary btn-sm" title="Ver" onclick="visualizar('cosntan_estudios')">
-                                <svg class="svg-inline--fa fa-eye" aria-hidden="true" focusable="false" data-prefix="fas" data-icon="eye" role="img" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 576 512" data-fa-i2svg=""><path fill="currentColor" d="M572.5 238.1C518.3 115.5 410.9 32 288 32S57.69 115.6 3.469 238.1C1.563 243.4 0 251 0 256c0 4.977 1.562 12.6 3.469 17.03C57.72 396.5 165.1 480 288 480s230.3-83.58 284.5-206.1C574.4 268.6 576 260.1 576 256C576 251 574.4 243.4 572.5 238.1zM432 256c0 79.45-64.47 144-143.9 144C208.6 400 144 335.5 144 256S208.5 112 288 112S432 176.5 432 256zM288 160C285.7 160 282.4 160.4 279.5 160.8C284.8 170 288 180.6 288 192c0 35.35-28.65 64-64 64C212.6 256 201.1 252.7 192.7 247.5C192.4 250.5 192 253.6 192 256c0 52.1 43 96 96 96s96-42.99 96-95.99S340.1 160 288 160z"></path></svg><!-- <i class="fas fa-eye"></i> Font Awesome fontawesome.com -->
-                            </button>
-                        </td>
-                    </tr><tr>
-                        <td>Copia de recibo de luz o agua</td>
-                        <td>
-                            <input id="cop_luz_agua" name="cop_luz_agua" type="file" class="form-control" accept="image/*,application/pdf">
-                        </td>
-                        <td>
-                            <input type="checkbox" name="es_cop_luz_agua" id="es_cop_luz_agua">
-                            <label for="">Validado</label>
-                        </td>
-                        <td>
+            <button type="button" class="btn btn-primary btn-sm" title="Ver" onclick="visualizar('constan_bau_celebrante')">
+                <svg class="svg-inline--fa fa-eye" aria-hidden="true" focusable="false" data-prefix="fas" data-icon="eye"
+                    role="img" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 576 512" data-fa-i2svg="">
+                    <path fill="currentColor"
+                        d="M572.5 238.1C518.3 115.5 410.9 32 288 32S57.69 115.6 3.469 238.1C1.563 243.4 0 251 0 256c0 4.977 1.562 12.6 3.469 17.03C57.72 396.5 165.1 480 288 480s230.3-83.58 284.5-206.1C574.4 268.6 576 260.1 576 256C576 251 574.4 243.4 572.5 238.1zM432 256c0 79.45-64.47 144-143.9 144C208.6 400 144 335.5 144 256S208.5 112 288 112S432 176.5 432 256zM288 160C285.7 160 282.4 160.4 279.5 160.8C284.8 170 288 180.6 288 192c0 35.35-28.65 64-64 64C212.6 256 201.1 252.7 192.7 247.5C192.4 250.5 192 253.6 192 256c0 52.1 43 96 96 96s96-42.99 96-95.99S340.1 160 288 160z">
+                    </path>
+                </svg><!-- <i class="fas fa-eye"></i> Font Awesome fontawesome.com -->
+            </button>
+        </td>
+    </tr>
+    <tr>
+        <td>Constancia de estudios de 3°, 4° o 5° primaria</td>
+        <td>
+            <input id="cosntan_estudios" name="cosntan_estudios" type="file" class="form-control"
+                accept="image/*,application/pdf">
+        </td>
+        <td>
+            <input type="checkbox" name="es_cosntan_estudios" id="es_cosntan_estudios">
+            <label for="">Validado</label>
+        </td>
+        <td>
+            <button type="button" class="btn btn-primary btn-sm" title="Ver" onclick="visualizar('cosntan_estudios')">
+                <svg class="svg-inline--fa fa-eye" aria-hidden="true" focusable="false" data-prefix="fas" data-icon="eye"
+                    role="img" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 576 512" data-fa-i2svg="">
+                    <path fill="currentColor"
+                        d="M572.5 238.1C518.3 115.5 410.9 32 288 32S57.69 115.6 3.469 238.1C1.563 243.4 0 251 0 256c0 4.977 1.562 12.6 3.469 17.03C57.72 396.5 165.1 480 288 480s230.3-83.58 284.5-206.1C574.4 268.6 576 260.1 576 256C576 251 574.4 243.4 572.5 238.1zM432 256c0 79.45-64.47 144-143.9 144C208.6 400 144 335.5 144 256S208.5 112 288 112S432 176.5 432 256zM288 160C285.7 160 282.4 160.4 279.5 160.8C284.8 170 288 180.6 288 192c0 35.35-28.65 64-64 64C212.6 256 201.1 252.7 192.7 247.5C192.4 250.5 192 253.6 192 256c0 52.1 43 96 96 96s96-42.99 96-95.99S340.1 160 288 160z">
+                    </path>
+                </svg><!-- <i class="fas fa-eye"></i> Font Awesome fontawesome.com -->
+            </button>
+        </td>
+    </tr>
+    <tr>
+        <td>Copia de recibo de luz o agua</td>
+        <td>
+            <input id="cop_luz_agua" name="cop_luz_agua" type="file" class="form-control" accept="image/*,application/pdf">
+        </td>
+        <td>
+            <input type="checkbox" name="es_cop_luz_agua" id="es_cop_luz_agua">
+            <label for="">Validado</label>
+        </td>
+        <td>
 
-                            <button type="button" class="btn btn-primary btn-sm" title="Ver" onclick="visualizar('cop_luz_agua')">
-                                <svg class="svg-inline--fa fa-eye" aria-hidden="true" focusable="false" data-prefix="fas" data-icon="eye" role="img" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 576 512" data-fa-i2svg=""><path fill="currentColor" d="M572.5 238.1C518.3 115.5 410.9 32 288 32S57.69 115.6 3.469 238.1C1.563 243.4 0 251 0 256c0 4.977 1.562 12.6 3.469 17.03C57.72 396.5 165.1 480 288 480s230.3-83.58 284.5-206.1C574.4 268.6 576 260.1 576 256C576 251 574.4 243.4 572.5 238.1zM432 256c0 79.45-64.47 144-143.9 144C208.6 400 144 335.5 144 256S208.5 112 288 112S432 176.5 432 256zM288 160C285.7 160 282.4 160.4 279.5 160.8C284.8 170 288 180.6 288 192c0 35.35-28.65 64-64 64C212.6 256 201.1 252.7 192.7 247.5C192.4 250.5 192 253.6 192 256c0 52.1 43 96 96 96s96-42.99 96-95.99S340.1 160 288 160z"></path></svg><!-- <i class="fas fa-eye"></i> Font Awesome fontawesome.com -->
-                                </button>
-                        </td>
-                    </tr><tr>
-                        <td>DNI del celebrante </td>
-                        <td>
+            <button type="button" class="btn btn-primary btn-sm" title="Ver" onclick="visualizar('cop_luz_agua')">
+                <svg class="svg-inline--fa fa-eye" aria-hidden="true" focusable="false" data-prefix="fas" data-icon="eye"
+                    role="img" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 576 512" data-fa-i2svg="">
+                    <path fill="currentColor"
+                        d="M572.5 238.1C518.3 115.5 410.9 32 288 32S57.69 115.6 3.469 238.1C1.563 243.4 0 251 0 256c0 4.977 1.562 12.6 3.469 17.03C57.72 396.5 165.1 480 288 480s230.3-83.58 284.5-206.1C574.4 268.6 576 260.1 576 256C576 251 574.4 243.4 572.5 238.1zM432 256c0 79.45-64.47 144-143.9 144C208.6 400 144 335.5 144 256S208.5 112 288 112S432 176.5 432 256zM288 160C285.7 160 282.4 160.4 279.5 160.8C284.8 170 288 180.6 288 192c0 35.35-28.65 64-64 64C212.6 256 201.1 252.7 192.7 247.5C192.4 250.5 192 253.6 192 256c0 52.1 43 96 96 96s96-42.99 96-95.99S340.1 160 288 160z">
+                    </path>
+                </svg><!-- <i class="fas fa-eye"></i> Font Awesome fontawesome.com -->
+            </button>
+        </td>
+    </tr>
+    <tr>
+        <td>DNI del celebrante </td>
+        <td>
 
-                    <div class="d-flex">
-                        <div class="col-5">
-                            <input id="dni_celebrante" name="dni_celebrante" oninput="desabilitar('es_dni_celebrante')" required="" type="number" max="99999999" min="10000000" class="form-control" placeholder="Ingrese un número">
-                        </div>
-                        <div class="col-6">
-                            <input type="text" id="nombre_responsable2" name="Feligresnull" class="form-control" placeholder="Nombre del responsable" readonly="" disabled="">
-                        </div>
-                    </div>
+            <div class="d-flex">
+                <div class="col-5">
+                    <input id="dni_celebrante" name="dni_celebrante" oninput="desabilitar('es_dni_celebrante')" required="" type="number" max="99999999" min="10000000" class="form-control" placeholder="Ingrese un número">
+                </div>
+                <div class="col-6">
+                    <input type="text" id="nombre_responsable2" name="nombre_responsable2" class="form-control"
+                        placeholder="Nombre del celebrante" readonly="" disabled="">
+                </div>
+            </div>
 
-                        </td>
-                        <td>
-                            <input type="checkbox" onclick="validar_dni('dni_celebrante','es_dni_celebrante','nombre_responsable2')" name="es_dni_celebrante" id="es_dni_celebrante" required="">
-                            <label for="">Validado</label>
-                        </td>
-                        <td>
-                        </td>
-                    <tr></tr>
-                        <td>Nombre sede</td>
-                        <td>
-                            <input id="sede" name="sede" value="Sede Central" type="text" class="form-control" placeholder="Ingrese texto" disabled="">
-                        </td>
-                        <td>
-                            <input type="checkbox" name="es_sede" id="es_sede" required="">
-                            <label for="">Validado</label>
-                        </td>
-                        <td>
+        </td>
+        <td>
+            <input type="checkbox" onclick="validar_dni('dni_celebrante','es_dni_celebrante','nombre_responsable2')" name="es_dni_celebrante" id="es_dni_celebrante" required="">
+            <label for="">Validado</label>
+        </td>
+        <td>
+        </td>
+    <tr></tr>
+    <td>Nombre sede</td>
+    <td>
+        <input id="sede" name="sede" value="Sede Central" type="text" class="form-control" placeholder="Ingrese texto"
+            disabled="">
+    </td>
+    <td>
+        <input type="checkbox" name="es_sede" id="es_sede" required="">
+        <label for="">Validado</label>
+    </td>
+    <td>
 
-                        </td>
-                    </tr>
-                    <tr>
-                        <td>charlas preparación</td>
-                        <td>
-                            <div id="rcharlas">
-                                <select class="form-select" name="cha" id="cha">
-                            </select>
-                        </td>
-                        <td>
-                            <input type="checkbox" name="es_charlas" id="es_charlas" required="">
-                            <label for="">Validado</label>
-                        </td>
-                        <td>
+    </td>
+    </tr>
+    <tr>
+        <td>charlas preparación</td>
+        <td>
+            <div id="rcharlas">
+                <select class="form-select" name="cha" id="cha">
+                </select>
+        </td>
+        <td>
+            <input type="checkbox" name="es_charlas" id="es_charlas" required="">
+            <label for="">Validado</label>
+        </td>
+        <td>
 
-                                    <button class="btn btn-primary" type="button" onclick="ver_fechas()">
-                                        <i class="bi bi-calendar3"></i>
-                                    </button>
+            <button class="btn btn-primary" type="button" onclick="ver_fechas()">
+                <i class="bi bi-calendar3"></i>
+            </button>
 
-                        </td>
-                    </tr>
+        </td>
+    </tr>
     `
     ;
 
@@ -1358,9 +1396,9 @@ function array_comunion() {
                         row.innerHTML = `
                             <td class="text-center">${solicitud.id_solicitud}</td>
                             <td class="text-center">${solicitud.fecha}</td>
-                            <td class="text-center">${solicitud.nombre_sede}</td>
-                            <td class="text-center">${solicitud.nombre_liturgia}</td>
-                            <td class="text-center">${solicitud.nombres}</td>
+                            <td class="text-right">${solicitud.nombre_sede}</td>
+                            <td class="text-right">${solicitud.nombre_liturgia}</td>
+                            <td class="text-right">${solicitud.nombres}</td>
                             <td class="text-center">
                                 <button class="btn btn-primary btn-sm" onclick="rellenar_formulario(${solicitud.id_solicitud}, '${solicitud.nombre_liturgia}')">
                                     <i class="bi bi-check2-circle"></i>
@@ -1431,13 +1469,13 @@ function array_comunion() {
                     var tr = document.createElement('tr');
                     tr.innerHTML = 
                         `
-                        <td> ${dt.id_asistencia} </td>
+                        <td class="text-center"> ${dt.id_asistencia} </td>
                         <td> ${dt.descripcion}  </td>
-                        <td> ${dt.fecha}  </td>
+                        <td class="text-center"> ${dt.fecha}  </td>
                         <td> ${dt.rol}  </td>
-                        <td> ${dt.dni}  </td>
-                        <td> ${dt.nombre}  </td>
-                        <td>
+                        <td class="text-center"> ${dt.dni}  </td>
+                        <td class="text-center"> ${dt.nombre}  </td>
+                        <td class="text-center">
                         <input class="me-1" id="${dt.id_asistencia}" 
                             type="checkbox" 
                             ${dt.estado == 1 ? 'checked disabled' : `onclick="agregar_asistencia(${dt.id_asistencia})"`}>
