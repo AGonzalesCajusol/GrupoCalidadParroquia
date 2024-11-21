@@ -27,10 +27,10 @@ def registrar_rutas(app):
         
 
     @app.route("/gestionar_asistencia_celebracion/<int:id_celebracion>", methods=["GET"])
-    @requerido_login
-    def gestionar_asistencia_celebracion(id_celebracion):
+    #@requerido_login
+    #def gestionar_asistencia_celebracion(id_celebracion):
     
-        try:
+        #try:
             # Obtener solicitudes para el acto litúrgico específico
     @app.route("/gestionar_asistencia_celebracion", methods=["GET", "POST"])
     def gestionar_asistencia_celebracion():
