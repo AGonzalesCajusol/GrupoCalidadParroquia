@@ -26,19 +26,19 @@ def registrar_rutas(app):
 
         
 
-    # @app.route("/gestionar_asistencia_celebracion/<int:id_celebracion>", methods=["GET"])
-    # @requerido_login
-    # def gestionar_asistencia_celebracion(id_celebracion):
+    @app.route("/gestionar_asistencia_celebracion/<int:id_celebracion>", methods=["GET"])
+    #@requerido_login
+    #def gestionar_asistencia_celebracion(id_celebracion):
     
-    #     try:
-    #         # Obtener solicitudes para el acto litúrgico específico
-    # @app.route("/gestionar_asistencia_celebracion", methods=["GET", "POST"])
-    # def gestionar_asistencia_celebracion():
-    #     if request.method == "POST":
-    #         data = request.get_json()  # Leer datos del cuerpo para POST
-    #         id_celebracion = data.get("id_celebracion")
-    #     elif request.method == "GET":
-    #         id_celebracion = request.args.get("id_celebracion")
+        try:
+            # Obtener solicitudes para el acto litúrgico específico
+    @app.route("/gestionar_asistencia_celebracion", methods=["GET", "POST"])
+    def gestionar_asistencia_celebracion():
+        if request.method == "POST":
+            data = request.get_json()  # Leer datos del cuerpo para POST
+            id_celebracion = data.get("id_celebracion")
+        elif request.method == "GET":
+            id_celebracion = request.args.get("id_celebracion")
 
     #     if not id_celebracion:
     #         return jsonify(success=False, message="ID de celebración no proporcionado"), 400
