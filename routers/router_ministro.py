@@ -13,13 +13,14 @@ def encriptar_contraseña(contraseña):
     sha_signature = hashlib.sha256(contraseña.encode()).hexdigest()
     return sha_signature
 
+
 def registrar_rutas(app):
     # Ruta para gestionar ministros
     @app.route("/gestionar_ministro", methods=["GET"])
     @requerido_login
     def gestionar_ministro():
         try:
-            ministros = obtener_ministros()  
+            ministros = obtener_ministros()
             tipos = obtener_tipos_ministro()
             sedes = obtener_sede()
             cargos = obtener_cargo()
@@ -42,8 +43,9 @@ def registrar_rutas(app):
             cargo_nombre = request.form.get("id_cargo")
             contraseña = request.form.get("password")
             confirmar_contraseña = request.form.get("confirmPassword")
-
-            # Validación básica de los campos requeridos
+            # Capturar el estado (activo o inactivo)
+            estado = request.form.get("estado", "off")
+# Validación básica de los campos requeridos
             if not all([nombre, documento, nacimiento, ordenacion, tipo_ministro_nombre, sede_nombre, cargo_nombre, contraseña, confirmar_contraseña]):
                 return jsonify(success=False, message="Todos los campos son obligatorios"), 400
 
@@ -55,7 +57,8 @@ def registrar_rutas(app):
             contraseña_encriptada = encriptar_contraseña(contraseña)
 
             # Obtener los IDs a partir de los nombres proporcionados
-            id_tipoministro = obtener_id_tipoMinistro_por_nombre(tipo_ministro_nombre)
+            id_tipoministro = obtener_id_tipoMinistro_por_nombre(
+                tipo_ministro_nombre)
             id_sede = obtener_id_sede_por_nombre(sede_nombre)
             id_cargo = obtener_id_cargo_por_nombre(cargo_nombre)
 
@@ -67,10 +70,13 @@ def registrar_rutas(app):
             if not id_cargo:
                 return jsonify(success=False, message="Cargo no válido"), 400
 
+            # Convertir estado a 1 (activo) o 0 (inactivo)
+            estado_final = 1 if estado == "on" else 0
+
             # Insertar el ministro en la base de datos
             insertar_ministro(
                 nombre, documento, nacimiento, ordenacion, actividades,
-                id_tipoministro, id_sede, id_cargo, contraseña_encriptada
+                id_tipoministro, id_sede, id_cargo, contraseña_encriptada, estado_final
             )
 
             # Responder con éxito
@@ -78,7 +84,6 @@ def registrar_rutas(app):
         except Exception as e:
             print(f"Error al insertar ministro: {str(e)}")
             return jsonify(success=False, message=f"Error al procesar el ministro: {str(e)}"), 500
-
 
     @app.route("/procesar_actualizar_ministro", methods=["POST"])
     @requerido_login
@@ -94,6 +99,7 @@ def registrar_rutas(app):
             tipo_ministro_nombre = request.form["id_tipoministro"]
             sede_nombre = request.form["id_sede"]
             cargo_nombre = request.form["id_cargo"]
+            estado = request.form.get("estado", "off")  # Capturar el estado (activo o inactivo)
 
             # Obtener la nueva contraseña y la confirmación
             nueva_contraseña = request.form.get("password")
@@ -116,6 +122,9 @@ def registrar_rutas(app):
                 if nueva_contraseña:
                     contraseña_encriptada = encriptar_contraseña(nueva_contraseña)
 
+            # Convertir estado a 1 (activo) o 0 (inactivo)
+            estado_final = 1 if estado == "on" else 0
+
             # Actualizar el ministro en la base de datos
             actualizar_ministro(
                 nombre,
@@ -127,15 +136,16 @@ def registrar_rutas(app):
                 id_sede,
                 id_cargo,
                 id,
-                contraseña_encriptada  # Solo se actualizará si se proporcionó una nueva contraseña
+                contraseña_encriptada,  # Solo se actualizará si se proporcionó una nueva contraseña
+                estado_final
             )
             return jsonify(success=True)
         except Exception as e:
             print(f"Error al actualizar ministro: {str(e)}")
             return jsonify(success=False, message=str(e)), 500
 
-
     # Procesar la eliminación de un ministro
+
     @app.route("/eliminar_ministro", methods=["POST"])
     @requerido_login
     def procesar_eliminar_ministro():
@@ -147,16 +157,15 @@ def registrar_rutas(app):
             print(f"Error al eliminar ministro: {str(e)}")
             return jsonify(success=False, message="Error interno del servidor: " + str(e)), 500
 
-
     @app.route("/procesar_dar_baja_ministro", methods=["POST"])
     @requerido_login
     def procesar_dar_baja_ministro():
-            try:
-                data = request.json
-                id = data.get("id")
-                estado = data.get("estado", 0)  # Estado del tipo de ministro (1: activo, 0: inactivo)
-                dar_baja_ministro(id,estado)
-                return jsonify(success=True)
-            except Exception as e:
-                return jsonify(success=False, message="Error al actualizar el tipo de ministro: " + str(e))
-
+        try:
+            data = request.json
+            id = data.get("id")
+            # Estado del tipo de ministro (1: activo, 0: inactivo)
+            estado = data.get("estado", 0)
+            dar_baja_ministro(id, estado)
+            return jsonify(success=True)
+        except Exception as e:
+            return jsonify(success=False, message="Error al actualizar el tipo de ministro: " + str(e))
