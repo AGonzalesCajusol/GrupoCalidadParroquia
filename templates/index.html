@@ -33,16 +33,23 @@
     <link href="https://cdn.jsdelivr.net/npm/fullcalendar@5.11.3/main.min.css" rel="stylesheet">
     <!-- FullCalendar JS -->
     <script src="https://cdn.jsdelivr.net/npm/fullcalendar@5.11.3/main.min.js"></script>
+
+    <style>
+        .btm-hover:focus{
+            border: none;
+        }
+    </style>
+
 <body class="bg-light">
 
     <header class="bg-white shadow-sm border-bottom">
         <div class="container-fluid d-flex align-items-center justify-content-between py-3 px-4">
             <!-- Logo y Nombre de la Sede -->
             <div class="d-flex align-items-center">
-                <img src="/static/img/celebracion.avif" alt="Logo Iglesia" class="me-3" style="height: 40px;">
+                <img src="/static/img/calidazzzz.jpg" alt="Logo Iglesia" class="me-3" style="height: 60px; width: 60px;">
                 <div>
                     <h5 class="mb-0 text-primary fw-bold">{{ request.cookies.get('sede') }}</h5>
-                    <small class="text-muted">Sistema de Gestión Parroquial</small>
+                    <small class="text-muted">😼 🥃 🥃 de la Chavarry</small>
                 </div>
             </div>
 
@@ -51,13 +58,17 @@
                 <!-- Información del Usuario -->
                 {% if request.cookies.get('nombre') %}
                 <div class="dropdown">
-                    <button class="btn btn-outline-secondary dropdown-toggle" type="button" id="dropdownUserMenu"
+                    <button class="btn text-start   btm-hover" type="button" id="dropdownUserMenu"
                         data-bs-toggle="dropdown" aria-expanded="false">
-                        <i class="bi bi-person-circle me-2"></i>
-                        {{ request.cookies.get('nombre') }}
+                        <div class="text-start text-primary fw-bold">
+                            <i class="bi bi-person-circle me-2"></i>
+                            <span id="ministro" class="me-2">{{ request.cookies.get('nombre')
+                            }}</span><i class="bi bi-caret-down-fill"></i>
+                        </div>
+                        <small class=" ms-4 text-muted">{{ request.cookies.get('tipo') }}</small>
                     </button>
                     <ul class="dropdown-menu dropdown-menu-end" aria-labelledby="dropdownUserMenu">
-                        <li><a class="dropdown-item text-danger" href="#" onclick="finalizar_sesion()">Salir</a></li>
+                        <li><a class="dropdown-item text-danger text-e" href="#" onclick="finalizar_sesion()">Salir <i class="bi bi-box-arrow-right"></i></a></li>
                     </ul>
                 </div>
                 {% else %}
