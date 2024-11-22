@@ -5,68 +5,92 @@ $(document).ready(function() {
 function listar() {
     const tbody = document.getElementById('cuerpo_actos');
     
-    if ($.fn.dataTable.isDataTable('#tablas')) {
-        $('#tablas').DataTable().clear(); 
-        $('#tablas').DataTable().destroy(); 
-    }
-    
-
-    
     fetch('/Apilistaactos')
-        .then(response => {
-            return response.json();
-        })
+        .then(response => response.json())
         .then(data => {
-            tbody.textContent = '';  
-                data.forEach(element => {
-                const tr = document.createElement('tr');
-                tr.innerHTML = `
-                    <td> ${element.id} </td>
-                    <td> ${element.nombre_acto} </td>
-                    <td> ${element.sacramento}</td>
-                    <td> ${element.estado}</td>
-                    <td> ${element.monto}</td>
-                    <td>
-                        <button class="btn btn-primary btn-sm" title="Ver" onclick="ver( ${element.id}, '${element.nombre_acto}', '${element.sacramento}', '${element.estado}', ${element.monto})">
+            // Verificar si DataTable ya está inicializado
+            if ($.fn.dataTable.isDataTable('#tablas')) {
+                const dataTable = $('#tablas').DataTable();
+                dataTable.clear(); // Limpiar datos existentes
+                const rows = data.map(element => {
+                    return [
+                        element.id,
+                        element.nombre_acto,
+                        element.sacramento,
+                        element.estado,
+                        element.monto,
+                        `
+                        <button class="btn btn-primary btn-sm" title="Ver" onclick="ver(${element.id}, '${element.nombre_acto}', '${element.sacramento}', '${element.estado}', ${element.monto})">
                             <i class="fas fa-eye"></i>
                         </button>
-                        <button class="btn btn-warning btn-sm" title="Editar" onclick="modificarw( ${element.id}, '${element.nombre_acto}', '${element.sacramento}', '${element.estado}', ${element.monto})">
+                        <button class="btn btn-warning btn-sm" title="Editar" onclick="modificarw(${element.id}, '${element.nombre_acto}', '${element.sacramento}', '${element.estado}', ${element.monto})">
                             <i class="fas fa-edit"></i>
                         </button>
-                        <button type="button" class="btn btn-secondary btn-sm" title="Dar de baja" onclick="darbaja(${element.id})"  ${element.estado == 'Inactivo' ? 'disabled' : ''} ">
-                            <i class="fas fa-ban"></i>
-                        </button>
+                        ${element.estado == 'Inactivo' ? 
+                            `<button type="button" class="btn btn-success btn-sm" title="Activar" onclick="activar(${element.id})">
+                                <i class="bi bi-check-lg"></i>
+                            </button>`
+                            :
+                            `<button type="button" class="btn btn-secondary btn-sm" title="Dar de baja" onclick="darbaja(${element.id})">
+                                <i class="fas fa-ban"></i>
+                            </button>`
+                        }
                         <button type="button" class="btn btn-danger btn-sm" title="Eliminar" onclick="eliminar(${element.id})">
                             <i class="fas fa-trash-alt"></i>
                         </button>
-                    </td>
-                `;
-                tbody.appendChild(tr);
-            });
-            console.log('Tabla antes de destruir:', $.fn.dataTable.isDataTable('#tablas'));
-
-
-
-            $('#tablas').DataTable({
-                destroy:    true,
-                pageLength: 8,
-                dom: '<"d-flex justify-content-between align-items-center mb-3"<"d-flex"f><"d-flex justify-content-end button-section">>rt<"bottom"p>',
-                language: {
-                    search: "Buscar:",
-                    searchPlaceholder: "Filtrar registros..."
-                },
-                columnDefs: [
-                    { orderable: false, targets: [5] },
-                    { targets: [0, 3, 5], className: 'text-center' },  // Alineación centrada
-                    { targets: [4], className: 'text-end' }
-                ],
-                initComplete: function () {
-                    // Insertar el botón "Agregar" dinámicamente
-                    $("div.button-section").html('<button type="button" class="btn btn-success btn-sm mr-2" onclick="abrir_modal(\'agregar\')"><i class="bi bi-plus-circle"></i> Agregar acto litúrgico</button>');
-                }
-            });
+                        `
+                    ];
+                });
+                dataTable.rows.add(rows).draw(); // Agregar y redibujar los datos
+            } else {
+                // Inicializar DataTable si no existe
+                $('#tablas').DataTable({
+                    data: data.map(element => [
+                        element.id,
+                        element.nombre_acto,
+                        element.sacramento,
+                        element.estado,
+                        element.monto,
+                        `
+                        <button class="btn btn-primary btn-sm" title="Ver" onclick="ver(${element.id}, '${element.nombre_acto}', '${element.sacramento}', '${element.estado}', ${element.monto})">
+                            <i class="fas fa-eye"></i>
+                        </button>
+                        <button class="btn btn-warning btn-sm" title="Editar" onclick="modificarw(${element.id}, '${element.nombre_acto}', '${element.sacramento}', '${element.estado}', ${element.monto})">
+                            <i class="fas fa-edit"></i>
+                        </button>
+                        ${element.estado == 'Inactivo' ? 
+                            `<button type="button" class="btn btn-success btn-sm" title="Activar" onclick="activar(${element.id})">
+                                <i class="bi bi-check-lg"></i>
+                            </button>`
+                            :
+                            `<button type="button" class="btn btn-secondary btn-sm" title="Dar de baja" onclick="darbaja(${element.id})">
+                                <i class="fas fa-ban"></i>
+                            </button>`
+                        }
+                        <button type="button" class="btn btn-danger btn-sm" title="Eliminar" onclick="eliminar(${element.id})">
+                            <i class="fas fa-trash-alt"></i>
+                        </button>
+                        `
+                    ]),
+                    destroy: false,
+                    pageLength: 8,
+                    dom: '<"d-flex justify-content-between align-items-center mb-3"<"d-flex"f><"d-flex justify-content-end button-section">>rt<"bottom"p>',
+                    language: {
+                        search: "Buscar:",
+                        searchPlaceholder: "Filtrar registros..."
+                    },
+                    columnDefs: [
+                        { orderable: false, targets: [5] },
+                        { targets: [0, 3, 5], className: 'text-center' },
+                        { targets: [4], className: 'text-end' }
+                    ],
+                    initComplete: function () {
+                        $("div.button-section").html('<button type="button" class="btn btn-success btn-sm mr-2" onclick="abrir_modal(\'agregar\')"><i class="bi bi-plus-circle"></i> Agregar acto litúrgico</button>');
+                    }
+                });
+            }
         })
-        .catch(error => console.error('Error al listar actos:', error)); // Manejo de errores
+        .catch(error => console.error('Error al listar actos:', error));
 }
 
 const modal = new bootstrap.Modal(document.getElementById('modalactos'));
@@ -222,7 +246,7 @@ function darbaja(id){
             }).showToast();
         } else {            
             Toastify({
-                text: "No se pudo dar de baha el acto litúrgico",
+                text: "No se pudo dar de baja el acto litúrgico",
                 duration: 2000,
                 close: true,
                 backgroundColor: "#dc3545",
@@ -231,6 +255,32 @@ function darbaja(id){
             }).showToast();
         }
     });   
+}
+function activar(id){
+    fetch(`/activar_acto/${id}`)
+    .then(response => response.json())
+    .then(data => {
+        if (data.estado === 'Correcto') {
+            listar();            
+            Toastify({
+                text: "Se activo correctamente el estado del acto litúrgico",
+                duration: 2000,
+                close: true,
+                backgroundColor: "--bs-primary",
+                gravity: "bottom",
+                position: "right",
+            }).showToast();
+        } else {            
+            Toastify({
+                text: "No se pudo activar el estado del acto litúrgico",
+                duration: 2000,
+                close: true,
+                backgroundColor: "#dc3545",
+                gravity: "bottom",
+                position: "right",
+            }).showToast();
+        }
+    }); 
 }
 
 function ver(id,nombre,tipo,estado,monto){

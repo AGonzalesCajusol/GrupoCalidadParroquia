@@ -240,7 +240,17 @@ def registrar_rutas(app):
         except Exception as e:
             return jsonify({'estado': 'Error', 'mensaje': str(e)}), 500  # Error del servidor
         
-
+    @app.route('/activar_acto/<int:id>', methods=["GET"])
+    @requerido_login
+    def activar_acto(id):
+        try:
+            if cal.activar_acto(id):
+                return jsonify({'estado': 'Correcto'}), 200  # Respuesta exitosa
+            else:
+                return jsonify({'estado': 'Incorrecto'}), 404  # No se encontró el acto
+        except Exception as e:
+            return jsonify({'estado': 'Error', 'mensaje': str(e)}), 500  # Error del servidor
+        
     @app.route("/modificaracto1", methods=["POST"])
     @requerido_login
     def modificaracto1():
@@ -322,6 +332,17 @@ def registrar_rutas(app):
     def darbaja_requisito(id,id_requi):
         try:
             if cal.darbaja_requisito(id, id_requi):
+                return jsonify({'estado': 'Correcto'}), 200  # Respuesta exitosa
+            else:
+                return jsonify({'estado': 'Incorrecto'}), 404  # No se encontró el acto
+        except Exception as e:
+            return jsonify({'estado': 'Error', 'mensaje': str(e)}), 500  # Error del servidor
+        
+    @app.route('/activar_requisito/<int:id>/<int:id_requi>', methods=["GET"])
+    @requerido_login
+    def activar_requisito(id,id_requi):
+        try:
+            if cal.activar_requisito(id, id_requi):
                 return jsonify({'estado': 'Correcto'}), 200  # Respuesta exitosa
             else:
                 return jsonify({'estado': 'Incorrecto'}), 404  # No se encontró el acto

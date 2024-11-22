@@ -294,6 +294,21 @@ def darbaja_acto(id):
     finally:
         conexion.close()
 
+def activar_acto(id):
+    conexion = obtener_conexion()
+    try:
+        with conexion.cursor() as cursor:
+            cursor.execute('''Update actoliturgico  SET estado= 'A' WHERE id_actoliturgico = %s ''', (id,))
+            conexion.commit()
+            return True
+    except Exception as e:
+        conexion.rollback()
+        print(f'Error al eliminar acto: {e}')
+        return False
+
+    finally:
+        conexion.close()
+
 def modificar_acto(id_actoliturgico, acto, tipo, monto, estado):
     conexion = obtener_conexion()
     try:
@@ -319,7 +334,7 @@ def listar_requisitosLit():
     try:
         with conexion.cursor() as cursor:
             cursor.execute('''
-                select * from actoliturgico as   al left join  requisito as rq 
+                select * from actoliturgico as   al inner join  requisito as rq 
                 on rq.id_actoliturgico = al.id_actoliturgico order by al.id_actoliturgico asc
             ''')
             valores = cursor.fetchall()
@@ -366,7 +381,21 @@ def darbaja_requisito(id_acto, id_requisito):
         conexion.rollback()
         print(f'Error al eliminar acto: {e}')
         return False
+    finally:
+        conexion.close()
 
+
+def activar_requisito(id_acto, id_requisito):
+    conexion = obtener_conexion()
+    try:
+        with conexion.cursor() as cursor:
+            cursor.execute('''update requisito set estado = 'A' where id_requisito = %s and id_actoliturgico = %s''', (id_requisito,id_acto,))
+            conexion.commit()
+            return True
+    except Exception as e:
+        conexion.rollback()
+        print(f'Error al eliminar acto: {e}')
+        return False
     finally:
         conexion.close()
 
@@ -553,7 +582,6 @@ def obtener_celebraciones_por_fecha(year, month=None):
         return []
     finally:
         conexion.close()
-
 
 def obtener_celebraciones_por_fecha(year, month=None):
     conexion = obtener_conexion()
