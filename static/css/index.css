@@ -1,0 +1,125 @@
+/* Estilo del header */
+header {
+    border-bottom: 2px solid #f0f0f0;
+}
+
+header .dropdown-menu {
+    min-width: 180px; /* Asegura un ancho consistente en los menús desplegables */
+}
+
+/* Fondo fijo del aside */
+aside {
+    background: #f8f9fa; /* Fondo claro */
+    border-right: 1px solid #e9ecef; /* Línea divisoria sutil */
+}
+
+/* Resaltar la opción activa */
+.nav-link.active {
+    color: #ffffff; /* Texto blanco */
+    background-color: #0d6efd; /* Fondo azul Bootstrap */
+    border-radius: 5px; /* Bordes redondeados */
+}
+
+/* Animación de la flecha en collapse */
+[data-bs-toggle="collapse"] i {
+    transition: transform 0.3s; /* Suavidad al girar */
+}
+
+[data-bs-toggle="collapse"][aria-expanded="true"] i {
+    transform: rotate(180deg); /* Rotar flecha hacia arriba */
+}
+
+/* Estilo base para los enlaces del menú */
+nav .d-flex {
+    padding: 8px 12px; /* Espaciado interno */
+    border-bottom: 1px solid #e9ecef; /* Línea divisoria suave */
+    transition: background-color 0.3s ease; /* Efecto al pasar el ratón */
+}
+
+nav .d-flex:hover {
+    background-color: #f8f9fa; /* Fondo claro al pasar el ratón */
+    text-decoration: none; /* Sin subrayado */
+}
+
+/* Subenlaces (colapsables) */
+nav .collapse .nav-link {
+    padding: 4px 12px; /* Menor espaciado para subniveles */
+    transition: color 0.3s ease;
+}
+
+nav .collapse .nav-link:hover {
+    color: #0d6efd; /* Azul Bootstrap para el hover */
+    text-decoration: none; /* Sin subrayado */
+}
+
+/* Indicador (flecha) */
+[data-bs-toggle="collapse"] i {
+    transition: transform 0.3s;
+}
+
+[data-bs-toggle="collapse"][aria-expanded="true"] i {
+    transform: rotate(180deg); /* Rotar flecha hacia arriba */
+}
+
+/* Submenú general */
+.sub-menu-item {
+    padding-left: 20px; /* Separación del borde izquierdo */
+    border-left: 2px solid transparent; /* Indicador visual para el activo */
+    transition: all 0.3s ease; /* Transición suave */
+}
+
+/* Efectos al pasar el ratón */
+.sub-menu-item:hover {
+    color: #0d6efd; /* Azul Bootstrap */
+    border-left-color: #0d6efd; /* Indicador visual en el borde izquierdo */
+    transform: translateX(5px); /* Desplazamiento ligero hacia la derecha */
+}
+
+/* Indicador del enlace activo */
+.sub-menu-item.active {
+    color: #0d6efd; /* Azul para el enlace activo */
+    font-weight: bold; /* Texto en negrita */
+    border-left-color: #0d6efd; /* Indicador en el borde izquierdo */
+}
+
+/* Animación de aparición del contenido */
+.collapse.show .sub-menu-item {
+    animation: fadeIn 0.5s ease;
+}
+
+@keyframes  fadeIn {
+    from {
+        opacity: 0;
+        transform: translateY(-10px); /* Ligero desplazamiento hacia arriba */
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+/* Estilo para el layout principal */
+.layout {
+    display: flex; /* Coloca el sidenav y el contenido principal en línea */
+    height: 100vh; /* Ocupa toda la altura de la ventana */
+    overflow: hidden; /* Evita el scroll global */
+}
+
+/* Estilo para el sidenav */
+.sidenav {
+    width: 250px; /* Ancho fijo del sidenav */
+    overflow-y: auto; /* Habilita el scroll interno */
+    overflow-x: hidden; /* Oculta el scroll horizontal */
+    border-right: 1px solid #e9ecef; /* Línea divisoria */
+}
+
+/* Estilo para el contenido principal */
+.content {
+    flex-grow: 1; /* Ocupa todo el espacio restante */
+    overflow-y: auto; /* Habilita el scroll independiente para el contenido */
+}
+
+.new-sidenav a {
+    padding: 8px 12px;
+    font-size: 14px;
+}
