@@ -42,8 +42,9 @@ def encriptar_contraseña(contraseña):
 
 
 
-def actualizar_ministro(nombre_ministro, numero_documento, fecha_nacimiento, fecha_ordenacion, fin_actividades, tipoministro, id_sede, id_cargo, id_ministro, contraseña_encriptada=None):
+def actualizar_ministro(nombre_ministro, numero_documento, fecha_nacimiento, fecha_ordenacion, fin_actividades, tipoministro, id_sede, id_cargo, id_ministro, contraseña_encriptada=None, estado=1):
     conexion = obtener_conexion()
+
     try:
         with conexion.cursor() as cursor:
             # Construir la base de la consulta de actualización
@@ -56,9 +57,14 @@ def actualizar_ministro(nombre_ministro, numero_documento, fecha_nacimiento, fec
                     fin_actividades = %s, 
                     tipoministro = %s, 
                     id_sede = %s, 
-                    id_cargo = %s
+                    id_cargo = %s, 
+                    estado = %s
             """
-            params = [nombre_ministro, numero_documento, fecha_nacimiento, fecha_ordenacion, fin_actividades, tipoministro, id_sede, id_cargo]
+            params = [
+                nombre_ministro, numero_documento, fecha_nacimiento, 
+                fecha_ordenacion, fin_actividades, tipoministro, 
+                id_sede, id_cargo, estado
+            ]
 
             # Si se proporciona una nueva contraseña, agregarla a la consulta
             if contraseña_encriptada:

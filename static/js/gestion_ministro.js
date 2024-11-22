@@ -13,10 +13,7 @@ $(document).ready(function () {
     });
 });
 
-
-
-
-function openModal(type, id = null, nombre = '', documento = '', nacimiento = '', ordenacion = '', actividades = '', tipo = '', sede = '', cargo = '') {
+function openModal(type, id = null, nombre = '', documento = '', nacimiento = '', ordenacion = '', actividades = '', tipo = '', sede = '', cargo = '', estado = '') {
     var modalTitle = '';
     var formAction = '';
     var isReadOnly = false;
@@ -25,11 +22,11 @@ function openModal(type, id = null, nombre = '', documento = '', nacimiento = ''
         modalTitle = 'Agregar ministro';
         formAction = '/insertar_ministro';
         limpiarModal();
-        // Mostrar los campos de contraseña al agregar
         document.getElementById('passwordSection').style.display = 'block';
         document.getElementById('confirmPasswordSection').style.display = 'block';
         document.getElementById('password').required = true;
         document.getElementById('confirmPassword').required = true;
+        document.getElementById('estado').checked = true;
     } else if (type === 'edit') {
         modalTitle = 'Editar ministro';
         formAction = '/procesar_actualizar_ministro';
@@ -42,8 +39,7 @@ function openModal(type, id = null, nombre = '', documento = '', nacimiento = ''
         document.getElementById('id_tipoministro').value = tipo;
         document.getElementById('id_sede').value = sede;
         document.getElementById('id_cargo').value = cargo;
-
-        // Ocultar campos de contraseña al editar
+        document.getElementById('estado').checked = (estado === 'Activo');
         document.getElementById('passwordSection').style.display = 'none';
         document.getElementById('confirmPasswordSection').style.display = 'none';
         document.getElementById('password').required = false;
@@ -61,8 +57,7 @@ function openModal(type, id = null, nombre = '', documento = '', nacimiento = ''
         document.getElementById('id_tipoministro').value = tipo;
         document.getElementById('id_sede').value = sede;
         document.getElementById('id_cargo').value = cargo;
-
-        // Ocultar los campos de contraseña en modo "Ver"
+        document.getElementById('estado').checked = (estado === 'Activo');
         document.getElementById('passwordSection').style.display = 'none';
         document.getElementById('confirmPasswordSection').style.display = 'none';
     }
@@ -74,12 +69,10 @@ function openModal(type, id = null, nombre = '', documento = '', nacimiento = ''
     ministroModal.show();
 }
 
-
-
 function eliminarMinistro(id) {
     if (confirm("¿Estás seguro de que deseas eliminar este ministro?")) {
         fetch('/eliminar_ministro', {
-            method: 'POST',  // O 'DELETE' si es más adecuado en tu caso
+            method: 'POST',
             headers: {
                 'Content-Type': 'application/json'
             },
@@ -88,10 +81,10 @@ function eliminarMinistro(id) {
         .then(response => response.json())
         .then(data => {
             if (data.success) {
-                alert('Ministro eliminado exitosamente');
-                location.reload();  // Recargar la página para reflejar los cambios
+                mostrarMensaje('success', 'Ministro eliminado exitosamente');
+                location.reload();
             } else {
-                alert('Error al eliminar el ministro: ' + data.message);
+                mostrarMensaje('error', 'Error al eliminar el ministro: ' + data.message);
             }
         })
         .catch(error => console.error('Error:', error));
@@ -105,21 +98,20 @@ function darDeBajaMinistro(id) {
             headers: {
                 'Content-Type': 'application/json'
             },
-            body: JSON.stringify({ id: id, estado: 0 })  // Cambiar estado a inactivo
+            body: JSON.stringify({ id: id, estado: 0 })
         })
         .then(response => response.json())
         .then(data => {
             if (data.success) {
-                alert('Ministro dado de baja exitosamente');
-                location.reload();  // Recargar la página para reflejar los cambios
+                mostrarMensaje('success', 'Ministro dado de baja exitosamente');
+                location.reload();
             } else {
-                alert('Error al dar de baja al ministro: ' + data.message);
+                mostrarMensaje('error', 'Error al dar de baja al ministro: ' + data.message);
             }
         })
         .catch(error => console.error('Error:', error));
     }
 }
-
 
 function limpiarModal() {
     document.getElementById('ministroId').value = '';
@@ -133,45 +125,49 @@ function limpiarModal() {
     document.getElementById('id_cargo').value = '';
     document.getElementById('password').value = '';
     document.getElementById('confirmPassword').value = '';
+    document.getElementById('estado').checked = true;
 }
 
+function mostrarMensaje(tipo, mensaje) {
+    const colores = {
+        success: "#28a745",
+        error: "#dc3545"
+    };
 
-// Escuchar el evento de envío del formulario del ministro
+    Toastify({
+        text: mensaje,
+        duration: 3000,
+        close: true,
+        gravity: "bottom",
+        position: "right",
+        backgroundColor: colores[tipo] || "#6c757d",
+    }).showToast();
+}
+
 document.addEventListener('DOMContentLoaded', function () {
     const ministroForm = document.getElementById('ministroForm');
 
     if (ministroForm) {
         ministroForm.addEventListener('submit', function (event) {
-            event.preventDefault(); // Prevenir el envío predeterminado del formulario
+            event.preventDefault();
 
             const form = this;
             const url = form.action;
             const formData = new FormData(form);
 
-            // Enviar el formulario usando fetch
             fetch(url, {
                 method: 'POST',
                 body: formData
             })
             .then(response => response.json())
-
-
             .then(data => {
-                const mensajeFlotante = document.getElementById('mensaje-flotante');
                 if (data.success) {
-                    mensajeFlotante.className = 'alert alert-success';
-                    mensajeFlotante.textContent = 'Ministro registrado exitosamente';
+                    mostrarMensaje('success', 'Ministro actualizado exitosamente');
+                    location.reload();
                 } else {
-                    mensajeFlotante.className = 'alert alert-danger';
-                    mensajeFlotante.textContent = 'Error al registrar ministro: ' + data.message;
+                    mostrarMensaje('error', 'Error al registrar ministro: ' + data.message);
                 }
-                mensajeFlotante.classList.remove('d-none');
-                setTimeout(() => mensajeFlotante.classList.add('d-none'), 3000); // Ocultar después de 3 segundos
             });
-            
-            
         });
     }
 });
-
-
