@@ -117,6 +117,7 @@ nav .collapse .nav-link:hover {
 .content {
     flex-grow: 1; /* Ocupa todo el espacio restante */
     overflow-y: auto; /* Habilita el scroll independiente para el contenido */
+    height: calc(100vh - 60px); 
 }
 
 .new-sidenav a {
