@@ -170,8 +170,7 @@ function actualizarTabla(tiposRecaudacion) {
                     <i class="${estadoIcono}"></i>
                 </button>
                 <form style="display:inline-block;" onsubmit="eliminarTipoRecaudacion(event, '${tipo.id}')">
-                    <button type="submit" class="btn btn-danger btn-sm"
-                            onclick="return confirm('¿Estás seguro de que deseas eliminar este tipo de recaudación?');">
+                    <button type="submit" class="btn btn-danger btn-sm">
                         <i class="fas fa-trash-alt"></i>
                     </button>
                 </form>
@@ -218,34 +217,16 @@ function eliminarTipoRecaudacion(event, id) {
     }
 }
 function mostrarMensaje(mensaje, tipo) {
-    const alertContainer = document.createElement("div");
-    alertContainer.className = `alert alert-${tipo} alert-dismissible fade show position-fixed`;
-    alertContainer.role = "alert";
-    alertContainer.style.cssText = `
-        bottom: 20px; 
-        right: 20px; 
-        min-width: 250px; 
-        max-width: 300px; 
-        padding: 0.5rem 1rem;
-        font-size: 0.9rem;
-        z-index: 1050;
-        box-shadow: 0px 0px 10px rgba(0,0,0,0.1);
-    `;
-    alertContainer.innerHTML = `
-        ${mensaje}
-        <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
-    `;
-
-    // Agregar la alerta al body para que se muestre en la esquina inferior derecha
-    document.body.appendChild(alertContainer);
-
-    // Desaparecer la alerta después de 3 segundos
-    setTimeout(() => {
-        alertContainer.classList.remove("show");
-        alertContainer.style.opacity = "0";
-        setTimeout(() => alertContainer.remove(), 500);
-    }, 3000);
+    Toastify({
+        text: mensaje,
+        duration: 2000, // Duración en milisegundos
+        close: true, // Mostrar botón de cierre
+        backgroundColor: tipo === "success" ? "--bs-primary" : "#dc3545", // Cambiar color según el tipo
+        gravity: "bottom", // Posición del mensaje en la pantalla
+        position: "right" // Alineación (derecha)
+    }).showToast();
 }
+
 
 function cambiarEstadoTipoRecaudacion(button) {
     const id = button.getAttribute("data-id");
