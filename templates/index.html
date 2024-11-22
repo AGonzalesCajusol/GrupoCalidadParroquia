@@ -57,7 +57,7 @@
                         {{ request.cookies.get('nombre') }}
                     </button>
                     <ul class="dropdown-menu dropdown-menu-end" aria-labelledby="dropdownUserMenu">
-                        <li><a class="dropdown-item text-danger" onclick="finalizar_sesion()">Salir</a></li>
+                        <li><a class="dropdown-item text-danger" href="#" onclick="finalizar_sesion()">Salir</a></li>
                     </ul>
                 </div>
                 {% else %}
@@ -229,6 +229,7 @@
 
 
 </body>
+<script src="{{ url_for('static', filename='/js/defecto.js') }}"></script>
 
 <script>
     $.extend(true, $.fn.dataTable.defaults, {
