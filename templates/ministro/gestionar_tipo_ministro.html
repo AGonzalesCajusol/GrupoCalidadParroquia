@@ -34,7 +34,7 @@
                         title="{{ 'Dar de baja' if tipo[2] == 1 else 'Activar' }}" 
                         data-id="{{ tipo[0] }}" 
                         data-estado="{{ tipo[2] }}"
-                        onclick="cambiarEstadoTipoMinistro(this)">
+                        onclick="cambiarEstadoTipoMinistro('{{ tipo[0] }}', '{{ tipo[1] }}')">
                         <i class="{{ 'fas fa-ban' if tipo[2] == 1 else 'fas fa-check' }}"></i>
                         </button>
                     
