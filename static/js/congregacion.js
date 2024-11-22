@@ -47,6 +47,16 @@ function abirC() {
 
     document.getElementById('estado').setAttribute('disabled', true);
 
+    formCongregacion.onsubmit = function (event) {
+        Toastify({
+            text: "Congregación agregada correctamente.",
+            duration: 2000,
+            close: true,
+            backgroundColor: "--bs-primary",
+            gravity: "bottom",
+            position: "right",
+        }).showToast();
+    };
     modalCongreg.show();
 }
 
@@ -75,13 +85,37 @@ function abrirModalEditarC(id, nombre, estado) {
         .then(data => {
             if (data.success) {
                 actualizarTablaCongregacion(data.congregacion); // Actualiza la tabla con los nuevos datos
+                Toastify({
+                    text: "Se modificó la congregación correctamente.",
+                    duration: 2000,
+                    close: true,
+                    backgroundColor: "--bs-primary",
+                    gravity: "bottom",
+                    position: "right",
+                }).showToast();
                 modalCongreg.hide(); // Cierra el modal
             } else {
-                console.error("Error al actualizar la congregación:", data.message);
+                Toastify({
+                    text: data.message || "Error al intentar modificar la congregación.",
+                    duration: 2000,
+                    close: true,
+                    backgroundColor: "#dc3545",
+                    gravity: "bottom",
+                    position: "right",
+                }).showToast();
+                //console.error("Error al actualizar la congregación:", data.message);
             }
         })
         .catch(error => {
             console.error("Error en la solicitud de actualización:", error);
+            Toastify({
+                text: "Ocurrió un error al modificar la congregación.",
+                duration: 2000,
+                close: true,
+                backgroundColor: "#dc3545",
+                gravity: "bottom",
+                position: "right",
+            }).showToast();
         });
     };
 
@@ -154,7 +188,7 @@ function cambiarEstadoCongregacion(id, estadoActual) {
                     text: `Congregación ${accion.toLowerCase()} correctamente.`,
                     duration: 2000,
                     close: true,
-                    backgroundColor: "#28a745", // Verde para éxito
+                    backgroundColor: "--bs-primary",
                     gravity: "bottom",
                     position: "right",
                 }).showToast();
@@ -247,15 +281,39 @@ function eliminarCongre(event, id) {
         .then(response => response.json())
         .then(data => {
             if (data.success) {
-                mostrarAlerta("success", data.message);
+                //mostrarAlerta("success", data.message);
+                Toastify({
+                    text: "Congregación eliminada correctamente.",
+                    duration: 2000,
+                    close: true,
+                    backgroundColor: "--bs-primary",
+                    gravity: "bottom",
+                    position: "right",
+                }).showToast();
                 actualizarTablaCongregacion();
             } else {
-                mostrarAlerta("danger", data.message);
+                Toastify({
+                    text: data.message || "Error al intentar eliminar la congregación.",
+                    duration: 2000,
+                    close: true,
+                    backgroundColor: "#dc3545",
+                    gravity: "bottom",
+                    position: "right",
+                }).showToast();
+                //mostrarAlerta("danger", data.message);
             }
         })
         .catch(error => {
             console.error("Error en la solicitud de eliminación:", error);
-            mostrarAlerta("danger", "Hubo un error al intentar eliminar la congregación.");
+            Toastify({
+                text: "Ocurrió un error al intentar eliminar la congregación.",
+                duration: 2000,
+                close: true,
+                backgroundColor: "#dc3545",
+                gravity: "bottom",
+                position: "right",
+            }).showToast();
+            //mostrarAlerta("danger", "Hubo un error al intentar eliminar la congregación.");
         });
     }
 }

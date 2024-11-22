@@ -150,6 +150,16 @@ function abir() {
     document.getElementById('id_diosesis').value = '';
     document.getElementById('monto_traslado').value = '';
 
+    formSede.onsubmit = function (event) {
+        Toastify({
+            text: "Sede agregada correctamente.",
+            duration: 2000,
+            close: true,
+            backgroundColor: "--bs-primary",
+            gravity: "bottom",
+            position: "right",
+        }).showToast();
+    };
     modalSede.show();
 }
 
@@ -178,13 +188,37 @@ function abrirModalEditar(id, nombre, direccion, creacion, telefono, correo, mon
         .then(data => {
             if (data.success) {
                 actualizarTablaSede(data.sedes); // Actualiza solo la tabla con los datos nuevos
+                Toastify({
+                    text: "Se modificó la sede correctamente.",
+                    duration: 2000,
+                    close: true,
+                    backgroundColor: "--bs-primary",
+                    gravity: "bottom",
+                    position: "right",
+                }).showToast();
                 modalSede.hide(); // Cierra el modal
             } else {
-                console.error("Error al actualizar la sede:", data.message);
+                Toastify({
+                    text: data.message || "Error al intentar modificar la sede.",
+                    duration: 2000,
+                    close: true,
+                    backgroundColor: "#dc3545",
+                    gravity: "bottom",
+                    position: "right",
+                }).showToast();
+                //console.error("Error al actualizar la sede:", data.message);
             }
         })
         .catch(error => {
             console.error("Error en la solicitud de actualización:", error);
+            Toastify({
+                text: "Ocurrió un error al modificar la sede.",
+                duration: 2000,
+                close: true,
+                backgroundColor: "#dc3545",
+                gravity: "bottom",
+                position: "right",
+            }).showToast();
         });
     };
 
@@ -380,7 +414,7 @@ function cambiarEstadoSede(id, estadoActual) {
                     text: `El estado de la sede se a actualizado correctamente.`,
                     duration: 2000,
                     close: true,
-                    backgroundColor: "#28a745", // Verde para éxito
+                    backgroundColor: "--bs-primary",
                     gravity: "bottom",
                     position: "right",
                 }).showToast();
@@ -473,15 +507,38 @@ function eliminarSede(event, id) {
         .then(response => response.json())
         .then(data => {
             if (data.success) {
-                mostrarAlerta("success", data.message);
+                Toastify({
+                    text: "Sede eliminada correctamente.",
+                    duration: 2000,
+                    close: true,
+                    backgroundColor: "--bs-primary",
+                    gravity: "bottom",
+                    position: "right",
+                }).showToast();
                 actualizarTablaSede();
             } else {
-                mostrarAlerta("danger", data.message);
+                Toastify({
+                    text: data.message || "Error al intentar eliminar la sede.",
+                    duration: 2000,
+                    close: true,
+                    backgroundColor: "#dc3545",
+                    gravity: "bottom",
+                    position: "right",
+                }).showToast();
+                //mostrarAlerta("danger", data.message);
             }
         })
         .catch(error => {
             console.error("Error en la solicitud de eliminación:", error);
-            mostrarAlerta("danger", "Hubo un error al intentar eliminar la sede.");
+            Toastify({
+                text: "Ocurrió un error al intentar eliminar la sede.",
+                duration: 2000,
+                close: true,
+                backgroundColor: "#dc3545",
+                gravity: "bottom",
+                position: "right",
+            }).showToast();
+            //mostrarAlerta("danger", "Hubo un error al intentar eliminar la sede.");
         });
     }
 }

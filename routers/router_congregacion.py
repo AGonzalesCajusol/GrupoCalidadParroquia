@@ -32,14 +32,14 @@ def registrar_rutas(app):
             nombre = request.form["nombre_congregacion"]
             id_congregacion = insertar_congregacion(nombre)
 
-            if id_congregacion:  # Si la inserción fue exitosa y tenemos el id_congregacion
-                flash("La congregación fue agregada exitosamente", "success")
-            else:
-                flash("Hubo un error al agregar la congregación.", "danger")
+            #if id_congregacion:  # Si la inserción fue exitosa y tenemos el id_congregacion
+                #flash("La congregación fue agregada exitosamente", "success")
+            #else:
+                #flash("Hubo un error al agregar la congregación.", "danger")
             
         except Exception as e:
             error_message = str(e)
-            flash(f"Hubo un error al procesar la solicitud: {error_message}", "danger")
+            #flash(f"Hubo un error al procesar la solicitud: {error_message}", "danger")
             traceback.print_exc()
 
         return redirect(url_for("gestionar_congregacion"))

@@ -73,13 +73,13 @@ def registrar_rutas(app):
                     estado_acto = request.form.get(f'estado-{acto_id}') == 'on'  # Obtener el estado del checkbox (on o off)
                     insertar_sede_acto_liturgico(id_sede, acto_id, estado_acto)  # Insertar en la tabla sede_acto_liturgico
 
-                flash("La sede fue agregada exitosamente", "success")
-            else:
-                flash("Hubo un error al agregar la sede.", "danger")
+                #flash("La sede fue agregada exitosamente", "success")
+            #else:
+                #flash("Hubo un error al agregar la sede.", "danger")
 
         except Exception as e:
             error_message = str(e)
-            flash(f"Hubo un error al procesar la solicitud: {error_message}", "danger")
+            #flash(f"Hubo un error al procesar la solicitud: {error_message}", "danger")
             traceback.print_exc()
 
         return redirect(url_for("gestionar_sede"))
