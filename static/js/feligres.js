@@ -16,7 +16,7 @@ document.addEventListener("DOMContentLoaded", function () {
 function openModal(type, dni = '', apellidos = '', nombres = '', fecha_nacimiento = '', estado_civil = '', sexo = '', id_sede = '', correo = '') {
     let modalTitle;
     let formAction;
-    let isReadOnly = false;
+    let isReadOnly = false;    
 
     if (type === 'add') {
         modalTitle = 'Agregar feligrés';
@@ -82,7 +82,9 @@ function openModal(type, dni = '', apellidos = '', nombres = '', fecha_nacimient
         event.preventDefault();
         enviarFormulario(formAction, type);
     };
+    
 }
+
 
 function enviarFormulario(url, type) {
     const formData = new FormData(document.getElementById('feligresForm'));
@@ -99,16 +101,38 @@ function enviarFormulario(url, type) {
         return response.json();
     })
     .then(data => {
-        if (data.success) {
-            alert(type === 'edit' ? 'Feligrés actualizado exitosamente' : 'Feligrés agregado exitosamente');
+        if (data.success) {            
+            const message = type === 'add' ? "Feligrés ingresado exitosamente" : "Feligrés actualizado exitosamente";
+            Toastify({
+                text: message,
+                duration: 2000,
+                close: true,
+                backgroundColor: "--bs-primary",
+                gravity: "bottom",
+                position: "right",
+            }).showToast();
             location.reload();
-        } else {
-            alert(data.message);
+        } else {            
+            Toastify({
+                text: data.message,
+                duration: 2000,
+                close: true,
+                backgroundColor: "#dc3545",
+                gravity: "bottom",
+                position: "right",
+            }).showToast();
         }
     })
     .catch(error => {
-        console.error('Error en la respuesta del servidor:', error);
-        alert('Hubo un error al procesar la solicitud. Revisa la consola para más detalles.');
+        console.error('Error en la respuesta del servidor:', error);        
+        Toastify({
+            text: "Hubo un error al procesar la solicitud. Revisa la consola para más detalles",
+            duration: 2000,
+            close: true,
+            backgroundColor: "#dc3545",
+            gravity: "bottom",
+            position: "right",
+        }).showToast();
     });
 }
 
@@ -147,3 +171,53 @@ function limpiarModal() {
     document.getElementById('id_sede').value = '';
     document.getElementById('email').value = '';
 }
+
+function eliminarFeligres(dni) {
+    if (!confirm("¿Estás seguro de que deseas eliminar este feligrés?")) {
+        return;
+    }
+
+    fetch(urlEliminarFeligres, {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/x-www-form-urlencoded',
+        },
+        body: `dni=${dni}`
+    })
+    .then(response => {
+        if (!response.ok) {
+            // Si la respuesta no es 2xx, procesa el mensaje de error devuelto por el backend
+            return response.json().then(data => {
+                throw new Error(data.message || "Ha ocurrido un error al eliminar el feligrés");
+            });
+        }
+        return response.json(); // Respuesta exitosa
+    })
+    .then(data => {
+        // Mostrar mensaje de éxito con Toastify
+        Toastify({
+            text: data.message || "Feligrés eliminado correctamente",
+            duration: 2000,
+            close: true,
+            backgroundColor: "#28a745", // Verde para éxito
+            gravity: "bottom",
+            position: "right",
+        }).showToast();
+
+        // Recargar o actualizar la tabla
+        location.reload();
+    })
+    .catch(error => {
+        // Mostrar mensaje de error con Toastify
+        Toastify({
+            text: error.message || "No se pudo eliminar el feligrés",
+            duration: 3000,
+            close: true,
+            backgroundColor: "#dc3545", // Rojo para errores
+            gravity: "bottom",
+            position: "right",
+        }).showToast();
+    });
+}
+
+

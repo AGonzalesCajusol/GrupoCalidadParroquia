@@ -16,9 +16,9 @@
 
     <link rel="stylesheet" href="static/css/inicio_sesion.css" />
     <link rel="stylesheet" href="static/css/styles.css" />
-    <link rel="stylesheet" href="static/css/defecto.css" />  
-    <link rel="stylesheet" href="../static/css/index.css">      
-    <!-- DataTable -->    
+    <link rel="stylesheet" href="static/css/defecto.css" />
+    <link rel="stylesheet" href="../static/css/index.css">
+    <!-- DataTable -->
     <link rel="stylesheet" href="https://cdn.datatables.net/1.13.4/css/jquery.dataTables.min.css">
     <link href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-icons/1.8.1/font/bootstrap-icons.min.css"
         rel="stylesheet" />
@@ -33,9 +33,15 @@
     <link href="https://cdn.jsdelivr.net/npm/fullcalendar@5.11.3/main.min.css" rel="stylesheet">
     <!-- FullCalendar JS -->
     <script src="https://cdn.jsdelivr.net/npm/fullcalendar@5.11.3/main.min.js"></script>
+    <!-- Incluir el CSS de AOS -->
+<link href="https://cdn.jsdelivr.net/npm/aos@2.3.4/dist/aos.css" rel="stylesheet">
+
+<!-- Incluir el JS de AOS antes de tu propio script -->
+<script src="https://cdn.jsdelivr.net/npm/aos@2.3.4/dist/aos.js"></script>
+
 
     <style>
-        .btm-hover:focus{
+        .btm-hover:focus {
             border: none;
         }
     </style>
@@ -46,7 +52,8 @@
         <div class="container-fluid d-flex align-items-center justify-content-between py-3 px-4">
             <!-- Logo y Nombre de la Sede -->
             <div class="d-flex align-items-center">
-                <img src="/static/img/calidazzzz.jpg" alt="Logo Iglesia" class="me-3" style="height: 60px; width: 60px;">
+                <img src="/static/img/calidazzzz.jpg" alt="Logo Iglesia" class="me-3"
+                    style="height: 60px; width: 60px;">
                 <div>
                     <h5 class="mb-0 text-primary fw-bold">{{ request.cookies.get('sede') }}</h5>
                     <small class="text-muted">😼 🥃 🥃 de la Chavarry</small>
@@ -63,12 +70,13 @@
                         <div class="text-start text-primary fw-bold">
                             <i class="bi bi-person-circle me-2"></i>
                             <span id="ministro" class="me-2">{{ request.cookies.get('nombre')
-                            }}</span><i class="bi bi-caret-down-fill"></i>
+                                }}</span><i class="bi bi-caret-down-fill"></i>
                         </div>
                         <small class=" ms-4 text-muted">{{ request.cookies.get('tipo') }}</small>
                     </button>
                     <ul class="dropdown-menu dropdown-menu-end" aria-labelledby="dropdownUserMenu">
-                        <li><a class="dropdown-item text-danger text-e" href="#" onclick="finalizar_sesion()">Salir <i class="bi bi-box-arrow-right"></i></a></li>
+                        <li><a class="dropdown-item text-danger text-e" href="#" onclick="finalizar_sesion()">Salir <i
+                                    class="bi bi-box-arrow-right"></i></a></li>
                     </ul>
                 </div>
                 {% else %}
@@ -82,158 +90,163 @@
     <div class=" layout  d-flex">
 
         <aside class="sidenav bg-light p-3">
-            <nav class="nav flex-column">
+            <nav class="nav flex-column accordion" id="menuAccordion">
+                <div class="accordion-item">
+                    <!-- secretaria -->
+                    <a class="d-flex align-items-center justify-content-between text-primary text-decoration-none py-2 border-bottom"
+                        data-bs-toggle="collapse" href="#moduloSecretaria" role="button" aria-expanded="false"
+                        aria-controls="moduloSecretaria">
+                        <span><i class="bi bi-card-list me-2"></i> Gestión de Secretaría</span>
+                        <i class="bi bi-chevron-down"></i>
+                    </a>
 
-                <!-- secretaria -->
-                <a class="d-flex align-items-center justify-content-between text-primary text-decoration-none py-2 border-bottom"
-                    data-bs-toggle="collapse" href="#moduloSecretaria" role="button" aria-expanded="false"
-                    aria-controls="moduloSecretaria">
-                    <span><i class="bi bi-card-list me-2"></i> Gestión de Secretaría</span>
-                    <i class="bi bi-chevron-down"></i>
-                </a>
-
-                <div class="collapse ps-3 mt-2" id="moduloSecretaria">
-                    <a href="{{ url_for('gestionar_ministro') }}"
-                        class="d-flex align-items-center text-muted py-2 sub-menu-item">
-                        <i class="bi bi-arrow-return-right me-2"></i> Ministro
-                    </a>
-                    <a href="{{ url_for('gestionar_tipo_ministro') }}"
-                        class="d-flex align-items-center text-muted py-2 sub-menu-item">
-                        <i class="bi bi-arrow-return-right me-2"></i> Tipo de Ministro
-                    </a>
-                    <a href="{{ url_for('gestionar_feligres') }}"
-                        class="d-flex align-items-center text-muted py-2 sub-menu-item">
-                        <i class="bi bi-arrow-return-right me-2"></i> Feligres
-                    </a>
-                    <a href="{{ url_for('solicitudes') }}"
-                        class="d-flex align-items-center text-muted py-2 sub-menu-item">
-                        <i class="bi bi-arrow-return-right me-2"></i> Solicitudes
-                    </a>
-                    <a href="{{ url_for('gestionar_celebracion_crud') }}"
-                        class="d-flex align-items-center text-muted py-2 sub-menu-item">
-                        <i class="bi bi-arrow-return-right me-2"></i> Celebraciones
-                    </a>
+                    <div class="collapse ps-3 mt-2" id="moduloSecretaria">
+                        <a href="{{ url_for('gestionar_ministro') }}"
+                            class="d-flex align-items-center text-muted py-2 sub-menu-item">
+                            <i class="bi bi-arrow-return-right me-2"></i> Ministro
+                        </a>
+                        <a href="{{ url_for('gestionar_tipo_ministro') }}"
+                            class="d-flex align-items-center text-muted py-2 sub-menu-item">
+                            <i class="bi bi-arrow-return-right me-2"></i> Tipo de Ministro
+                        </a>
+                        <a href="{{ url_for('gestionar_feligres') }}"
+                            class="d-flex align-items-center text-muted py-2 sub-menu-item">
+                            <i class="bi bi-arrow-return-right me-2"></i> Feligres
+                        </a>
+                        <a href="{{ url_for('solicitudes') }}"
+                            class="d-flex align-items-center text-muted py-2 sub-menu-item">
+                            <i class="bi bi-arrow-return-right me-2"></i> Solicitudes
+                        </a>
+                        <a href="{{ url_for('gestionar_celebracion_crud') }}"
+                            class="d-flex align-items-center text-muted py-2 sub-menu-item">
+                            <i class="bi bi-arrow-return-right me-2"></i> Celebraciones
+                        </a>
+                    </div>
                 </div>
-
                 <!-- catequesis -->
 
-                <a class="d-flex align-items-center justify-content-between text-primary text-decoration-none py-2 border-bottom"
-                    data-bs-toggle="collapse" href="#moduloCatequesis" role="button" aria-expanded="false"
-                    aria-controls="moduloCatequesis">
-                    <span><i class="bi bi-book me-2"></i> Gestión de Catequesis</span>
-                    <i class="bi bi-chevron-down"></i>
-                </a>
+                <div class="accordion-item">
+                    <a class="d-flex align-items-center justify-content-between text-primary text-decoration-none py-2 border-bottom"
+                        data-bs-toggle="collapse" href="#moduloCatequesis" role="button" aria-expanded="false"
+                        aria-controls="moduloCatequesis">
+                        <span><i class="bi bi-book me-2"></i> Gestión de Catequesis</span>
+                        <i class="bi bi-chevron-down"></i>
+                    </a>
 
-                <div class="collapse ps-3 mt-2" id="moduloCatequesis">
-                    <a href="{{ url_for('gestionar_actos') }}"
-                        class="d-flex align-items-center text-muted py-2 sub-menu-item">
-                        <i class="bi bi-arrow-return-right me-2"></i> Actos Litúrgicos
+                    <div class="collapse ps-3 mt-2" id="moduloCatequesis">
+                        <a href="{{ url_for('gestionar_actos') }}"
+                            class="d-flex align-items-center text-muted py-2 sub-menu-item">
+                            <i class="bi bi-arrow-return-right me-2"></i> Actos Litúrgicos
+                        </a>
+                        <a href="{{ url_for('gestionar_requisitosactos') }}"
+                            class="d-flex align-items-center text-muted py-2 sub-menu-item">
+                            <i class="bi bi-arrow-return-right me-2"></i> Requisitos de Actos Litúrgicos
+                        </a>
+                        <a href="{{ url_for('gestionar_intenciones') }}"
+                            class="d-flex align-items-center text-muted py-2 sub-menu-item">
+                            <i class="bi bi-arrow-return-right me-2"></i> Registrar Intenciones
+                        </a>
+                        <a href="{{ url_for('requisitosXactoliturgico') }}"
+                            class="d-flex align-items-center text-muted py-2 sub-menu-item">
+                            <i class="bi bi-arrow-return-right me-2"></i> Reporte de Requisitos
+                        </a>
+                        <a href="{{ url_for('gestionar_tema') }}"
+                            class="d-flex align-items-center text-muted py-2 sub-menu-item">
+                            <i class="bi bi-arrow-return-right me-2"></i> Temas
+                        </a>
+                        <a href="{{ url_for('gestionar_programacionActo') }}"
+                            class="d-flex align-items-center text-muted py-2 sub-menu-item">
+                            <i class="bi bi-arrow-return-right me-2"></i> Programación de Charlas
+                        </a>
+                        <a href="{{ url_for('gestionar_asistencia') }}"
+                            class="d-flex align-items-center text-muted py-2 sub-menu-item">
+                            <i class="bi bi-arrow-return-right me-2"></i> Asistencia
+                        </a>
+                    </div>
+                </div>
+                <div class="accordion-item">
+                    <a class="d-flex align-items-center justify-content-between text-primary text-decoration-none py-2 border-bottom"
+                        data-bs-toggle="collapse" href="#moduloParroquial" role="button" aria-expanded="false"
+                        aria-controls="moduloParroquial">
+                        <span><i class="bi bi-people-fill me-2"></i> Gestión Parroquial</span>
+                        <i class="bi bi-chevron-down"></i>
                     </a>
-                    <a href="{{ url_for('gestionar_requisitosactos') }}"
-                        class="d-flex align-items-center text-muted py-2 sub-menu-item">
-                        <i class="bi bi-arrow-return-right me-2"></i> Requisitos de Actos Litúrgicos
+
+                    <div class="collapse ps-3 mt-2" id="moduloParroquial">
+                        <a href="{{ url_for('gestionar_congregacion') }}"
+                            class="d-flex align-items-center text-muted py-2 sub-menu-item">
+                            <i class="bi bi-arrow-return-right me-2"></i> Congregación
+                        </a>
+                        <a href="{{ url_for('gestionar_diocesis') }}"
+                            class="d-flex align-items-center text-muted py-2 sub-menu-item">
+                            <i class="bi bi-arrow-return-right me-2"></i> Diócesis
+                        </a>
+                        <a href="{{ url_for('gestionar_sede') }}"
+                            class="d-flex align-items-center text-muted py-2 sub-menu-item">
+                            <i class="bi bi-arrow-return-right me-2"></i> Sede
+                        </a>
+                    </div>
+                </div>
+                <div class="accordion-item">
+                    <a class="d-flex align-items-center justify-content-between text-primary text-decoration-none py-2 border-bottom"
+                        data-bs-toggle="collapse" href="#moduloFinanzas" role="button" aria-expanded="false"
+                        aria-controls="moduloFinanzas">
+                        <span><i class="bi bi-cash me-2"></i> Gestión Financiera</span>
+                        <i class="bi bi-chevron-down"></i>
                     </a>
-                    <a href="{{ url_for('gestionar_intenciones') }}"
-                        class="d-flex align-items-center text-muted py-2 sub-menu-item">
-                        <i class="bi bi-arrow-return-right me-2"></i> Registrar Intenciones
-                    </a>
-                    <a href="{{ url_for('requisitosXactoliturgico') }}"
-                        class="d-flex align-items-center text-muted py-2 sub-menu-item">
-                        <i class="bi bi-arrow-return-right me-2"></i> Reporte de Requisitos
-                    </a>
-                    <a href="{{ url_for('gestionar_tema') }}"
-                        class="d-flex align-items-center text-muted py-2 sub-menu-item">
-                        <i class="bi bi-arrow-return-right me-2"></i> Temas
-                    </a>
-                    <a href="{{ url_for('gestionar_programacionActo') }}"
-                        class="d-flex align-items-center text-muted py-2 sub-menu-item">
-                        <i class="bi bi-arrow-return-right me-2"></i> Programación de Charlas
-                    </a>
-                    <a href="{{ url_for('gestionar_asistencia') }}"
-                        class="d-flex align-items-center text-muted py-2 sub-menu-item">
-                        <i class="bi bi-arrow-return-right me-2"></i> Asistencia
-                    </a>
+
+                    <div class="collapse ps-3 mt-2" id="moduloFinanzas">
+                        <a href="{{ url_for('gestionar_recaudaciones') }}"
+                            class="d-flex align-items-center text-muted py-2 sub-menu-item">
+                            <i class="bi bi-arrow-return-right me-2"></i> Recaudaciones
+                        </a>
+                        <a href="{{ url_for('gestionar_tipo_recaudacion') }}"
+                            class="d-flex align-items-center text-muted py-2 sub-menu-item">
+                            <i class="bi bi-arrow-return-right me-2"></i> Tipo de Recaudaciones
+                        </a>
+                        <a href="{{ url_for('gestionar_egresos') }}"
+                            class="d-flex align-items-center text-muted py-2 sub-menu-item">
+                            <i class="bi bi-arrow-return-right me-2"></i> Egresos
+                        </a>
+                    </div>
                 </div>
 
-                <a class="d-flex align-items-center justify-content-between text-primary text-decoration-none py-2 border-bottom"
-                    data-bs-toggle="collapse" href="#moduloParroquial" role="button" aria-expanded="false"
-                    aria-controls="moduloParroquial">
-                    <span><i class="bi bi-people-fill me-2"></i> Gestión Parroquial</span>
-                    <i class="bi bi-chevron-down"></i>
-                </a>
+                <div class="accordion-item">
+                    <a class="d-flex align-items-center justify-content-between text-primary text-decoration-none py-2 border-bottom"
+                        data-bs-toggle="collapse" href="#moduloReportes" role="button" aria-expanded="false"
+                        aria-controls="moduloReportes">
+                        <span><i class="bi bi-bar-chart-line me-2"></i> Reportes</span>
+                        <i class="bi bi-chevron-down"></i>
+                    </a>
 
-                <div class="collapse ps-3 mt-2" id="moduloParroquial">
-                    <a href="{{ url_for('gestionar_congregacion') }}"
-                        class="d-flex align-items-center text-muted py-2 sub-menu-item">
-                        <i class="bi bi-arrow-return-right me-2"></i> Congregación
-                    </a>
-                    <a href="{{ url_for('gestionar_diocesis') }}"
-                        class="d-flex align-items-center text-muted py-2 sub-menu-item">
-                        <i class="bi bi-arrow-return-right me-2"></i> Diócesis
-                    </a>
-                    <a href="{{ url_for('gestionar_sede') }}"
-                        class="d-flex align-items-center text-muted py-2 sub-menu-item">
-                        <i class="bi bi-arrow-return-right me-2"></i> Sede
-                    </a>
+                    <div class="collapse ps-3 mt-2" id="moduloReportes">
+                        <a href="{{ url_for('cronograma_actividades') }}"
+                            class="d-flex align-items-center text-muted py-2 sub-menu-item">
+                            <i class="bi bi-arrow-return-right me-2"></i> Cronograma de Actividades
+                        </a>
+                        <a href="{{ url_for('numero_actos_liturgicos') }}"
+                            class="d-flex align-items-center text-muted py-2 sub-menu-item">
+                            <i class="bi bi-arrow-return-right me-2"></i> Celebraciones por Actos Litúrgicos
+                        </a>
+                        <a href="{{ url_for('reporte_egresos') }}"
+                            class="d-flex align-items-center text-muted py-2 sub-menu-item">
+                            <i class="bi bi-arrow-return-right me-2"></i> Reporte de Egresos
+                        </a>
+                        <a href="{{ url_for('reporte_recaudaciones') }}"
+                            class="d-flex align-items-center text-muted py-2 sub-menu-item">
+                            <i class="bi bi-arrow-return-right me-2"></i> Reporte de Recaudaciones
+                        </a>
+                    </div>
                 </div>
-
-                <a class="d-flex align-items-center justify-content-between text-primary text-decoration-none py-2 border-bottom"
-                    data-bs-toggle="collapse" href="#moduloFinanzas" role="button" aria-expanded="false"
-                    aria-controls="moduloFinanzas">
-                    <span><i class="bi bi-cash me-2"></i> Gestión Financiera</span>
-                    <i class="bi bi-chevron-down"></i>
-                </a>
-
-                <div class="collapse ps-3 mt-2" id="moduloFinanzas">
-                    <a href="{{ url_for('gestionar_recaudaciones') }}"
-                        class="d-flex align-items-center text-muted py-2 sub-menu-item">
-                        <i class="bi bi-arrow-return-right me-2"></i> Recaudaciones
-                    </a>
-                    <a href="{{ url_for('gestionar_tipo_recaudacion') }}"
-                        class="d-flex align-items-center text-muted py-2 sub-menu-item">
-                        <i class="bi bi-arrow-return-right me-2"></i> Tipo de Recaudaciones
-                    </a>
-                    <a href="{{ url_for('gestionar_egresos') }}"
-                        class="d-flex align-items-center text-muted py-2 sub-menu-item">
-                        <i class="bi bi-arrow-return-right me-2"></i> Egresos
-                    </a>
-                </div>
-
-                <a class="d-flex align-items-center justify-content-between text-primary text-decoration-none py-2 border-bottom"
-                    data-bs-toggle="collapse" href="#moduloReportes" role="button" aria-expanded="false"
-                    aria-controls="moduloReportes">
-                    <span><i class="bi bi-bar-chart-line me-2"></i> Reportes</span>
-                    <i class="bi bi-chevron-down"></i>
-                </a>
-
-                <div class="collapse ps-3 mt-2" id="moduloReportes">
-                    <a href="{{ url_for('cronograma_actividades') }}"
-                        class="d-flex align-items-center text-muted py-2 sub-menu-item">
-                        <i class="bi bi-arrow-return-right me-2"></i> Cronograma de Actividades
-                    </a>
-                    <a href="{{ url_for('numero_actos_liturgicos') }}"
-                        class="d-flex align-items-center text-muted py-2 sub-menu-item">
-                        <i class="bi bi-arrow-return-right me-2"></i> Celebraciones por Actos Litúrgicos
-                    </a>
-                    <a href="{{ url_for('reporte_egresos') }}"
-                        class="d-flex align-items-center text-muted py-2 sub-menu-item">
-                        <i class="bi bi-arrow-return-right me-2"></i> Reporte de Egresos
-                    </a>
-                    <a href="{{ url_for('reporte_recaudaciones') }}"
-                        class="d-flex align-items-center text-muted py-2 sub-menu-item">
-                        <i class="bi bi-arrow-return-right me-2"></i> Reporte de Recaudaciones
-                    </a>
-                </div>
-
             </nav>
         </aside>
 
 
         <!-- Cuerpo Principal -->
         <main class="content flex-grow-1 p-4">
-            
+
             {% block cuerpo %}
-            
+
             {% endblock %}
         </main>
     </div>
@@ -257,6 +270,27 @@
                 last: "Última"
             }
         }
+    });
+</script>
+
+<script>
+    document.addEventListener("DOMContentLoaded", () => {
+        const collapseElements = document.querySelectorAll(".collapse");
+
+        collapseElements.forEach((collapse) => {
+            collapse.addEventListener("show.bs.collapse", function () {
+                // Cerrar otros colapsos
+                const openItems = document.querySelectorAll(".collapse.show");
+                openItems.forEach((item) => {
+                    if (item !== collapse) {
+                        const bsCollapse = new bootstrap.Collapse(item, {
+                            toggle: false,
+                        });
+                        bsCollapse.hide();
+                    }
+                });
+            });
+        });
     });
 </script>
 
