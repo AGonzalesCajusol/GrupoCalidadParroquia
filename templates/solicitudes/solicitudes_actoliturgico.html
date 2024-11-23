@@ -46,6 +46,122 @@
         height: auto;
     }
 </style>
+
+<main class="ms-5">
+    <h1 class="titulo-gestion">GESTIÓN DE SOLICITUDES DE ACTO LITÚRGICO</h1>
+    <ul class="nav nav-tabs" id="myTab" role="tablist">
+        <li class="nav-item" role="presentation">
+            <button class="nav-link active" id="solicitudes-tab" data-bs-toggle="tab" data-bs-target="#solicitudes" type="button" role="tab" aria-controls="solicitudes" aria-selected="true">
+                <i class="bi bi-envelope-paper-fill"></i> Registro de solicitudes
+            </button>
+        </li>
+        <li class="nav-item" role="presentation">
+            <button   class="nav-link" id="requisitos-tab" data-bs-toggle="tab" data-bs-target="#requisitos" type="button" role="tab" aria-controls="requisitos" aria-selected="false">
+                <i class="bi bi-list-check"></i> Solicitudes
+            </button>
+        </li>
+        <li class="nav-item" role="presentation">
+            <button class="nav-link" id="pagos-tab" data-bs-toggle="tab" data-bs-target="#pagos" type="button" role="tab" aria-controls="pagos" aria-selected="false">
+                Pagos
+            </button>
+        </li>
+    </ul>
+
+    <div class="tab-content mt-4">
+        <!-- Tab 1: Registro de solicitudes -->
+        <div class="tab-pane fade show active" id="solicitudes" role="tabpanel" aria-labelledby="solicitudes-tab">
+            <label for="" class="">Seleccione un acto:</label>
+            <div class="d-flex" class="mt-5" id="gg">
+                <select name="acto_seleccionado" id="acto_seleccionado" class="form-select w-25" onchange="verificar()">
+                    <option value="" >
+                    </option>
+                    {% for actos in lista_actos %}
+                    <option value="{{ actos[0]}}">
+                        {{actos[1]}}
+                    </option>
+                    {% endfor %}
+                </select>
+            </div>
+    
+        </div>
+    
+        <!-- Tab 2: Requisitos -->
+        <div class="tab-pane fade" id="requisitos" role="tabpanel" aria-labelledby="requisitos-tab">
+            <!----- Tabla solicitudes ------>
+            <div class="mt-3" id="aaa">
+                <h6><strong>Tabla solicitudes:</strong></h6>
+                <!-- Contenedor con scroll -->
+                <div class="table-responsive" style="max-height: 500px; overflow-y: auto;">
+                    <table class="table" id="soli_tab">
+                        <thead >
+                            <tr>
+                                <th class="text-center">ID</th>
+                                <th class="text-center">Fecha</th>
+                                <th class="text-center">Sede</th>
+                                <th class="text-center">Acto litúrgico</th>
+                                <th class="text-center">Feligres responsable</th>
+                                <th class="text-center">Opciones</th>
+                            </tr>
+                        </thead>
+                        <tbody id="solicitud">
+                        </tbody>
+                    </table>
+                </div> 
+            </div>
+        </div>
+    
+        <!-- Tab 3: Pagos -->
+        <div class="tab-pane fade" id="pagos" role="tabpanel" aria-labelledby="pagos-tab">
+            <h3>Método de Pago</h3>
+            <div class="d-flex justify-content-around">
+                <div>
+                    <img src="https://via.placeholder.com/80" alt="Yape" class="img-fluid">
+                    <p class="text-center">Yape</p>
+                </div>
+                <div>
+                    <img src="https://via.placeholder.com/80" alt="Plin" class="img-fluid">
+                    <p class="text-center">Plin</p>
+                </div>
+                <div>
+                    <img src="https://via.placeholder.com/80" alt="Tarjeta" class="img-fluid">
+                    <p class="text-center">Tarjeta</p>
+                </div>
+            </div>
+        </div>
+    
+        <!-- Tab 4: Asistencias -->
+        <div class="tab-pane fade" id="asistencias" role="tabpanel" aria-labelledby="asistencias-tab">
+            <h3>Asistencias</h3>
+            <div class="table-responsive">
+                <table class="table">
+                    <thead>
+                        <tr>
+                            <th>ID</th>
+                            <th>Tema</th>
+                            <th>Fecha</th>
+                            <th>Nombre</th>
+                            <th>Estado</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td>1</td>
+                            <td>Preparación Bautizo</td>
+                            <td>2024-11-20</td>
+                            <td>Juan Pérez</td>
+                            <td>Presente</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+    
+
+</main>
+
+
+
 <main class="ms-5">
     <!---------<button class="btn btn-primary"><i class="bi bi-plus-circle-fill me-2"></i>Nueva Solicitud</button>
     <hr>-------------->
@@ -53,10 +169,9 @@
         <!-- Contenedor para pestañas -->
         <div class="tab-content mt-1">
             <div class="col-12 mt-3">
-                <h1 class="titulo-gestion">GESTIÓN DE SOLICITUDES DE ACTO LITÚRGICO</h1>
                 <h6><strong>Acto litúrgico:</strong></h6>
                 <div class="d-flex">
-                    <select name="acto_seleccionado" id="acto_seleccionado" class="form-select w-25">
+                    <select name="acto_seleccionado" id="acto_seleccionado" class="form-select w-25" onchange="verificar()">
                         <option value="">
                             ----Seleccione un acto litúrgico----
                         </option>
@@ -67,9 +182,6 @@
                         {% endfor %}
                     </select>
 
-                    <button class="btn btn-success" id="bbb"  onclick="verificar()">
-                        <i class="bi bi-plus-circle-fill me-2"></i>Nuevo
-                    </button>
                 </div>
                 <!---------   Esta es la tabla donde se muestran los requisitos    ----------->
                 <div class="accordion mt-3" id="accordionRequisitos" >
@@ -149,28 +261,7 @@
                     </div>
                 </div>
 
-                <!----- Tabla solicitudes ------>
-                <div class="mt-3" id="aaa">
-                    <h6><strong>Tabla solicitudes:</strong></h6>
-                    <!-- Contenedor con scroll -->
-                    <div class="table-responsive" style="max-height: 500px; overflow-y: auto;">
-                        <table class="table">
-                            <thead >
-                                <tr>
-                                    <th class="text-center">ID</th>
-                                    <th class="text-center">Fecha</th>
-                                    <th class="text-center">Sede</th>
-                                    <th class="text-center">Acto litúrgico</th>
-                                    <th class="text-center">Feligres responsable</th>
-                                    <th class="text-center">Opciones</th>
-                                </tr>
-                            </thead>
-                            <tbody id="solicitud">
-                                <!-- Aquí irán los datos dinámicos -->
-                            </tbody>
-                        </table>
-                    </div>
-                </div>
+                
 
             </div>
         </div>
@@ -267,8 +358,8 @@
     </div>
 
 </main>
-<script src="/static/js/solicitudes.js"></script>
-
+<!------<script src="/static/js/solicitudes.js"></script> !------>
+<script src="/static/js/solicitudes2.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 
 {% endblock %}
