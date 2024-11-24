@@ -113,8 +113,7 @@ table {
     overflow-x: auto;
 }
 
-th,
-td {
+th{
     padding: 10px;
     text-align: left;
     border-bottom: 1px solid #ddd;
@@ -160,10 +159,8 @@ th {
 
 table.dataTable tbody td {
     vertical-align: middle;
-    padding: 8px;
-    /* Puedes ajustar este valor según necesites */
+    padding: 8px;    
     height: auto;
-    /* Asegúrate de que la altura se ajuste automáticamente */
 }
 
 .btn-success {
