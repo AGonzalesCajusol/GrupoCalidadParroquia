@@ -64,10 +64,21 @@ def actualizar_diocesis(nombre, id_departamento, id_provincia, id):
 
 def eliminar_diocesis(id):
     conexion = obtener_conexion()
-    with conexion.cursor() as cursor:
-        cursor.execute("DELETE FROM diosesis WHERE id_diosesis = %s", (id,))
-    conexion.commit()
-    conexion.close()
+    try:
+        with conexion.cursor() as cursor:
+            cursor.execute("DELETE FROM diosesis WHERE id_diosesis = %s", (id,))
+        conexion.commit()
+        return {"success": True, "message": "Diócesis eliminada correctamente"}
+    except Exception as e:        
+        print(f"Error al eliminar diócesis: {e}")
+        
+        if "1451" in str(e):
+            return {"success": False, "message": "No se puede eliminar la diócesis porque tiene registros asociados"}
+        else:
+            return {"success": False, "message": "Ha ocurrido un error inesperado al eliminar la diócesis"}
+    finally:
+        conexion.close()
+
 
 def obtener_id_departamento_por_nombre(nombre_departamento):
     conexion = obtener_conexion()
@@ -94,3 +105,14 @@ def obtener_id_provincia_por_nombre(nombre_provincia):
             return resultado[0] if resultado else None
     finally:
         conexion.close()
+
+def buscar_provincias_por_departamento(id_departamento):
+    conexion = obtener_conexion()
+    with conexion.cursor() as cursor:
+        cursor.execute(
+            "SELECT id_provincia, nombre_provincia FROM provincia WHERE id_departamento = %s",
+            (id_departamento,)
+        )
+        provincias = cursor.fetchall()
+    conexion.close()
+    return provincias

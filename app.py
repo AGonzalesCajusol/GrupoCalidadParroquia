@@ -4,16 +4,16 @@ import routers.router_celebracion
 import routers.router_charlas
 import routers.router_diocesis
 import routers.router_feligres
-import routers.router_main  # Importa las rutas generales
+import routers.router_main  
 import routers.router_ministro
 import routers.router_solicitud
 import routers.router_recaudaciones
 import routers.router_gestionar_intencionactos
 import routers.router_tema
-import routers.router_tipo_recaudacion  # Importa las rutas relacionadas con
+import routers.router_tipo_recaudacion
 import routers.router_sede
-import routers.router_tipo_ministro # Importa las rutas relacionadas con tipos de ministro
-import routers.router_congregacion  # Importa las rutas relacionadas con
+import routers.router_tipo_ministro 
+import routers.router_congregacion  
 import routers.router_cargo
 import routers.router_egresos
 import routers.router_charlas
