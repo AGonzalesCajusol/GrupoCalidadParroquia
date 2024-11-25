@@ -345,6 +345,10 @@ def listar_requisitosLit():
         conexion.close()  
 
 def insertar_requisito(acto, requisito, tipo, estado, maximo, minimo, nivel):
+    nombre_requisito_sin_espacios = requisito.replace(" ", "")
+    id_js_requisito = nombre_requisito_sin_espacios
+    id_js_estado = f"es_{nombre_requisito_sin_espacios}"
+
     conexion = obtener_conexion()
     try:
         with conexion.cursor() as cursor:
@@ -358,9 +362,9 @@ def insertar_requisito(acto, requisito, tipo, estado, maximo, minimo, nivel):
                 return 'duplicado'
 
             cursor.execute('''
-                INSERT INTO requisito (nombre_requisito, id_actoliturgico, tipo, estado, maximo, minimo, nivel_requisito) 
-                VALUES (%s, %s, %s, %s, %s, %s,%s)
-            ''', (requisito, acto, tipo, estado, maximo, minimo,nivel))
+                INSERT INTO requisito (nombre_requisito, id_actoliturgico, tipo, estado, maximo, minimo, id_js_requisito, id_js_estado, nivel_requisito) 
+                VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s)
+            ''', (requisito, acto, tipo, estado, maximo, minimo, id_js_requisito, id_js_estado, nivel))
             conexion.commit()
             return True
     except Exception as e:
