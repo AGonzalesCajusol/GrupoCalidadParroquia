@@ -643,28 +643,62 @@ def solicitudes(sede):
     conexion = obtener_conexion()
     try:
         with conexion.cursor() as cursor:
-            cursor.execute("""
-                SELECT 
-                    sl.id_solicitud,
-                    sd.nombre_sede,
-                    al.nombre_liturgia,
-                    CONCAT(fl.nombres, ' ', fl.apellidos) AS nombres,
-                    CASE
-                        WHEN COUNT(ar.id_solicitud) > 0 AND 
-                            SUM(CASE WHEN ar.estado = 'F' THEN 1 ELSE 0 END) > 0 THEN 'Pendiente'
-                        WHEN COUNT(ar.id_solicitud) = 0 THEN 'Aprobado'
-                        ELSE 'Aprobado'
-                    END AS estado,
-                    sl.fecha_registro
-                FROM solicitud AS sl
-                INNER JOIN feligres AS fl ON fl.dni = sl.dni_feligres
-                INNER JOIN sede AS sd ON sd.id_sede = sl.id_sede
-                INNER JOIN actoliturgico AS al ON al.id_actoliturgico = sl.id_actoliturgico
-                LEFT JOIN aprobacionrequisitos AS ar ON ar.id_solicitud = sl.id_solicitud
-                WHERE sd.nombre_sede = %s
-                GROUP BY sl.id_solicitud, sd.nombre_sede, al.nombre_liturgia, fl.nombres, fl.apellidos, sl.fecha_registro
-                ORDER BY sl.id_solicitud;
-            """, (sede,))
+            query = """
+            SELECT 
+                sl.id_solicitud,
+                sd.nombre_sede,
+                al.nombre_liturgia,
+                CONCAT(fl.nombres, ' ', fl.apellidos) AS nombres,
+                CASE
+                    -- Si hay algún requisito con estado 'F' (pendiente)
+                    WHEN COUNT(ar.id_solicitud) > 0 
+                        AND SUM(CASE WHEN ar.estado = 'F' THEN 1 ELSE 0 END) > 0 THEN 'Pendiente'
+
+                    -- Si hay asistencias pendientes (estado = 0)
+                    WHEN EXISTS (
+                        SELECT 1 
+                        FROM asistencia AS asist 
+                        WHERE asist.id_solicitud = sl.id_solicitud 
+                        AND asist.estado = 0
+                    ) THEN 'Pendiente'
+
+                    -- Si todos los requisitos tienen estado 'V' (aprobado) y todas las asistencias son '1' (aprobadas)
+                    WHEN COUNT(ar.id_solicitud) > 0 
+                        AND SUM(CASE WHEN ar.estado = 'V' THEN 1 ELSE 0 END) = COUNT(ar.id_solicitud)
+                        AND (
+                            SELECT COUNT(id_solicitud) 
+                            FROM asistencia 
+                            WHERE id_solicitud = sl.id_solicitud
+                        ) = (
+                            SELECT COUNT(id_solicitud) 
+                            FROM asistencia 
+                            WHERE estado = 1 
+                            AND id_solicitud = sl.id_solicitud
+                        ) THEN 'Aprobado'
+
+                    -- Si no hay registros de requisitos
+                    WHEN COUNT(ar.id_solicitud) = 0 THEN 'Aprobado'
+
+                    -- Por defecto
+                    ELSE 'Pendiente'
+                END AS estado,
+                sl.fecha_registro
+            FROM solicitud AS sl
+            INNER JOIN feligres AS fl ON fl.dni = sl.dni_feligres
+            INNER JOIN sede AS sd ON sd.id_sede = sl.id_sede
+            INNER JOIN actoliturgico AS al ON al.id_actoliturgico = sl.id_actoliturgico
+            LEFT JOIN aprobacionrequisitos AS ar ON ar.id_solicitud = sl.id_solicitud
+            WHERE sd.nombre_sede = %s
+            GROUP BY 
+                sl.id_solicitud, 
+                sd.nombre_sede, 
+                al.nombre_liturgia, 
+                fl.nombres, 
+                fl.apellidos, 
+                sl.fecha_registro
+            ORDER BY sl.id_solicitud;
+            """
+            cursor.execute(query, (sede,))
             solicitudes = cursor.fetchall()
             return solicitudes
     except Exception as e:
