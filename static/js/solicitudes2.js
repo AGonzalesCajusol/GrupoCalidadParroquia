@@ -6,6 +6,7 @@ document.addEventListener('show.bs.tab', function (event) {
 
 <<<<<<< HEAD
 <<<<<<< HEAD
+<<<<<<< HEAD
 function verificar() {
     const acto_liturgico = document.getElementById('acto_seleccionado').value;
 
@@ -13,7 +14,30 @@ function verificar() {
 =======
 
 =======
+=======
+
+
+
+function verificar(){
+    var acto_liturgico = document.getElementById('acto_seleccionado').value;
+
+    if (acto_liturgico == ""){
+        Toastify({
+            text: "Selecciona un acto litúrgico",
+            duration: 2000,
+            close: true,
+            backgroundColor: "#dc3545",
+            gravity: "bottom",
+            position: "right",
+        }).showToast();
+    }else{
+
+    }
+}
+
+>>>>>>> parent of 70241f3 (ccccccc)
 function listar_solicitudes() {
+
     fetch('/listar_solicitudes')
         .then(response => response.json())
         .then(data => {
@@ -82,6 +106,7 @@ function listar_solicitudes() {
             console.error('Error al obtener solicitudes:', error);
         });
 }
+<<<<<<< HEAD
 
 function responsable_pago() {
     var acto = document.getElementById('acto_seleccionado').value;
@@ -889,3 +914,5 @@ var modal_prevcharlas = new bootstrap.Modal(document.getElementById('modal_prevc
                 }).showToast();
             });
     }
+=======
+>>>>>>> parent of 70241f3 (ccccccc)

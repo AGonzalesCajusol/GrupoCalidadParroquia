@@ -62,7 +62,7 @@ function listar() {
                             <i class="fas fa-edit"></i>
                         </button>
                         ${element.estado === 'Inactivo' ? 
-                            `<button class="btn btn-success btn-sm" title="Activar" onclick="activar(${element.id}, ${element.id_requisito})">
+                            `<button class="btn btn-success btn-sm" title="Activara" onclick="activar(${element.id}, ${element.id_requisito})">
                                 <i class="bi bi-check-lg"></i>
                             </button>`
                             :

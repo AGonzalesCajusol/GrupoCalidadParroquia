@@ -87,7 +87,6 @@ def registrar_rutas(app):
     @app.route('/monto_acto/<string:acto_liturgico>/<string:sede>/<int:dni_responsable>/<int:dni1>/<int:dni2>', methods=['GET'])
     @requerido_login
     def monto_actos(acto_liturgico, sede, dni_responsable, dni1, dni2=''):
-        acto = cactos.obtener_acto
 
         monto = cactos.monto_total(acto_liturgico, sede, dni_responsable, dni1, dni2)
         
@@ -120,7 +119,7 @@ def registrar_rutas(app):
         sede = request.cookies.get('sede')
         charlas = csoli.fcelebraciones(acto,sede)
         lista_charlas = []
-        if charlas is not  None or charlas != "":
+        if charlas is not  None:
             for ch in charlas:
                 lista_charlas.append({
                     'id_charla': ch[0],
@@ -444,6 +443,7 @@ def registrar_rutas(app):
                             'data': lista_datos})
 <<<<<<< HEAD
 <<<<<<< HEAD
+<<<<<<< HEAD
         
 =======
 
@@ -633,3 +633,5 @@ def registrar_rutas(app):
         except Exception as e:
             return jsonify({'estado': 'Error'})   
 >>>>>>> parent of 40b9c5e (Merge branch 'secundaria' of https://github.com/AGonzalesCajusol/GrupoCalidadParroquia into secundaria)
+=======
+>>>>>>> parent of 70241f3 (ccccccc)

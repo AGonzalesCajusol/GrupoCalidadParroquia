@@ -102,7 +102,7 @@ def solicitudes(sede):
         conexion.close() 
 >>>>>>> parent of 70241f3 (ccccccc)
 
-def insertar_bautismo(requisitos_data,extra):
+def insertar_bautismo(requisitos_data):
     id_sede = csede.obtener_id_sede_por_nombre(requisitos_data['sedebau'])
     try:
         conexion = obtener_conexion()
@@ -110,7 +110,7 @@ def insertar_bautismo(requisitos_data,extra):
             cursor.execute(
                 '''
                 insert into solicitud(id_actoliturgico,id_sede,estado,id_celebracion,dni_feligres, asistencia, fecha_registro) values (%s,%s,%s,%s,%s,0, CURRENT_DATE())
-                ''',(2,id_sede,'P',requisitos_data['charbau'],extra['responsable'])
+                ''',(requisitos_data['id_acto'],id_sede,'P',requisitos_data['id_charla'],requisitos_data['dni_tutor'])
             )
             id_solicitud = cursor.lastrowid
 
@@ -151,12 +151,12 @@ def insertar_bautismo(requisitos_data,extra):
                 INSERT INTO comprobante (fecha_hora, total, tipo_comprobante, forma_pago, id_solicitud, id_sede) 
                 VALUES (CURRENT_DATE(), %s, %s, %s, %s, %s)
                 ''',
-                (monto, 'Electrónico', extra['f_pago'], id_solicitud, id_sede) 
+                (monto, 'Electrónico', requisitos_data['metodo'], id_solicitud, id_sede) 
             )
 
 
             #ahora falta insertar el nombre de las imagenes y sus estados
-            requisitos = cactos.listar_requisitos(2)
+            requisitos = cactos.listar_requisitos(requisitos_data['id_acto'])
 
             directorio = 'static/archivos_usuario/'+ str(id_solicitud) +'/'
             print(f"Directorio donde se guardará la imagen: {directorio}")  # Imprimir para verificar
@@ -180,14 +180,12 @@ def insertar_bautismo(requisitos_data,extra):
                 else:
                     enlace_imagen = requisitos_data[rq[7]]
 
-                estado = requisitos_data[rq[8]]
-
                 cursor.execute(
                 '''
                     insert into aprobacionrequisitos (id_solicitud,id_requisito,estado,enlace_imagen) 
                     values (%s,%s,%s,%s)
                 '''
-                ,(id_solicitud, rq[0],estado,enlace_imagen)
+                ,(id_solicitud, rq[0],'V',enlace_imagen)
             )
             conexion.commit()
 
@@ -198,7 +196,7 @@ def insertar_bautismo(requisitos_data,extra):
     finally:
         conexion.close()
 
-def insertar_confirmacion(requisitos_data,extra):
+def insertar_confirmacion(requisitos_data):
     id_sede = csede.obtener_id_sede_por_nombre(requisitos_data['sede'])
     try:
         conexion = obtener_conexion()
@@ -206,7 +204,7 @@ def insertar_confirmacion(requisitos_data,extra):
             cursor.execute(
                 '''
                 insert into solicitud(id_actoliturgico,id_sede,estado,id_celebracion,dni_feligres, asistencia, fecha_registro) values (%s,%s,%s,%s,%s,0, CURRENT_DATE())
-                ''',(3,id_sede,'P',requisitos_data['charlas'],extra['responsable'])
+                ''',(requisitos_data['id_acto'],id_sede,'P',requisitos_data['id_charla'],requisitos_data['dni_confirmado'])
             )
             id_solicitud = cursor.lastrowid
 
@@ -242,11 +240,11 @@ def insertar_confirmacion(requisitos_data,extra):
                 INSERT INTO comprobante (fecha_hora, total, tipo_comprobante, forma_pago, id_solicitud, id_sede) 
                 VALUES (CURRENT_DATE(), %s, %s, %s, %s, %s)
                 ''',
-                (monto, 'Electrónico', extra['f_pago'], id_solicitud, id_sede) 
+                (monto, 'Electrónico', requisitos_data['metodo'], id_solicitud, id_sede) 
             )
 
 
-            requisitos = cactos.listar_requisitos(3)
+            requisitos = cactos.listar_requisitos(requisitos_data['id_acto'])
 
             directorio = 'static/archivos_usuario/'+ str(id_solicitud) +'/'
             print(f"Directorio donde se guardará la imagen: {directorio}")  # Imprimir para verificar
@@ -270,14 +268,12 @@ def insertar_confirmacion(requisitos_data,extra):
                 else:
                     enlace_imagen = requisitos_data[rq[7]]
 
-                estado = requisitos_data[rq[8]]
-
                 cursor.execute(
                 '''
                     insert into aprobacionrequisitos (id_solicitud,id_requisito,estado,enlace_imagen) 
                     values (%s,%s,%s,%s)
                 '''
-                ,(id_solicitud, rq[0],estado,enlace_imagen)
+                ,(id_solicitud, rq[0],'V',enlace_imagen)
             )
             conexion.commit()
 
@@ -288,7 +284,7 @@ def insertar_confirmacion(requisitos_data,extra):
     finally:
         conexion.close()
 
-def insertar_Pcomunion(requisitos_data,extra):
+def primeracomu(requisitos_data):
     id_sede = csede.obtener_id_sede_por_nombre(requisitos_data['sede'])
     try:
         conexion = obtener_conexion()
@@ -296,7 +292,7 @@ def insertar_Pcomunion(requisitos_data,extra):
             cursor.execute(
                 '''
                 insert into solicitud(id_actoliturgico,id_sede,estado,id_celebracion,dni_feligres, asistencia, fecha_registro) values (%s,%s,%s,%s,%s,0, CURRENT_DATE())
-                ''',(6,id_sede,'P',requisitos_data['charlas'],extra['responsable'])
+                ''',(requisitos_data['id_acto'],id_sede,'P',requisitos_data['id_charla'],requisitos_data['dni_pri_responsable'])
             )
             id_solicitud = cursor.lastrowid
 
@@ -332,11 +328,11 @@ def insertar_Pcomunion(requisitos_data,extra):
                 INSERT INTO comprobante (fecha_hora, total, tipo_comprobante, forma_pago, id_solicitud, id_sede) 
                 VALUES (CURRENT_DATE(), %s, %s, %s, %s, %s)
                 ''',
-                (monto, 'Electrónico', extra['f_pago'], id_solicitud, id_sede) 
+                (monto, 'Electrónico', requisitos_data['metodo'], id_solicitud, id_sede) 
             )
 
 
-            requisitos = cactos.listar_requisitos(6)
+            requisitos = cactos.listar_requisitos(requisitos_data['id_acto'])
 
             directorio = 'static/archivos_usuario/'+ str(id_solicitud) +'/'
             print(f"Directorio donde se guardará la imagen: {directorio}")  # Imprimir para verificar
@@ -359,14 +355,13 @@ def insertar_Pcomunion(requisitos_data,extra):
                         enlace_imagen = ""
                 else:
                     enlace_imagen = requisitos_data[rq[7]]
-                estado = requisitos_data[rq[8]]
 
                 cursor.execute(
                 '''
                     insert into aprobacionrequisitos (id_solicitud,id_requisito,estado,enlace_imagen) 
                     values (%s,%s,%s,%s)
                 '''
-                ,(id_solicitud, rq[0],estado,enlace_imagen)
+                ,(id_solicitud, rq[0],'V',enlace_imagen)
             )
             conexion.commit()
 
@@ -379,20 +374,34 @@ def insertar_Pcomunion(requisitos_data,extra):
 
 
 
-def insertar_solicitudMatrimonio(requisitos_data,extra):
+def insertar_solicitudMatrimonio(requisitos_data):
     try:
         conexion = obtener_conexion()
+
+        # Cambia la forma de acceder a f_matrimonio usando la notación de diccionario
+        fecha_hora = requisitos_data['f_matrimonio']  # Cambiado a la notación de clave
+        fecha_hora_formateada = datetime.strptime(fecha_hora, '%Y-%m-%dT%H:%M')
+
+        # Extraer fecha y hora
+        fecha = fecha_hora_formateada.date()
+        hora_inicio = fecha_hora_formateada.time()
+        hora_fin_objeto = fecha_hora_formateada + timedelta(hours=1)
+        hora_fin = hora_fin_objeto.time()
 
         # Obtener ID de la sede
         id_sede = csede.obtener_id_sede_por_nombre(requisitos_data['sede']) 
 
         # Aquí deberías agregar la lógica para insertar en la base de datos
         with conexion.cursor() as cursor:
-            print(id_sede)
+            cursor.execute(
+                "INSERT INTO celebracion (fecha, hora_inicio, hora_fin, estado, id_sede, id_actoliturgico) VALUES (%s, %s, %s, %s, %s, %s)",
+                (fecha, hora_inicio, hora_fin, 'P', id_sede, requisitos_data['id_acto'])
+            )
+            id_celebracion = cursor.lastrowid
             cursor.execute(
                 '''
-                insert into solicitud(id_actoliturgico,id_sede,estado,id_celebracion,dni_feligres, asistencia, fecha_registro,monto_total) values (%s,%s,%s,%s,%s,0, CURRENT_DATE(),%s)
-                ''',(1,id_sede,'P',None,extra['responsable'],extra['monto'])
+                insert into solicitud(id_actoliturgico,id_sede,estado,id_celebracion,dni_feligres, asistencia, fecha_registro) values (%s,%s,%s,%s,%s,0, CURRENT_DATE())
+                ''',(requisitos_data['id_acto'],id_sede,'P',id_celebracion,requisitos_data['dni_responsable'])
             )
             id_solicitud = cursor.lastrowid
             cursor.execute(
@@ -415,17 +424,27 @@ def insertar_solicitudMatrimonio(requisitos_data,extra):
             mensaje = cursor.fetchone()  # Devuelve una tupla
             print(mensaje[0])
             
-            monto = cactos.monto_total('Matrimonio', requisitos_data['sede'], extra['responsable'], requisitos_data['dni_novio'], requisitos_data['dni_novia'])
+            ##Pasamos a realozar los pagos de igual forma el comprobante
 
+
+            monto = cactos.monto_total('Matrimonio', requisitos_data['sede'], requisitos_data['dni_responsable'], requisitos_data['dni_novio'], requisitos_data['dni_novia'])
             cursor.execute(
                 '''
                 INSERT INTO comprobante (fecha_hora, total, tipo_comprobante, forma_pago, id_solicitud, id_sede) 
                 VALUES (CURRENT_DATE(), %s, %s, %s, %s, %s)
                 ''',
-                (extra['pago'], 'Electrónico', extra['f_pago'], id_solicitud, id_sede) 
+                (monto['pf_sede']+monto['pf_acto'], 'Electrónico', requisitos_data['metodo'], id_solicitud, id_sede) 
             )
-
-            requisitos = cactos.listar_requisitos(1)
+            if 'id_sedetraslado' in monto:
+                cursor.execute(
+                    '''
+                    INSERT INTO comprobante (fecha_hora, total, tipo_comprobante, forma_pago, id_solicitud, id_sede) 
+                    VALUES (CURRENT_DATE(), %s, %s, %s, %s, %s)
+                    ''',
+                    (monto['pf_traslado'], 'Electrónico', requisitos_data['metodo'], id_solicitud, monto['id_sedetraslado'])
+            )
+            #ahora falta insertar el nombre de las imagenes y sus estados
+            requisitos = cactos.listar_requisitos(requisitos_data['id_acto'])
             directorio = 'static/archivos_usuario/'+ str(id_solicitud) +'/'
             print(f"Directorio donde se guardará la imagen: {directorio}")  # Imprimir para verificar
 
