@@ -397,7 +397,7 @@ $('#recaudacionForm').on('submit', function(event) {
                 text: "Recaudación guardada con éxito.",
                 duration: 2000,
                 close: true,
-                backgroundColor: "#28a745", // Verde para éxito
+                backgroundColor: "--bs-primary",
                 gravity: "bottom",
                 position: "right",
             }).showToast();
