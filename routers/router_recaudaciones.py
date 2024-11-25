@@ -15,7 +15,8 @@ from controladores.controlador_recaudaciones import (
     eliminar_recaudacion,
     obtener_todos_los_tipos_recaudacion,
     obtener_tipos_recaudacion_activos,
-    obtener_recaudaciones_por_mes
+    obtener_recaudaciones_por_mes,
+    obtener_recaudaciones_por_sede
 )
 from routers.router_main import requerido_login
 
