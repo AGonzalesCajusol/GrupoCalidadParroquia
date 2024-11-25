@@ -6,72 +6,64 @@ document.addEventListener('show.bs.tab', function (event){
 
 function listar_solicitudes() {
     fetch('/listar_solicitudes')
-        .then(response => response.json()) // Parseamos la respuesta como JSON
+        .then(response => response.json())
         .then(data => {
-            const tbody = document.getElementById('solicitud');
-            tbody.innerHTML = '';
-            if ($.fn.dataTable.isDataTable('#soli_tab')) {
-                const dataTable = $('#soli_tab').DataTable();
-                dataTable.clear();
-                if (data && data.data && data.data.length > 0) {
-                    const rows = data.data.map(solicitud => [
-                        solicitud.id_solicitud,
-                        solicitud.fecha,
-                        solicitud.nombre_sede,
-                        solicitud.nombre_liturgia,
-                        solicitud.nombres,
-                        `
-                        <button class="btn btn-primary btn-sm" onclick="rellenar_formulario(${solicitud.id_solicitud}, '${solicitud.nombre_liturgia}')">
-                            <i class="bi bi-check2-circle"></i>
-                        </button>
-                        <button class="btn btn-secondary btn-sm" onclick="asistencias(${solicitud.id_solicitud}, '${solicitud.nombre_liturgia}')">
-                            <i class="bi bi-calendar3"></i>
-                        </button>
-                        `
-                    ]);
-                    dataTable.rows.add(rows).draw();
-                } else {
-                    // Si no hay datos, mostramos un mensaje
-                    dataTable.draw();
-                }
-            } else {
-                // Inicializamos el DataTable si no está inicializado
-                $('#soli_tab').DataTable({
-                    data: data && data.data ? data.data.map(solicitud => [
-                        solicitud.id_solicitud,
-                        solicitud.fecha,
-                        solicitud.nombre_sede,
-                        solicitud.nombre_liturgia,
-                        solicitud.nombres,
-                        `
-                        <button class="btn btn-primary btn-sm" onclick="rellenar_formulario(${solicitud.id_solicitud}, '${solicitud.nombre_liturgia}')">
-                            <i class="bi bi-check2-circle"></i>
-                        </button>
-                        <button class="btn btn-secondary btn-sm" onclick="asistencias(${solicitud.id_solicitud}, '${solicitud.nombre_liturgia}')">
-                            <i class="bi bi-calendar3"></i>
-                        </button>
-                        `
-                    ]) : [],
-                    pageLength: 10,
-                    dom: '<"d-flex justify-content-between align-items-center mb-3"<"d-flex"f><"d-flex justify-content-end button-section">>rt<"bottom"p>',
-                    language: {
-                        search: "Buscar:",
-                        searchPlaceholder: "Filtrar solicitudes...",
-                        emptyTable: "No se encontraron solicitudes",
-                    },
-                    columnDefs: [
-                        { targets: [0, 5], className: 'text-center' },
-                        { orderable: false, targets: [5] }
-                    ],
-                    initComplete: function () {
-                        $("div.button-section").html(``);
-                    }
-                });
+            if ($.fn.DataTable.isDataTable('#soli_tab')) {
+                $('#soli_tab').DataTable().clear().destroy();
             }
+            $('#soli_tab').DataTable({
+                data: data && data.data ? data.data.map(solicitud => [
+                    solicitud.id_solicitud,       // Columna 0
+                    solicitud.fecha,             // Columna 1
+                    solicitud.nombre_sede,       // Columna 2
+                    solicitud.nombre_liturgia,   // Columna 3
+                    solicitud.nombres,           // Columna 4
+                    solicitud.estado,            // Columna 5
+                    `
+                    <button class="btn btn-primary btn-sm" onclick="rellenar_formulario(${solicitud.id_solicitud}, '${solicitud.nombre_liturgia}')">
+                        <i class="bi bi-check2-circle"></i>
+                    </button>
+                    <button class="btn btn-secondary btn-sm" onclick="asistencias(${solicitud.id_solicitud}, '${solicitud.nombre_liturgia}')">
+                        <i class="bi bi-calendar3"></i>
+                    </button>
+                    `
+                ]) : [],
+                pageLength: 10,
+                dom: '<"d-flex justify-content-between align-items-center mb-3"<"d-flex button-section">>rt<"bottom"p>',
+                columnDefs: [
+                    { targets: [6], orderable: false, className: 'text-center' } // Opciones no ordenables
+                ],
+                language: {
+                    search: "",
+                    emptyTable: "No se encontraron solicitudes",
+                },
+                columnDefs: [
+                    { targets: [0, 5], className: 'text-center' },
+                    { orderable: false, targets: [5] }
+                ],
+                initComplete: function () {
+                    $('#filtroLiturgia').on('change', function () {
+                        const liturgia = this.value.trim();
+                        const table = $('#soli_tab').DataTable();
+                        table.column(3).search(liturgia, false, false).draw(); // Filtro por Acto
+                    });
+
+                    $('#filtroEstado').on('change', function () {
+                        const estado = this.value.trim();
+                        const table = $('#soli_tab').DataTable();
+                        table.column(5).search(estado, false, false).draw(); // Filtro por Estado
+                    });
+
+                    $('#buscar').on('keyup', function () {
+                        const value = this.value.trim();
+                        const table = $('#soli_tab').DataTable();
+                        table.search(value).draw(); // Filtro general
+                    });
+                }
+            });
+            limpiar();
         })
-        .catch(error => {
-            console.error('Error al obtener solicitudes:', error);
-        });
+        .catch(error => console.error('Error al obtener solicitudes:', error));
 }
 
 function responsable_pago() {
@@ -235,6 +227,7 @@ function verificar(){
             }else if(acto_liturgico == 6){
                 document.getElementById('formulario_solicitud').action = "registrar_solicitud_Pcomunion";
             }
+            limpiar();
         })
     }
 }
@@ -344,11 +337,11 @@ function retornar_input(tipo,id,nivel){
                     }
                 }) 
             }
-            return select;   
+            return select;
+            case 'Texto':
+                return '<input name="${id}"  id="${id}" ${requerido} type="text" class="form-control form-control-sm" readOnly></input>';  
     }
-
 }
-
 
 function validar_campos(tipo,id,checkbox){
     if (tipo == 'Dni'){
@@ -514,6 +507,7 @@ function validar_campos(tipo,id,checkbox){
 
 
 }
+
 
 function visualizar(id_archivo) {
     const archivo_formulario = document.getElementById(id_archivo).files[0];
@@ -734,4 +728,57 @@ var modal_prevcharlas = new bootstrap.Modal(document.getElementById('modal_prevc
                     position: "right",
                 }).showToast();
             });
+    }
+
+    var md_asistencias = new bootstrap.Modal(document.getElementById('modal_asistencia'));
+    function asistencias(id,acto){
+        md_asistencias.show();
+        //limpiamos
+        var tbody = document.getElementById('cu_cuerpo');
+        tbody.innerHTML = "";
+
+        fetch(`/asistencias_solicitud/${id}`)
+        .then(response => response.json())
+        .then(item => {
+            if (item.estado == "si"){
+                item.data.forEach(dt => {
+                    console.log(dt);
+                    var tr = document.createElement('tr');
+                    tr.innerHTML = 
+                        `
+                        <td class="text-center"> ${dt.id_asistencia} </td>
+                        <td> ${dt.descripcion}  </td>
+                        <td class="text-center"> ${dt.fecha}  </td>
+                        <td> ${dt.rol}  </td>
+                        <td class="text-center"> ${dt.dni}  </td>
+                        <td class="text-center"> ${dt.nombre}  </td>
+                        <td class="text-center">
+                        <input class="me-1" id="${dt.id_asistencia}" 
+                            type="checkbox" 
+                            ${dt.estado == 1 ? 'checked disabled' : `onclick="agregar_asistencia(${dt.id_asistencia})"`}>
+                        <label for="">${ dt.estado == 1 ? '(Asistió)' : '(Falto)' }</label>
+                        </td>
+                    `
+                    tbody.appendChild(tr);
+                });
+            }else{
+                alert("No se encontro las asistencias para esa solicitud");
+            }
+        })
+    }
+
+    function limpiar() {
+
+        const responsable = document.getElementById('responsable');
+        responsable.selectedIndex = 0; 
+        while (responsable.options.length > 1) { 
+            responsable.remove(1);
+        }
+
+        document.getElementById('responsable').selectedIndex = 0; 
+        document.getElementById('formaPago').selectedIndex = 0;   
+        document.getElementById('monto').value = '';              
+        document.getElementById('saldo').value = '';              
+        document.getElementById('money').value = '';  
+
     }

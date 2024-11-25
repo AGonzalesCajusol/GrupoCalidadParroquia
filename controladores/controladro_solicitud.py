@@ -62,24 +62,6 @@ def verificar_fecha(fecha,sede):
     finally:
         conexion.close() 
 
-def solicitudes(sede):
-    conexion = obtener_conexion()
-    try:
-        with conexion.cursor() as cursor:
-            cursor.execute("""
-                SELECT sl.id_solicitud, sd.id_sede , sd.nombre_sede ,fl.dni , al.nombre_liturgia  ,CONCAT(fl.nombres, ' ', fl.apellidos) as 'nombres', sl.fecha_registro
-                FROM solicitud AS sl
-                INNER JOIN feligres AS fl ON fl.dni = sl.dni_feligres inner join sede as sd
-                on sd.id_sede = sl.id_sede  inner join actoliturgico as al
-                on al.id_actoliturgico = sl.id_actoliturgico
-                where sd.nombre_sede = %s order by sl.id_solicitud desc
-            """, (sede))
-        return cursor.fetchall()
-    except Exception as e:
-        return "Error"
-    finally:
-        conexion.close() 
-
 def insertar_bautismo(requisitos_data,extra):
     id_sede = csede.obtener_id_sede_por_nombre(requisitos_data['sedebau'])
     try:
@@ -107,7 +89,7 @@ def insertar_bautismo(requisitos_data,extra):
                 print("ok")
  
             #grabamos las asistenicas de las 3 pesonas
-            datos_celebracion = viww(requisitos_data['id_charla'])[0]
+            datos_celebracion = viww(requisitos_data['charbau'])[0]
             dnis = [requisitos_data['dni_padrino'],requisitos_data['dni_madrina'],requisitos_data['dni_tutor']]
 
             for dni in dnis:
@@ -201,20 +183,19 @@ def insertar_confirmacion(requisitos_data,extra):
                         ,(dni,id_solicitud,rol)
                 )
                 print("ok")
- 
             cursor.execute(
             '''
-                CALL GenerarAsistenciasPorSolicitud(%s);
-            ''',(id_solicitud)
+                SELECT InsertarAsistencias(3, %s, %s, %s, %s, 0) AS resultado;            ''',
+                (id_sede,requisitos_data['charlas'],requisitos_data['dni_confirmado'],id_solicitud)
             )
-            print("ok")
-    
-
+            datos = str(cursor.fetchone()[0])
+            if datos.startswith('Se insertaron'):
+                print("se inserto correctmaente")
+            else:
+                raise 'Error' 
             #registramos comprobantes
-
             monto = monto_confirmacion(requisitos_data['sede'])
             print(monto)
-
             cursor.execute(
                 '''
                 INSERT INTO comprobante (fecha_hora, total, tipo_comprobante, forma_pago, id_solicitud, id_sede) 
@@ -294,12 +275,14 @@ def insertar_Pcomunion(requisitos_data,extra):
  
             cursor.execute(
             '''
-                CALL GenerarAsistenciasPorSolicitud(%s);
-            ''',(id_solicitud)
+                SELECT InsertarAsistencias(6, %s, %s, %s, %s, 0) AS resultado;            ''',
+                (id_sede,requisitos_data['charlas'],requisitos_data['dni_celebrante'],id_solicitud)
             )
-            print("ok")
-    
-
+            datos = str(cursor.fetchone()[0])
+            if datos.startswith('Se insertaron'):
+                print("se inserto correctmaente")
+            else:
+                raise 'Error' 
             #registramos comprobantes
 
             monto = monto_primera(requisitos_data['sede'])
@@ -655,3 +638,38 @@ def ch_comunion(sede,id_acto,id):
         return 0
     finally:
         conexion.close()
+
+def solicitudes(sede):
+    conexion = obtener_conexion()
+    try:
+        with conexion.cursor() as cursor:
+            cursor.execute("""
+                SELECT 
+                    sl.id_solicitud,
+                    sd.nombre_sede,
+                    al.nombre_liturgia,
+                    CONCAT(fl.nombres, ' ', fl.apellidos) AS nombres,
+                    CASE
+                        WHEN COUNT(ar.id_solicitud) > 0 AND 
+                            SUM(CASE WHEN ar.estado = 'F' THEN 1 ELSE 0 END) > 0 THEN 'Pendiente'
+                        WHEN COUNT(ar.id_solicitud) = 0 THEN 'Aprobado'
+                        ELSE 'Aprobado'
+                    END AS estado,
+                    sl.fecha_registro
+                FROM solicitud AS sl
+                INNER JOIN feligres AS fl ON fl.dni = sl.dni_feligres
+                INNER JOIN sede AS sd ON sd.id_sede = sl.id_sede
+                INNER JOIN actoliturgico AS al ON al.id_actoliturgico = sl.id_actoliturgico
+                LEFT JOIN aprobacionrequisitos AS ar ON ar.id_solicitud = sl.id_solicitud
+                WHERE sd.nombre_sede = %s
+                GROUP BY sl.id_solicitud, sd.nombre_sede, al.nombre_liturgia, fl.nombres, fl.apellidos, sl.fecha_registro
+                ORDER BY sl.id_solicitud;
+            """, (sede,))
+            solicitudes = cursor.fetchall()
+            return solicitudes
+    except Exception as e:
+        print(f"Error en solicitudes(): {e}")
+        return "Error"
+    finally:
+        conexion.close()
+

@@ -16,25 +16,25 @@ def registrar_rutas(app):
         lista_actos = cactos.listar_actosxsede(nombre_sede)
         return render_template('solicitudes/solicitudes_actoliturgico.html', lista_actos=lista_actos)
     
-    @app.route('/listar_solicitudes', methods=['GET'])
-    @requerido_login
-    def listar_solicitudes():
-        sede = request.cookies.get('sede')
-        solicitudes = csoli.solicitudes(sede)
-        listar_solicitudes = []
-        if solicitudes != 'Error':
-            for sl in solicitudes:
-                listar_solicitudes.append({
-                'id_solicitud': sl[0],
-                'id_sede': sl[1],
-                'nombre_sede' : sl[2],
-                'dni': sl[3],
-                'nombre_liturgia': sl[4],
-                'nombres': sl[5],
-                'fecha': str(sl[6])
-            })
-            return jsonify({'data': listar_solicitudes})
-        return jsonify({'mensaje': 'Error'})
+    # @app.route('/listar_solicitudes', methods=['GET'])
+    # @requerido_login
+    # def listar_solicitudes():
+    #     sede = request.cookies.get('sede')
+    #     solicitudes = csoli.solicitudes(sede)
+    #     listar_solicitudes = []
+    #     if solicitudes != 'Error':
+    #         for sl in solicitudes:
+    #             listar_solicitudes.append({
+    #             'id_solicitud': sl[0],
+    #             'id_sede': sl[1],
+    #             'nombre_sede' : sl[2],
+    #             'dni': sl[3],
+    #             'nombre_liturgia': sl[4],
+    #             'nombres': sl[5],
+    #             'fecha': str(sl[6])
+    #         })
+    #         return jsonify({'data': listar_solicitudes})
+    #     return jsonify({'mensaje': 'Error'})
     
 
     @app.route('/calendario_solicitud/<int:id_charla>')
@@ -606,3 +606,22 @@ def registrar_rutas(app):
                 return jsonify({'estado': 'Error'})
         except Exception as e:
             return jsonify({'estado': 'Error'})   
+        
+    @app.route('/listar_solicitudes', methods=['GET'])
+    @requerido_login
+    def listar_solicitudes():
+        sede = request.cookies.get('sede')
+        solicitudes = csoli.solicitudes(sede)
+        listar_solicitudes = []
+        if solicitudes != 'Error':
+            for sl in solicitudes:
+                listar_solicitudes.append({
+                    'id_solicitud': sl[0],
+                    'nombre_sede': sl[1],
+                    'nombre_liturgia': sl[2],
+                    'nombres': sl[3],
+                    'estado': sl[4],  # Agregamos el estado calculado ('Pendiente' o 'Aprobado')
+                    'fecha': str(sl[5]) if sl[5] else None
+                })
+            return jsonify({'data': listar_solicitudes})
+        return jsonify({'mensaje': 'Error al obtener las solicitudes'}), 500
