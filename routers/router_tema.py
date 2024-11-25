@@ -71,7 +71,9 @@ def registrar_rutas(app):
     @requerido_login
     def procesar_eliminar_tema():
         id_tema = request.form.get("id_tema")
-        if eliminar_tema_por_id(id_tema):
-            return jsonify({"success": True, "message": "Tema eliminado exitosamente"})
+        resultado = eliminar_tema_por_id(id_tema)
+        if resultado["success"]:
+            return jsonify(resultado), 200
         else:
-            return jsonify({"success": False, "message": "No se pudo eliminar el tema"}), 500    
+            return jsonify(resultado), 400
+

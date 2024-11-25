@@ -104,6 +104,7 @@
                         <input type="text" class="form-control" id="dni" name="dni" required maxlength="8"
                             pattern="^\d{8}$" title="El DNI debe ser un número de 8 dígitos">
                     </div>
+                    
                     <div class="mb-3">
                         <label for="apellidos" class="form-label">Apellidos</label>
                         <input type="text" class="form-control" id="apellidos" name="apellidos" required>
@@ -140,7 +141,7 @@
                         <select class="form-select" id="id_sede" name="id_sede" required>
                             <option>Seleccione una sede</option>
                             {% for sede in sedes %}
-                            <option value="{{ sede[0] }}">{{ sede[1] }}</option>
+                            <option value="{{ sede[0] }}">{{ sede[1] }}</option required>
                             {% endfor %}
                         </select>
                     </div>
