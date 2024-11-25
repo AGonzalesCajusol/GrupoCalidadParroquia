@@ -55,7 +55,8 @@
                 <img src="/static/img/calidazzzz.jpg" alt="Logo Iglesia" class="me-3"
                     style="height: 60px; width: 60px;">
                 <div>
-                    <h5 class="mb-0 text-primary fw-bold">{{ request.cookies.get('sede') }}</h5>
+                    <h5 class="mb-0 text-primary fw-bold" >{{ request.cookies.get('sede') }}</h5>
+                    <input id="sede" type="text" value="{{ request.cookies.get('sede') }}" class="d-none">
                     <small class="text-muted">😼 🥃 🥃 de la Chavarry</small>
                 </div>
             </div>
