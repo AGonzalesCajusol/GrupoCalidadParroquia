@@ -56,17 +56,16 @@ def registrar_rutas(app):
     @requerido_login
     def eliminar_celebracion():
         try:
-            # Obtener el ID desde la solicitud JSON
-            data = request.get_json()
-            id_celebracion = data.get('id')
+            data = request.get_json()  
+            id_celebracion = data.get('id')  # Extraer el ID
 
-            # Llamar al controlador para eliminar el registro
-            eliminar_celebracion_crud(id_celebracion)
-
-            # Retornar respuesta exitosa
-            return jsonify({"success": True, "message": "Celebración eliminada correctamente."})
+            resultado = eliminar_celebracion_crud(id_celebracion)
+            
+            return jsonify(resultado)
         except Exception as e:
-            return jsonify({"success": False, "message": f"Error al eliminar la celebración: {str(e)}"})
+            print(f"Error en la solicitud de eliminación: {e}")
+            return jsonify({"success": False, "message": "Error al procesar la solicitud de eliminación"})
+
 
 
     @app.route('/editar_celebracion_crud', methods=['POST'])

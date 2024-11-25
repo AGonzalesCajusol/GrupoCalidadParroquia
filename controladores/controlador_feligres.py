@@ -28,7 +28,7 @@ def obtener_feligreses():
     try:
         with conexion.cursor() as cursor:
             cursor.execute("""
-                SELECT f.dni, f.apellidos, f.nombres, f.fecha_nacimiento, f.estado_civil, f.sexo, s.nombre_sede, f.correo 
+                SELECT f.dni, f.apellidos, f.nombres, f.fecha_nacimiento, f.estado_civil, f.sexo, s.id_sede,s.nombre_sede, f.correo 
                 FROM feligres f
                 INNER JOIN sede s ON f.id_sede = s.id_sede
             """)
@@ -62,11 +62,20 @@ def eliminar_feligres(dni):
         with conexion.cursor() as cursor:
             cursor.execute("DELETE FROM feligres WHERE dni = %s", (dni,))
         conexion.commit()
+        return {"success": True, "message": "Feligrés eliminado correctamente"}
     except Exception as e:
-        print(f"Error al eliminar feligres: {e}")
-        conexion.rollback()
+        # Log del error solo en el servidor
+        print(f"Error al eliminar feligrés: {e}")  # Para depuración interna (opcional)
+
+        # Respuesta controlada al cliente
+        if "1451" in str(e):  # Detecta error de restricción de clave foránea
+            return {"success": False, "message": "No se puede eliminar el feligrés porque tiene registros asociados"}
+        else:
+            return {"success": False, "message": "Ha ocurrido un error inesperado al eliminar el feligrés"}
     finally:
         conexion.close()
+
+
 
 def verificarcuentaFeligres(dni, apellidos, nombres, fecha_nacimiento, estado_civil, sexo, token, contraseña, id_sede, estado):
     conexion = obtener_conexion()

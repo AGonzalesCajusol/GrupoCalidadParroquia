@@ -1,34 +1,57 @@
 $(document).ready(function () {
     var table = $('#asistenciaTable').DataTable({
         pageLength: 7,
-        dom: '<"d-flex justify-content-between align-items-center mb-3"<"d-flex"f>>rt<"bottom"p>',
+        dom: '<"d-flex justify-content-between align-items-start mb-2"<"d-flex"f>>rt<"bottom"p>',
         language: {
             search: "Buscar:"
         },
         initComplete: function () {
+            $("div.dataTables_filter label").addClass("ms-3 mt-1");
             $("div.bottom").append(`
-                <div class="d-flex justify-content-center mt-3">
+                <div class="d-flex justify-content-center mt-2">
                     <button type="button" class="btn btn-success btn-lg custom-btn btn-agregar-ministro" data-bs-toggle="modal" data-bs-target="#agregarModal" onclick="guardar()">
                         <i class="bi bi-person-check"></i> Guardar asistencias
                     </button>
                 </div>
             `);
 
-            let opcionesFiltro = '<option value="">Todos</option>';
+            let opcionesFiltro = '<option value=""> Todos </option>';
+            let opcionesFiltroH = '<option value=""> 00:00:00 </option>';
+            let opcionesFiltroD = '<option value=""> 00:00:00 </option>';
+            let opcionesFiltroM = '<option value=""> ---------- </option>';
             fetch("/apiprogramacion")
                 .then(response => response.json())
                 .then(response => {
                     response.data.forEach(element => {
                         opcionesFiltro += `<option value="${element.id_programacion}">${element.hora_tema}</option>`;
+                        opcionesFiltroH += `<option value="${element.id_programacion}">${element.hora_inicio}</option>`;
+                        opcionesFiltroD += `<option value="${element.id_programacion}">${element.duracion}</option>`;
+                        opcionesFiltroM += `<option value="${element.id_programacion}">${element.nombre_ministro}</option>`;
                     });
 
-                    $("div.dataTables_filter").addClass("d-flex align-items-center");
+                    $("div.dataTables_filter").addClass("d-flex align-items-start");
                     $("div.dataTables_filter").prepend(`
-                        <div class="d-flex align-items-center me-2">
-                            <label for="filtroProgramacion" class="me-2">Programación:</label>
-                            <select id="filtroProgramacion" class="form-select" style="width: auto;" onchange="filtrarPorProgramacion()">
-                                ${opcionesFiltro}
-                            </select>
+                        <div>
+                            <div class="d-flex align-items-center mb-2">
+                                <label for="filtroProgramacion" class="me-2">Programación:</label>
+                                <select id="filtroProgramacion" class="form-select" style="width: auto;" onchange="filtrarPorProgramacion()">
+                                    ${opcionesFiltro}
+                                </select>
+                                <label for="filtroMinistro" class="ms-4 me-4">Ministro:</label>
+                                <select id="filtroMinistro" class="form-select" style="width: auto;" disabled>
+                                    ${opcionesFiltroM}
+                                </select>
+                            </div>
+                            <div class="d-flex align-items-center mb-2">
+                                <label for="filtroHoraInicio" class="ms-4 me-4">Hora de inicio:</label>
+                                <select id="filtroHoraInicio" class="form-select" style="width: auto;" disabled>
+                                    ${opcionesFiltroH}
+                                </select>
+                                <label for="filtroDuracion" class="ms-4 me-4">Duración:</label>
+                                <select id="filtroDuracion" class="form-select" style="width: auto;" disabled>
+                                    ${opcionesFiltroD}
+                                </select>
+                            </div>
                         </div>
                     `);
                 })
@@ -41,6 +64,10 @@ $(document).ready(function () {
     // Función para filtrar por id_programacion
     window.filtrarPorProgramacion = function () {
         const filtro = $('#filtroProgramacion').val();
+        // Seleccionar automáticamente las opciones de los otros combobox
+        $('#filtroMinistro').val(filtro);
+        $('#filtroHoraInicio').val(filtro);
+        $('#filtroDuracion').val(filtro);
         if (filtro) {
             table.column(1).search('^' + filtro + '$', true, false).draw(); // Filtra por id_programacion exacto
         } else {
@@ -49,7 +76,7 @@ $(document).ready(function () {
     };
 
     // Código para minimizar o mostrar el calendario
-    $('#toggle-calendar').click(function() {
+    $('#toggle-calendar').click(function () {
         var calendarContainer = $('#calendar');
         var isHidden = calendarContainer.css('display') === 'none';
 
@@ -70,10 +97,17 @@ $(document).ready(function () {
         initialView: 'dayGridMonth',
         height: '400px',
         contentHeight: 'auto',
+        locale: 'es',
         headerToolbar: {
             left: 'prev,next',
             center: 'title',
             right: 'dayGridMonth,dayGridWeek'
+        },
+        buttonText: {
+            today: 'Hoy',
+            month: 'Mes',
+            week: 'Semana',
+            day: 'Día'
         },
         events: function (info, successCallback, failureCallback) {
             fetch('/apicalendar')
@@ -98,7 +132,7 @@ $(document).ready(function () {
                     failureCallback(error);
                 });
         },
-        loading: function(isLoading) {
+        loading: function (isLoading) {
             if (isLoading) {
                 console.log("Cargando eventos...");
             } else {
@@ -115,9 +149,24 @@ $(document).ready(function () {
             $('#toggle-calendar').text('Mostrar Calendario');
 
             // Filtrar registros de la tabla por fecha seleccionada
+            const fechaSeleccionada = info.dateStr;
             table
-                .column(0).search('^' + info.dateStr + '$', true, false) // Filtro en la columna de fecha
+                .column(0).search('^' + fechaSeleccionada + '$', true, false) // Filtro en la columna de fecha
                 .draw();
+
+            // Verificar si hay opciones disponibles para la fecha seleccionada
+            fetch('/apiprogramacion')
+                .then(response => response.json())
+                .then(response => {
+                    const opcionesDisponibles = response.data.filter(item => item.Fecha === fechaSeleccionada);
+                    if (opcionesDisponibles.length === 0) {
+                        // Si no hay opciones para la fecha seleccionada, seleccionar "Todos"
+                        $('#filtroProgramacion').val('').trigger('change');
+                    }
+                })
+                .catch(error => {
+                    console.error("Error al filtrar por fecha:", error);
+                });
         },
         eventClick: function (info) {
             // Cambiar color del día del evento seleccionado
@@ -155,7 +204,7 @@ $(document).ready(function () {
     calendar.render();
     setTimeout(() => {
         calendar.updateSize(); // Actualiza el tamaño para adaptarse al contenedor
-    }, 300); 
+    }, 300);
 
     // Añadir estilo para el día seleccionado
     $('<style>')
@@ -187,7 +236,6 @@ $(document).ready(function () {
     }
 
 });
-
 
 function mostrarAlerta(mensaje, tipo = 'success') {
     const alertaDiv = document.createElement('div');
@@ -225,17 +273,49 @@ function guardar() {
             })
             .then(data => {
                 if (data.success) {
-                    mostrarAlerta('Asistencias actualizadas correctamente.', 'success');
+                    //mostrarAlerta('Asistencias actualizadas correctamente.', 'success');
+                    Toastify({
+                        text: `Asistencias actualizadas correctamente.`,
+                        duration: 2000,
+                        close: true,
+                        backgroundColor: "--bs-primary",
+                        gravity: "bottom",
+                        position: "right",
+                    }).showToast();
                     location.reload(); // Recargar para ver los cambios
                 } else {
-                    mostrarAlerta('Error al actualizar las asistencias.', 'danger');
+                    Toastify({
+                        text: data.message || "Error al actualizar las asistencias.",
+                        duration: 2000,
+                        close: true,
+                        backgroundColor: "#dc3545",
+                        gravity: "bottom",
+                        position: "right",
+                    }).showToast();
+                    //mostrarAlerta('Error al actualizar las asistencias.', 'danger');
                 }
             })
             .catch(error => {
                 console.error('Error en la petición:', error);
-                mostrarAlerta('Hubo un error al procesar la solicitud.', 'danger');
+                Toastify({
+                    text: "Ocurrió un error al intentar actualizar las asistencias.",
+                    duration: 2000,
+                    close: true,
+                    backgroundColor: "#dc3545",
+                    gravity: "bottom",
+                    position: "right",
+                }).showToast();
+                //mostrarAlerta('Hubo un error al procesar la solicitud.', 'danger');
             });
     } else {
-        mostrarAlerta('No se ha seleccionado ninguna asistencia.', 'warning');
+        Toastify({
+            text: "No se ha seleccionado ninguna asistencia.",
+            duration: 2000,
+            close: true,
+            backgroundColor: "#dc3545",
+            gravity: "bottom",
+            position: "right",
+        }).showToast();
+        //mostrarAlerta('No se ha seleccionado ninguna asistencia.', 'warning');
     }
 }

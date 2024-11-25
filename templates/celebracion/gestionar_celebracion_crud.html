@@ -4,19 +4,17 @@
 
 <div class="container mt-4">
     <h1 class="titulo-gestion">Gestión de Celebraciones</h1>
-    
+
     <table id="celebracionTable" class="table table-hover table-striped">
         <thead>
-            <tr>
-                <th style="vertical-align: middle; text-align: center;">ID</th>
-                <th style="vertical-align: middle; text-align: center;">Fecha</th>
-                <th style="vertical-align: middle; text-align: center;">Hora Inicio</th>
-                <th style="vertical-align: middle; text-align: center;">Hora Fin</th>
-                <th style="vertical-align: middle; text-align: center;">Estado</th>
-                <th style="vertical-align: middle; text-align: center;">ID Sede</th>
-                <th style="vertical-align: middle; text-align: center;">ID Acto Litúrgico</th>
-                <th style="vertical-align: middle; text-align: center;  width: 150px;">Acciones</th>
-            </tr>
+            <th style="vertical-align: middle; text-align: center;">ID</th>
+            <th style="vertical-align: middle; text-align: center;">Fecha</th>
+            <th style="vertical-align: middle; text-align: center;">Hora Inicio</th>
+            <th style="vertical-align: middle; text-align: center;">Hora Fin</th>
+            <th style="vertical-align: middle; text-align: center;">Estado</th>
+            <th class="text-center" style="text-align: center;">Sede</th> 
+            <th class="text-center" style="text-align: center;">Acto Litúrgico</th> 
+            <th style="vertical-align: middle; text-align: center; width: 150px;">Acciones</th>
         </thead>
         <tbody>
             <!-- Aquí se cargarán dinámicamente los registros -->
@@ -39,23 +37,29 @@
                 <div class="modal-body">
                     <div class="mb-3">
                         <label for="fecha" class="form-label">Fecha</label>
-                        <input type="date" class="form-control" id="fecha" name="fecha" required>
+                        <input type="date" class="form-control" id="fecha" name="fecha" required min=""
+                               onkeydown="return false"  
+                               onchange="validarFecha()">
                     </div>
                     <div class="mb-3">
                         <label for="hora_inicio" class="form-label">Hora Inicio</label>
-                        <input type="time" class="form-control" id="hora_inicio" name="hora_inicio" required>
+                        <input type="time" class="form-control" id="hora_inicio" name="hora_inicio" required 
+                               min="07:00" max="20:00" onchange="validarHora('hora_inicio')">
                     </div>
                     <div class="mb-3">
                         <label for="hora_fin" class="form-label">Hora Fin</label>
-                        <input type="time" class="form-control" id="hora_fin" name="hora_fin" required>
+                        <input type="time" class="form-control" id="hora_fin" name="hora_fin" required 
+                               min="07:00" max="20:00" onchange="validarHora('hora_fin')">
                     </div>
+                    
                     <div class="mb-3">
                         <label for="estado" class="form-label">Estado</label>
                         <select class="form-select" id="estado" name="estado" required>
                             <option value="A">Agendado</option>
                             <option value="C">Celebrado</option>
                             <option value="P">Programado</option>
-                            <option value="I">Realizado</option>                            
+                            <option value="R">Realizado</option>
+                            <option value="I">Inactivo</option>
                         </select>
                     </div>
                     <div class="mb-3">
@@ -77,17 +81,18 @@
                         </select>
                     </div>
                 </div>
-                
+
 
                 <div class="modal-footer">
                     <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cerrar</button>
                     <button type="submit" class="btn btn-primary" id="saveChanges">Guardar</button>
-                </div>                
+                </div>
             </form>
         </div>
     </div>
 </div>
 
 <script src="/static/js/gestion_celebracion_crud.js"></script>
+
 
 {% endblock %}
