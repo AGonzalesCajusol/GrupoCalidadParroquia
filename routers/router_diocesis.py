@@ -8,7 +8,8 @@ from controladores.controlador_diocesis import (
     obtener_departamento,
     obtener_provincia,
     obtener_id_departamento_por_nombre,
-    obtener_id_provincia_por_nombre
+    obtener_id_provincia_por_nombre,
+    buscar_provincias_por_departamento
 )
 from routers.router_main import requerido_login
 
@@ -92,14 +93,16 @@ def registrar_rutas(app):
             print(f"Error al actualizar diócesis: {e}")
             return jsonify(success=False, message=f"Error al actualizar diócesis: {str(e)}"), 400
     
-    # Ruta para eliminar una diócesis
     @app.route("/eliminar_diocesis", methods=["POST"])
     @requerido_login
     def procesar_eliminar_diocesis():
         id = request.form["id"]
-        eliminar_diocesis(id)
-        flash("La diócesis fue eliminada exitosamente")
-        return redirect(url_for("gestionar_diocesis"))
+        resultado = eliminar_diocesis(id)
+        if resultado["success"]:
+            return jsonify(success=True, message=resultado["message"])
+        else:
+            return jsonify(success=False, message=resultado["message"]), 400
+
     
     @app.route("/obtener_provincias_por_departamento")
     @requerido_login
@@ -114,7 +117,7 @@ def registrar_rutas(app):
             return jsonify({"provincias": []})
 
         # Obtener las provincias del departamento
-        provincias = obtener_provincias_por_departamento(id_departamento)
+        provincias = buscar_provincias_por_departamento(id_departamento)
         provincias_data = [{"nombre": provincia[1]} for provincia in provincias]
 
         # Devolver las provincias en formato JSON

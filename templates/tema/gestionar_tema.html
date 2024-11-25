@@ -25,19 +25,17 @@
     </div>
 </div>
 
-<!-- Modal para Agregar, Ver y Editar Tema -->
+
 <div class="modal fade" id="temaModal" tabindex="-1" aria-labelledby="temaModalLabel" aria-hidden="true">
     <div class="modal-dialog">
         <div class="modal-content">
             <form id="temaForm">
                 <input type="hidden" id="temaId" name="id">
-
                 <div class="modal-header">
                     <h5 class="modal-title" id="temaModalLabel">Modal Title</h5>
                     <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
                 </div>
                 <div class="modal-body">
-
                     <div class="mb-3">
                         <label for="id_actoliturgico" class="form-label">Acto Litúrgico</label>
                         <select class="form-select" id="id_actoliturgico" name="id_actoliturgico" required>
@@ -51,10 +49,11 @@
                         <label for="descripcion" class="form-label">Descripción del Tema</label>
                         <input type="text" class="form-control" id="descripcion" name="descripcion" required>
                     </div>
-                    
+
                     <div class="mb-3">
                         <label for="duracion" class="form-label">Duración (HH:MM)</label>
-                        <input type="time" class="form-control" id="duracion" name="duracion" step="60" required>
+                        <input type="time" class="form-control" id="duracion" name="duracion" step="60" required
+                            min="01:00" max="03:00" onchange="validarHora('duracion')">
                     </div>
                     <div class="mb-3">
                         <label for="orden" class="form-label">Orden</label>
@@ -64,7 +63,8 @@
 
                 <div class="modal-footer">
                     <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cerrar</button>
-                    <button type="button" class="btn btn-primary" id="saveChanges" onclick="insertarTema()">Guardar</button>
+                    <button type="button" class="btn btn-primary" id="saveChanges"
+                        onclick="insertarTema()">Guardar</button>
                 </div>
             </form>
         </div>

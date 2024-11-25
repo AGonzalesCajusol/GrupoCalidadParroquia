@@ -47,7 +47,7 @@ document.addEventListener("DOMContentLoaded", function() {
             $("div.button-section").html('<button type="button" class="btn btn-success btn-lg custom-btn ml-3" data-bs-toggle="modal" onclick="openModal(\'add\')"><i class="bi bi-person-plus"></i> Agregar tema</button>');
         }
     });
-    listarTemas(); // Llamar a listarTemas después de la inicialización
+    listarTemas(); 
 });
 
 function openModal(type, id_tema) {
@@ -59,16 +59,15 @@ function openModal(type, id_tema) {
     const inputs = modal ? modal.querySelectorAll('.form-control') : [];
     const selects = modal ? modal.querySelectorAll('select') : [];
 
-    // Resetear campos
     inputs.forEach(input => {
-        input.disabled = false; // Habilitar todos los campos por defecto
+        input.disabled = false; 
     });
 
     selects.forEach(select => {
-        select.disabled = false; // Habilitar todos los select por defecto
+        select.disabled = false;
     });
 
-    saveButton.style.display = 'inline-block'; // Mostrar botón de guardar por defecto
+    saveButton.style.display = 'inline-block'; 
 
     if (type === 'view') {
         modalTitle.textContent = 'Ver Tema';
@@ -122,14 +121,13 @@ function cargarTema(id_tema) {
 }
 
 function formatearDuracion(duracion) {
-    if (!duracion) return ''; // Validar si la duración es nula o no está definida
-    const [horas, minutos] = duracion.split(':'); // Dividir la duración en partes
-    return `${horas.padStart(2, '0')}:${minutos.padStart(2, '0')}`; // Formatear con dos dígitos
+    if (!duracion) return '';
+    const [horas, minutos] = duracion.split(':'); 
+    return `${horas.padStart(2, '0')}:${minutos.padStart(2, '0')}`; 
 }
 
-
-// Función para actualizar un tema
 function actualizarTema() {
+    if (!validarDuracion('duracion')) return;
     const id_tema = document.getElementById('temaId').value;
     const id_actoliturgico = document.getElementById('id_actoliturgico').value;
     const descripcion = document.getElementById('descripcion').value;
@@ -150,18 +148,46 @@ function actualizarTema() {
     .then(response => response.json())
     .then(data => {
         if (data.success) {
-            alert('Tema actualizado exitosamente');
+            // Notificación de éxito
+            Toastify({
+                text: "¡El tema fue actualizado exitosamente!",
+                duration: 2000,
+                close: true,
+                backgroundColor: "--bs-primary",
+                gravity: "bottom",
+                position: "right",
+            }).showToast();
+
             listarTemas();  
             let modalElement = bootstrap.Modal.getInstance(document.getElementById('temaModal'));
             modalElement.hide();  
         } else {
-            alert(data.message);
+            // Notificación de error
+            Toastify({
+                text: "No se pudo actualizar el tema: " + data.message,
+                duration: 2000,
+                close: true,
+                backgroundColor: "#dc3545",
+                gravity: "bottom",
+                position: "right",
+            }).showToast();
         }
     })
-    .catch(error => console.error('Error al actualizar el tema:', error));
+    .catch(error => {
+        console.error('Error al actualizar el tema:', error);
+        // Notificación de error en solicitud
+        Toastify({
+            text: "No se pudo extraer los datos de la solicitud!!",
+            duration: 2000,
+            close: true,
+            backgroundColor: "#dc3545",
+            gravity: "bottom",
+            position: "right",
+        }).showToast();
+    });
 }
 
-// Función para limpiar los campos del modal
+
 function limpiarModal() {
     document.getElementById('id_actoliturgico').value = '';
     document.getElementById('descripcion').value = '';    
@@ -169,14 +195,13 @@ function limpiarModal() {
     document.getElementById('orden').value = '';
 }
 
-// Función para insertar un nuevo tema
 function insertarTema() {
-    // Recoger los datos del formulario
+    if (!validarDuracion('duracion')) return;
     const id_actoliturgico = parseInt(document.getElementById('id_actoliturgico').value, 10);
     const descripcion = document.getElementById('descripcion').value;
     const duracion = document.getElementById('duracion').value;
     const orden = document.getElementById('orden').value;
-    console.log(document.getElementById('id_actoliturgico').value);
+
     // Crear el objeto FormData
     const formData = new FormData();
     formData.append('id_actoliturgico', id_actoliturgico);
@@ -192,39 +217,115 @@ function insertarTema() {
     .then(response => response.json())
     .then(data => {
         if (data.success) {
-            alert('Tema agregado exitosamente');
+            // Notificación de éxito
+            Toastify({
+                text: "¡El tema fue agregado exitosamente!",
+                duration: 2000,
+                close: true,
+                backgroundColor: "--bs-primary",
+                gravity: "bottom",
+                position: "right",
+            }).showToast();
+
             listarTemas(); 
             let modalElement = bootstrap.Modal.getInstance(document.getElementById('temaModal'));
             modalElement.hide();
         } else {
-            alert('Error al agregar el tema: ' + data.message);
+            // Notificación de error
+            Toastify({
+                text: "No se pudo agregar el tema: " + data.message,
+                duration: 2000,
+                close: true,
+                backgroundColor: "#dc3545",
+                gravity: "bottom",
+                position: "right",
+            }).showToast();
         }
     })
     .catch(error => {
         console.error('Error en la solicitud de insertarTema:', error);
-        alert('Ocurrió un error al intentar agregar el tema');
+        // Notificación de error en solicitud
+        Toastify({
+            text: "No se pudo extraer los datos de la solicitud!!",
+            duration: 2000,
+            close: true,
+            backgroundColor: "#dc3545",
+            gravity: "bottom",
+            position: "right",
+        }).showToast();
     });
-    
 }
 
 function eliminarTema(id_tema) {
     const confirmar = confirm("¿Estás seguro de que deseas eliminar este tema?");
-    if (!confirmar) return; 
+    if (!confirmar) return; // Si el usuario cancela, no se ejecuta nada.
 
     const formData = new FormData();
     formData.append('id_tema', id_tema);
 
+    // Realizar la solicitud al servidor
     fetch('/eliminar_tema', {
         method: 'POST',
         body: formData
     })
     .then(response => response.json())
     .then(data => {
-        if (data.success) {            
-            listarTemas(); 
+        if (data.success) {
+            // Notificación de éxito
+            Toastify({
+                text: data.message || "Tema eliminado correctamente",
+                duration: 2000,
+                close: true,
+                backgroundColor: "--bs-primary",
+                gravity: "bottom",
+                position: "right",
+            }).showToast();
+
+            listarTemas(); // Actualizar la lista de temas
         } else {
-            alert(data.message); 
+            // Notificación de error controlado
+            Toastify({
+                text: data.message || "No se pudo eliminar el tema",
+                duration: 2000,
+                close: true,
+                backgroundColor: "#dc3545",
+                gravity: "bottom",
+                position: "right",
+            }).showToast();
         }
     })
-    .catch(error => console.error('Error en la solicitud de eliminarTema:', error));
+    .catch(error => {
+        console.error('Error en la solicitud de eliminarTema:', error);
+        // Notificación de error inesperado
+        Toastify({
+            text: "No se pudo extraer los datos de la solicitud!!",
+            duration: 2000,
+            close: true,
+            backgroundColor: "#dc3545",
+            gravity: "bottom",
+            position: "right",
+        }).showToast();
+    });
+}
+
+function validarDuracion(campoId) {
+    const horaInput = document.getElementById(campoId);
+    const horaSeleccionada = horaInput.value;
+
+    // Valores mínimos y máximos permitidos
+    const horaMinima = "01:00";
+    const horaMaxima = "03:00";
+
+    if (!horaSeleccionada || horaSeleccionada === "00:00" || horaSeleccionada < horaMinima || horaSeleccionada > horaMaxima) {
+        Toastify({
+            text: "La duración debe estar entre 1:00 y 3:00 horas.",
+            duration: 2000,
+            close: true,
+            backgroundColor: "#dc3545",
+            gravity: "bottom",
+            position: "right",
+        }).showToast();
+        return false; // Indica que la validación falló
+    }
+    return true; // Validación exitosa
 }

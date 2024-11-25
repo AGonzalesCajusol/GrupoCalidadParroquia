@@ -95,11 +95,20 @@ def eliminar_tema_por_id(id_tema):
         with conexion.cursor() as cursor:
             cursor.execute("DELETE FROM tema WHERE id_tema = %s", (id_tema,))
         conexion.commit()
-        return True
+        return {"success": True, "message": "El tema fue eliminado correctamente"}
     except Exception as e:
-        print(f"Error al eliminar el tema: {e}")
-        conexion.rollback()
-        return False
+        print(f"Error al eliminar el tema: {e}") 
+        
+        if "1451" in str(e): 
+            return {
+                "success": False,
+                "message": "No se puede eliminar el tema porque tiene registros asociados"
+            }
+        else:
+            return {
+                "success": False,
+                "message": "Ha ocurrido un error inesperado al intentar eliminar el tema"
+            }
     finally:
         conexion.close()
 
