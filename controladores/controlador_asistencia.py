@@ -26,9 +26,10 @@ def obtener_programacion():
     conexion = obtener_conexion()
     with conexion.cursor() as cursor:
         cursor.execute("""
-            SELECT prgCH.id_programacion, prgCH.hora_inicio, t.descripcion, prgCH.id_ministro, prgCH.id_sede, prgCH.dias_semana
+            SELECT prgCH.id_programacion, prgCH.hora_inicio, t.descripcion, mi.nombre_ministro, t.duracion, prgCH.id_sede, prgCH.dias_semana
             FROM programacion_charlas prgCH
             INNER JOIN tema t ON prgCH.id_tema = t.id_tema
+            INNER JOIN ministro mi ON prgCH.id_ministro = mi.id_ministro
         """)
         programacion = cursor.fetchall()
     conexion.close()

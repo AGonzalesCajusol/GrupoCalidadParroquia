@@ -1,4 +1,5 @@
 from flask import render_template, request, redirect, url_for, flash, jsonify
+from datetime import datetime, timedelta
 from controladores.controlador_asistencia import (
     obtener_asistencia,
     obtener_programacion,
@@ -32,13 +33,16 @@ def registrar_rutas(app):
             programacion = obtener_programacion()
             lista_programacion = [{
                 "id_programacion": p[0],
-                "hora_tema": f"{p[1]} - {p[2]}"  # Formato: "hora_inicio - tema"
+                "hora_inicio": str(p[1]),
+                "hora_tema": f"{p[1]} - {p[2]}", # Formato: "hora_inicio - tema"
+                "nombre_ministro": p[3],
+                "duracion": str(p[4])
             } for p in programacion]
             return jsonify({"data": lista_programacion})
         except Exception as e:
             print(f"Error al obtener la programación de charlas: {e}")
             return jsonify({"error": "Error al obtener la programación de charlas"}), 500
-        
+           
     @app.route("/apicalendar", methods=["GET"])
     @requerido_login
     def api_calendar():
