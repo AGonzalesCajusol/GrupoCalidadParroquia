@@ -70,14 +70,14 @@ async function cargarTemasPorActo() {
         const idSede = document.getElementById('hiddenIdSede').value;
 
 
-
-
-        // Llenar la tabla con los temas disponibles
         data.temas.forEach(tema => {
-            // Si los campos ministro y sede están vacíos, usar los datos de la cookie
-            const ministro = tema.ministro || idMinistro ? `Ministro ${idMinistro}` : "N/A";
-            const sede = tema.sede || idSede ? `Sede ${idSede}` : "N/A";
-
+            // Obtén nombres de los campos ocultos
+            const idMinistro = document.getElementById('hiddenIdMinistro').value;
+            const nombreMinistro = document.getElementById('hiddenNombreMinistro').value || "N/A";
+        
+            const idSede = document.getElementById('hiddenIdSede').value;
+            const nombreSede = document.getElementById('hiddenNombreSede').value || "N/A";
+        
             const row = `
                 <tr data-id-programacion="${tema.id_programacion || ''}" data-id-tema="${tema.id_tema}">
                     <td>${tema.descripcion || 'Sin descripción'}</td>
@@ -94,8 +94,8 @@ async function cargarTemasPorActo() {
                             <option value="7" ${tema.dias_semana == 7 ? 'selected' : ''}>Domingo</option>
                         </select>
                     </td>
-                    <td>${ministro}</td>
-                    <td>${sede}</td>
+                    <td>${nombreMinistro}</td>
+                    <td>${nombreSede}</td>
                     <td>
                         <button class="btn btn-primary btn-sm" title="Ver" onclick="abrirModalVer(this)">
                             <i class="fas fa-eye"></i>
@@ -110,6 +110,7 @@ async function cargarTemasPorActo() {
                 </tr>`;
             temasTable.row.add($(row)).draw();
         });
+        
 
     } catch (error) {
         console.error("Error al cargar temas:", error);
@@ -220,18 +221,22 @@ async function obtenerDatosMinistroSede() {
 
         if (data.success) {
             console.log("Datos de ministro y sede obtenidos:", data);
-            
-            // Aquí asignas los valores a los campos ocultos
+
+            // Asignar ID y nombre del ministro
             document.getElementById('hiddenIdMinistro').value = data.id_ministro;
+            document.getElementById('hiddenNombreMinistro').value = data.nombre_ministro;
+
+            // Asignar ID y nombre de la sede
             document.getElementById('hiddenIdSede').value = data.id_sede;
-            
-            console.log("Campo oculto de ministro:", document.getElementById('hiddenIdMinistro').value);
-            console.log("Campo oculto de sede:", document.getElementById('hiddenIdSede').value);
+            document.getElementById('hiddenNombreSede').value = data.nombre_sede;
+
+            console.log("Ministro y sede almacenados en campos ocultos.");
         }
     } catch (error) {
         console.error("Error al obtener datos del ministro y sede:", error);
     }
 }
+
 
 async function registrarProgramacion() {
     const filas = $('#tablaProgramacion tbody tr');

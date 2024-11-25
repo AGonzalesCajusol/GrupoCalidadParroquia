@@ -16,7 +16,10 @@
             </select>
         </div>
         <input type="hidden" id="hiddenIdMinistro">
+        <input type="hidden" id="hiddenNombreMinistro">
         <input type="hidden" id="hiddenIdSede">
+        <input type="hidden" id="hiddenNombreSede">
+
 
 
         <button type="button" class="btn btn-success btn-lg custom-btn" id="btnRegistrar"
@@ -79,12 +82,12 @@
 
 
                     <div class="mb-3">
-                        <label for="modalSede" class="form-label">Sede</label>                        
+                        <label for="modalSede" class="form-label">Sede</label>
                         <div class="input-group">
                             <input type="text" id="modalSede" class="form-control" disabled>
                             <button type="button" class="btn btn-secondary" disabled>Seleccionar</button>
                         </div>
-                    </div>                    
+                    </div>
                 </div>
 
                 <div class="modal-footer">
@@ -100,17 +103,18 @@
 
 
 <!-- Modal para Editar Programación -->
-<div class="modal fade" id="modalEditarProgramacion" tabindex="-1" aria-labelledby="editarProgramacionLabel" aria-hidden="true">
+<div class="modal fade" id="modalEditarProgramacion" tabindex="-1" aria-labelledby="editarProgramacionLabel"
+    aria-hidden="true">
     <div class="modal-dialog">
         <div class="modal-content">
             <form id="editarProgramacionForm" method="POST">
                 <input type="hidden" id="editarIdProgramacion"> <!-- Campo oculto para el ID -->
-                
+
                 <div class="modal-header">
                     <h5 class="modal-title" id="editarProgramacionLabel">Editar Programación</h5>
                     <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
                 </div>
-                
+
                 <div class="modal-body">
                     <!-- Campo: Tema (Solo Lectura) -->
                     <div class="mb-3">
@@ -144,7 +148,8 @@
                         <label for="editarMinistro" class="form-label">Ministro</label>
                         <div class="input-group">
                             <input type="text" id="editarMinistro" class="form-control" readonly>
-                            <button type="button" class="btn btn-secondary" onclick="abrirModalMinistro()">Seleccionar</button>
+                            <button type="button" class="btn btn-secondary"
+                                onclick="abrirModalMinistro()">Seleccionar</button>
                         </div>
                     </div>
 
@@ -153,14 +158,16 @@
                         <label for="editarSede" class="form-label">Sede</label>
                         <div class="input-group">
                             <input type="text" id="editarSede" class="form-control" readonly>
-                            <button type="button" class="btn btn-secondary" onclick="abrirModalSede()">Seleccionar</button>
+                            <button type="button" class="btn btn-secondary"
+                                onclick="abrirModalSede()">Seleccionar</button>
                         </div>
                     </div>
                 </div>
-                
+
                 <div class="modal-footer">
                     <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cerrar</button>
-                    <button type="button" class="btn btn-primary" onclick="guardarCambiosProgramacion()">Guardar Cambios</button>
+                    <button type="button" class="btn btn-primary" onclick="guardarCambiosProgramacion()">Guardar
+                        Cambios</button>
                 </div>
             </form>
         </div>
@@ -169,7 +176,8 @@
 
 
 <!-- Modal para Seleccionar Ministro -->
-<div class="modal fade" id="modalSeleccionarMinistro" tabindex="-1" aria-labelledby="seleccionarMinistroLabel" aria-hidden="true">
+<div class="modal fade" id="modalSeleccionarMinistro" tabindex="-1" aria-labelledby="seleccionarMinistroLabel"
+    aria-hidden="true">
     <div class="modal-dialog modal-lg">
         <div class="modal-content">
             <div class="modal-header">
@@ -178,8 +186,9 @@
             </div>
             <div class="modal-body">
                 <!-- Campo de búsqueda -->
-                <input type="text" id="buscarMinistro" class="form-control mb-3" placeholder="Buscar por nombre o documento...">
-                
+                <input type="text" id="buscarMinistro" class="form-control mb-3"
+                    placeholder="Buscar por nombre o documento...">
+
                 <!-- Tabla de ministros con ID -->
                 <table id="tablaMinistros" class="table table-striped">
                     <thead>
@@ -203,7 +212,8 @@
 </div>
 
 <!-- Modal para Seleccionar Sede -->
-<div class="modal fade" id="modalSeleccionarSede" tabindex="-1" aria-labelledby="seleccionarSedeLabel" aria-hidden="true">
+<div class="modal fade" id="modalSeleccionarSede" tabindex="-1" aria-labelledby="seleccionarSedeLabel"
+    aria-hidden="true">
     <div class="modal-dialog modal-lg">
         <div class="modal-content">
             <div class="modal-header">
@@ -212,8 +222,9 @@
             </div>
             <div class="modal-body">
                 <!-- Campo de búsqueda -->
-                <input type="text" id="buscarSede" class="form-control mb-3" placeholder="Buscar por nombre o dirección...">
-                
+                <input type="text" id="buscarSede" class="form-control mb-3"
+                    placeholder="Buscar por nombre o dirección...">
+
                 <!-- Tabla de sedes -->
                 <table id="tablaSedes" class="table table-striped">
                     <thead>
