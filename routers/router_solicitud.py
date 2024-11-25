@@ -441,6 +441,7 @@ def registrar_rutas(app):
             print(lista_datos)
             return jsonify({'estado': 'Correcto',
                             'data': lista_datos})
+<<<<<<< HEAD
         
     @app.route('/listar_solicitudes', methods=['GET'])
     @requerido_login
@@ -462,3 +463,5 @@ def registrar_rutas(app):
         return jsonify({'mensaje': 'Error al obtener las solicitudes'}), 500
 
 
+=======
+>>>>>>> parent of 70241f3 (ccccccc)

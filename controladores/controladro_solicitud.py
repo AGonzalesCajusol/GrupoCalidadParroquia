@@ -62,6 +62,7 @@ def verificar_fecha(fecha,sede):
     finally:
         conexion.close() 
 
+<<<<<<< HEAD
 # def solicitudes(sede):
 #     conexion = obtener_conexion()
 #     try:
@@ -80,6 +81,26 @@ def verificar_fecha(fecha,sede):
 #         return "Error"
 #     finally:
 #         conexion.close() 
+=======
+def solicitudes(sede):
+    conexion = obtener_conexion()
+    try:
+        with conexion.cursor() as cursor:
+            cursor.execute("""
+                SELECT sl.id_solicitud, sd.id_sede , sd.nombre_sede ,fl.dni , al.nombre_liturgia  ,CONCAT(fl.nombres, ' ', fl.apellidos) as 'nombres', sl.fecha_registro
+                FROM solicitud AS sl
+                INNER JOIN feligres AS fl ON fl.dni = sl.dni_feligres inner join sede as sd
+                on sd.id_sede = sl.id_sede  inner join celebracion as cl
+                on cl.id_celebracion = sl.id_celebracion inner join actoliturgico as al
+                on al.id_actoliturgico = cl.id_actoliturgico
+                where sd.nombre_sede = %s order by sl.id_solicitud asc
+            """, (sede))
+        return cursor.fetchall()
+    except Exception as e:
+        return "Error"
+    finally:
+        conexion.close() 
+>>>>>>> parent of 70241f3 (ccccccc)
 
 def insertar_bautismo(requisitos_data):
     id_sede = csede.obtener_id_sede_por_nombre(requisitos_data['sedebau'])
