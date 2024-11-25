@@ -1,82 +1,3 @@
-/* $(document).ready(function () {
-    // Inicializar DataTable
-    var table = $('#recaudacionesTable').DataTable({
-        pageLength: 8,
-        dom: '<"d-flex justify-content-between align-items-center mb-3"<"d-flex"f><"d-flex justify-content-end button-section">>rt<"bottom"p>',
-        language: {
-            search: "Buscar:"
-        },
-        initComplete: function () {
-            $("div.button-section").html('<button type="button" class="btn btn-success btn-lg custom-btn ml-3 btn-agregar-recaudacion" data-bs-toggle="modal" onclick="abrirModalRecaudacion(\'add\')"><i class="bi bi-person-plus"></i> Agregar recaudación</button>');
-            $("div.button-section").append('<button type="button" class="btn btn-success btn-lg custom-btn ml-3" data-bs-toggle="modal" data-bs-target="#exportModal"><i class="bi bi-file-earmark-arrow-down"></i> Exportar recaudaciones</button>');
-         let opciones = '<option value="">Todos</option>';
-
-            fetch("/apiaños")
-                .then(response => response.json())
-                .then(response => { 
-                    // Generar las opciones directamente en la variable opciones
-                    response.data.forEach(element => {
-                        opciones += `<option value="${element.año}">${element.año}</option>`;
-                    });
-
-                    // Insertar el selector de año en el DOM después de que opciones esté lleno
-                    $("div.dataTables_filter").addClass("d-flex align-items-center"); // Para alinear ambos elementos
-                    $("div.dataTables_filter").append(`
-                        <div class="d-flex align-items-center ms-2">
-                            <label for="filtroAño" class="me-2">Año:</label>
-                            <select id="filtroAño" class="form-select" style="width: auto;" onchange="filtrarPorAño()">
-                                ${opciones}
-                            </select>
-                        </div>
-                    `);
-                })
-                .catch(error => {
-                    console.error("Error al cargar los años:", error);
-                });
-         `);
-        }
-    });
-});
- */
-/* $(document).ready(function () {
-    // Inicializar DataTable
-    var table = $('#recaudacionesTable').DataTable({
-        pageLength: 8,
-        dom: '<"d-flex justify-content-between align-items-center mb-3"<"d-flex"f><"d-flex justify-content-end button-section">>rt<"bottom"p>',
-        language: {
-            search: "Buscar:"
-        },
-        initComplete: function () {
-            // Agregar botones para agregar y exportar recaudaciones
-            $("div.button-section").html('<button type="button" class="btn btn-success btn-lg custom-btn ml-3 btn-agregar-recaudacion" data-bs-toggle="modal" onclick="abrirModalRecaudacion(\'add\')"><i class="bi bi-person-plus"></i> Agregar recaudación</button>');
-            $("div.button-section").append('<button type="button" onclick= "exportarTablaPDF()" class="btn btn-success btn-lg custom-btn ml-3" data-bs-toggle="modal" data-bs-target="#exportModal"><i class="bi bi-file-earmark-arrow-down"></i> Exportar recaudaciones</button>');
-            let opciones = '<option value="">Todos</option>';
-
-            fetch("/apiaños")
-                .then(response => response.json())
-                .then(response => { 
-                    // Generar las opciones directamente en la variable opciones
-                    response.data.forEach(element => {
-                        opciones += `<option value="${element.año}">${element.año}</option>`;
-                    });
-
-                    // Insertar el selector de año en el DOM después de que opciones esté lleno
-                    $("div.dataTables_filter").addClass("d-flex align-items-center"); // Para alinear ambos elementos
-                    $("div.dataTables_filter").append(`
-                        <div class="d-flex align-items-center ms-2">
-                            <label for="filtroAño" class="me-2">Año:</label>
-                            <select id="filtroAño" class="form-select" style="width: auto;" onchange="filtrarPorAño()">
-                                ${opciones}
-                            </select>
-                        </div>
-                    `);
-                })
-                .catch(error => {
-                    console.error("Error al cargar los años:", error);
-                });
-        }
-    });
-}); */
 $(document).ready(function () {
     // Inicializar DataTable
     var table = $('#recaudacionesTable').DataTable({
@@ -129,7 +50,16 @@ $(document).ready(function () {
                     });
                 })
                 .catch(error => {
-                    console.error("Error al cargar los años:", error);
+                    //console.error("Error al cargar los años:", error);
+                    // Mostrar mensaje de error general
+                    Toastify({
+                        text: error.message || "Ocurrió un error al cargar los años.",
+                        duration: 2000,
+                        close: true,
+                        backgroundColor: "#dc3545", // Rojo para errores
+                        gravity: "bottom",
+                        position: "right",
+                    }).showToast();
                 });
 
             // Opciones para el filtro de tipo
@@ -147,7 +77,15 @@ $(document).ready(function () {
                     }
                 })
                 .catch(error => {
-                    console.error("Error al cargar los tipos:", error);
+                    //console.error("Error al cargar los tipos:", error);
+                    Toastify({
+                        text: error.message || "Ocurrió un error al cargar los tipos.",
+                        duration: 2000,
+                        close: true,
+                        backgroundColor: "#dc3545", // Rojo para errores
+                        gravity: "bottom",
+                        position: "right",
+                    }).showToast();
                 });
         }
     });
@@ -453,13 +391,40 @@ $('#recaudacionForm').on('submit', function(event) {
         if (data.success) {
             actualizarTabla(data.recaudaciones);
             $('#recaudacionModal').modal('hide');
-            mostrarMensaje(data.message, 'success');
+           // mostrarMensaje(data.message, 'success');
+            // Mostrar mensaje de éxito con Toastify
+            Toastify({
+                text: "Recaudación guardada con éxito.",
+                duration: 2000,
+                close: true,
+                backgroundColor: "#28a745", // Verde para éxito
+                gravity: "bottom",
+                position: "right",
+            }).showToast();
         } else {
-            mostrarMensaje(data.message, 'danger');
+            //mostrarMensaje(data.message, 'danger');
+            // Mostrar mensaje de error devuelto por el backend
+            Toastify({
+                text: data.message || "Error al intentar guardar la recaudación.",
+                duration: 2000,
+                close: true,
+                backgroundColor: "#dc3545", // Rojo para errores
+                gravity: "bottom",
+                position: "right",
+            }).showToast();
         }
     })
     .catch(() => {
-        mostrarMensaje("Error en la operación.", 'danger');
+        //mostrarMensaje("Error en la operación.", 'danger');
+        // Mostrar mensaje de error general
+        Toastify({
+            text: "Ocurrió un error inesperado al intentar guardar la recaudación.",
+            duration: 2000,
+            close: true,
+            backgroundColor: "#dc3545", // Rojo para errores
+            gravity: "bottom",
+            position: "right",
+        }).showToast();
     })
     .finally(() => {
         $('#submitBtn').prop('disabled', false);
