@@ -221,11 +221,98 @@ function exportarTablaPDF() {
     const { jsPDF } = window.jspdf;
     const doc = new jsPDF();
 
-    // Título del informe
-    doc.setFontSize(18);
-    doc.text("Informe de Recaudaciones", 14, 20);
+    // Ruta del logo de la iglesia
+    const logoRuta = '/static/img/calidazzzz.jpg';
 
-    // Obtener solo las filas visibles en la tabla (las filtradas)
+    // Dimensiones del logo
+    const logoWidth = 25;
+    const logoHeight = 25;
+    const logoX = 10;
+    const logoY = 10;
+
+    const img = new Image();
+    img.src = logoRuta;
+
+    img.onload = function () {
+        // Configuración de la tabla
+        const table = $('#recaudacionesTable').DataTable();
+        const datos = [];
+        table.rows({ search: 'applied' }).every(function () {
+            const data = this.data();
+            datos.push([
+                data[0], // ID
+                data[1], // Sede
+                data[2], // Tipo
+                data[3], // Observaciones
+                data[4], // Fecha
+                data[5]  // Monto
+            ]);
+        });
+
+        // Agregar contenido en todas las páginas
+        function addHeader() {
+            // Fondo blanco para evitar cuadros negros
+            doc.setFillColor(255, 255, 255);
+            doc.rect(0, 0, doc.internal.pageSize.width, 40, 'F');
+
+            // Logo y título
+            doc.addImage(img, 'JPEG', logoX, logoY, logoWidth, logoHeight);
+            doc.setFontSize(18);
+            doc.text("Informe de Recaudaciones", 40, 25);
+        }
+
+        // Renderizar la tabla con encabezado en todas las páginas
+        doc.autoTable({
+            head: [['ID', 'Sede', 'Tipo', 'Observaciones', 'Fecha', 'Monto']],
+            body: datos,
+            startY: 40, // La tabla comienza después del logo y título
+            styles: {
+                fontSize: 10,
+                cellPadding: 3,
+                valign: 'middle',
+            },
+            headStyles: {
+                fillColor: [167, 192, 221],
+                textColor: 255,
+                fontSize: 11,
+                fontStyle: 'bold',
+            },
+            bodyStyles: {
+                textColor: [0, 0, 0],
+            },
+            alternateRowStyles: {
+                fillColor: [240, 248, 255],
+            },
+            columnStyles: {
+                0: { cellWidth: 15, halign: 'center' },
+                1: { cellWidth: 30, halign: 'center' },
+                2: { cellWidth: 40, halign: 'left' },
+                3: { cellWidth: 50, halign: 'left' },
+                4: { cellWidth: 25, halign: 'center' },
+                5: { cellWidth: 20, halign: 'right' },
+            },
+            didDrawPage: function (data) {
+                // Agregar encabezado en cada página
+                addHeader();
+
+                // Número de página
+                const pageCount = doc.internal.getCurrentPageInfo().pageNumber;
+                doc.setFontSize(10);
+                doc.text(`Página ${pageCount}`, 180, 10);
+            },
+        });
+
+        // Guardar el PDF
+        doc.save("Informe_Recaudaciones.pdf");
+    };
+
+    img.onerror = function () {
+        console.error("No se pudo cargar la imagen del logo.");
+    };
+}
+
+// Función para obtener los datos visibles de la tabla
+function obtenerDatosTabla() {
     const table = $('#recaudacionesTable').DataTable();
     const datos = [];
     table.rows({ search: 'applied' }).every(function () {
@@ -239,52 +326,8 @@ function exportarTablaPDF() {
             data[5]  // Monto
         ]);
     });
-
-    // Configuración de la tabla en el PDF
-    doc.autoTable({
-        head: [['ID', 'Sede', 'Tipo', 'Observaciones', 'Fecha', 'Monto']],
-        body: datos,
-        startY: 30,
-        styles: {
-            fontSize: 10,
-            cellPadding: 3,
-            valign: 'middle',
-            //halign: 'center', // Alinear el texto al centro
-        },
-        headStyles: {
-            fillColor: [167, 192, 221], // Color de encabezado
-            textColor: 255, // Texto en blanco
-            fontSize: 11,
-            fontStyle: 'bold',
-        },
-        bodyStyles: {
-            textColor: [0, 0, 0],
-        },
-        alternateRowStyles: {
-            fillColor: [240, 248, 255], // Alternar color de fondo de las filas
-        },
-        columnStyles: {
-            0: { cellWidth: 15, halign: 'center' },   // ID
-            1: { cellWidth: 30, halign: 'center' },   // Sede
-            2: { cellWidth: 40, halign: 'left' },   // Tipo
-            3: { cellWidth: 50, halign: 'left' },   // Observaciones
-            4: { cellWidth: 25, halign: 'center' },   // Fecha
-            5: { cellWidth: 20, halign: 'right' },   // Monto
-        },
-        didDrawPage: function (data) {
-            // Encabezado de página
-            doc.setFontSize(10);
-            doc.text("Página " + doc.internal.getCurrentPageInfo().pageNumber, 180, 10);
-        }
-    });
-
-    // Guardar el PDF
-    doc.save("Informe_Recaudaciones.pdf");
+    return datos;
 }
-
-
-
-
 
 document.getElementById('monto').addEventListener('input', function () {
     const valoracionInput = this.value;

@@ -205,7 +205,37 @@ def obtener_tipos_recaudacion_activos():
     finally:
         conexion.close()
 
-        
+def obtener_recaudaciones_por_sede(id_sede):
+    conexion = obtener_conexion()
+    try:
+        with conexion.cursor() as cursor:
+            cursor.execute("""
+                SELECT 
+                    r.id_recaudacion,
+                    r.fecha,
+                    r.hora,
+                    r.monto,
+                    r.observacion,
+                    s.nombre_sede,
+                    tr.nombre_recaudacion
+                FROM 
+                    recaudacion r
+                JOIN 
+                    sede s ON r.id_sede = s.id_sede
+                JOIN 
+                    tipo_recaudacion tr ON r.id_tipo_recaudacion = tr.id_tipo_recaudacion
+                WHERE 
+                    r.id_sede = %s
+            """, (id_sede,))
+            recaudaciones = cursor.fetchall()
+        return recaudaciones
+    except Exception as e:
+        print(f"Error al obtener recaudaciones por sede: {e}")
+        return []
+    finally:
+        conexion.close()
+
+
 def obtener_nombre_sede(sede_id):
     conexion = obtener_conexion()
     try:
