@@ -230,6 +230,16 @@ function verificar(excusa){
             limpiar();
             if(excusa == "si"){
                 document.getElementById('registrar').textContent = "Modificar";
+                console.log(document.getElementById('acto_seleccionado').value);
+                if(acto_liturgico == 1){
+                    document.getElementById('formulario_solicitud').action = "modificar_solicitud_matrimonio";
+                }else if(acto_liturgico == 2){
+                    document.getElementById('formulario_solicitud').action = "modificar_solicitud_bautismo";
+                }else if(acto_liturgico == 3){
+                    document.getElementById('formulario_solicitud').action = "modificar_solicitud_Confirmacion";
+                }else if(acto_liturgico == 6){
+                    document.getElementById('formulario_solicitud').action = "modificar_solicitud_Pcomunion";
+                }
             }
         })
     }
@@ -922,10 +932,11 @@ var modal_prevcharlas = new bootstrap.Modal(document.getElementById('modal_prevc
                                     }
                                     
                                 });
+                            
+
                             }
-                            
-                            
-                            
+
+
                             
                         })
                         .catch(error => {

@@ -735,3 +735,29 @@ def obtener_requisitos_solicitud(id_solicitud):
     finally:
         conexion.close()
 
+
+def obtener_detalle_money(id_solicitud):
+    conexion = obtener_conexion()
+    try:
+        with conexion.cursor() as cursor:
+            cursor.execute("""
+                SELECT 
+                    CONCAT(fl.apellidos, ' ', fl.nombres) AS name,
+                    sl.dni_feligres,
+                    co.total,
+                    co.forma_pago
+                FROM 
+                    solicitud AS sl
+                INNER JOIN 
+                    comprobante AS co ON co.id_solicitud = sl.id_solicitud
+                INNER JOIN 
+                    feligres fl ON fl.dni = sl.dni_feligres
+                WHERE 
+                    sl.id_solicitud = %s;
+            """, (id_solicitud,))
+            return cursor.fetchone()
+    except Exception as e:
+        print(f"Error al obtener el nombre, DNI, total y forma de pago de la solicitud: {e}")
+        return None
+    finally:
+        conexion.close()

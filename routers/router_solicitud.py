@@ -493,6 +493,7 @@ def registrar_rutas(app):
         monto = request.form.get('monto')
         pago = request.form.get('money')
         f_pago = request.form.get('formaPago')
+        print(f_pago)
         extra = {'responsable':responsable,
                  'monto': monto,
                  'pago':pago,
@@ -632,9 +633,11 @@ def registrar_rutas(app):
     def requisitos_solicitud(id_solicitud):
         try:
             requisitos = csoli.obtener_requisitos_solicitud(id_solicitud)
+            #money = csoli.obtener_detalle_money(id_solicitud)
             print("Requisitos obtenidos desde la base de datos:", requisitos)  # Verifica los datos extraídos
             if requisitos is not None:
-                data = [] 
+                data = []
+                mot = [] 
                 for req in requisitos:
                     if req[3] == 'V':
                         estado = True
@@ -649,6 +652,14 @@ def registrar_rutas(app):
                         "id_c": req[5],
                         "id_es": req[6],
                     })
+
+                #for mo in money:                   
+                  #  mot.append({
+                    #    "resposable": mo[0], 
+                    #    "dni": mo[1], 
+                   #     "total": mo[2],
+                   #     "f_pago": mo[3],
+                  #  })
                     
                 return jsonify({"estado": "Correcto", "data": data})
             else:
