@@ -124,3 +124,11 @@ nav .collapse .nav-link:hover {
     padding: 8px 12px;
     font-size: 14px;
 }
+
+.sub-menu-item {
+    text-decoration: none;
+}
+
+.sub-menu-item {
+    font-weight: bold;
+}   
