@@ -6,7 +6,7 @@ def generar_token():
     # Genera un token alfanumérico aleatorio de 20 caracteres
     return secrets.token_hex(10)
 
-def insertar_ministro(nombre_ministro, numero_documento, fecha_nacimiento, fecha_ordenacion, fin_actividades, tipoministro, id_sede, id_cargo, contraseña_encriptada):
+def insertar_ministro(nombre_ministro, numero_documento, fecha_nacimiento, fecha_ordenacion, fin_actividades, tipoministro, id_sede, id_cargo, contraseña_encriptada, estado):
     token = generar_token()  # Genera un token aleatorio
     conexion = obtener_conexion()
     try:
@@ -15,12 +15,11 @@ def insertar_ministro(nombre_ministro, numero_documento, fecha_nacimiento, fecha
             cursor.execute("SELECT COALESCE(MAX(id_ministro) + 1, 1) as siguiente_id FROM ministro")
             siguiente_id = cursor.fetchone()[0]
 
-
             # Inserción del nuevo ministro
             cursor.execute("""
-                INSERT INTO ministro (id_ministro, nombre_ministro, numero_documento, fecha_nacimiento, fecha_ordenacion, fin_actividades, token, tipoministro, id_sede, id_cargo, contraseña) 
-                VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s)
-            """, (siguiente_id, nombre_ministro, numero_documento, fecha_nacimiento, fecha_ordenacion, fin_actividades, token, tipoministro, id_sede, id_cargo, contraseña_encriptada))
+                INSERT INTO ministro (id_ministro, nombre_ministro, numero_documento, fecha_nacimiento, fecha_ordenacion, fin_actividades, token, tipoministro, id_sede, id_cargo, contraseña, estado) 
+                VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s)
+            """, (siguiente_id, nombre_ministro, numero_documento, fecha_nacimiento, fecha_ordenacion, fin_actividades, token, tipoministro, id_sede, id_cargo, contraseña_encriptada, estado))
         
         # Confirmar la transacción
         conexion.commit()
@@ -31,7 +30,6 @@ def insertar_ministro(nombre_ministro, numero_documento, fecha_nacimiento, fecha
         return None
     finally:
         conexion.close()  # Asegurarse de cerrar la conexión
-
 
 def encriptar_contraseña(contraseña):
     # Encripta la contraseña usando SHA-256
@@ -94,25 +92,36 @@ def obtener_ministros():
     try:
         with conexion.cursor() as cursor:
             cursor.execute("""
-               SELECT m.id_ministro, m.nombre_ministro, m.numero_documento, m.fecha_nacimiento, m.fecha_ordenacion, m.fin_actividades, m.token, 
-                       tp.tipo_ministro, s.nombre_sede, c.cargo,  
-                           CASE 
-                                WHEN m.estado = 1 THEN 'Activo'
-                                WHEN m.estado = 0 THEN 'Inactivo'
-                                ELSE 'Desconocido'
-                            END AS estado
-                FROM ministro m 
-                INNER JOIN sede s ON s.id_sede = m.id_sede 
-                INNER JOIN tipo_ministro tp ON tp.id_tipoministro = m.tipoministro 
-                INNER JOIN cargo c ON c.id_cargo = m.id_cargo
+               SELECT m.id_ministro, m.nombre_ministro, m.numero_documento, m.fecha_nacimiento, 
+                      m.fecha_ordenacion, m.fin_actividades, m.token, 
+                      tp.tipo_ministro, s.nombre_sede, c.cargo,  
+                      CASE 
+                          WHEN m.estado = 1 THEN 'Activo'
+                          WHEN m.estado = 0 THEN 'Inactivo'
+                          ELSE 'Desconocido'
+                      END AS estado
+               FROM ministro m 
+               INNER JOIN sede s ON s.id_sede = m.id_sede 
+               INNER JOIN tipo_ministro tp ON tp.id_tipoministro = m.tipoministro 
+               INNER JOIN cargo c ON c.id_cargo = m.id_cargo
             """)
             ministros = cursor.fetchall()
+
+        # Validar si se obtuvieron resultados
+        if not ministros:
+            print("No se encontraron registros de ministros.")
+            return []
+
         return ministros
     except Exception as e:
         print(f"Error al obtener ministros: {e}")
         return []
     finally:
-        conexion.close()
+        try:
+            conexion.close()
+        except Exception as e:
+            print(f"Error al cerrar la conexión: {e}")
+
 
 def obtener_ministro_por_id(id_ministro):
     conexion = obtener_conexion()
@@ -131,17 +140,6 @@ def obtener_ministro_por_id(id_ministro):
     finally:
         conexion.close()
 
-def eliminar_ministro(id_ministro):
-    conexion = obtener_conexion()
-    try:
-        with conexion.cursor() as cursor:
-            cursor.execute("DELETE FROM ministro WHERE id_ministro = %s", (id_ministro,))
-        conexion.commit()
-    except Exception as e:
-        print(f"Error al eliminar ministro: {e}")
-        conexion.rollback()
-    finally:
-        conexion.close()
 
 def retornar_datos_ministro(num_doc):
     conexion = obtener_conexion()
@@ -217,3 +215,55 @@ def dar_baja_ministro( id,estado):
         cursor.execute("UPDATE ministro SET estado = %s WHERE id_ministro = %s", ( estado, id))
     conexion.commit()
     conexion.close()
+
+
+
+def eliminar_ministro(id_ministro):
+    conexion = obtener_conexion()
+    try:
+        with conexion.cursor() as cursor:
+            dependencias_encontradas = []
+
+            # Verificar dependencias en la tabla 'solicitud'
+            cursor.execute("""
+                SELECT COUNT(*)
+                FROM solicitud
+                WHERE id_sede IN (
+                    SELECT id_sede
+                    FROM ministro
+                    WHERE id_ministro = %s
+                )
+            """, (id_ministro,))
+            dependencias_solicitud = cursor.fetchone()[0]
+            if dependencias_solicitud > 0:
+                dependencias_encontradas.append(f"{dependencias_solicitud} en Solicitudes")
+
+            # Verificar dependencias en la tabla 'celebracion'
+            cursor.execute("""
+                SELECT COUNT(*)
+                FROM celebracion
+                WHERE id_sede IN (
+                    SELECT id_sede
+                    FROM ministro
+                    WHERE id_ministro = %s
+                )
+            """, (id_ministro,))
+            dependencias_celebracion = cursor.fetchone()[0]
+            if dependencias_celebracion > 0:
+                dependencias_encontradas.append(f"{dependencias_celebracion} en Celebraciones")
+
+            # Si hay dependencias, retornar un mensaje detallado
+            if dependencias_encontradas:
+                mensaje = f"No se puede eliminar el ministro porque tiene dependencias: " + ", ".join(dependencias_encontradas)
+                return {"success": False, "message": mensaje}
+
+            # Si no hay dependencias, proceder a la eliminación
+            cursor.execute("DELETE FROM ministro WHERE id_ministro = %s", (id_ministro,))
+            conexion.commit()
+            return {"success": True, "message": "Ministro eliminado exitosamente."}
+    except Exception as e:
+        print(f"Error al intentar eliminar ministro: {e}")
+        conexion.rollback()
+        return {"success": False, "message": f"Error interno: {e}"}
+    finally:
+        conexion.close()

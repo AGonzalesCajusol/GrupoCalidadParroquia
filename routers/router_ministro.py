@@ -151,10 +151,13 @@ def registrar_rutas(app):
     def procesar_eliminar_ministro():
         data = request.get_json()
         try:
-            eliminar_ministro(data['id'])
-            return jsonify(success=True)
+            resultado = eliminar_ministro(data['id'])
+            if resultado["success"]:
+                return jsonify(success=True, message=resultado["message"])
+            else:
+                return jsonify(success=False, message=resultado["message"]), 400
         except Exception as e:
-            print(f"Error al eliminar ministro: {str(e)}")
+            print(f"Error al eliminar ministro: {e}")
             return jsonify(success=False, message="Error interno del servidor: " + str(e)), 500
 
     @app.route("/procesar_dar_baja_ministro", methods=["POST"])
