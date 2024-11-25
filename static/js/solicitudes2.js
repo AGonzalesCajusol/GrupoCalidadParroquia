@@ -9,6 +9,7 @@ document.addEventListener('show.bs.tab', function (event) {
 <<<<<<< HEAD
 <<<<<<< HEAD
 <<<<<<< HEAD
+<<<<<<< HEAD
 function verificar() {
     const acto_liturgico = document.getElementById('acto_seleccionado').value;
 
@@ -17,6 +18,8 @@ function verificar() {
 
 =======
 =======
+=======
+>>>>>>> parent of 70241f3 (ccccccc)
 =======
 >>>>>>> parent of 70241f3 (ccccccc)
 =======
@@ -43,6 +46,9 @@ function verificar(){
 
 <<<<<<< HEAD
 <<<<<<< HEAD
+<<<<<<< HEAD
+>>>>>>> parent of 70241f3 (ccccccc)
+=======
 >>>>>>> parent of 70241f3 (ccccccc)
 =======
 >>>>>>> parent of 70241f3 (ccccccc)
@@ -118,6 +124,7 @@ function listar_solicitudes() {
             console.error('Error al obtener solicitudes:', error);
         });
 }
+<<<<<<< HEAD
 <<<<<<< HEAD
 <<<<<<< HEAD
 <<<<<<< HEAD
@@ -928,6 +935,8 @@ var modal_prevcharlas = new bootstrap.Modal(document.getElementById('modal_prevc
                 }).showToast();
             });
     }
+=======
+>>>>>>> parent of 70241f3 (ccccccc)
 =======
 >>>>>>> parent of 70241f3 (ccccccc)
 =======

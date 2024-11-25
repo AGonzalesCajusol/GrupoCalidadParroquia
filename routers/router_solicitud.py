@@ -446,6 +446,7 @@ def registrar_rutas(app):
 <<<<<<< HEAD
 <<<<<<< HEAD
 <<<<<<< HEAD
+<<<<<<< HEAD
         
 =======
 
@@ -635,6 +636,8 @@ def registrar_rutas(app):
         except Exception as e:
             return jsonify({'estado': 'Error'})   
 >>>>>>> parent of 40b9c5e (Merge branch 'secundaria' of https://github.com/AGonzalesCajusol/GrupoCalidadParroquia into secundaria)
+=======
+>>>>>>> parent of 70241f3 (ccccccc)
 =======
 >>>>>>> parent of 70241f3 (ccccccc)
 =======
