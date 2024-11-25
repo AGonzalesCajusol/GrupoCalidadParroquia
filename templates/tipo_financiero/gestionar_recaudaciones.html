@@ -86,7 +86,7 @@
                     </div>                              
                     <div class="mb-3">
                         <label for="monto" class="form-label">Monto</label>
-                        <input type="text" class="form-control" id="monto" name="monto" required>
+                        <input type="number" class="form-control" id="monto" name="monto" required>
                     </div>
                     
                     <div class="mb-3">
@@ -113,18 +113,7 @@
     </div>
 </div>
 
-<div class="container mt-3" id="mensaje-container">
-    {% with messages = get_flashed_messages(with_categories=True) %}
-      {% if messages %}
-        {% for category, message in messages %}
-          <div class="alert alert-{{ category }} alert-dismissible fade show" role="alert">
-            {{ message }}
-            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
-          </div>
-        {% endfor %}
-      {% endif %}
-    {% endwith %}
-</div>
+
 <script src="/static/js/recaudaciones.js"></script>
 <script type="text/javascript">
     const urlInsertarRecaudacion = "{{ url_for('procesar_insertar_recaudacion') }}";
