@@ -54,47 +54,108 @@ function openModal(type, id = null, nombre = '', departamento = '', provincia = 
 
     document.getElementById('diocesisForm').onsubmit = function (event) {
         event.preventDefault();
-    
+
         const saveButton = document.getElementById('saveChanges');
         saveButton.disabled = true; // Deshabilita el botón después del primer clic
-    
+
         let formData = new FormData(this);
-    
-        fetch(formAction, {
+
+        fetch(formAction, {  // `formAction` ya se define dinámicamente para insertar o actualizar
             method: 'POST',
             body: formData
         })
-        .then(response => response.json())
-        .then(data => {
-            if (data.success) {
-                // Cerrar el modal sin mostrar alerta
-                const diocesisModal = bootstrap.Modal.getInstance(document.getElementById('diocesisModal'));
-                diocesisModal.hide();
-    
-                // Actualizar la tabla con la nueva lista de diócesis
-                actualizarTablaDiocesis(data.diocesis);
-    
-                // Reactivar el botón para futuras acciones
-                saveButton.disabled = false;
-            } else {
-                // Mostrar el mensaje de error en caso de fallo y reactivar el botón
-                console.error('Error al procesar la diócesis: ' + data.message);
-                saveButton.disabled = false; // Reactivar el botón si hay un error en la respuesta
-            }
-        })
-        .catch(error => {
-            console.error('Error:', error);
-            alert('Hubo un problema al procesar la solicitud.');
-            saveButton.disabled = false; // Reactivar el botón en caso de error
-        });
+            .then(response => response.json())
+            .then(data => {
+                if (data.success) {
+                    // Mostrar mensaje de éxito para editar
+                    if (formAction === urlActualizarDiocesis) {
+                        Toastify({
+                            text: "Diócesis actualizada exitosamente",
+                            duration: 2000,
+                            close: true,
+                            backgroundColor: "--bs-primary", // Color verde (Bootstrap success)
+                            gravity: "bottom",
+                            position: "right",
+                        }).showToast();
+                    } else {
+                        // Mostrar mensaje para insertar
+                        Toastify({
+                            text: "Diócesis insertada exitosamente",
+                            duration: 2000,
+                            close: true,
+                            backgroundColor: "--bs-primary",
+                            gravity: "bottom",
+                            position: "right",
+                        }).showToast();
+                    }
+                    
+                    const diocesisModal = bootstrap.Modal.getInstance(document.getElementById('diocesisModal'));
+                    diocesisModal.hide();
+
+                    
+                    actualizarTablaDiocesis(data.diocesis);
+                } else {
+                    // Mostrar mensaje de error
+                    Toastify({
+                        text: data.message || "No se pudo actualizar la diócesis",
+                        duration: 2000,
+                        close: true,
+                        backgroundColor: "#dc3545", // Color rojo (Bootstrap danger)
+                        gravity: "bottom",
+                        position: "right",
+                    }).showToast();
+
+                    console.error('Error al procesar la diócesis: ' + data.message);
+                }
+                saveButton.disabled = false; // Reactivar el botón después del proceso
+            })
+            .catch(error => {
+                console.error('Error:', error);
+
+                Toastify({
+                    text: "Hubo un problema al procesar la solicitud",
+                    duration: 2000,
+                    close: true,
+                    backgroundColor: "#dc3545", // Color rojo
+                    gravity: "bottom",
+                    position: "right",
+                }).showToast();
+
+                saveButton.disabled = false; // Reactivar el botón en caso de error
+            });
     };
+
+    document.getElementById('id_departamento').addEventListener('change', function () {
+        const departamentoSeleccionado = this.value; 
+        const provinciasSelect = document.getElementById('id_provincia'); 
+    
+        provinciasSelect.innerHTML = '<option value="">Cargando...</option>';
+    
+    
+        fetch(`/obtener_provincias_por_departamento?departamento=${encodeURIComponent(departamentoSeleccionado)}`)
+            .then(response => response.json())
+            .then(data => {
+    
+                provinciasSelect.innerHTML = '<option value="">Seleccione una provincia</option>';
+    
+    
+                data.provincias.forEach(provincia => {
+                    const option = document.createElement('option');
+                    option.value = provincia.nombre;
+                    option.textContent = provincia.nombre;
+                    provinciasSelect.appendChild(option);
+                });
+            })
+            .catch(error => {
+                console.error('Error al cargar las provincias:', error);
+                provinciasSelect.innerHTML = '<option value="">Error al cargar provincias</option>';
+            });
+    });
     
     function actualizarTablaDiocesis(diocesis) {
-        // Obtener el cuerpo de la tabla
         const tableBody = document.querySelector('#diocesisTable tbody');
-        tableBody.innerHTML = ''; // Limpiar el contenido actual de la tabla
-    
-        // Recorrer las diócesis y agregarlas a la tabla
+        tableBody.innerHTML = '';
+
         diocesis.forEach(dio => {
             const row = document.createElement('tr');
             row.innerHTML = `
@@ -111,23 +172,77 @@ function openModal(type, id = null, nombre = '', departamento = '', provincia = 
                         onclick="openModal('edit', '${dio.id}', '${dio.nombre}', '${dio.departamento}', '${dio.provincia}')">
                         <i class="fas fa-edit"></i>
                     </button>
-                    <form action="${urlEliminarDiocesis}" method="POST" style="display:inline-block;">
-                        <input type="hidden" name="id" value="${dio.id}">
-                        <button type="submit" class="btn btn-danger btn-sm" title="Eliminar"
-                            onclick="return confirm('¿Estás seguro de que deseas eliminar esta diócesis?');">
-                            <i class="fas fa-trash-alt"></i>
-                        </button>
-                    </form>
+                    <button class="btn btn-danger btn-sm" title="Eliminar" onclick="eliminarDiocesis('${dio.id}')">
+                        <i class="fas fa-trash-alt"></i>
+                    </button>
                 </td>
             `;
             tableBody.appendChild(row);
         });
     }
-}     
+}
 
 function limpiarModal() {
     document.getElementById('diocesisId').value = '';
     document.getElementById('nombre').value = '';
     document.getElementById('id_departamento').value = '';
     document.getElementById('id_provincia').value = '';
+}
+
+function eliminarDiocesis(id) {
+    if (!confirm('¿Estás seguro de que deseas eliminar esta diócesis?')) {
+        return false; 
+    }
+
+    fetch(urlEliminarDiocesis, {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/x-www-form-urlencoded'
+        },
+        body: new URLSearchParams({ id: id })
+    })
+        .then(response => response.json())
+        .then(data => {
+            if (data.success) {
+                // Mostrar mensaje de éxito
+                Toastify({
+                    text: "Diócesis eliminada exitosamente",
+                    duration: 2000,
+                    close: true,
+                    backgroundColor: "--bs-primary",
+                    gravity: "bottom",
+                    position: "right",
+                }).showToast();
+
+
+                const fila = document.querySelector(`tr[data-id="${id}"]`);
+                if (fila) fila.remove();
+                setTimeout(() => {
+                    location.reload(); 
+                }, 2000);
+            } else {
+                // Mostrar mensaje de error
+                Toastify({
+                    text: data.message || "No se pudo eliminar la diócesis",
+                    duration: 2000,
+                    close: true,
+                    backgroundColor: "#dc3545", // Rojo
+                    gravity: "bottom",
+                    position: "right",
+                }).showToast();
+            }
+        })
+        .catch(error => {
+            console.error('Error:', error);
+            Toastify({
+                text: "Error al procesar la solicitud",
+                duration: 2000,
+                close: true,
+                backgroundColor: "#dc3545",
+                gravity: "bottom",
+                position: "right",
+            }).showToast();
+        });
+
+    return false; 
 }
