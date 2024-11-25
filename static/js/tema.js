@@ -127,6 +127,7 @@ function formatearDuracion(duracion) {
 }
 
 function actualizarTema() {
+    if (!validarDuracion('duracion')) return;
     const id_tema = document.getElementById('temaId').value;
     const id_actoliturgico = document.getElementById('id_actoliturgico').value;
     const descripcion = document.getElementById('descripcion').value;
@@ -195,6 +196,7 @@ function limpiarModal() {
 }
 
 function insertarTema() {
+    if (!validarDuracion('duracion')) return;
     const id_actoliturgico = parseInt(document.getElementById('id_actoliturgico').value, 10);
     const descripcion = document.getElementById('descripcion').value;
     const duracion = document.getElementById('duracion').value;
@@ -306,22 +308,26 @@ function eliminarTema(id_tema) {
     });
 }
 
-function validarHora(campoId) {
+function validarDuracion(campoId) {
     const horaInput = document.getElementById(campoId);
     const horaSeleccionada = horaInput.value;
-    
+
+    // Valores mínimos y máximos permitidos
     const horaMinima = "01:00";
     const horaMaxima = "03:00";
 
-    if (horaSeleccionada < horaMinima || horaSeleccionada > horaMaxima) {        
+    if (!horaSeleccionada || horaSeleccionada === "00:00" || horaSeleccionada < horaMinima || horaSeleccionada > horaMaxima) {
         Toastify({
-            text: "La duracion debe estar entre 1:00 y 3:00 H",
+            text: "La duración debe estar entre 1:00 y 3:00 horas.",
             duration: 2000,
             close: true,
             backgroundColor: "#dc3545",
             gravity: "bottom",
             position: "right",
         }).showToast();
-        horaInput.value = "";
+        return false; // Indica que la validación falló
     }
+    return true; // Validación exitosa
 }
+
+

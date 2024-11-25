@@ -14,8 +14,8 @@ def registrar_rutas(app):
     
     @app.route("/gestionar_tema", methods=["GET"])
     @requerido_login
-    def gestionar_tema():        
-        actos = acto.listar_nombres_actos()
+    def gestionar_tema():            
+        actos = acto.listar_sacramentos()
         return render_template("tema/gestionar_tema.html", actos=actos)
 
     @app.route("/api/obtener_temas", methods=["GET"])
