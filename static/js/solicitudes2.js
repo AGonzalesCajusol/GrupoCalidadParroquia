@@ -782,3 +782,35 @@ var modal_prevcharlas = new bootstrap.Modal(document.getElementById('modal_prevc
         document.getElementById('money').value = '';  
 
     }
+    function agregar_asistencia(id){
+        var seleccion = document.getElementById(id);
+        if (seleccion.checked == true){
+            seleccion = 1
+        }else{
+            seleccion = 0;
+        }
+        fetch(`/check_asistencia/${id}/${seleccion}`)
+        .then(response => response.json())
+        .then(item =>{
+            if (item.estado == "correcto"){
+                Toastify({
+                    text: "Se modifico la asistencia!!",
+                    duration: 2000,
+                    close: true,
+                    backgroundColor: "--bs-primary",
+                    gravity: "top",
+                    position: "left",
+                }).showToast();
+            }else{
+                Toastify({
+                    text: "No se pudo modificar la asistencia!!",
+                    duration: 2000,
+                    close: true,
+                    backgroundColor: "#dc3545;",
+                    gravity: "top",
+                    position: "left",
+                }).showToast();
+            }
+        })
+
+    }
