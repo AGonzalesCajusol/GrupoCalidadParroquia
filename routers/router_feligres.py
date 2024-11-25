@@ -125,10 +125,10 @@ def registrar_rutas(app):
 
     @app.route("/eliminar_feligres", methods=["POST"])
     @requerido_login
-    def procesar_eliminar_feligres():        
+    def procesar_eliminar_feligres():
         dni = request.form["dni"]
-        eliminar_feligres(dni)
-        flash("El feligrés fue eliminado exitosamente")
-        return redirect(url_for("gestionar_feligres"))
-    
-    
+        resultado = eliminar_feligres(dni)
+        if resultado["success"]:
+            return jsonify(resultado)  # Código 200
+        else:
+            return jsonify(resultado), 400  # Código 400 para errores

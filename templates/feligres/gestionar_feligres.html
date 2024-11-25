@@ -24,8 +24,7 @@
             <thead>
                 <tr>
                     <th style="vertical-align: middle; text-align: center;">DNI</th>
-                    <th style="vertical-align: middle; text-align: center;">Apellidos</th>
-                    <th style="vertical-align: middle; text-align: center;">Nombres</th>
+                    <th style="vertical-align: middle; text-align: center;">Nombres completos</th>
                     <th style="vertical-align: middle; text-align: center;">Fecha de Nacimiento</th>
                     <th style="vertical-align: middle; text-align: center;">Estado Civil</th>
                     <th style="vertical-align: middle; text-align: center;">Sexo</th>
@@ -38,35 +37,50 @@
                 {% for feligres in feligreses %}
                 <tr>
                     <td class="text-center">{{ feligres[0] }}</td>
-                    <td class="text-start">{{ feligres[1] }}</td>
-                    <td class="text-start">{{ feligres[2] }}</td>
+                    <td class="text-start">{{ feligres[1] }}, {{feligres[2]}}</td>
                     <td>{{ feligres[3] }}</td>
-                    <td>{{ feligres[4] }}</td>
-                    <td>{{ feligres[5] }}</td>
-                    <td class="text-start">{{ feligres[6] }}</td>
+                    <td>
+                        {% if feligres[4] == 's' or feligres[4] == 'S' %}
+                        Soltero
+                        {% elif feligres[4] == 'c' or feligres[4] == 'C' %}
+                        Casado
+                        {% elif feligres[4] == 'v' or feligres[4] == 'V' %}
+                        Viudo
+                        {% elif feligres[4] == 'd' or feligres[4] == 'D' %}
+                        Divorciado
+                        {% else %}
+                        Desconocido
+                        {% endif %}
+                    </td>
+                    <td>
+                        {% if feligres[5] == 'm' or feligres[5] == 'M' %}
+                        Masculino
+                        {% elif feligres[5] == 'f' or feligres[5] == 'F' %}
+                        Femenino
+                        {% else %}
+                        Desconocido
+                        {% endif %}
+                    </td>
+
                     <td class="text-start">{{ feligres[7] }}</td>
+                    <td class="text-start">{{ feligres[8] }}</td>
 
                     <td class="text-center">
 
                         <button class="btn btn-primary btn-sm" title="Ver"
-                            onclick="openModal('view', '{{ feligres[0] }}', '{{ feligres[1] }}', '{{ feligres[2] }}', '{{ feligres[3] }}', '{{ feligres[4] }}', '{{ feligres[5] }}', '{{ feligres[6] }}', '{{ feligres[7] }}')">
+                            onclick="openModal('view', '{{ feligres[0] }}', '{{ feligres[1] }}', '{{ feligres[2] }}', '{{ feligres[3] }}', '{{ feligres[4] }}', '{{ feligres[5] }}', '{{ feligres[6] }}', '{{ feligres[8] }}')">
                             <i class="fas fa-eye"></i>
                         </button>
 
                         <button class="btn btn-warning btn-sm" title="Editar"
-                            onclick="openModal('edit', '{{ feligres[0] }}', '{{ feligres[1] }}', '{{ feligres[2] }}', '{{ feligres[3] }}', '{{ feligres[4] }}', '{{ feligres[5] }}', '{{ feligres[6] }}', '{{ feligres[7] }}')">
+                            onclick="openModal('edit', '{{ feligres[0] }}', '{{ feligres[1] }}', '{{ feligres[2] }}', '{{ feligres[3] }}', '{{ feligres[4] }}', '{{ feligres[5] }}', '{{ feligres[6] }}', '{{ feligres[8] }}')">
                             <i class="fas fa-edit"></i>
                         </button>
 
-                        <!-- Botón para eliminar -->
-                        <form action="{{ url_for('procesar_eliminar_feligres') }}" method="POST"
-                            style="display:inline-block;">
-                            <input type="hidden" name="dni" value="{{ feligres[0] }}">
-                            <button type="submit" class="btn btn-danger btn-sm" title="Eliminar"
-                                onclick="return confirm('¿Estás seguro de que deseas eliminar este feligrés?');">
-                                <i class="fas fa-trash-alt"></i>
-                            </button>
-                        </form>
+                        <button type="button" class="btn btn-danger btn-sm" title="Eliminar"
+                            onclick="eliminarFeligres('{{ feligres[0] }}')">
+                            <i class="fas fa-trash-alt"></i>
+                        </button>
                     </td>
                 </tr>
                 {% endfor %}
@@ -87,8 +101,10 @@
                 <div class="modal-body">
                     <div class="mb-3">
                         <label for="dni" class="form-label">DNI</label>
-                        <input type="text" class="form-control" id="dni" name="dni" required>
+                        <input type="text" class="form-control" id="dni" name="dni" required maxlength="8"
+                            pattern="^\d{8}$" title="El DNI debe ser un número de 8 dígitos">
                     </div>
+                    
                     <div class="mb-3">
                         <label for="apellidos" class="form-label">Apellidos</label>
                         <input type="text" class="form-control" id="apellidos" name="apellidos" required>
@@ -99,13 +115,16 @@
                     </div>
                     <div class="mb-3">
                         <label for="fecha_nacimiento" class="form-label">Fecha de nacimiento</label>
-                        <input type="date" class="form-control" id="fecha_nacimiento" name="fecha_nacimiento" required>
+                        <input type="date" class="form-control" id="fecha_nacimiento" name="fecha_nacimiento" required
+                            max="{{ today }}">
                     </div>
                     <div class="mb-3">
                         <label for="estado_civil" class="form-label">Estado Civil</label>
                         <select class="form-select" id="estado_civil" name="estado_civil" required>
-                            <option value="s">Soltero</option>
-                            <option value="c">Casado</option>
+                            <option value="S">Soltero</option>
+                            <option value="C">Casado</option>
+                            <option value="V">Viudo</option>
+                            <option value="D">Divorciado</option>
                         </select>
                     </div>
 
@@ -118,19 +137,20 @@
                     </div>
 
                     <div class="mb-3">
-                        <label for="id_sede" class="form-label">Sede</label>
+                        <label for="sede" class="form-label">Sede</label>
                         <select class="form-select" id="id_sede" name="id_sede" required>
+                            <option>Seleccione una sede</option>
                             {% for sede in sedes %}
-                            <option value="{{ sede[0] }}">{{ sede[1] }}</option>
+                            <option value="{{ sede[0] }}">{{ sede[1] }}</option required>
                             {% endfor %}
                         </select>
                     </div>
 
                     <div class="mb-3">
                         <label for="correo" class="form-label">Correo electrónico</label>
-                        <input type="email" class="form-control" id="email" name="correo" required>
+                        <input type="email" class="form-control" id="email" name="correo">
                     </div>
-                    
+
                 </div>
                 <div class="modal-footer">
                     <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cerrar</button>
@@ -147,6 +167,11 @@
     const urlInsertarFeligres = "{{ url_for('procesar_insertar_feligres') }}";
     const urlActualizarFeligres = "{{ url_for('procesar_actualizar_feligres') }}";
     const urlEliminarFeligres = "{{ url_for('procesar_eliminar_feligres') }}";
+</script>
+
+<script>
+    var today = new Date().toISOString().split('T')[0];
+    document.getElementById('fecha_nacimiento').setAttribute('max', today);
 </script>
 
 {% endblock %}
