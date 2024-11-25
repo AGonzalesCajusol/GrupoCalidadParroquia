@@ -92,7 +92,7 @@ $(document).ready(function () {
                     <i class="bi bi-person-plus"></i> Agregar recaudación
                 </button>
                 <button type="button" onclick="exportarTablaPDF()" class="btn btn-success btn-lg custom-btn" data-bs-toggle="modal" data-bs-target="#exportModal">
-                    <i class="bi bi-file-earmark-arrow-down"></i> Exportar recaudaciones
+                    <i class="bi bi-file-earmark-arrow-down"></i> Exportar recaudaciones PDF
                 </button>
             `);
             // Opciones para el filtro de año
