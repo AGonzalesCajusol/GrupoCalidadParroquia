@@ -707,3 +707,31 @@ def solicitudes(sede):
     finally:
         conexion.close()
 
+
+def obtener_requisitos_solicitud(id_solicitud):
+    conexion = obtener_conexion()
+    try:
+        with conexion.cursor() as cursor:
+            cursor.execute("""
+                SELECT 
+                    ar.id_requisito,
+                    r.nombre_requisito,
+                    r.tipo,
+                    ar.estado,
+                    ar.enlace_imagen,
+                    r.id_js_requisito,
+                    r.id_js_estado
+                FROM 
+                    aprobacionrequisitos ar
+                INNER JOIN 
+                    requisito r ON ar.id_requisito = r.id_requisito				
+                WHERE 
+                    ar.id_solicitud =%s;
+            """, (id_solicitud,))
+            return cursor.fetchall()
+    except Exception as e:
+        print(f"Error al obtener requisitos de la solicitud: {e}")
+        return None
+    finally:
+        conexion.close()
+

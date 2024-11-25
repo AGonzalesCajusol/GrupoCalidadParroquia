@@ -84,7 +84,7 @@
                     </option>
                     {% endfor %}
                 </select>
-                <button onclick="verificar();limpiar()" class="btn btn-sm btn-primary"> <i
+                <button id="nuevo" onclick="verificar();limpiar()" class="btn btn-sm btn-primary"> <i
                         class="bi bi-plus-circle-fill me-2"></i>Nuevo</button>
             </div>
 
@@ -285,65 +285,6 @@
         <!-- Contenedor para pestañas -->
         <div class="tab-content mt-1">
             <div class="col-12 mt-3">
-                <h6><strong>Acto litúrgico:</strong></h6>
-                <div class="d-flex">
-                    <select name="acto_seleccionado" id="acto_seleccionado" class="form-select w-25"
-                        onchange="verificar()">
-                        <option value="">
-                            ----Seleccione un acto litúrgico----
-                        </option>
-                        {% for actos in lista_actos %}
-                        <option value="{{ actos[0]}}">
-                            {{actos[1]}}
-                        </option>
-                        {% endfor %}
-                    </select>
-                </div>
-                <!---------   Esta es la tabla donde se muestran los requisitos    ----------->
-                <div class="accordion mt-3" id="accordionRequisitos">
-                    <div class="accordion-item">
-                        <h2 class="accordion-header" id="headingRequisito">
-                            <button class="accordion-button" type="button" data-bs-toggle="collapse"
-                                data-bs-target="#requi_actos" aria-expanded="true" aria-controls="requi_actos">
-                                Requisitos del Acto
-                            </button>
-                        </h2>
-                        <div id="requi_actos" class="accordion-collapse collapse show"
-                            aria-labelledby="headingRequisito" data-bs-parent="#accordionRequisitos">
-                            <div class="accordion-body">
-                                <form id="formulario_solicitud" enctype="multipart/form-data">
-                                    <table class="table mt-1">
-                                        <thead>
-                                            <tr>
-                                                <th>
-                                                    Requisito
-                                                </th>
-                                                <th>
-                                                    Tipo
-                                                </th>
-                                                <th>
-                                                    <input type="checkbox" id="estado_general"
-                                                        onchange="estado_generales()">
-                                                    <label for="estado_general">Estado</label>
-                                                </th>
-                                                <th>
-                                                    Opciones
-                                                </th>
-                                            </tr>
-                                        </thead>
-                                        <tbody id="datos_solicitud">
-                                            <!-- Aquí irán las filas dinámicas de la tabla -->
-                                        </tbody>
-                                    </table>
-                                    <div>
-                                        <button type="submit" id="registrar" onclick="enviar_datos(event)"
-                                            class="btn btn-primary">Registrar</button>
-                                    </div>
-                                </form>
-                            </div>
-                        </div>
-                    </div>
-                </div>
 
                 <div class="mt-2 d-none" id="contenido_calendario_celebracion">
                     <div class="d-flex justify-content-end">

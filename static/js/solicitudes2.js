@@ -166,7 +166,7 @@ function responsable_pago() {
 }
 
 
-function verificar(){
+function verificar(excusa){
     var acto_liturgico = document.getElementById('acto_seleccionado').value;
     if (acto_liturgico == ""){
         Toastify({
@@ -228,23 +228,28 @@ function verificar(){
                 document.getElementById('formulario_solicitud').action = "registrar_solicitud_Pcomunion";
             }
             limpiar();
+            if(excusa == "si"){
+                document.getElementById('registrar').textContent = "Modificar";
+            }
         })
     }
 }
 
-function retornar_input(tipo,id,nivel){
+function retornar_input(tipo, id, nivel) {
     var sede = document.getElementById('sede').value;
     var requerido = "";
     var id_acto = document.getElementById('acto_seleccionado').value;
-    if(nivel == "O" ){
+    if (nivel == "O") {
         requerido = "";
     }
     //101,139
-
+    console.log("Generando input:", { tipo, id, nivel });
     switch (tipo) {
         case 'Imagen':
             return `
                 <input  name="${id}" id="${id}" ${requerido} type="file" class="form-control form-control-sm" accept="image/*,application/pdf">
+                <input  id="I${id}"  type="text" class="form-control form-control-sm ">
+
             `;
         case 'Dni':
             return `
@@ -264,83 +269,85 @@ function retornar_input(tipo,id,nivel){
         case 'Charla':
             const select = `<select id=${id}    name=${id} class="form-select form-select-sm" id="formaPago" name="formaPago" >
             </select>`;
-            if(id_acto == 2){
+            if (id_acto == 2) {
                 fetch('/fcelebraciones/2')
-                .then(data =>  data.json())
-                .then( item => {
-                    if(item.data == "Error" || item.data == ""){
-                        Toastify({
-                            text: "No existen charlas programadas!!",
-                            duration: 2000,
-                            close: true,
-                            backgroundColor: "#dc3545",
-                            gravity: "bottom",
-                            position: "right",
-                        }).showToast();
-                        document.getElementById('registrar').disabled = true;
-                        return "";
-                    }else{
-                        document.getElementById(`${id}`).innerHTML += "";
+                    .then(data => data.json())
+                    .then(item => {
+                        if (item.data == "Error" || item.data == "") {
+                            Toastify({
+                                text: "No existen charlas programadas!!",
+                                duration: 2000,
+                                close: true,
+                                backgroundColor: "#dc3545",
+                                gravity: "bottom",
+                                position: "right",
+                            }).showToast();
+                            document.getElementById('registrar').disabled = true;
+                            return "";
+                        } else {
+                            document.getElementById(`${id}`).innerHTML += "";
 
-                        item.data.forEach(v => {
-                            document.getElementById(`${id}`).innerHTML +=  `<option value="${v.id_charla}">${v.charla}</option>`;
-                           
-                        });
-                    }
-                }) 
-            }else if(id_acto == 3){
+                            item.data.forEach(v => {
+                                document.getElementById(`${id}`).innerHTML += `<option value="${v.id_charla}">${v.charla}</option>`;
+
+                            });
+                        }
+                    })
+            } else if (id_acto == 3) {
                 fetch('/fcelebraciones/3')
-                .then(data =>  data.json())
-                .then( item => {
-                    if(item.data == "Error" || item.data == ""){
-                        Toastify({
-                            text: "No existen charlas programadas!!",
-                            duration: 2000,
-                            close: true,
-                            backgroundColor: "#dc3545",
-                            gravity: "bottom",
-                            position: "right",
-                        }).showToast();
-                        document.getElementById('registrar').disabled = true;
-                        return "";
-                    }else{
-                        document.getElementById(`${id}`).innerHTML += "";
+                    .then(data => data.json())
+                    .then(item => {
+                        if (item.data == "Error" || item.data == "") {
+                            Toastify({
+                                text: "No existen charlas programadas!!",
+                                duration: 2000,
+                                close: true,
+                                backgroundColor: "#dc3545",
+                                gravity: "bottom",
+                                position: "right",
+                            }).showToast();
+                            document.getElementById('registrar').disabled = true;
+                            return "";
+                        } else {
+                            document.getElementById(`${id}`).innerHTML += "";
 
-                        item.data.forEach(v => {
-                            document.getElementById(`${id}`).innerHTML +=  `<option value="${v.id_charla}">${v.charla}</option>`;
-                           
-                        });
-                    }
-                }) 
-            }else if(id_acto == 6){
+                            item.data.forEach(v => {
+                                document.getElementById(`${id}`).innerHTML += `<option value="${v.id_charla}">${v.charla}</option>`;
+
+                            });
+                        }
+                    })
+            } else if (id_acto == 6) {
                 fetch('/fcelebraciones/6')
-                .then(data =>  data.json())
-                .then( item => {
-                    if(item.data == "Error" || item.data == ""){
-                        Toastify({
-                            text: "No existen charlas programadas!!",
-                            duration: 2000,
-                            close: true,
-                            backgroundColor: "#dc3545",
-                            gravity: "bottom",
-                            position: "right",
-                        }).showToast();
-                        document.getElementById('registrar').disabled = true;
-                        return "";
-                    }else{
-                        document.getElementById(`${id}`).innerHTML += "";
+                    .then(data => data.json())
+                    .then(item => {
+                        if (item.data == "Error" || item.data == "") {
+                            Toastify({
+                                text: "No existen charlas programadas!!",
+                                duration: 2000,
+                                close: true,
+                                backgroundColor: "#dc3545",
+                                gravity: "bottom",
+                                position: "right",
+                            }).showToast();
+                            document.getElementById('registrar').disabled = true;
+                            return "";
+                        } else {
+                            document.getElementById(`${id}`).innerHTML += "";
 
-                        item.data.forEach(v => {
-                            document.getElementById(`${id}`).innerHTML +=  `<option value="${v.id_charla}">${v.charla}</option>`;
-                           
-                        });
-                    }
-                }) 
+                            item.data.forEach(v => {
+                                document.getElementById(`${id}`).innerHTML += `<option value="${v.id_charla}">${v.charla}</option>`;
+
+                            });
+                        }
+                    })
+            }else{
+                return ""
             }
             return select;
-            case 'Texto':
-                return '<input name="${id}"  id="${id}" ${requerido} type="text" class="form-control form-control-sm" readOnly></input>';  
     }
+    document.getElementById("datos_solicitud").appendChild(row);
+    console.log("Fila añadida:", row.innerHTML); // Verifica cada fila generada
 }
 
 function validar_campos(tipo,id,checkbox){
@@ -508,10 +515,10 @@ function validar_campos(tipo,id,checkbox){
 
 }
 
-
 function visualizar(id_archivo) {
     const archivo_formulario = document.getElementById(id_archivo).files[0];
-    const modal_contenido = document.getElementById('modal_contenido');
+
+    const modal_contenido = document.getElementById('modal_contenido'); // Contenedor del contenido en el modal
     if (archivo_formulario && archivo_formulario.name.length > 0) {
         const objUrl = URL.createObjectURL(archivo_formulario);
         modal_contenido.innerHTML = "";
@@ -524,35 +531,38 @@ function visualizar(id_archivo) {
         }
         var myModal = new bootstrap.Modal(document.getElementById('myModal'));
         myModal.show();
-    }else{
-        const src = document.getElementById(id_archivo).name; 
-        if (src) {
-            // Verifica si es una imagen
-            if (src.endsWith('.jpg') || src.endsWith('.jpeg') || src.endsWith('.png') || src.endsWith('.gif')) {
-                modal_contenido.innerHTML = `<img src="${src}" class="img-fluid formulario_imagenes" alt="Imagen referenciada">`;
-            }
-            // Verifica si es un PDF
-            else if (src.endsWith('.pdf')) {
-                modal_contenido.innerHTML = `<iframe src="${src}" width="100%" height="800px" style="border:none;"></iframe>`;
-            } 
-            else {
-                modal_contenido.innerHTML = "Tipo de archivo no soportado.";
-            }
-
-            var myModal = new bootstrap.Modal(document.getElementById('myModal'));
-            myModal.show();
-        }else{
-            Toastify({
-                text: "Aún no ha sudido ninguna imagen/pdf",
-                duration: 2000,
-                close: true,
-                backgroundColor: "#dc3545",
-                gravity: "bottom",
-                position: "right",
-            }).showToast(); 
-        }
-    }  
+    } else {
+         // Si no hay archivo en el input, verifica el valor del archivo referenciado
+         const src = document.getElementById(`I${id_archivo}`).value; // Usar el valor (value) del archivo referenciado
+        
+         console.log(src);  // Verifica lo que contiene el valor
+ 
+         if (src) {
+             // Verifica si el src tiene la ruta completa de la imagen o PDF
+             if (src.endsWith('.jpg') || src.endsWith('.jpeg') || src.endsWith('.png') || src.endsWith('.gif')) {
+                 modal_contenido.innerHTML = `<img src="${src}" class="img-fluid formulario_imagenes" alt="Imagen referenciada">`;
+             }
+             else if (src.endsWith('.pdf')) {
+                 modal_contenido.innerHTML = `<iframe src="${src}" width="100%" height="800px" style="border:none;"></iframe>`;
+             } else {
+                 modal_contenido.innerHTML = "Tipo de archivo no soportado.";
+             }
+ 
+             var myModal = new bootstrap.Modal(document.getElementById('myModal'));
+             myModal.show();
+         } else {
+             Toastify({
+                 text: "No se ha encontrado el archivo referenciado.",
+                 duration: 2000,
+                 close: true,
+                 backgroundColor: "#dc3545",
+                 gravity: "bottom",
+                 position: "right",
+             }).showToast();
+         }
+    }
 }
+
 
 function precio() {
     var pagos = document.getElementById('pagos');
@@ -780,6 +790,7 @@ var modal_prevcharlas = new bootstrap.Modal(document.getElementById('modal_prevc
         document.getElementById('monto').value = '';              
         document.getElementById('saldo').value = '';              
         document.getElementById('money').value = '';  
+        document.getElementById('registrar').textContent = "Registrar";
 
     }
     function agregar_asistencia(id){
@@ -814,3 +825,121 @@ var modal_prevcharlas = new bootstrap.Modal(document.getElementById('modal_prevc
         })
 
     }
+
+
+    function rellenar_formulario(id_solicitud, nombre_liturgia) {
+        var select = document.getElementById('acto_seleccionado');
+        var options = select.getElementsByTagName('option');
+    
+        for (var i = 0; i < options.length; i++) {
+            if (options[i].text === nombre_liturgia) {
+                select.selectedIndex = i;
+                options[i].click();
+                verificar("si");
+                const tabTrigger = new bootstrap.Tab(document.getElementById('solicitudes-tab'));
+                tabTrigger.show();
+                break;
+            }
+
+        }
+        fetch(`/requisitos_solicitud/${id_solicitud}`)
+        .then(response => response.json())
+        .then(data => {
+            console.log("Datos recibidos del backend:", data);
+            if (data.estado == "Correcto") {
+                data.data.forEach(item => {
+                    if (item.tipo === "Dni") {
+                        console.log(`ID del campo: ${item.id_c}`);  // Verifica el ID
+                        console.log(`Valor a asignar: ${item.valor}`);  // Verifica el valor
+                        
+                        const element = fetch(`/requisitos_solicitud/${id_solicitud}`)
+                        .then(response => response.json())
+                        .then(data => {
+                            console.log("Datos recibidos del backend:", data);
+                            if (data.estado == "Correcto") {
+                                data.data.forEach(item => {
+                                    if (item.tipo === "Dni") {
+                                        console.log(`ID del campo: ${item.id_c}`);  // Verifica el ID
+                                        console.log(`Valor a asignar: ${item.valor}`);  // Verifica el valor
+                                        
+                                        const element = document.getElementById(`${item.id_c}`);
+                                        const estadoElement = document.getElementById(`${item.id_es}`);
+                                    
+                                        if (element) {
+                                            // Asignar el valor al campo correspondiente
+                                            element.value = item.valor;  
+                                            console.log(`Valor asignado a ${item.id_c}: ${element.value}`);
+                                        } else {
+                                            console.error(`No se encuentra el elemento con ID: ${item.id_c}`);
+                                        }
+                            
+                                        if (estadoElement && estadoElement.type === "checkbox") {
+                                            // Verifica que el estado sea un booleano
+                                            estadoElement.checked = item.estado === true || item.estado === "true";
+                                            console.log(`Checkbox (${item.id_es}) actualizado: ${estadoElement.checked}`);
+                            
+                                            // Si el checkbox está marcado, simula el clic
+                                            if (estadoElement.checked) {
+                                                estadoElement.onchange();
+                                                console.log(`Se hizo clic en el checkbox (${item.id_es})`);
+                                            }
+                                        } else if (!estadoElement) {
+                                            console.error(`No se encuentra el elemento con ID: ${item.id_es}`);
+                                        } else {
+                                            console.error(`El elemento con ID ${item.id_es} no es un checkbox`);
+                                        }
+                                    }else if(item.tipo == "Sede"){
+                                        const estadoElement = document.getElementById(`${item.id_es}`);
+                                        estadoElement.checked = true;
+                                    }else if(item.tipo == "Charla"){
+                                        const estadoElement = document.getElementById(`${item.id_es}`);
+                                        const element = document.getElementById(`${item.id_c}`);
+                                        estadoElement.checked = item.estado;
+                                        element.value = item.valor;
+                                    }else if(item.tipo == "Texto"){
+                                        const estadoElement = document.getElementById(`${item.id_es}`);
+                                        const element = document.getElementById(`${item.id_c}`);
+                                        estadoElement.checked = item.estado;
+                                        element.value = item.valor;
+                                    }else if(item.tipo == "Fecha"){
+    
+                                    } else if (item.tipo == "Imagen") {
+                                        const estadoElement = document.getElementById(`${item.id_es}`);
+                                        const element = document.getElementById(`I${item.id_c}`);
+                                        const element2 = document.getElementById(`${item.id_c}`);
+                                        
+                                        element2.readOnly = item.estado;
+                                        estadoElement.checked = item.estado;
+                                        estadoElement.readOnly = item.estado;
+                                        element.value = item.valor;
+                                        
+                                        if (item.estado === true) {
+                                            element2.style.backgroundColor = "var(--bs-primary)";
+                                            element2.style.color = "white";
+                                            element2.disabled = true;
+                                            estadoElement.disabled = true;
+                                        }
+                                    }
+                                    
+                                });
+                            }
+                            
+                            
+                            
+                            
+                        })
+                        .catch(error => {
+                            console.error("Error al obtener los datos:", error);
+                        });
+                    }
+                });
+            }
+        })
+        .catch(error => {
+            console.error("Error al obtener los datos:", error);
+        });
+        document.getElementById('registrar').textContent = "Modificar";
+
+    
+    }
+    

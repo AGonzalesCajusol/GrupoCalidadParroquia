@@ -625,3 +625,34 @@ def registrar_rutas(app):
                 })
             return jsonify({'data': listar_solicitudes})
         return jsonify({'mensaje': 'Error al obtener las solicitudes'}), 500
+    
+
+    @app.route('/requisitos_solicitud/<int:id_solicitud>', methods=['GET'])
+    @requerido_login
+    def requisitos_solicitud(id_solicitud):
+        try:
+            requisitos = csoli.obtener_requisitos_solicitud(id_solicitud)
+            print("Requisitos obtenidos desde la base de datos:", requisitos)  # Verifica los datos extraídos
+            if requisitos is not None:
+                data = [] 
+                for req in requisitos:
+                    if req[3] == 'V':
+                        estado = True
+                    else:
+                        estado = False                    
+                    data.append({
+                        "id": req[0], 
+                        "campo1": req[1],  # Nombre del requisito
+                        "tipo": req[2],  # Tipo de requisito (Imagen, FechaHora, etc.)
+                        "estado": estado,  # Estado del requisito ('A' o vacío)
+                        "valor": req[4],  # Enlace de la imagen/documento (si aplica)
+                        "id_c": req[5],
+                        "id_es": req[6],
+                    })
+                    
+                return jsonify({"estado": "Correcto", "data": data})
+            else:
+                return jsonify({"estado": "Error", "mensaje": "No se encontraron requisitos para esta solicitud."}), 404
+        except Exception as e:
+            print(f"Error en requisitos_solicitud: {e}")
+            return jsonify({"estado": "Error", "mensaje": "Error interno del servidor."}), 500
