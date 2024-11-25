@@ -450,12 +450,11 @@ def modificar_requisito(id_requisito, requisito, tipo, estado, maximo, minimo, n
         conexion.close()
 
 def listar_requisitos(id_actoliturgico):
-
     conexion = obtener_conexion()
     try:
         with conexion.cursor() as cursor:
             cursor.execute('''
-                select * from requisito where id_actoliturgico = %s
+                select * from requisito where id_actoliturgico = %s and estado = 'A'
             ''',(id_actoliturgico))
             valores = cursor.fetchall()
         return valores

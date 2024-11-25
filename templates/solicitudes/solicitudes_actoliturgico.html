@@ -51,17 +51,20 @@
     <h1 class="titulo-gestion">GESTIÓN DE SOLICITUDES DE ACTO LITÚRGICO</h1>
     <ul class="nav nav-tabs" id="myTab" role="tablist">
         <li class="nav-item" role="presentation">
-            <button class="nav-link active" id="solicitudes-tab" data-bs-toggle="tab" data-bs-target="#solicitudes" type="button" role="tab" aria-controls="solicitudes" aria-selected="true">
+            <button class="nav-link active" id="solicitudes-tab" data-bs-toggle="tab" data-bs-target="#solicitudes"
+                type="button" role="tab" aria-controls="solicitudes" aria-selected="true">
                 <i class="bi bi-envelope-paper-fill"></i> Registro de solicitudes
             </button>
         </li>
         <li class="nav-item" role="presentation">
-            <button   class="nav-link" id="requisitos-tab" data-bs-toggle="tab" data-bs-target="#requisitos" type="button" role="tab" aria-controls="requisitos" aria-selected="false">
+            <button class="nav-link" id="requisitos-tab" data-bs-toggle="tab" data-bs-target="#requisitos" type="button"
+                role="tab" aria-controls="requisitos" aria-selected="false">
                 <i class="bi bi-list-check"></i> Solicitudes
             </button>
         </li>
         <li class="nav-item" role="presentation">
-            <button class="nav-link" id="pagos-tab" data-bs-toggle="tab" data-bs-target="#pagos" type="button" role="tab" aria-controls="pagos" aria-selected="false">
+            <button class="nav-link" id="pagos-tab" data-bs-toggle="tab" data-bs-target="#pagos" type="button"
+                role="tab" aria-controls="pagos" aria-selected="false">
                 Pagos
             </button>
         </li>
@@ -70,10 +73,10 @@
     <div class="tab-content mt-4">
         <!-- Tab 1: Registro de solicitudes -->
         <div class="tab-pane fade show active" id="solicitudes" role="tabpanel" aria-labelledby="solicitudes-tab">
-            <label for="" class="">Seleccione un acto:</label>
-            <div class="d-flex" class="mt-5" id="gg">
-                <select name="acto_seleccionado" id="acto_seleccionado" class="form-select w-25" onchange="verificar()">
-                    <option value="" >
+            <label for="" class="mb-2">Seleccione un acto:</label>
+            <div class="d-flex" class="" id="gg">
+                <select name="acto_seleccionado" id="acto_seleccionado" class="form-select  form-select-sm w-25 me-2">
+                    <option value="">
                     </option>
                     {% for actos in lista_actos %}
                     <option value="{{ actos[1]}}">
@@ -81,10 +84,95 @@
                     </option>
                     {% endfor %}
                 </select>
+                <button onclick="verificar()" class="btn btn-sm btn-primary"> <i
+                        class="bi bi-plus-circle-fill me-2"></i>Nuevo</button>
             </div>
-    
+
+            <div class="mt-3">
+                <form class="row"  id="formulario_solicitud" enctype="multipart/form-data" method="post">
+                    <div class="col-8">
+                        <table class="table mt-1">
+                            <thead>
+                                <tr>
+                                    <th class="text-center d-none">
+                                        ID
+                                    </th>
+                                    <th class="text-center">
+                                        Requisito
+                                    </th>
+                                    <th>
+                                        Tipo
+                                    </th>
+                                    <th>
+                                        <input type="checkbox" id="estado_general" onchange="estado_generales()">
+                                        <label for="estado_general">Estado</label>
+                                    </th>
+                                    <th>
+                                        Opciones
+                                    </th>
+                                </tr>
+                            </thead>
+                            <tbody id="datos_solicitud">   
+                            </tbody>
+                        </table>
+                    </div>
+                    <!----- Sección de pagos ------>
+                    <div class="col-4">
+                        <div class="card text-white bg-secondary mb-3" style="max-width: 18rem;">
+                            <div class="card-header"> <i class="bi bi-cash me-2"></i> Pago de solicitud <i class="bi bi-cash ms-2"></i></div> 
+                            <div class="card-body">
+                                <div class="mb-3">
+                                    <label for="nombre" class="form-label"> 
+                                        <i class="bi bi-person-square me-2"></i> Nombre completo
+                                    </label>
+                                    <select name="responsable" class="form-select form-select-sm text-bl" onclick="responsable_pago()" id="responsable" required>
+                                        <option value=""></option>
+                                    </select>
+                                </div>
+                                
+                                <!-- Formas de pago -->
+                                <div class="mb-3">
+                                    <label for="formaPago" class="form-label"><i class="bi bi-wallet2 me-2"></i> Forma de pago</label>
+                                    <select class="form-select form-select-sm" id="formaPago" name="formaPago" >
+                                        <option value=""  selected>Forma de pago</option>
+                                        <option value="tarjeta">Tarjeta de crédito/débito</option>
+                                        <option value="transferencia">Transferencia bancaria</option>
+                                        <option value="paypal">Yape</option>
+                                        <option value="paypal">Plin</option>
+                                        <option value="efectivo">Efectivo</option>
+                                    </select>
+                                </div>
+                                <!-- Monto Total -->
+                                <div class="mb-3 row">
+                                    <div class="col-6">
+                                        <label for="monto" class="form-label"><i class="bi bi-cash me-2"></i>Total</label>
+                                        <input type="number" class="form-control form-control-sm " id="monto" name="monto"
+                                            placeholder="Ingrese el monto" min="0" readonly  >
+                                    </div>
+                                    <div class="col-6">
+                                        <label for="saldo" class="form-label"><i class="bi bi-cash me-2"></i>Saldo restante</label>
+                                        <input type="number" value="12"  class="form-control form-control-sm" id="saldo" name="saldo"   placeholder="Saldo" readonly >            
+                                    </div>
+                                </div>
+                                <!-- Monto -->
+                                <div class="mb-3">
+                                    <label for="money" class="form-label"><i class="bi bi-cash me-2"></i>Monto ingresado</label>
+                                    <input type="number"  onkeyup="validar_precio()" class="form-control form-control-sm" id="money" name="money"
+                                        placeholder="Ingrese el monto" min="0" required>
+                                </div>
+                            </div>
+                          </div>
+                      
+                    </div>
+
+                    <button type="submit" id="registrar" class="btn btn-primary">Registrar
+                    </button>
+
+                </form>
+            </div>
+
         </div>
-    
+
         <!-- Tab 2: Requisitos -->
         <div class="tab-pane fade" id="requisitos" role="tabpanel" aria-labelledby="requisitos-tab">
             <!----- Tabla solicitudes ------>
@@ -135,10 +223,10 @@
                         <tbody id="solicitud">
                         </tbody>
                     </table>
-                </div>                
+                </div>
             </div>
         </div>
-    
+
         <!-- Tab 3: Pagos -->
         <div class="tab-pane fade" id="pagos" role="tabpanel" aria-labelledby="pagos-tab">
             <h3>Método de Pago</h3>
@@ -157,7 +245,7 @@
                 </div>
             </div>
         </div>
-    
+
         <!-- Tab 4: Asistencias -->
         <div class="tab-pane fade" id="asistencias" role="tabpanel" aria-labelledby="asistencias-tab">
             <h3>Asistencias</h3>
@@ -185,7 +273,7 @@
             </div>
         </div>
     </div>
-    
+
 
 </main>
 
@@ -200,7 +288,8 @@
             <div class="col-12 mt-3">
                 <h6><strong>Acto litúrgico:</strong></h6>
                 <div class="d-flex">
-                    <select name="acto_seleccionado" id="acto_seleccionado" class="form-select w-25" onchange="verificar()">
+                    <select name="acto_seleccionado" id="acto_seleccionado" class="form-select w-25"
+                        onchange="verificar()">
                         <option value="">
                             ----Seleccione un acto litúrgico----
                         </option>
@@ -210,10 +299,9 @@
                         </option>
                         {% endfor %}
                     </select>
-
                 </div>
                 <!---------   Esta es la tabla donde se muestran los requisitos    ----------->
-                <div class="accordion mt-3" id="accordionRequisitos" >
+                <div class="accordion mt-3" id="accordionRequisitos">
                     <div class="accordion-item">
                         <h2 class="accordion-header" id="headingRequisito">
                             <button class="accordion-button" type="button" data-bs-toggle="collapse"
@@ -270,7 +358,7 @@
                             <thead>
                                 <tr>
                                     <th>
-                                       Tema 
+                                        Tema
                                     </th>
                                     <th>
                                         Fecha
@@ -284,61 +372,15 @@
                                 </tr>
                             </thead>
                             <tbody id="cu_tablapdf">
-        
+
                             </tbody>
                         </table>
                     </div>
                 </div>
 
-                
-
             </div>
         </div>
     </div>
-
-
-    <div class="container d-none" id="pago">
-        <div class="payment-form">
-            <div class="form-header">
-                <h2>Método de pago</h2>
-                <h2><strong id="metodo">efectivo</strong></h2>
-            </div>
-            <div class="qr-code d-inline-flex">
-                <div class="col-3 me-2 btn" onclick="mostrar_img('yape')">
-                    <img src="/static/img/yape.png" class="card-img-top" alt="...">
-                </div>
-                <div class="col-3 me-2 btn" onclick="mostrar_img('plin')">
-                    <img src="/static/img/plin.jpg" class="card-img-top" alt="...">
-                </div>
-                <div class="col-3 me-2 btn" onclick="mostrar_img('tarjeta')">
-                    <img src="/static/img/tarjeta.webp" class="card-img-top" alt="...">
-                </div>
-                <div class="col-3 me-5 btn" onclick="mostrar_img('efecto')">
-                    <img src="/static/img/efectivo.jpg" class="card-img-top" alt="...">
-                </div>
-            </div>
-
-            <div class="d-flex  mt-4">
-                <img class="mx-auto" id="imagen_qr" alt="">
-            </div>
-            <form id="paguitos" enctype="multipart/form-data">
-                <div>
-                    <label for="responsable">Seleccione el feligres responsable</label>
-                    <select name="responsable" id="responsable" class="form-select" onchange="precio()" required>
-                    </select>
-                </div>
-
-                <div class="form-group mt-2">
-                    <label for="amount">Monto a Pagar</label>
-                    <input type="text" class="form-control" id="amount" placeholder="Ingrese el monto" disabled>
-                </div>
-
-                <button id="pagos" type="button" class="btn btn-primary btn-block mt-2 w-100"
-                    onclick="grabar_solicitud()" disabled>Confirmar Pago</button>
-            </form>
-        </div>
-    </div>
-
 
 
     <!-- MODAL PARA MOSTRAR FOTO -->
@@ -351,40 +393,69 @@
         </div>
     </div>
 
-    <!-- Modal -->
+    <!-- Modal Asistencias-->
     <div class="modal" tabindex="-1" id="modal_asistencia">
         <div class="modal-dialog" style="max-width: none ; width: 90%">
             <div class="modal-content" style="height: 45vw;">
                 <div class="modal-body overflow-y-scroll" id="modal_asistencia">
                     <div class="modal-header">
-                        <h5 class="modal-title " id="exampleModalLabel">Asistencias de los feligreses a: <span id="uno"> </span>, <br> Número de solicitud: <span id="dos"> </span> </h5>
+                        <h5 class="modal-title " id="exampleModalLabel">Asistencias de los feligreses a: <span id="uno">
+                            </span>, <br> Número de solicitud: <span id="dos"> </span> </h5>
                         <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-                      </div>
+                    </div>
                     <div class="modal-body">
-                    <table class="table table-sm">
-                        <thead id="cu_asistencias">
-                            <tr class="table-primary">
-                                <th class="text-center">ID</th>
-                                <th class="text-center">Tema</th>
-                                <th class="text-center">Fecha</th>
-                                <th class="text-center">Rol</th>
-                                <th class="text-center">Dni</th>
-                                <th class="text-center">Nombre</th>
-                                <th class="text-center">
-                                    <label>Estado</label>
-                                </th>
-                            </tr>
-                        </thead>
-                        <tbody id="cu_cuerpo">
+                        <table class="table table-sm">
+                            <thead id="cu_asistencias">
+                                <tr class="table-primary">
+                                    <th class="text-center">ID</th>
+                                    <th class="text-center">Tema</th>
+                                    <th class="text-center">Fecha</th>
+                                    <th class="text-center">Rol</th>
+                                    <th class="text-center">Dni</th>
+                                    <th class="text-center">Nombre</th>
+                                    <th class="text-center">
+                                        <label>Estado</label>
+                                    </th>
+                                </tr>
+                            </thead>
+                            <tbody id="cu_cuerpo">
 
-                        </tbody>
+                            </tbody>
 
-                    </table>
-                </div>
+                        </table>
+                    </div>
                 </div>
             </div>
         </div>
     </div>
+
+    <!-- Modal previsualización Charlas-->
+    <div class="modal" tabindex="-1" id="modal_prevcharlas">
+        <div class="modal-dialog" style="max-width: none; width: 90%">
+            <div class="modal-content" style="height: 45vw;">
+                <div class="modal-body overflow-y-scroll" id="modal_asistencia">
+                    <div class="modal-header">
+                        <h5 class="modal-title" id="exampleModalLabel">Charlas que se llevarán a cabo</h5>
+                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                    </div>
+                    <div class="modal-body">
+                        <table class="table table-sm">
+                            <thead id="cu_asistencias">
+                                <tr class="table-primary">
+                                    <th class="text-center">Descripción</th>
+                                    <th class="text-center">Fecha</th>
+                                    <th class="text-center">Hora inicio</th>
+                                    <th class="text-center">Hora fin</th>
+                                </tr>
+                            </thead>
+                            <tbody id="cu_previ"></tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    
 
 </main>
 <!------<script src="/static/js/solicitudes.js"></script> !------>
