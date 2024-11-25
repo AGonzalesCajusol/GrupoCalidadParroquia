@@ -87,8 +87,14 @@ $(document).ready(function () {
         },
         initComplete: function () {
             // Agregar botones para agregar y exportar recaudaciones
-            $("div.button-section").html('<button type="button" margin-left: auto; class="btn btn-success btn-lg custom-btn ml-3 btn-agregar-recaudacion" data-bs-toggle="modal" onclick="abrirModalRecaudacion(\'add\')"><i class="bi bi-person-plus"></i> Agregar recaudación</button>');
-            $("div.button-section").append('<button type="button"margin-left: auto; onclick="exportarTablaPDF()" class="btn btn-success btn-lg custom-btn ml-3" data-bs-toggle="modal" data-bs-target="#exportModal"><i class="bi bi-file-earmark-arrow-down"></i> Exportar recaudaciones</button>');
+            $("div.button-section").html(`
+                <button type="button" class="btn btn-success btn-lg custom-btn me-3 btn-agregar-recaudacion" data-bs-toggle="modal" onclick="abrirModalRecaudacion('add')">
+                    <i class="bi bi-person-plus"></i> Agregar recaudación
+                </button>
+                <button type="button" onclick="exportarTablaPDF()" class="btn btn-success btn-lg custom-btn" data-bs-toggle="modal" data-bs-target="#exportModal">
+                    <i class="bi bi-file-earmark-arrow-down"></i> Exportar recaudaciones
+                </button>
+            `);
             // Opciones para el filtro de año
             let opcionesAño = '<option value="">Todos</option>';
             fetch("/apiaños")
