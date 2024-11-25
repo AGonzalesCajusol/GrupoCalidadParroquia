@@ -82,10 +82,6 @@ nav .collapse .nav-link:hover {
     border-left-color: #0d6efd; /* Indicador en el borde izquierdo */
 }
 
-/* Animación de aparición del contenido */
-.collapse.show .sub-menu-item {
-    animation: fadeIn 0.5s ease;
-}
 
 @keyframes  fadeIn {
     from {
