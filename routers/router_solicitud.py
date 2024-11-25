@@ -87,7 +87,6 @@ def registrar_rutas(app):
     @app.route('/monto_acto/<string:acto_liturgico>/<string:sede>/<int:dni_responsable>/<int:dni1>/<int:dni2>', methods=['GET'])
     @requerido_login
     def monto_actos(acto_liturgico, sede, dni_responsable, dni1, dni2=''):
-        acto = cactos.obtener_acto
 
         monto = cactos.monto_total(acto_liturgico, sede, dni_responsable, dni1, dni2)
         
@@ -120,7 +119,7 @@ def registrar_rutas(app):
         sede = request.cookies.get('sede')
         charlas = csoli.fcelebraciones(acto,sede)
         lista_charlas = []
-        if charlas is not  None or charlas != "":
+        if charlas is not  None:
             for ch in charlas:
                 lista_charlas.append({
                     'id_charla': ch[0],
@@ -442,7 +441,7 @@ def registrar_rutas(app):
             print(lista_datos)
             return jsonify({'estado': 'Correcto',
                             'data': lista_datos})
-
+        
     @app.route('/listar_solicitudes', methods=['GET'])
     @requerido_login
     def listar_solicitudes():
@@ -462,164 +461,4 @@ def registrar_rutas(app):
             return jsonify({'data': listar_solicitudes})
         return jsonify({'mensaje': 'Error al obtener las solicitudes'}), 500
 
-    @app.route('/registrar_solicitud_matrimonio', methods=['POST'])
-    def registrar_solicitud_matrimonio():
-        requisitos = cactos.listar_requisitos(1)  # Ejemplo: lista de requisitos
-        responsable = request.form.get('responsable')
-        monto = request.form.get('monto')
-        pago = request.form.get('money')
-        f_pago = request.form.get('formaPago')
-        extra = {'responsable':responsable,
-                 'monto': monto,
-                 'pago':pago,
-                 'f_pago':f_pago
-                 }
-        data = {}
-        for rq in requisitos:
-            id = rq[7]
-            id_estado = rq[8]
-            tipo = rq[3]
-            if tipo != 'Imagen':
-                data[id] = request.form.get(id) or ''
-                if request.form.get(id_estado) == "on":
-                    data[id_estado] = 'V'
-                else:
-                    data[id_estado] = 'F'
-            else:
-                if request.form.get(id_estado) == "on":
-                    data[id_estado] = 'V'
-                else:
-                    data[id_estado] = 'F'
-                data[id] = request.files.get(id) or ''
-        
-        try:
-            print(data)
-            estado = csoli.insertar_solicitudMatrimonio(data,extra) 
-            if estado:
-                return jsonify({'estado': 'Correcto'})
-            else:
-                return jsonify({'estado': 'Error'})
-        except Exception as e:
-            return jsonify({'estado': 'Error'})
-        return 'hello'
-    
-    @app.route('/registrar_solicitud_bautismo', methods=['POST'])
-    def registrar_solicitud_bautismo():
-        requisitos = cactos.listar_requisitos(2)
-        responsable = request.form.get('responsable')
-        monto = request.form.get('monto')
-        pago = request.form.get('money')
-        f_pago = request.form.get('formaPago')
-        extra = {'responsable':responsable,
-                 'monto': monto,
-                 'pago':pago,
-                 'f_pago':f_pago
-                 }
-        data = {}
-        for rq in requisitos:
-            id = rq[7]
-            id_estado = rq[8]
-            tipo = rq[3]
-            if tipo != 'Imagen':
-                data[id] = request.form.get(id) or ''
-                if request.form.get(id_estado) == "on":
-                    data[id_estado] = 'V'
-                else:
-                    data[id_estado] = 'F'
-            else:
-                if request.form.get(id_estado) == "on":
-                    data[id_estado] = 'V'
-                else:
-                    data[id_estado] = 'F'
-                data[id] = request.files.get(id) or ''
-        
-        try:
-            print(data)
-            estado = csoli.insertar_bautismo(data,extra) 
-            if estado:
-                return jsonify({'estado': 'Correcto'})
-            else:
-                return jsonify({'estado': 'Error'})
-        except Exception as e:
-            return jsonify({'estado': 'Error'})
-        
-    @app.route('/registrar_solicitud_Confirmacion', methods=['POST'])
-    def registrar_solicitud_Confirmacion():
-        requisitos = cactos.listar_requisitos(3)
-        responsable = request.form.get('responsable')
-        monto = request.form.get('monto')
-        pago = request.form.get('money')
-        f_pago = request.form.get('formaPago')
-        extra = {'responsable':responsable,
-                 'monto': monto,
-                 'pago':pago,
-                 'f_pago':f_pago
-                 }
-        data = {}
-        for rq in requisitos:
-            id = rq[7]
-            id_estado = rq[8]
-            tipo = rq[3]
-            if tipo != 'Imagen':
-                data[id] = request.form.get(id) or ''
-                if request.form.get(id_estado) == "on":
-                    data[id_estado] = 'V'
-                else:
-                    data[id_estado] = 'F'
-            else:
-                if request.form.get(id_estado) == "on":
-                    data[id_estado] = 'V'
-                else:
-                    data[id_estado] = 'F'
-                data[id] = request.files.get(id) or ''
-        
-        try:
-            print(data)
-            estado = csoli.insertar_confirmacion(data,extra) 
-            if estado:
-                return jsonify({'estado': 'Correcto'})
-            else:
-                return jsonify({'estado': 'Error'})
-        except Exception as e:
-            return jsonify({'estado': 'Error'})
-        
 
-    @app.route('/registrar_solicitud_Pcomunion', methods=['POST'])
-    def registrar_solicitud_Pcomunion():
-        requisitos = cactos.listar_requisitos(6)
-        responsable = request.form.get('responsable')
-        monto = request.form.get('monto')
-        pago = request.form.get('money')
-        f_pago = request.form.get('formaPago')
-        extra = {'responsable':responsable,
-                 'monto': monto,
-                 'pago':pago,
-                 'f_pago':f_pago
-                 }
-        data = {}
-        for rq in requisitos:
-            id = rq[7]
-            id_estado = rq[8]
-            tipo = rq[3]
-            if tipo != 'Imagen':
-                data[id] = request.form.get(id) or ''
-                if request.form.get(id_estado) == "on":
-                    data[id_estado] = 'V'
-                else:
-                    data[id_estado] = 'F'
-            else:
-                if request.form.get(id_estado) == "on":
-                    data[id_estado] = 'V'
-                else:
-                    data[id_estado] = 'F'
-                data[id] = request.files.get(id) or ''
-        
-        try:
-            print(data)
-            estado = csoli.insertar_Pcomunion(data,extra) 
-            if estado:
-                return jsonify({'estado': 'Correcto'})
-            else:
-                return jsonify({'estado': 'Error'})
-        except Exception as e:
-            return jsonify({'estado': 'Error'})   
