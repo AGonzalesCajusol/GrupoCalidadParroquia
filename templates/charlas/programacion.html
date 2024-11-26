@@ -1,6 +1,30 @@
 {% extends "index.html" %}
 {% block title %}Gestión de Programación de Charlas{% endblock %}
 {% block cuerpo %}
+<style>
+
+/* Centrar las cabeceras */
+table th {
+    text-align: center;
+    vertical-align: middle; /* Opcional: centra verticalmente */
+}
+
+/* Centrar las celdas de Ministro, Sede y Acciones */
+table td:nth-child(3), /* Ministro */
+table td:nth-child(4), /* Ministro */
+table td:nth-child(5), /* Sede */
+table td:nth-child(6) { /* Acciones */
+    text-align: center;
+}
+
+/* Asegurar que los botones dentro de las celdas de Acciones estén centrados */
+table td:nth-child(6) button {
+    display: inline-block;
+    margin: 0 auto;
+}
+
+
+</style>
 <div class="container mt-4">
     <!-- Título -->
     <h1 class="titulo-gestion">Gestión de Programación de Charlas</h1>
@@ -32,12 +56,12 @@
         <table id="tablaProgramacion" class="table table-striped align-middle">
             <thead>
                 <tr>
-                    <th>Tema</th>
-                    <th>Hora de inicio</th>
-                    <th>Días de la semana</th>
-                    <th>Ministro</th>
-                    <th>Sede</th>
-                    <th>Acciones</th>
+                    <th class="text-center">Tema</th>
+                    <th class="text-center">Hora de inicio</th>
+                    <th class="text-center">Días de la semana</th>
+                    <th class="text-center">Ministro</th>
+                    <th class="text-center">Sede</th>
+                    <th class="text-center">Acciones</th>
                 </tr>
             </thead>
             <tbody id="temasTableBody">

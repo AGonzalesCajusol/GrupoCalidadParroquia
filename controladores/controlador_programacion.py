@@ -304,10 +304,8 @@ def eliminar_programacion(id_programacion):
         return {"success": True, "message": "Programación eliminada correctamente"}
     except Exception as e:
         conexion.rollback()
-        print(f"Error al eliminar la programación: {e}")
-        return {"success": False, "error": str(e)}
+        if "1451" in str(e):  # Error de clave foránea
+            return {"success": False, "message": "No se puede eliminar la programación porque tiene registros asociados."}
+        return {"success": False, "message": "Error inesperado al eliminar la programación."}
     finally:
         conexion.close()
-
-
-

@@ -155,7 +155,15 @@ def registrar_rutas(app):
         id_programacion = request.args.get('id_programacion')
         
         if not id_programacion:
-            return jsonify({"success": False, "error": "ID de programación no proporcionado"}), 400
+            # Si no se proporciona el ID, devolver error con mensaje adecuado
+            return jsonify({"success": False, "message": "ID de programación no proporcionado"}), 400
 
+        # Llamada al controlador para eliminar la programación
         resultado = cncha.eliminar_programacion(id_programacion)
-        return jsonify(resultado)
+
+        # Devolver el resultado del controlador
+        if resultado['success']:
+            return jsonify({"success": True, "message": resultado['message']}), 200
+        else:
+            return jsonify({"success": False, "message": resultado['message']}), 500
+

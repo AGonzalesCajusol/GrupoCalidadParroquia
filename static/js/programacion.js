@@ -1,7 +1,7 @@
 document.addEventListener("DOMContentLoaded", async function () {
     // Inicializar DataTables para la tabla de programación
     $('#tablaProgramacion').DataTable({
-        pageLength: 8,
+        pageLength: 20,
         lengthChange: false,
         searching: false,
         paging: true,
@@ -152,8 +152,15 @@ function abrirModalVer(button) {
     const idProgramacion = row.getAttribute('data-id-programacion');
     console.log("ID de programación enviado al backend:", idProgramacion);
 
-    if (!idProgramacion) {
-        alert("No se pudo obtener el ID de la programación.");
+    if (!idProgramacion) {        
+        Toastify({
+            text: "No se pudo obtener el ID de la programación",
+            duration: 2000,
+            close: true,
+            backgroundColor: "#dc3545",
+            gravity: "bottom",
+            position: "right",
+        }).showToast();
         return;
     }
 
@@ -185,8 +192,15 @@ function abrirModalVer(button) {
                 const modalElement = document.getElementById('modalVerProgramacion');
                 const modal = new bootstrap.Modal(modalElement);
                 modal.show();
-            } else {
-                alert("Error al obtener los detalles de la programación.");
+            } else {                
+                Toastify({
+                    text: "Error al obtener los detalles de la programación",
+                    duration: 2000,
+                    close: true,
+                    backgroundColor: "#dc3545",
+                    gravity: "bottom",
+                    position: "right",
+                }).showToast();
             }
         })
         .catch(error => console.error("Error al abrir el modal:", error));
@@ -236,24 +250,39 @@ async function obtenerDatosMinistroSede() {
 async function registrarProgramacion() {
     const filas = $('#tablaProgramacion tbody tr');
     const programaciones = [];
-
+    
     const idMinistro = document.getElementById('hiddenIdMinistro').value;
     const idSede = document.getElementById('hiddenIdSede').value;
 
     console.log("ID Ministro:", idMinistro);
     console.log("ID Sede:", idSede);
 
+    
     if (!idMinistro || !idSede) {
-        console.error("No se encontraron los valores de ministro o sede");
-        alert("Debe seleccionar un ministro y una sede antes de registrar.");
+        Toastify({
+            text: "Debe seleccionar un ministro y una sede antes de registrar.",
+            duration: 2000,
+            close: true,
+            backgroundColor: "#dc3545",
+            gravity: "bottom",
+            position: "right",
+        }).showToast();
         return;
     }
+
+    let camposCompletos = true;
 
     filas.each(function () {
         const idTema = $(this).attr('data-id-tema');
         const horaInicio = $(this).find('input[type="time"]').val();
         const diaSemana = $(this).find('td select').val();
 
+        // Validar si los campos están completos para cada fila
+        if (!idTema || !horaInicio || !diaSemana) {
+            camposCompletos = false;
+        }
+
+        // Si los campos están completos, agregar la programación al array
         if (idTema && horaInicio && diaSemana) {
             programaciones.push({
                 id_tema: parseInt(idTema),
@@ -264,6 +293,18 @@ async function registrarProgramacion() {
             });
         }
     });
+    
+    if (!camposCompletos) {
+        Toastify({
+            text: "Por favor, complete todos los campos antes de registrar.",
+            duration: 2000,
+            close: true,
+            backgroundColor: "#dc3545",
+            gravity: "bottom",
+            position: "right",
+        }).showToast();
+        return;
+    }
 
     console.log("Programaciones a registrar:", programaciones);
 
@@ -278,17 +319,40 @@ async function registrarProgramacion() {
 
         const data = await response.json();
         if (data.success) {
-            alert("Programación registrada con éxito.");
-            cargarTemasPorActo()
+            Toastify({
+                text: "Programación registrada con éxito.",
+                duration: 2000,
+                close: true,
+                backgroundColor: "#198754",
+                gravity: "bottom",
+                position: "right",
+            }).showToast();
+            cargarTemasPorActo();
             location.reload();
         } else {
             console.error("Error al registrar la programación:", data.error);
-            alert("Error al registrar la programación.");
+            Toastify({
+                text: "Error al registrar la programación.",
+                duration: 2000,
+                close: true,
+                backgroundColor: "#dc3545",
+                gravity: "bottom",
+                position: "right",
+            }).showToast();
         }
     } catch (error) {
         console.error("Error en la solicitud al backend:", error);
+        Toastify({
+            text: "Error al procesar la solicitud.",
+            duration: 2000,
+            close: true,
+            backgroundColor: "#dc3545",
+            gravity: "bottom",
+            position: "right",
+        }).showToast();
     }
 }
+
 
 async function verificarProgramacionActo() {
     const actoId = document.getElementById('selectActoLiturgico').value;
@@ -361,7 +425,17 @@ function abrirModalEditar(button) {
     const row = button.closest('tr');
     const idProgramacion = row.getAttribute('data-id-programacion');
     
-    if (!idProgramacion) return alert("No se encontró la programación a editar.");
+    if (!idProgramacion) 
+        return     
+    Toastify({
+        text: "No se encontró la programación a editar",
+        duration: 2000,
+        close: true,
+        backgroundColor: "#dc3545",
+        gravity: "bottom",
+        position: "right",
+    }).showToast();
+    ;
 
     fetch(`/obtener_programacion_detalle?id_programacion=${idProgramacion}`)
         .then(response => response.json())
@@ -388,8 +462,15 @@ function guardarCambiosProgramacion() {
     const idMinistro = document.getElementById('hiddenIdMinistro').value;
     const idSede = document.getElementById('hiddenIdSede').value;
 
-    if (!idProgramacion || !horaInicio || !diaSemana || !idMinistro || !idSede) {
-        alert("Todos los campos son obligatorios.");
+    if (!idProgramacion || !horaInicio || !diaSemana || !idMinistro || !idSede) {        
+        Toastify({
+            text: "Todos los campos son obligatorios",
+            duration: 2000,
+            close: true,
+            backgroundColor: "#dc3545",
+            gravity: "bottom",
+            position: "right",
+        }).showToast();
         return;
     }
 
@@ -410,11 +491,26 @@ function guardarCambiosProgramacion() {
     })
     .then(response => response.json())
     .then(data => {
-        if (data.success) {
-            alert("Programación actualizada con éxito.");
+        if (data.success) {            
+            Toastify({
+                text: "Programación actualizada con éxito",
+                duration: 2000,
+                close: true,
+                backgroundColor: "--bs-primary",
+                gravity: "bottom",
+                position: "right",
+            }).showToast();
+
             location.reload();
-        } else {
-            alert("Error al actualizar la programación.");
+        } else {            
+            Toastify({
+                text: "Error al actualizar la programación",
+                duration: 2000,
+                close: true,
+                backgroundColor: "#dc3545",
+                gravity: "bottom",
+                position: "right",
+            }).showToast();
         }
     })
     .catch(error => console.error("Error al guardar cambios:", error));
@@ -476,8 +572,15 @@ async function abrirModalMinistro() {
             // Mostrar el modal
             const modal = new bootstrap.Modal(document.getElementById('modalSeleccionarMinistro'));
             modal.show();
-        } else {
-            alert('Error al cargar los ministros.');
+        } else {            
+            Toastify({
+                text: "Error al cargar los ministros",
+                duration: 2000,
+                close: true,
+                backgroundColor: "#dc3545",
+                gravity: "bottom",
+                position: "right",
+            }).showToast();
         }
     } catch (error) {
         console.error("Error al obtener los ministros:", error);
@@ -547,16 +650,22 @@ async function abrirModalSede() {
 
             const modal = new bootstrap.Modal(document.getElementById('modalSeleccionarSede'));
             modal.show();
-        } else {
-            alert('Error al cargar las sedes.');
+        } else {            
+            Toastify({
+                text: "Error al cargar las sedes",
+                duration: 2000,
+                close: true,
+                backgroundColor: "#dc3545",
+                gravity: "bottom",
+                position: "right",
+            }).showToast();
         }
     } catch (error) {
         console.error("Error al obtener las sedes:", error);
     }
 }
 
-function seleccionarSede(id, nombre) {
-    // Asignar el nombre y el ID de la sede seleccionada al formulario principal
+function seleccionarSede(id, nombre) {    
     document.getElementById('editarSede').value = nombre;
     document.getElementById('hiddenIdSede').value = id;
 
@@ -565,13 +674,19 @@ function seleccionarSede(id, nombre) {
     modal.hide();
 }
 
-// eliminaaaaaar
 function eliminarProgramacion(button) {
     const row = button.closest('tr');
     const idProgramacion = row.getAttribute('data-id-programacion');
 
     if (!idProgramacion) {
-        alert("No se pudo obtener el ID de la programación.");
+        Toastify({
+            text: "No se pudo obtener el ID de la programación.",
+            duration: 2000,
+            close: true,
+            backgroundColor: "#dc3545",
+            gravity: "bottom",
+            position: "right",
+        }).showToast();
         return;
     }
 
@@ -582,16 +697,43 @@ function eliminarProgramacion(button) {
 
     // Enviar solicitud al backend para eliminar la programación
     fetch(`/eliminar_programacion?id_programacion=${idProgramacion}`, {
-        method: 'DELETE'
+        method: 'DELETE',
     })
     .then(response => response.json())
     .then(data => {
         if (data.success) {
-            alert("Programación eliminada con éxito.");
-            location.reload(); // Recargar la tabla para reflejar los cambios
+            Toastify({
+                text: "Programación eliminada con éxito.",
+                duration: 2000,
+                close: true,
+                backgroundColor: "#198754",
+                gravity: "bottom",
+                position: "right",
+            }).showToast();
+
+            // Remover la fila de la tabla
+            const temasTable = $('#tablaProgramacion').DataTable();
+            temasTable.row(row).remove().draw();
         } else {
-            alert("Error al eliminar la programación.");
+            Toastify({
+                text: data.message || "Error al eliminar la programación.",
+                duration: 2000,
+                close: true,
+                backgroundColor: "#dc3545",
+                gravity: "bottom",
+                position: "right",
+            }).showToast();
         }
     })
-    .catch(error => console.error("Error al eliminar programación:", error));
+    .catch(error => {
+        console.error("Error al eliminar programación:", error);
+        Toastify({
+            text: "Ha ocurrido un error inesperado.",
+            duration: 2000,
+            close: true,
+            backgroundColor: "#dc3545",
+            gravity: "bottom",
+            position: "right",
+        }).showToast();
+    });
 }
