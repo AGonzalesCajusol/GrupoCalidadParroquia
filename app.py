@@ -22,6 +22,8 @@ import routers.router_asistencia
 import routers.router_cronograma
 import routers.router_celebracion_crud
 import routers.router_celebracionesR
+import routers.router_certificado
+
 app = Flask(__name__)
 app.secret_key = 'super-secret'
 
@@ -40,7 +42,7 @@ def raiz():
     print('Todas las cookies han sido eliminadas.')
     return response
 
-#ruta_envio
+#ruta_envio.p
 
 
 # Registrar las rutas definidas en router_main.pyw
@@ -92,6 +94,6 @@ routers.router_cronograma.registrar_rutas(app)
 
 routers.router_celebracion_crud.registrar_rutas(app)
 
-
+routers.router_certificado.registrar_rutas(app)
 if __name__ == '__main__':
     app.run(debug=True)

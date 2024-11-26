@@ -1,0 +1,58 @@
+{% extends "index.html" %}
+{% block title %}Gestión de Certificados{% endblock %}
+
+{% block cuerpo %}
+<div class="container mt-4">
+    <h1 class="titulo-gestion">Gestión de Certificados</h1>
+
+    <!-- Filtro de Acto Litúrgico -->
+    <div class="mb-3 d-flex align-items-center">
+        <label for="filtroActo" class="me-2">Acto Litúrgico:</label>
+        <select id="filtroActo" class="form-select" style="width: auto;" onchange="filtrarPorActo()">
+            <option value="">Todos</option>
+            {% for acto in actos_liturgicos %}
+            <option value="{{ acto.nombre }}">{{ acto.nombre }}</option>
+            {% endfor %}
+        </select>
+    </div>
+
+    <!-- Tabla de Celebraciones -->
+    <div>
+        <table id="celebracionesTable" class="table table-hover table-striped">
+            
+            <thead>
+                <tr class="text-center">
+                    <th>ID</th>
+                    <th>Fecha</th>
+                    <th>Solicitud</th>
+                    <th>Acto litúrgico</th>
+                    <th>Feligres</th>
+                    <th>Acciones</th>
+
+                </tr>
+            </thead>
+            <tbody>
+                {% for celebracion in celebraciones %}
+                <tr>
+                    <td class="text-center">{{ celebracion.id_celebracion }}</td>
+                    <td>{{ celebracion.fecha }}</td>
+                    <td>{{ celebracion.id_solicitud }}</td>
+                    <td>{{ celebracion.nombre_liturgia }}</td>
+                    <td>{{ celebracion.feligres}}</td>
+                    <td class="text-center">
+                        <button class="btn btn-primary btn-sm" onclick="generarCertificadoPost('{{ celebracion.id_solicitud }}')">
+                            Descargar
+                        </button>
+                        
+                    </td>
+                    
+                   
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+</div>
+
+<script src="/static/js/certificados.js"></script>
+{% endblock %}
