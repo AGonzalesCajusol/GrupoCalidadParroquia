@@ -90,9 +90,6 @@ def registrar_rutas(app):
         acto = cactos.obtener_acto
 
         monto = cactos.monto_total(acto_liturgico, sede, dni_responsable, dni1, dni2)
-        
-        # Imprimir el monto total
-        print("Monto Total:", monto)
 
         if monto == 0:
             return jsonify({'estado': 'no'}) 
@@ -145,7 +142,6 @@ def registrar_rutas(app):
                     'hora_inicio': str(data[2]),
                     'hora_fin': str(data[3]),
                 })
-            print(data)
             return jsonify({'mensaje': "OK",
                            'data': lista_datos})
 
@@ -220,7 +216,6 @@ def registrar_rutas(app):
             }
             
             try:
-                print("oks")
                 estado = csoli.insertar_bautismo(requisitos_bautismo) 
                 if estado == 1:
                     return jsonify({'estado': 'Correcto'})
@@ -241,7 +236,6 @@ def registrar_rutas(app):
                 'metodo': request.form.get('metodo')
             }
                      
-            print(requisitos_confirmacion)
             try:
                 estado = csoli.insertar_confirmacion(requisitos_confirmacion)
                 if estado == 1:
@@ -266,7 +260,6 @@ def registrar_rutas(app):
                 'metodo': request.form.get('metodo')
             }
                      
-            print(requisitos_confirmacion)
             try:
                 estado = csoli.primeracomu(requisitos_confirmacion)
                 if estado == 1:
@@ -282,7 +275,6 @@ def registrar_rutas(app):
         sede = request.cookies.get('sede')
         valor = csoli.verificar_fecha(fecha,sede)
         if valor ==0:
-            print("A")
             return jsonify({'estado': "Aceptado"})
         else:
       
@@ -294,7 +286,6 @@ def registrar_rutas(app):
         monto = csoli.monto_butismo(sede)
         
         # Imprimir el monto total
-        print("Monto Total:", monto)
 
         if monto == 0:
             return jsonify({'estado': 'no'}) 
@@ -305,10 +296,6 @@ def registrar_rutas(app):
     @requerido_login
     def confirmado(sede):
         monto = csoli.monto_confirmacion(sede)
-        
-        # Imprimir el monto total
-        print("Monto Total:", monto)
-
         if monto == 0:
             return jsonify({'estado': 'no'}) 
         else:
@@ -320,7 +307,7 @@ def registrar_rutas(app):
         monto = csoli.monto_primera(sede)
         
         # Imprimir el monto total
-        print("Monto Total:", monto)
+
 
         if monto == 0:
             return jsonify({'estado': 'no'}) 
@@ -395,7 +382,6 @@ def registrar_rutas(app):
                     'hora_inicio': str(data[2]),
                     'hora_fin': str(data[3]),
                 })
-            print(lista_datos)
             return jsonify({'estado': 'Correcto',
                             'data': lista_datos})
         
@@ -417,7 +403,6 @@ def registrar_rutas(app):
                     'hora_inicio': str(data[2]),
                     'hora_fin': str(data[3]),
                 })
-            print(lista_datos)
             return jsonify({'estado': 'Correcto',
                             'data': lista_datos})
         
@@ -439,7 +424,6 @@ def registrar_rutas(app):
                     'hora_inicio': str(data[2]),
                     'hora_fin': str(data[3]),
                 })
-            print(lista_datos)
             return jsonify({'estado': 'Correcto',
                             'data': lista_datos})
 
@@ -476,7 +460,6 @@ def registrar_rutas(app):
                 data[id] = request.files.get(id) or ''
         
         try:
-            print(data)
             estado = csoli.insertar_solicitudMatrimonio(data,extra) 
             if estado:
                 return jsonify({'estado': 'Correcto'})
@@ -493,7 +476,6 @@ def registrar_rutas(app):
         monto = request.form.get('monto')
         pago = request.form.get('money')
         f_pago = request.form.get('formaPago')
-        print(f_pago)
         extra = {'responsable':responsable,
                  'monto': monto,
                  'pago':pago,
@@ -518,7 +500,7 @@ def registrar_rutas(app):
                 data[id] = request.files.get(id) or ''
         
         try:
-            print(data)
+
             estado = csoli.insertar_bautismo(data,extra) 
             if estado:
                 return jsonify({'estado': 'Correcto'})
@@ -558,7 +540,6 @@ def registrar_rutas(app):
                 data[id] = request.files.get(id) or ''
         
         try:
-            print(data)
             estado = csoli.insertar_confirmacion(data,extra) 
             if estado:
                 return jsonify({'estado': 'Correcto'})
@@ -599,7 +580,6 @@ def registrar_rutas(app):
                 data[id] = request.files.get(id) or ''
         
         try:
-            print(data)
             estado = csoli.insertar_Pcomunion(data,extra) 
             if estado:
                 return jsonify({'estado': 'Correcto'})
@@ -634,10 +614,11 @@ def registrar_rutas(app):
         try:
             requisitos = csoli.obtener_requisitos_solicitud(id_solicitud)
             #money = csoli.obtener_detalle_money(id_solicitud)
-            print("Requisitos obtenidos desde la base de datos:", requisitos)  # Verifica los datos extraídos
+            detalle_pago = csoli.obtener_detalle_money(id_solicitud)
+
             if requisitos is not None:
                 data = []
-                mot = [] 
+
                 for req in requisitos:
                     if req[3] == 'V':
                         estado = True
@@ -653,17 +634,25 @@ def registrar_rutas(app):
                         "id_es": req[6],
                     })
 
-                #for mo in money:                   
-                  #  mot.append({
-                    #    "resposable": mo[0], 
-                    #    "dni": mo[1], 
-                   #     "total": mo[2],
-                   #     "f_pago": mo[3],
-                  #  })
+                if detalle_pago:
+                    pago = {
+                        "responsable": detalle_pago[0],  # Nombre del responsable
+                        "dni": detalle_pago[1],         # DNI del responsable
+                        "total": detalle_pago[2],       # Monto total
+                        "forma_pago": detalle_pago[3],  # Forma de pago (e.g., efectivo, tarjeta)
+                    }
+                else:
+                    pago = {}
                     
-                return jsonify({"estado": "Correcto", "data": data})
+                return jsonify({"estado": "Correcto", "data": data, "pago": pago})
             else:
                 return jsonify({"estado": "Error", "mensaje": "No se encontraron requisitos para esta solicitud."}), 404
         except Exception as e:
-            print(f"Error en requisitos_solicitud: {e}")
             return jsonify({"estado": "Error", "mensaje": "Error interno del servidor."}), 500
+        
+    @app.route('/fecha_habil/<int:id_soli>', methods=['GET'])
+    @requerido_login
+    def fecha_habil(id_soli):
+        solicitudes = csoli.fecha_habil(id_soli)
+        return jsonify({'estado': solicitudes})
+            
