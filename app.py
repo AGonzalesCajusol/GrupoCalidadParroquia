@@ -1,4 +1,4 @@
-from flask import Flask, render_template, request, redirect, url_for
+from flask import Flask, render_template, request, redirect, url_for, make_response
 import routers.router_actosliturgicos
 import routers.router_celebracion
 import routers.router_charlas
@@ -28,8 +28,17 @@ app.secret_key = 'super-secret'
 # Ruta para la página de inicio de sesión
 @app.route('/')
 def raiz():
-    print('11223344')
-    return render_template('inicio_sesion.html')
+    response = make_response(render_template('inicio_sesion.html'))
+    
+    # Eliminar las cookies conocidas (añade todas las claves que necesitas eliminar)
+    response.delete_cookie('dni')
+    response.delete_cookie('nombre')
+    response.delete_cookie('sede')
+    response.delete_cookie('tipo')
+    response.delete_cookie('token')
+
+    print('Todas las cookies han sido eliminadas.')
+    return response
 
 #ruta_envio
 
