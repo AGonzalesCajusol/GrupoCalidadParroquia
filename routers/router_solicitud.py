@@ -462,13 +462,15 @@ def registrar_rutas(app):
         try:
             estado = csoli.insertar_solicitudMatrimonio(data,extra) 
             if estado:
-                return jsonify({'estado': 'Correcto'})
+                flash('Se ingreso correctamente la liturgia', 'success')
             else:
-                return jsonify({'estado': 'Error'})
+                flash(f'Error al registrar matrimonio', 'danger')
+            return redirect(url_for('solicitudes'))
+
         except Exception as e:
-            return jsonify({'estado': 'Error'})
-        return 'hello'
-    
+            flash(f'Error al registrar matrimonio', 'danger')
+            return redirect(url_for('solicitudes'))
+
     @app.route('/registrar_solicitud_bautismo', methods=['POST'])
     def registrar_solicitud_bautismo():
         requisitos = cactos.listar_requisitos(2)
@@ -503,11 +505,16 @@ def registrar_rutas(app):
 
             estado = csoli.insertar_bautismo(data,extra) 
             if estado:
-                return jsonify({'estado': 'Correcto'})
+                flash('Se ingreso correctamente la liturgia', 'success')
             else:
-                return jsonify({'estado': 'Error'})
+                flash(f'Error al registrar bautismo', 'danger')
+
+            return redirect(url_for('solicitudes'))
+
         except Exception as e:
-            return jsonify({'estado': 'Error'})
+            flash(f'Error al registrar bautismo', 'danger')
+
+            return redirect(url_for('solicitudes'))
         
     @app.route('/registrar_solicitud_Confirmacion', methods=['POST'])
     def registrar_solicitud_Confirmacion():
@@ -542,12 +549,15 @@ def registrar_rutas(app):
         try:
             estado = csoli.insertar_confirmacion(data,extra) 
             if estado:
-                return jsonify({'estado': 'Correcto'})
+                flash('Se ingreso correctamente la liturgia', 'success')
             else:
-                return jsonify({'estado': 'Error'})
+                flash(f'Error al registrar confirmación', 'danger')
+            return redirect(url_for('solicitudes'))
+
         except Exception as e:
-            return jsonify({'estado': 'Error'})
-        
+            flash(f'Error al registrar confirmación', 'danger')
+
+            return redirect(url_for('solicitudes'))
 
     @app.route('/registrar_solicitud_Pcomunion', methods=['POST'])
     def registrar_solicitud_Pcomunion():
@@ -582,11 +592,14 @@ def registrar_rutas(app):
         try:
             estado = csoli.insertar_Pcomunion(data,extra) 
             if estado:
-                return jsonify({'estado': 'Correcto'})
+                flash('Se ingreso correctamente la liturgia', 'success')
             else:
-                return jsonify({'estado': 'Error'})
+                flash(f'Error al registrar la primera comunión', 'danger')
+            return redirect(url_for('solicitudes'))
         except Exception as e:
-            return jsonify({'estado': 'Error'})   
+            flash(f'Error al registrar la primera comunión', 'danger')
+            return redirect(url_for('solicitudes'))
+   
         
     @app.route('/listar_solicitudes', methods=['GET'])
     @requerido_login
