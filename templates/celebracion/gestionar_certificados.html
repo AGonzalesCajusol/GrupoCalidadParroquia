@@ -37,7 +37,7 @@
                     <td class="text-center">{{ celebracion.id_celebracion }}</td>
                     <td>{{ celebracion.fecha }}</td>
                     <td>{{ celebracion.id_solicitud }}</td>
-                    <td>{{ celebracion.nombre_liturgia }}</td>
+                    <td class="nombre_liturgia">{{ celebracion.nombre_liturgia }}</td>
                     <td>{{ celebracion.feligres}}</td>
                     <td class="text-center">
                         <button class="btn btn-primary btn-sm" onclick="generarCertificadoPost('{{ celebracion.id_solicitud }}')">

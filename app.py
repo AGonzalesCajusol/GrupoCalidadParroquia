@@ -1,6 +1,7 @@
 from flask import Flask, render_template, request, redirect, url_for, make_response
 import routers.router_actosliturgicos
 import routers.router_celebracion
+import routers.router_certificado
 import routers.router_charlas
 import routers.router_diocesis
 import routers.router_feligres
@@ -22,6 +23,10 @@ import routers.router_asistencia
 import routers.router_cronograma
 import routers.router_celebracion_crud
 import routers.router_celebracionesR
+import routers.router_certificado
+
+
+
 app = Flask(__name__)
 app.secret_key = 'super-secret'
 
@@ -92,6 +97,6 @@ routers.router_cronograma.registrar_rutas(app)
 
 routers.router_celebracion_crud.registrar_rutas(app)
 
-
+routers.router_certificado.registrar_rutas(app)
 if __name__ == '__main__':
     app.run(debug=True)
