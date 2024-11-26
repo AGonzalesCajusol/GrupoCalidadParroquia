@@ -136,7 +136,7 @@ def obtener_solicitudes_por_celebracion(id_celebracion):
         INNER JOIN actoliturgico at ON at.id_actoliturgico = s.id_actoliturgico 
         INNER JOIN feligres f ON f.dni = s.dni_feligres 
         INNER JOIN solicitud_feligres sf ON sf.id_solicitud = s.id_solicitud
-        WHERE LOWER(sf.rol) IN ('bautizado', 'confirmandos', 'comulgantes','novio') and s.estado='A'
+        WHERE LOWER(sf.rol) IN ('bautizado', 'confirmandos', 'comulgantes','novio','novia') and s.estado='A'
         and s.id_celebracion = %s
     """, (id_celebracion,))
     solicitudes = cursor.fetchall()
