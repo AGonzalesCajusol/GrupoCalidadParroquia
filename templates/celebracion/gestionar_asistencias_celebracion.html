@@ -21,23 +21,23 @@
     <table id="asistenciasTable" class="table table-hover table-striped">
         <thead>
             <tr class="text-center">
-                <th style="vertical-align: middle; text-align: center;width: 130px">Celebracion</th>
-                <th style="vertical-align: middle; text-align: center;width: 130px">ID Solicitud</th>
-                <th style="vertical-align: middle; text-align: center">Acto liturgico</th>
-                <th style="vertical-align: middle; text-align: center">Feligres</th>
-                <th style="vertical-align: middle; text-align: center">Asistencia</th>
+                <th>ID Solicitud</th>
+                <th>ID Acto Litúrgico</th>
+                <th>ID Celebración</th>
+                <th>DNI Feligres</th>
+                <th>Estado</th>
+                <th>Asistencia</th>
             </tr>
         </thead>
         <tbody>
             {% for solicitud in solicitudes %}
-
-
             <tr>
-                <td style="vertical-align: middle; text-align: center">{{ solicitud.id_celebracion}}</td>
-                <td style="vertical-align: middle; text-align: center">{{ solicitud.id_solicitud }}</td>
-                <td >{{ solicitud.acto_liturgico }}</td>
-                <td >{{ solicitud.feligres }}</td>
-                <td style="vertical-align: middle; text-align: center">
+                <td class="text-center">{{ solicitud.id_solicitud }}</td>
+                <td class="text-center">{{ solicitud.id_actoliturgico }}</td>
+                <td class="text-center">{{ solicitud.id_celebracion }}</td>
+                <td class="text-center">{{ solicitud.dni_feligres }}</td>
+                <td class="text-center">{{ solicitud.estado }}</td>
+                <td class="text-center">
                     <input 
                         type="checkbox" 
                         class="asistencia-checkbox" 
@@ -45,7 +45,7 @@
                         {% if solicitud.asistencia == 1 %}checked{% endif %}>
                 </td>
             </tr>
-            {% endfor %}    
+            {% endfor %}
         </tbody>
     </table>
 </div>
