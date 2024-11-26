@@ -10,10 +10,10 @@
         </div>
     </div>
     <div class="row">
-        <div class="col-lg-11 col-md-12"> <!-- Ajuste para mover contenido más a la izquierda -->
+        <div class="col-lg-11 col-md-12">
             <div class="card shadow-sm">
-                <div class="card-header d-flex justify-content-between align-items-center">
-                    <!-- Filtro de Año -->
+                <div class="card-header d-flex justify-content-start align-items-center gap-3 flex-wrap"> 
+                    <!-- Filtros en una sola línea -->
                     <div class="d-flex align-items-center">
                         <label for="yearFilter" class="form-label me-2"><strong>Año:</strong></label>
                         <select id="yearFilter" class="form-select form-select-sm">
@@ -23,9 +23,10 @@
                             {% endfor %}
                         </select>
                     </div>
-                    <!-- Filtro de Tipo de Acto Litúrgico -->
                     <div class="d-flex align-items-center">
-                        <label for="actoFilter" class="form-label me-2"><strong>Acto litúrgico:</strong></label>
+                        <label for="actoFilter" class="form-label me-2 text-nowrap">
+                            <strong>Acto litúrgico:</strong>
+                        </label>
                         <select id="actoFilter" class="form-select form-select-sm">
                             <option value="">Todos</option>
                             {% for acto in actos %}
@@ -48,6 +49,44 @@
         </div>
     </div>
 </div>
+
+<style>
+    body {
+        overflow-y: hidden;
+    }
+
+    .container {
+        max-width: 1200px;
+        margin-left: 1.5rem;
+    }
+
+    .chart-container {
+        position: relative;
+        height: 400px;
+        width: 100%;
+    }
+
+    .card {
+        border-radius: 8px;
+    }
+
+    .card-header {
+        gap: 1rem; /* Espaciado entre filtros */
+        padding: 10px 15px; /* Espaciado interno */
+    }
+
+    .form-select {
+        min-width: 150px;
+    }
+
+    .form-label {
+        white-space: nowrap; /* Evita que las etiquetas se dividan en varias líneas */
+    }
+
+    .d-flex > label {
+        margin-bottom: 0; /* Elimina cualquier margen adicional */
+    }
+</style>
 
 <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 <script src="/static/js/numeroActosLiturgicosAño.js"></script>

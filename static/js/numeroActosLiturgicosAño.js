@@ -5,13 +5,13 @@ document.addEventListener('DOMContentLoaded', function () {
     // Capturar selección del año
     document.getElementById('yearFilter').addEventListener('change', function (event) {
         selectedYear = event.target.value;
-        crearGrafico(selectedYear, selectedActo);
+        actualizarGrafico(selectedYear, selectedActo);
     });
 
     // Capturar selección del tipo de acto litúrgico
     document.getElementById('actoFilter').addEventListener('change', function (event) {
         selectedActo = event.target.value;
-        crearGrafico(selectedYear, selectedActo);
+        actualizarGrafico(selectedYear, selectedActo);
     });
 });
 
@@ -21,7 +21,48 @@ const meses = [
     "Julio", "Agosto", "Septiembre", "Octubre", "Noviembre", "Diciembre"
 ];
 
-// Función para obtener los datos
+// Función principal para actualizar el gráfico
+async function actualizarGrafico(year, acto) {
+    const noDataMessage = document.getElementById('noDataMessage');
+    const ctx = document.getElementById('actosLiturgicosChart').getContext('2d');
+
+    // Mostrar mensaje si faltan filtros
+    if (!year || !acto) {
+        mostrarMensaje(noDataMessage, "Seleccione un año y un tipo de acto litúrgico para ver el gráfico.");
+        renderEmptyChart(ctx);
+        return;
+    }
+
+    // Obtener datos
+    const data = await obtenerDatos(year, acto);
+
+    // Verificar si hay datos
+    if (data.length === 0) {
+        mostrarMensaje(noDataMessage, "No hay datos disponibles para los filtros seleccionados.");
+        renderEmptyChart(ctx);
+        return;
+    }
+
+    // Ocultar mensaje y renderizar gráfico
+    noDataMessage.classList.add('d-none');
+    renderChart(ctx, data);
+}
+
+// Función para mostrar y ocultar mensajes suavemente
+function mostrarMensaje(elemento, mensaje) {
+    elemento.textContent = mensaje;
+    elemento.classList.remove('d-none');
+    setTimeout(() => {
+        elemento.style.transition = "opacity 1s ease";
+        elemento.style.opacity = "0";
+        setTimeout(() => {
+            elemento.classList.add('d-none');
+            elemento.style.opacity = "";
+        }, 1000);
+    }, 3000);
+}
+
+// Función para obtener los datos del API
 async function obtenerDatos(year, acto) {
     const url = `/api/celebraciones_por_fecha?year=${year}${acto ? `&acto=${acto}` : ''}`;
     try {
@@ -34,39 +75,11 @@ async function obtenerDatos(year, acto) {
     }
 }
 
-// Función para crear o actualizar el gráfico
-async function crearGrafico(year, acto) {
-    const noDataMessage = document.getElementById('noDataMessage');
-    const ctx = document.getElementById('actosLiturgicosChart').getContext('2d');
+// Función para renderizar un gráfico real
+function renderChart(ctx, data) {
+    const mesesData = meses.reduce((acc, _, index) => ({ ...acc, [index + 1]: 0 }), {});
+    data.forEach(d => { mesesData[d.mes] = d.num_celebraciones; });
 
-    if (!year || !acto) {
-        noDataMessage.classList.remove('d-none');
-        noDataMessage.textContent = "Seleccione un año y un tipo de acto litúrgico para ver el gráfico.";
-        renderEmptyChart(ctx);
-        return;
-    }
-
-    const data = await obtenerDatos(year, acto);
-
-    if (data.length === 0) {
-        noDataMessage.classList.remove('d-none');
-        noDataMessage.textContent = "No hay datos disponibles para los filtros seleccionados.";
-        renderEmptyChart(ctx);
-        return;
-    } else {
-        noDataMessage.classList.add('d-none');
-    }
-
-    const mesesData = meses.reduce((acc, mes, index) => {
-        acc[index + 1] = 0;
-        return acc;
-    }, {});
-
-    data.forEach((d) => {
-        mesesData[d.mes] = d.num_celebraciones;
-    });
-
-    const labels = meses;
     const valores = Object.values(mesesData);
 
     if (window.chartInstance) {
@@ -76,7 +89,7 @@ async function crearGrafico(year, acto) {
     window.chartInstance = new Chart(ctx, {
         type: 'line',
         data: {
-            labels: labels,
+            labels: meses,
             datasets: [
                 {
                     label: 'Número de Celebraciones',
@@ -93,26 +106,10 @@ async function crearGrafico(year, acto) {
             responsive: true,
             maintainAspectRatio: false,
             scales: {
-                x: {
-                    title: {
-                        display: true,
-                        text: 'Mes',
-                    },
-                },
-                y: {
-                    beginAtZero: true,
-                    title: {
-                        display: true,
-                        text: 'Número de Celebraciones',
-                    },
-                },
+                x: { title: { display: true, text: 'Mes' } },
+                y: { beginAtZero: true, title: { display: true, text: 'Número de Celebraciones' } },
             },
-            plugins: {
-                legend: {
-                    display: true,
-                    position: 'top',
-                },
-            },
+            plugins: { legend: { display: true, position: 'top' } },
         },
     });
 }
@@ -143,25 +140,10 @@ function renderEmptyChart(ctx) {
             responsive: true,
             maintainAspectRatio: false,
             scales: {
-                x: {
-                    title: {
-                        display: true,
-                        text: 'Mes',
-                    },
-                },
-                y: {
-                    beginAtZero: true,
-                    title: {
-                        display: true,
-                        text: 'Número de Celebraciones',
-                    },
-                },
+                x: { title: { display: true, text: 'Mes' } },
+                y: { beginAtZero: true, title: { display: true, text: 'Número de Celebraciones' } },
             },
-            plugins: {
-                legend: {
-                    display: false,
-                },
-            },
+            plugins: { legend: { display: false } },
         },
     });
 }
