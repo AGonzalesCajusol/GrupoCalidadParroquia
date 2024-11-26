@@ -12,6 +12,7 @@ function listar_solicitudes() {
                 $('#soli_tab').DataTable().clear().destroy();
             }
             $('#soli_tab').DataTable({
+                
                 data: data && data.data ? data.data.map(solicitud => [
                     solicitud.id_solicitud,       // Columna 0
                     solicitud.fecha,             // Columna 1
@@ -258,7 +259,7 @@ function retornar_input(tipo, id, nivel) {
         case 'Imagen':
             return `
                 <input  name="${id}" id="${id}" ${requerido} type="file" class="form-control form-control-sm" accept="image/*,application/pdf">
-                <input  id="I${id}"  type="text" class="form-control form-control-sm ">
+                <input  id="I${id}"  type="text" class="form-control form-control-sm d-none">
 
             `;
         case 'Dni':
@@ -360,8 +361,8 @@ function retornar_input(tipo, id, nivel) {
     console.log("Fila añadida:", row.innerHTML); // Verifica cada fila generada
 }
 
-function validar_campos(tipo,id,checkbox){
-    if (tipo == 'Dni'){
+function validar_campos(tipo, id, checkbox) {
+    if (tipo == 'Dni') {
         var dni = document.getElementById(id);
         var variable = 'nombre' + id;
         var nombre = document.getElementById(variable);
@@ -370,7 +371,7 @@ function validar_campos(tipo,id,checkbox){
 
         var responsable = document.getElementById('responsable');
 
-        if(dni.value.length != 8 && estado){
+        if (dni.value.length != 8 && estado) {
             Toastify({
                 text: "Ingrese los campos completos del DNI!!",
                 duration: 2000,
@@ -381,149 +382,181 @@ function validar_campos(tipo,id,checkbox){
             }).showToast();
             st.checked = false;
 
-        }else if (estado){
+        } else if (estado) {
             fetch(`/validar_dni/${dni.value}`)
-            .then(response => {return response.json()})
-            .then(element => {
-                if(element.estado == "si"){
-                    dni.readOnly = true;  // Hacemos que el campo sea solo lectura
-                    nombre.value = element.nombre; // Asignamos el valor al campo 'nombre'
-                }else{
-                    Toastify({
-                        text: "Ingrese un DNI válido!!",
-                        duration: 2000,
-                        close: true,
-                        backgroundColor: "#dc3545",
-                        gravity: "bottom",
-                        position: "right",
-                    }).showToast();
-                    dni.readOnly = false;
-                    mostrar.value = ""; 
-                    estado.checked = false;
-                    responsable.innerHTML = "";
-
-                }
-
-                if(document.getElementById('acto_seleccionado').value == 1){
-                    // Seleccionar los elementos necesarios
-                    var es_dni_novio = document.getElementById('es_dni_novio');
-                    var es_dni_novia = document.getElementById('es_dni_novia');
-            
-                    // Validar si ambos checkboxes están seleccionados
-                    if (es_dni_novia.checked && es_dni_novio.checked) {
-                        var dni_novio = document.getElementById('dni_novio').value;
-                        var nombre_novio = document.getElementById('nombredni_novio').value;
-            
-                        var dni_novia = document.getElementById('dni_novia').value;
-                        var nombre_novia = document.getElementById('nombredni_novia').value;
-            
-                        // Actualizar las opciones dinámicamente
-                        responsable.innerHTML = `
-                            <option value=""></option>
-                            <option value="${dni_novio}">${nombre_novio}</option>
-                            <option value="${dni_novia}">${nombre_novia}</option>
-                        `;
+                .then(response => { return response.json() })
+                .then(element => {
+                    if (element.estado == "si") {
+                        dni.readOnly = true; // Hacemos que el campo sea solo lectura
+                        nombre.value = element.nombre; // Asignamos el valor al campo 'nombre'
                     } else {
-                        // Limpiar las opciones si no están seleccionados ambos checkboxes
+                        Toastify({
+                            text: "Ingrese un DNI válido!!",
+                            duration: 2000,
+                            close: true,
+                            backgroundColor: "#dc3545",
+                            gravity: "bottom",
+                            position: "right",
+                        }).showToast();
+                        dni.readOnly = false;
+                        mostrar.value = "";
+                        estado.checked = false;
                         responsable.innerHTML = "";
                     }
-                }else if(document.getElementById('acto_seleccionado').value == 2){
-                    var es_dni_padrino = document.getElementById('es_dni_padrino');
-                    var es_dni_madrina = document.getElementById('es_dni_madrina');
-                    var es_tutor = document.getElementById('es_dni_tutor');
-            
-                    // Validar si ambos checkboxes están seleccionados
-                    if (es_dni_padrino.checked && es_dni_madrina.checked && es_tutor.checked) {
 
-                        var dni_padrino = document.getElementById('dni_padrino').value;
-                        var nombredni_padrino = document.getElementById('nombredni_padrino').value;
-            
-                        var dni_madrina = document.getElementById('dni_madrina').value;
-                        var nombredni_madrina = document.getElementById('nombredni_madrina').value;
+                    if (document.getElementById('acto_seleccionado').value == 1) {
+                        // Seleccionar los elementos necesarios
+                        var es_dni_novio = document.getElementById('es_dni_novio');
+                        var es_dni_novia = document.getElementById('es_dni_novia');
 
-                                    
-                        var dni_tutor = document.getElementById('dni_tutor').value;
-                        var nombredni_tutor = document.getElementById('nombredni_tutor').value;
-            
-                        // Actualizar las opciones dinámicamente
-                        responsable.innerHTML = `
-                            <option value=""></option>
-                            <option value="${dni_padrino}">${nombredni_padrino}</option>
-                            <option value="${dni_madrina}">${nombredni_madrina}</option>
-                            <option value="${dni_tutor}">${nombredni_tutor}</option>
-                        `;
-                    } else {
-                        responsable.innerHTML = "";
+                        // Validar si ambos checkboxes están seleccionados
+                        if (es_dni_novia.checked && es_dni_novio.checked) {
+                            var dni_novio = document.getElementById('dni_novio').value;
+                            var nombre_novio = document.getElementById('nombredni_novio').value;
+
+                            var dni_novia = document.getElementById('dni_novia').value;
+                            var nombre_novia = document.getElementById('nombredni_novia').value;
+
+                            // Actualizar las opciones dinámicamente
+                            responsable.innerHTML = `
+                                <option value=""></option>
+                                <option value="${dni_novio}">${nombre_novio}</option>
+                                <option value="${dni_novia}">${nombre_novia}</option>
+                            `;
+                            autoSeleccionarComboBoxResponsable('responsable', nombre_novio); // Autoselecciona al novio
+                        } else {
+                            // Limpiar las opciones si no están seleccionados ambos checkboxes
+                            responsable.innerHTML = "";
+                        }
+                    } else if (document.getElementById('acto_seleccionado').value == 2) {
+                        var es_dni_padrino = document.getElementById('es_dni_padrino');
+                        var es_dni_madrina = document.getElementById('es_dni_madrina');
+                        var es_tutor = document.getElementById('es_dni_tutor');
+
+                        // Validar si todos los checkboxes están seleccionados
+                        if (es_dni_padrino.checked && es_dni_madrina.checked && es_tutor.checked) {
+                            var dni_padrino = document.getElementById('dni_padrino').value;
+                            var nombredni_padrino = document.getElementById('nombredni_padrino').value;
+
+                            var dni_madrina = document.getElementById('dni_madrina').value;
+                            var nombredni_madrina = document.getElementById('nombredni_madrina').value;
+
+                            var dni_tutor = document.getElementById('dni_tutor').value;
+                            var nombredni_tutor = document.getElementById('nombredni_tutor').value;
+
+                            // Actualizar las opciones dinámicamente
+                            responsable.innerHTML = `
+                                <option value=""></option>
+                                <option value="${dni_padrino}">${nombredni_padrino}</option>
+                                <option value="${dni_madrina}">${nombredni_madrina}</option>
+                                <option value="${dni_tutor}">${nombredni_tutor}</option>
+                            `;
+                            autoSeleccionarComboBoxResponsable('responsable', nombredni_padrino); // Autoselecciona al padrino
+                        } else {
+                            responsable.innerHTML = "";
+                        }
+                    } else if (document.getElementById('acto_seleccionado').value == 3) {
+                        var es_dni_padrino_madrina = document.getElementById('es_dni_padrino_madrina');
+
+                        // Validar si el checkbox está seleccionado
+                        if (es_dni_padrino_madrina.checked) {
+                            var dni_padrino_madrina = document.getElementById('dni_padrino_madrina').value;
+                            var nombredni_padrino_madrina = document.getElementById('nombredni_padrino_madrina').value;
+
+                            // Actualizar las opciones dinámicamente
+                            responsable.innerHTML = `
+                                <option value=""></option>
+                                <option value="${dni_padrino_madrina}">${nombredni_padrino_madrina}</option>
+                            `;
+                            autoSeleccionarComboBoxResponsable('responsable', nombredni_padrino_madrina); // Autoselecciona padrino/madrina
+                        } else {
+                            responsable.innerHTML = "";
+                        }
+                    } else if (document.getElementById('acto_seleccionado').value == 6) {
+                        var es_dni_pri_responsable = document.getElementById('es_dni_pri_responsable');
+
+                        // Validar si el checkbox está seleccionado
+                        if (es_dni_pri_responsable.checked) {
+                            var dni_pri_responsable = document.getElementById('dni_pri_responsable').value;
+                            var nombredni_pri_responsable = document.getElementById('nombredni_pri_responsable').value;
+
+                            // Actualizar las opciones dinámicamente
+                            responsable.innerHTML = `
+                                <option value=""></option>
+                                <option value="${dni_pri_responsable}">${nombredni_pri_responsable}</option>
+                            `;
+                            autoSeleccionarComboBoxResponsable('responsable', nombredni_pri_responsable);
+                        } else {
+                            responsable.innerHTML = "";
+                        }
                     }
-                }else if(document.getElementById('acto_seleccionado').value == 3){
-
-                    var es_dni_padrino_madrina = document.getElementById('es_dni_padrino_madrina');
-            
-                    // Validar si ambos checkboxes están seleccionados
-                    if (es_dni_padrino_madrina.checked) {
-
-                        var dni_padrino_madrina = document.getElementById('dni_padrino_madrina').value;
-                        var nombredni_padrino_madrina = document.getElementById('nombredni_padrino_madrina').value;
-            
-                        // Actualizar las opciones dinámicamente
-                        responsable.innerHTML = `
-                            <option value=""></option>
-                            <option value="${dni_padrino_madrina}">${nombredni_padrino_madrina}</option>
-                        `;
-                    } else {
-                        responsable.innerHTML = "";
-                    }
-                }else if(document.getElementById('acto_seleccionado').value == 6){
-
-                    var es_dni_pri_responsable = document.getElementById('es_dni_pri_responsable');
-            
-                    // Validar si ambos checkboxes están seleccionados
-                    if (es_dni_pri_responsable.checked) {
-
-                        var dni_pri_responsable = document.getElementById('dni_pri_responsable').value;
-                        var nombredni_pri_responsable = document.getElementById('nombredni_pri_responsable').value;
-            
-                        // Actualizar las opciones dinámicamente
-                        responsable.innerHTML = `
-                            <option value=""></option>
-                            <option value="${dni_pri_responsable}">${nombredni_pri_responsable}</option>
-                        `;
-                    } else {
-                        responsable.innerHTML = "";
-                    }
-                }
-            })
-        }else{
+                });
+        } else {
             dni.readOnly = false;
-            nombre.value = ""; 
+            nombre.value = "";
             estado.checked = false;
             responsable.innerHTML = "";
-
         }
-    }else if(tipo == 'FechaHora'){
-        document.getElementById(checkbox).checked = false;
-        Toastify({
-            text: "Para ingresar una fecha tienes que llevar todas tus charlas",
-            duration: 2000,
-            close: true,
-            backgroundColor: "#dc3545",
-            gravity: "bottom",
-            position: "right",
-        }).showToast();
-    }else if(tipo == 'Imagen'){
+    } else if (tipo == 'FechaHora') {
+        if(document.getElementById('registrar').textContent == "Registrar"){
+            document.getElementById(checkbox).checked = false;
+            Toastify({
+                text: "Para ingresar una fecha tienes que llevar todas tus charlas",
+                duration: 2000,
+                close: true,
+                backgroundColor: "#dc3545",
+                gravity: "bottom",
+                position: "right",
+            }).showToast();
+        }else{
+            document.getElementById(checkbox).disabled = false;
+            document.getElementById(id).disabled = false;
+            var id = document.getElementById('ff').value;
+            fetch(`fecha_habil/${id}`)
+            .then(response => response.json())
+            .then(
+                item =>{
+                    if (item.estado == true){
+                        
+                        document.getElementById(checkbox).disabled = false;
+                        document.getElementById(id).readOnly = false;
+                    }else{
+                        document.getElementById(checkbox).disabled = true;
+                        document.getElementById(id).disabled = true;
+                        Toastify({
+                            text: "Para ingresar una fecha tienes que llevar todas tus charlas",
+                            duration: 2000,
+                            close: true,
+                            backgroundColor: "#dc3545",
+                            gravity: "bottom",
+                            position: "right",
+                        }).showToast();
+                    }
+                }
+            )
+        }
+    } else if (tipo == 'Imagen') {
         var archivo = document.getElementById(id).files[0];
         var st = document.getElementById(checkbox);
-        if (archivo){
+        if (archivo) {
             st.checked = true;
-        }else{
+        } else {
             st.checked = false;
-        }
-
-    }
-    
-
-
+        }
+    }
 }
+function autoSeleccionarComboBoxResponsable(comboBoxId, textoBuscar) {
+    const comboBox = document.getElementById(comboBoxId);
+    const opciones = Array.from(comboBox.options);
+    const opcionSeleccionada = opciones.find(option => option.textContent === textoBuscar);
+
+    if (opcionSeleccionada) {
+        comboBox.value = opcionSeleccionada.value; // Seleccionar el valor correspondiente
+    } else {
+        comboBox.selectedIndex = 0; // Seleccionar la opción por defecto si no encuentra coincidencia
+    }
+}
+
 
 function visualizar(id_archivo) {
     const archivo_formulario = document.getElementById(id_archivo).files[0];
@@ -788,6 +821,10 @@ var modal_prevcharlas = new bootstrap.Modal(document.getElementById('modal_prevc
     }
 
     function limpiar() {
+        document.getElementById('rp').value = '';
+        document.getElementById('rp').classList.add('d-none');
+
+        document.getElementById('responsable').classList.remove('d-none');
 
         const responsable = document.getElementById('responsable');
         responsable.selectedIndex = 0; 
@@ -838,9 +875,10 @@ var modal_prevcharlas = new bootstrap.Modal(document.getElementById('modal_prevc
 
 
     function rellenar_formulario(id_solicitud, nombre_liturgia) {
+        limpiar();
         var select = document.getElementById('acto_seleccionado');
         var options = select.getElementsByTagName('option');
-    
+        document.getElementById('ff').value = id_solicitud;
         for (var i = 0; i < options.length; i++) {
             if (options[i].text === nombre_liturgia) {
                 select.selectedIndex = i;
@@ -855,94 +893,103 @@ var modal_prevcharlas = new bootstrap.Modal(document.getElementById('modal_prevc
         fetch(`/requisitos_solicitud/${id_solicitud}`)
         .then(response => response.json())
         .then(data => {
-            console.log("Datos recibidos del backend:", data);
             if (data.estado == "Correcto") {
                 data.data.forEach(item => {
-                    if (item.tipo === "Dni") {
-                        console.log(`ID del campo: ${item.id_c}`);  // Verifica el ID
-                        console.log(`Valor a asignar: ${item.valor}`);  // Verifica el valor
-                        
-                        const element = fetch(`/requisitos_solicitud/${id_solicitud}`)
-                        .then(response => response.json())
-                        .then(data => {
-                            console.log("Datos recibidos del backend:", data);
-                            if (data.estado == "Correcto") {
-                                data.data.forEach(item => {
-                                    if (item.tipo === "Dni") {
-                                        console.log(`ID del campo: ${item.id_c}`);  // Verifica el ID
-                                        console.log(`Valor a asignar: ${item.valor}`);  // Verifica el valor
-                                        
-                                        const element = document.getElementById(`${item.id_c}`);
-                                        const estadoElement = document.getElementById(`${item.id_es}`);
+                    const element = fetch(`/requisitos_solicitud/${id_solicitud}`)
+                    .then(response => response.json())
+                    .then(data => {
+                        if (data.estado == "Correcto") {
+                            data.data.forEach(item => {
+                                if (item.tipo === "Dni") {
+                                    console.log(`ID del campo: ${item.id_c}`);  // Verifica el ID
+                                    console.log(`Valor a asignar: ${item.valor}`);  // Verifica el valor
                                     
-                                        if (element) {
-                                            // Asignar el valor al campo correspondiente
-                                            element.value = item.valor;  
-                                            console.log(`Valor asignado a ${item.id_c}: ${element.value}`);
-                                        } else {
-                                            console.error(`No se encuentra el elemento con ID: ${item.id_c}`);
-                                        }
-                            
-                                        if (estadoElement && estadoElement.type === "checkbox") {
-                                            // Verifica que el estado sea un booleano
-                                            estadoElement.checked = item.estado === true || item.estado === "true";
-                                            console.log(`Checkbox (${item.id_es}) actualizado: ${estadoElement.checked}`);
-                            
-                                            // Si el checkbox está marcado, simula el clic
-                                            if (estadoElement.checked) {
-                                                estadoElement.onchange();
-                                                console.log(`Se hizo clic en el checkbox (${item.id_es})`);
-                                            }
-                                        } else if (!estadoElement) {
-                                            console.error(`No se encuentra el elemento con ID: ${item.id_es}`);
-                                        } else {
-                                            console.error(`El elemento con ID ${item.id_es} no es un checkbox`);
-                                        }
-                                    }else if(item.tipo == "Sede"){
-                                        const estadoElement = document.getElementById(`${item.id_es}`);
-                                        estadoElement.checked = true;
-                                    }else if(item.tipo == "Charla"){
-                                        const estadoElement = document.getElementById(`${item.id_es}`);
-                                        const element = document.getElementById(`${item.id_c}`);
-                                        estadoElement.checked = item.estado;
-                                        element.value = item.valor;
-                                    }else if(item.tipo == "Texto"){
-                                        const estadoElement = document.getElementById(`${item.id_es}`);
-                                        const element = document.getElementById(`${item.id_c}`);
-                                        estadoElement.checked = item.estado;
-                                        element.value = item.valor;
-                                    }else if(item.tipo == "Fecha"){
-    
-                                    } else if (item.tipo == "Imagen") {
-                                        const estadoElement = document.getElementById(`${item.id_es}`);
-                                        const element = document.getElementById(`I${item.id_c}`);
-                                        const element2 = document.getElementById(`${item.id_c}`);
-                                        
-                                        element2.readOnly = item.estado;
-                                        estadoElement.checked = item.estado;
-                                        estadoElement.readOnly = item.estado;
-                                        element.value = item.valor;
-                                        
-                                        if (item.estado === true) {
-                                            element2.style.backgroundColor = "var(--bs-primary)";
-                                            element2.style.color = "white";
-                                            element2.disabled = true;
+                                    const element = document.getElementById(`${item.id_c}`);
+                                    const estadoElement = document.getElementById(`${item.id_es}`);
+                                
+                                    if (element) {
+                                        // Asignar el valor al campo correspondiente
+                                        element.value = item.valor;  
+                                        console.log(`Valor asignado a ${item.id_c}: ${element.value}`);
+                                    } else {
+                                        console.error(`No se encuentra el elemento con ID: ${item.id_c}`);
+                                    }
+                        
+                                    if (estadoElement && estadoElement.type === "checkbox") {
+                                        estadoElement.checked = item.estado === true || item.estado === "true";
+                                        console.log(`Checkbox (${item.id_es}) actualizado: ${estadoElement.checked}`);
+                        
+                                        // Si el checkbox está marcado, simula el clic
+                                        if (estadoElement.checked) {
+                                            estadoElement.onchange();
                                             estadoElement.disabled = true;
                                         }
+                                    } else if (!estadoElement) {
+                                        console.error(`No se encuentra el elemento con ID: ${item.id_es}`);
+                                    } else {
+                                        console.error(`El elemento con ID ${item.id_es} no es un checkbox`);
                                     }
+                                }else if(item.tipo == "Sede"){
+                                    const estadoElement = document.getElementById(`${item.id_es}`);
+                                    estadoElement.checked = true;
+                                    estadoElement.disabled = true;
+
+                                }else if(item.tipo == "Charla"){
+                                    const estadoElement = document.getElementById(`${item.id_es}`);
+                                    const element = document.getElementById(`${item.id_c}`);
+                                    estadoElement.checked = item.estado;
+                                    estadoElement.disabled = item.estado;
+
+                                    element.value = item.valor;
+                                }else if(item.tipo == "Texto"){
+                                    const estadoElement = document.getElementById(`${item.id_es}`);
+                                    const element = document.getElementById(`${item.id_c}`);
+                                    estadoElement.checked = item.estado;
+                                    estadoElement.disabled = item.estado;
+                                    element.value = item.valor; 
+
+                                    element.value = item.valor;
+                                }else if(item.tipo == "FechaHora"){
+                                    if(document.getElementById('registrar').textContent != "Registrar"){
+                                        var id = document.getElementById('ff').value;
+                                    }
+
+
+                                } else if (item.tipo == "Imagen") {
+                                    const estadoElement = document.getElementById(`${item.id_es}`);
+                                    const element = document.getElementById(`I${item.id_c}`);
+                                    const element2 = document.getElementById(`${item.id_c}`);
                                     
-                                });
-                            
+                                    element2.readOnly = item.estado;
+                                    estadoElement.checked = item.estado;
+                                    estadoElement.readOnly = item.estado;
+                                    element.value = item.valor;
+                                    
+                                    if (item.estado === true) {
+                                        element2.style.backgroundColor = "var(--bs-primary)";
+                                        element2.style.color = "white";
+                                        element2.disabled = true;
+                                        estadoElement.disabled = true;
+                                    }
+                                }
+                            });
+                        }
 
-                            }
+                        document.getElementById('monto').value = data.pago.total;
+                        document.getElementById('saldo').value = data.pago.total;
+                        document.getElementById('money').value = data.pago.total;
+                        document.getElementById('formaPago').value = data.pago.forma_pago; 
+                        document.getElementById('money').disabled = true;
+                        document.getElementById('formaPago').disabled = true;
+                        document.getElementById('rp').value = data.pago.responsable;
+                        document.getElementById('rp').classList.remove('d-none');
 
+                        document.getElementById('responsable').classList.add('d-none');
 
-                            
-                        })
-                        .catch(error => {
-                            console.error("Error al obtener los datos:", error);
-                        });
-                    }
+                    })
+                    .catch(error => {
+                        console.error("Error al obtener los datos:", error);
+                    });
                 });
             }
         })
@@ -950,7 +997,5 @@ var modal_prevcharlas = new bootstrap.Modal(document.getElementById('modal_prevc
             console.error("Error al obtener los datos:", error);
         });
         document.getElementById('registrar').textContent = "Modificar";
-
-    
     }
     

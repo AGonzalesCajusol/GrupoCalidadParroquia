@@ -69,7 +69,7 @@
             </button>
         </li>
     </ul>
-
+    <input type="number" id="ff" class="d-none">
     <div class="tab-content mt-4">
         <!-- Tab 1: Registro de solicitudes -->
         <div class="tab-pane fade show active" id="solicitudes" role="tabpanel" aria-labelledby="solicitudes-tab">
@@ -84,7 +84,7 @@
                     </option>
                     {% endfor %}
                 </select>
-                <button id="nuevo" onclick="verificar();limpiar()" class="btn btn-sm btn-primary"> <i
+                <button id="nuevo" onclick="limpiar();verificar()" class="btn btn-sm btn-primary"> <i
                         class="bi bi-plus-circle-fill me-2"></i>Nuevo</button>
             </div>
 
@@ -104,7 +104,6 @@
                                         Tipo
                                     </th>
                                     <th>
-                                        <input type="checkbox" id="estado_general" onchange="estado_generales()">
                                         <label for="estado_general">Estado</label>
                                     </th>
                                     <th>
@@ -125,6 +124,8 @@
                                     <label for="nombre" class="form-label"> 
                                         <i class="bi bi-person-square me-2"></i> Nombre completo
                                     </label>
+                                    <input type="text" class="form-control form-control-sm d-none " id="rp" name="rp"
+                                     readonly  >
                                     <select name="responsable" class="form-select form-select-sm text-bl" onclick="responsable_pago()" id="responsable" required>
                                         <option value=""></option>
                                     </select>
@@ -133,6 +134,7 @@
                                 <!-- Formas de pago -->
                                 <div class="mb-3">
                                     <label for="formaPago" class="form-label"><i class="bi bi-wallet2 me-2"></i> Forma de pago</label>
+                                    
                                     <select class="form-select form-select-sm" id="formaPago" name="formaPago" >
                                         <option value=""  selected>Forma de pago</option>
                                         <option value="tarjeta">Tarjeta de crédito/débito</option>
@@ -144,12 +146,12 @@
                                 </div>
                                 <!-- Monto Total -->
                                 <div class="mb-3 row">
-                                    <div class="col-6">
+                                    <div class="col-12">
                                         <label for="monto" class="form-label"><i class="bi bi-cash me-2"></i>Total</label>
                                         <input type="number" class="form-control form-control-sm " id="monto" name="monto"
                                             placeholder="Ingrese el monto" min="0" readonly  >
                                     </div>
-                                    <div class="col-6">
+                                    <div class="col-6 d-none">
                                         <label for="saldo" class="form-label"><i class="bi bi-cash me-2"></i>Saldo restante</label>
                                         <input type="number" value="12"  class="form-control form-control-sm" id="saldo" name="saldo"   placeholder="Saldo" readonly >            
                                     </div>
@@ -395,7 +397,13 @@
             </div>
         </div>
     </div>
-    
+    {% with messages = get_flashed_messages(with_categories=true) %}
+    {% if messages %}
+        <div id="flashMessage" class="alert {{ 'bg-primary text-white' if messages[0][0] == 'success' else 'bg-danger text-white' }}" role="alert">
+            {{ messages[0][1] }}
+        </div>
+    {% endif %}
+    {% endwith %}
 
 </main>
 <!------<script src="/static/js/solicitudes.js"></script> !------>

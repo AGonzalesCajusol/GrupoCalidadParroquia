@@ -25,7 +25,6 @@ def verificar_fecha(fecha,sede):
         with conexion.cursor() as cursor:
             fecha = str(fecha)
             fecha= fecha.replace('T', ' ')
-            print(fecha)
             cursor.execute("""
                 SET @hora_inicio_usuario = %s;
             """, (fecha,))
@@ -57,7 +56,6 @@ def verificar_fecha(fecha,sede):
                 return 1
             return 0
     except Exception as e:
-        print("fallo")
         return 1
     finally:
         conexion.close() 
@@ -74,8 +72,6 @@ def insertar_bautismo(requisitos_data,extra):
             )
             id_solicitud = cursor.lastrowid
 
-            print(id_solicitud)
-
             roles = ['Padrino', 'Madrina', 'Padre']
             dnis = [requisitos_data['dni_padrino'],requisitos_data['dni_madrina'],requisitos_data['dni_tutor']]
 
@@ -86,8 +82,7 @@ def insertar_bautismo(requisitos_data,extra):
                         insert into solicitud_feligres (dni_feligres,id_solicitud,rol) values (%s,%s,%s) '''
                         ,(dni,id_solicitud,rol)
                 )
-                print("ok")
- 
+            
             #grabamos las asistenicas de las 3 pesonas
             datos_celebracion = viww(requisitos_data['charbau'])[0]
             dnis = [requisitos_data['dni_padrino'],requisitos_data['dni_madrina'],requisitos_data['dni_tutor']]
@@ -104,7 +99,7 @@ def insertar_bautismo(requisitos_data,extra):
             #registramos comprobantes
 
             monto = monto_butismo(requisitos_data['sedebau'])
-            print(monto)
+         
 
             cursor.execute(
                 '''
@@ -119,7 +114,6 @@ def insertar_bautismo(requisitos_data,extra):
             requisitos = cactos.listar_requisitos(2)
 
             directorio = 'static/archivos_usuario/'+ str(id_solicitud) +'/'
-            print(f"Directorio donde se guardará la imagen: {directorio}")  # Imprimir para verificar
 
             if not os.path.exists(directorio):
                 os.mkdir(directorio)
@@ -133,7 +127,6 @@ def insertar_bautismo(requisitos_data,extra):
                             archivo_imagen.save(ruta_imagen)  # Guardar la imagen en el sistema de archivos
                             enlace_imagen = ruta_imagen  # Guarda la ruta de la imagen
                         except Exception as e:
-                            print(f"Error al guardar la imagen: {e}")  # Imprime el error si ocurre
                             enlace_imagen = ""  # O maneja el error como consideres necesario
                     else:
                         enlace_imagen = ""
@@ -153,7 +146,6 @@ def insertar_bautismo(requisitos_data,extra):
 
         return 1
     except Exception as e:
-        print(f"Error: {e}")
         return 0
     finally:
         conexion.close()
@@ -170,8 +162,6 @@ def insertar_confirmacion(requisitos_data,extra):
             )
             id_solicitud = cursor.lastrowid
 
-            print(id_solicitud)
-
             roles = ['confirmandos']
             dnis = [requisitos_data['dni_confirmado']]
 
@@ -182,7 +172,6 @@ def insertar_confirmacion(requisitos_data,extra):
                         insert into solicitud_feligres (dni_feligres,id_solicitud,rol) values (%s,%s,%s) '''
                         ,(dni,id_solicitud,rol)
                 )
-                print("ok")
             cursor.execute(
             '''
                 SELECT InsertarAsistencias(3, %s, %s, %s, %s, 0) AS resultado;            ''',
@@ -195,7 +184,6 @@ def insertar_confirmacion(requisitos_data,extra):
                 raise 'Error' 
             #registramos comprobantes
             monto = monto_confirmacion(requisitos_data['sede'])
-            print(monto)
             cursor.execute(
                 '''
                 INSERT INTO comprobante (fecha_hora, total, tipo_comprobante, forma_pago, id_solicitud, id_sede) 
@@ -208,7 +196,6 @@ def insertar_confirmacion(requisitos_data,extra):
             requisitos = cactos.listar_requisitos(3)
 
             directorio = 'static/archivos_usuario/'+ str(id_solicitud) +'/'
-            print(f"Directorio donde se guardará la imagen: {directorio}")  # Imprimir para verificar
 
             if not os.path.exists(directorio):
                 os.mkdir(directorio)
@@ -222,7 +209,6 @@ def insertar_confirmacion(requisitos_data,extra):
                             archivo_imagen.save(ruta_imagen)  # Guardar la imagen en el sistema de archivos
                             enlace_imagen = ruta_imagen  # Guarda la ruta de la imagen
                         except Exception as e:
-                            print(f"Error al guardar la imagen: {e}")  # Imprime el error si ocurre
                             enlace_imagen = ""  # O maneja el error como consideres necesario
                     else:
                         enlace_imagen = ""
@@ -242,7 +228,6 @@ def insertar_confirmacion(requisitos_data,extra):
 
         return 1
     except Exception as e:
-        print(f"Error: {e}")
         return 0
     finally:
         conexion.close()
@@ -259,7 +244,6 @@ def insertar_Pcomunion(requisitos_data,extra):
             )
             id_solicitud = cursor.lastrowid
 
-            print(id_solicitud)
 
             roles = ['comulgantes']
             dnis = [requisitos_data['dni_celebrante']]
@@ -271,7 +255,6 @@ def insertar_Pcomunion(requisitos_data,extra):
                         insert into solicitud_feligres (dni_feligres,id_solicitud,rol) values (%s,%s,%s) '''
                         ,(dni,id_solicitud,rol)
                 )
-                print("ok")
  
             cursor.execute(
             '''
@@ -286,7 +269,6 @@ def insertar_Pcomunion(requisitos_data,extra):
             #registramos comprobantes
 
             monto = monto_primera(requisitos_data['sede'])
-            print(monto)
 
             cursor.execute(
                 '''
@@ -300,7 +282,6 @@ def insertar_Pcomunion(requisitos_data,extra):
             requisitos = cactos.listar_requisitos(6)
 
             directorio = 'static/archivos_usuario/'+ str(id_solicitud) +'/'
-            print(f"Directorio donde se guardará la imagen: {directorio}")  # Imprimir para verificar
 
             if not os.path.exists(directorio):
                 os.mkdir(directorio)
@@ -314,7 +295,6 @@ def insertar_Pcomunion(requisitos_data,extra):
                             archivo_imagen.save(ruta_imagen)  # Guardar la imagen en el sistema de archivos
                             enlace_imagen = ruta_imagen  # Guarda la ruta de la imagen
                         except Exception as e:
-                            print(f"Error al guardar la imagen: {e}")  # Imprime el error si ocurre
                             enlace_imagen = ""  # O maneja el error como consideres necesario
                     else:
                         enlace_imagen = ""
@@ -333,7 +313,6 @@ def insertar_Pcomunion(requisitos_data,extra):
 
         return 1
     except Exception as e:
-        print(f"Error: {e}")
         return 0
     finally:
         conexion.close()
@@ -349,7 +328,6 @@ def insertar_solicitudMatrimonio(requisitos_data,extra):
 
         # Aquí deberías agregar la lógica para insertar en la base de datos
         with conexion.cursor() as cursor:
-            print(id_sede)
             cursor.execute(
                 '''
                 insert into solicitud(id_actoliturgico,id_sede,estado,id_celebracion,dni_feligres, asistencia, fecha_registro,monto_total) values (%s,%s,%s,%s,%s,0, CURRENT_DATE(),%s)
@@ -374,7 +352,6 @@ def insertar_solicitudMatrimonio(requisitos_data,extra):
                 ''', (id_solicitud,)  # Nota la coma al final para crear una tupla
             )
             mensaje = cursor.fetchone()  # Devuelve una tupla
-            print(mensaje[0])
             
             monto = cactos.monto_total('Matrimonio', requisitos_data['sede'], extra['responsable'], requisitos_data['dni_novio'], requisitos_data['dni_novia'])
 
@@ -388,7 +365,6 @@ def insertar_solicitudMatrimonio(requisitos_data,extra):
 
             requisitos = cactos.listar_requisitos(1)
             directorio = 'static/archivos_usuario/'+ str(id_solicitud) +'/'
-            print(f"Directorio donde se guardará la imagen: {directorio}")  # Imprimir para verificar
 
             if not os.path.exists(directorio):
                 os.mkdir(directorio)
@@ -402,7 +378,6 @@ def insertar_solicitudMatrimonio(requisitos_data,extra):
                             archivo_imagen.save(ruta_imagen)  # Guardar la imagen en el sistema de archivos
                             enlace_imagen = ruta_imagen  # Guarda la ruta de la imagen
                         except Exception as e:
-                            print(f"Error al guardar la imagen: {e}")  # Imprime el error si ocurre
                             enlace_imagen = ""  # O maneja el error como consideres necesario
                     else:
                         enlace_imagen = ""
@@ -419,7 +394,6 @@ def insertar_solicitudMatrimonio(requisitos_data,extra):
             conexion.commit()
         return True
     except Exception as e:
-        print(f"Error al insertar solicitud: {e}")  # Log del error para depuración
         return False
 
     finally:
@@ -702,7 +676,6 @@ def solicitudes(sede):
             solicitudes = cursor.fetchall()
             return solicitudes
     except Exception as e:
-        print(f"Error en solicitudes(): {e}")
         return "Error"
     finally:
         conexion.close()
@@ -730,7 +703,6 @@ def obtener_requisitos_solicitud(id_solicitud):
             """, (id_solicitud,))
             return cursor.fetchall()
     except Exception as e:
-        print(f"Error al obtener requisitos de la solicitud: {e}")
         return None
     finally:
         conexion.close()
@@ -757,7 +729,49 @@ def obtener_detalle_money(id_solicitud):
             """, (id_solicitud,))
             return cursor.fetchone()
     except Exception as e:
-        print(f"Error al obtener el nombre, DNI, total y forma de pago de la solicitud: {e}")
+        return None
+    finally:
+        conexion.close()
+
+
+
+def fecha_habil(id_solicitud):
+    conexion = obtener_conexion()
+    try:
+        with conexion.cursor() as cursor:
+            cursor.execute("""
+                select count('sol.*') from solicitud as sol
+                inner join asistencia as asis
+                on asis.id_solicitud = sol.id_solicitud
+                where sol.id_solicitud = %s
+            """, (id_solicitud,))
+            primero =  cursor.fetchone()[0]
+            cursor.execute("""
+                select count('sol.*') from solicitud as sol
+                inner join asistencia as asis
+                on asis.id_solicitud = sol.id_solicitud
+                where sol.id_solicitud = %s and asis.estado = 1
+            """, (id_solicitud,))
+            segundo =  cursor.fetchone()[0]
+            cursor.execute("""
+                select count('*') from solicitud as soli inner join aprobacionrequisitos as ar
+                on ar.id_solicitud = soli.id_solicitud
+                where soli.id_solicitud = %s and ar.estado='V' 
+            """, (id_solicitud,))
+            tercero =  cursor.fetchone()[0]
+            cursor.execute("""
+                select count('*') from solicitud as soli inner join aprobacionrequisitos as ar
+                on ar.id_solicitud = soli.id_solicitud
+                where soli.id_solicitud = %s
+            """, (id_solicitud,))
+            cuarto =  cursor.fetchone()[0]
+            conexion.close()
+            if(primero ==  segundo):
+                if(tercero == cuarto - 1 ):
+                    return True
+                return False
+            return False
+    except Exception as e:
         return None
     finally:
         conexion.close()
