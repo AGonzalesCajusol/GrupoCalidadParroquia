@@ -2,6 +2,8 @@ import pymysql
 from bd import obtener_conexion
 from flask import jsonify, request
 from datetime import datetime
+from fpdf import FPDF
+
 
 def obtener_celebraciones():
     conexion = obtener_conexion()
@@ -103,7 +105,8 @@ def obtener_celebraciones_desde_bd():
     cursor.execute("""
         SELECT c.id_celebracion, c.fecha, c.hora_inicio, c.hora_fin, c.estado, s.nombre_sede, at.nombre_liturgia 
         FROM celebracion c inner join sede s on s.id_sede=c.id_sede inner join actoliturgico at on at.id_actoliturgico=c.id_actoliturgico
-        WHERE c.estado = 'R'
+        WHERE c.estado = 'R' 
+                   
     """)
     celebraciones = cursor.fetchall()
     conexion.close()
@@ -127,23 +130,31 @@ def obtener_solicitudes_por_celebracion(id_celebracion):
     conexion = obtener_conexion()
     cursor = conexion.cursor()
     cursor.execute("""
-        SELECT id_solicitud,id_actoliturgico, id_celebracion, dni_feligres, estado, asistencia
-        FROM solicitud
-        WHERE id_celebracion = %s
+        SELECT s.id_celebracion, s.id_solicitud, at.nombre_liturgia,  
+       CONCAT(f.nombres, ' ', f.apellidos) AS nombres, s.asistencia
+        FROM solicitud s
+        INNER JOIN actoliturgico at ON at.id_actoliturgico = s.id_actoliturgico 
+        INNER JOIN feligres f ON f.dni = s.dni_feligres 
+        INNER JOIN solicitud_feligres sf ON sf.id_solicitud = s.id_solicitud
+        WHERE LOWER(sf.rol) IN ('bautizado', 'confirmandos', 'comulgantes','novio','novia') and s.estado='A'
+        and s.id_celebracion = %s
     """, (id_celebracion,))
     solicitudes = cursor.fetchall()
     conexion.close()
     return [
         {
-            'id_solicitud': s[0],
-            'id_actoliturgico' : s[1],
-            'id_celebracion': s[2],
-            'dni_feligres': s[3],
-            'estado': s[4],
-            'asistencia': s[5]
+            'id_celebracion': s[0],
+            'id_solicitud' : s[1],
+            'acto_liturgico': s[2],
+            'feligres': s[3],
+            'asistencia': s[4]
         }
         for s in solicitudes
     ]
+
+
+
+
 
 
 def actualizar_asistencia_en_bd(id_solicitud, asistencia):
@@ -154,3 +165,34 @@ def actualizar_asistencia_en_bd(id_solicitud, asistencia):
     """, (asistencia, id_solicitud))
     conexion.commit()
     conexion.close()
+
+
+
+
+def obtener_solicitudes_asistidas():
+    conexion = obtener_conexion()
+    cursor = conexion.cursor()
+    cursor.execute("""
+        SELECT s.id_celebracion, c.fecha,s.id_solicitud, at.nombre_liturgia,  
+       CONCAT(f.nombres, ' ', f.apellidos) AS nombres
+        FROM solicitud s
+        INNER JOIN actoliturgico at ON at.id_actoliturgico = s.id_actoliturgico 
+        INNER JOIN feligres f ON f.dni = s.dni_feligres 
+        INNER JOIN solicitud_feligres sf ON sf.id_solicitud = s.id_solicitud
+        inner join celebracion c on c.id_celebracion=s.id_solicitud
+        WHERE LOWER(sf.rol) IN ('bautizado', 'confirmandos','confirmados', 'comulgantes','novio') and s.asistencia=1
+
+    """)
+    celebraciones = cursor.fetchall()
+    conexion.close()
+    return [
+        {
+            'id_celebracion': c[0],
+            'fecha': c[1],
+            'id_solicitud': c[2],
+            'nombre_liturgia': c[3],
+            'feligres': c[4],
+            
+        }
+        for c in celebraciones
+    ]

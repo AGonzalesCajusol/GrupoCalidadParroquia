@@ -1,7 +1,7 @@
 $(document).ready(function () {
     // Inicializar DataTable para la tabla de asistencias
     var table = $('#asistenciasTable').DataTable({
-        pageLength: 8,
+        pageLength: 10,
         dom: '<"d-flex justify-content-between align-items-center mb-3"<"d-flex"><"d-flex justify-content-end button-section">>rt<"bottom"p>',
         language: {
             search: "Buscar:",
