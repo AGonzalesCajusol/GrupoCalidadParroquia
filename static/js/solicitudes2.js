@@ -923,7 +923,6 @@ var modal_prevcharlas = new bootstrap.Modal(document.getElementById('modal_prevc
                                         if (estadoElement.checked) {
                                             estadoElement.onchange();
                                             estadoElement.disabled = true;
-                                            console.log(`Se hizo clic en el checkbox (${item.id_es})`);
                                         }
                                     } else if (!estadoElement) {
                                         console.error(`No se encuentra el elemento con ID: ${item.id_es}`);
@@ -947,38 +946,12 @@ var modal_prevcharlas = new bootstrap.Modal(document.getElementById('modal_prevc
                                     const element = document.getElementById(`${item.id_c}`);
                                     estadoElement.checked = item.estado;
                                     estadoElement.disabled = item.estado;
+                                    element.value = item.valor; 
 
                                     element.value = item.valor;
                                 }else if(item.tipo == "FechaHora"){
                                     if(document.getElementById('registrar').textContent != "Registrar"){
                                         var id = document.getElementById('ff').value;
-                                        fetch(`fecha_habil/${id}`)
-                                        .then(response => response.json())
-                                        .then(
-                                            item =>{
-                                                if (item.estado == true){
-                                                    document.getElementById(checkbox).disabled = false;
-                                                    document.getElementById(id).readOnly = false;
-                                                    const estadoElement = document.getElementById(`${item.id_es}`);
-                                                    const element = document.getElementById(`${item.id_c}`);
-                                                    estadoElement.checked = item.estado;
-                                                    element.disabled = item.estado;
-                                                    element.Toastify = item.estado;
-
-                                                }else{
-                                                    document.getElementById(checkbox).disabled = true;
-                                                    document.getElementById(id).disabled = true;
-                                                    Toastify({
-                                                        text: "Para ingresar una fecha tienes que llevar todas tus charlas",
-                                                        duration: 2000,
-                                                        close: true,
-                                                        backgroundColor: "#dc3545",
-                                                        gravity: "bottom",
-                                                        position: "right",
-                                                    }).showToast();
-                                                }
-                                            }
-                                        )
                                     }
 
 

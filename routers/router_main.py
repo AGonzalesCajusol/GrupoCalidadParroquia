@@ -21,8 +21,6 @@ def requerido_login(f):
             return redirect(url_for('raiz'))
 
         valor = cmin.verificar_ministro(token, dni)
-        print(f"Valor de verificación: {valor}")
-
         if valor == 1:
             return f(*args, **kwargs)
         else:
