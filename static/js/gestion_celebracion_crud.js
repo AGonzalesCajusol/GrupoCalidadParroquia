@@ -8,6 +8,8 @@ $(document).ready(function () {
         },
         columns: [
             { data: 'id_celebracion', title: 'ID' },
+            { data: 'nombre_actoliturgico', title: 'Acto Litúrgico', "className": "text-center" },
+            { data: 'nombre_sede', title: 'Sede', "className": "text-center"  },
             { data: 'fecha', title: 'Fecha' },
             { data: 'hora_inicio', title: 'Hora Inicio' },
             { data: 'hora_fin', title: 'Hora Fin' },
@@ -32,8 +34,6 @@ $(document).ready(function () {
                 }
                 
             },
-            { data: 'nombre_sede', title: 'Sede', "className": "text-center"  },
-            { data: 'nombre_actoliturgico', title: 'Acto Litúrgico', "className": "text-center" },
             {
                 data: null,
                 title: 'Acciones',
