@@ -1,0 +1,56 @@
+{% extends 'index.html' %}
+
+{% block title %}Estadísticas de Sacramentos{% endblock %}
+
+{% block cuerpo %}
+<div class="container mt-4">
+    <h1 class="text-center mb-4">Estadísticas de Sacramentos</h1>
+    
+    <!-- Tarjetas de resumen general -->
+    <div class="row mb-4">
+        <div class="col-12">
+            <div class="card">
+                <div class="card-header">
+                    <h5 class="card-title mb-0">Resumen General</h5>
+                </div>
+                <div class="card-body">
+                    <div id="pieChartGeneral"></div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Reporte con filtros -->
+    <div class="row">
+        <div class="col-12">
+            <div class="card">
+                <div class="card-header">
+                    <div class="d-flex justify-content-between align-items-center">
+                        <h5 class="card-title mb-0">Reporte Detallado</h5>
+                        <div class="d-flex gap-3">
+                            <select id="yearFilter" class="form-select">
+                                {% for year in años %}
+                                    <option value="{{ year }}">{{ year }}</option>
+                                {% endfor %}
+                            </select>
+                            <select id="monthFilter" class="form-select">
+                                <option value="">Todos los meses</option>
+                                <option value="1">Enero</option>
+                                <option value="2">Febrero</option>
+                                <!-- ... otros meses ... -->
+                                <option value="12">Diciembre</option>
+                            </select>
+                        </div>
+                    </div>
+                </div>
+                <div class="card-body">
+                    <div id="pieChartFiltered"></div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/apexcharts"></script>
+<script src="/static/js/estadisticas_sacramentos.js"></script>
+{% endblock %} 

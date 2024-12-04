@@ -10,9 +10,9 @@
     <div class="mb-4 text-center">
         <label for="yearSelect">Seleccionar Año:</label>
         <select id="yearSelect" class="form-control d-inline-block" style="width: 150px;">
-            <option value="2023">2023</option>
-            <option value="2024" selected>2024</option>
-            <option value="2025">2025</option>
+            {% for year in años %}
+                <option value="{{ year }}" {% if year == año_actual %}selected{% endif %}>{{ year }}</option>
+            {% endfor %}
         </select>
     </div>
 

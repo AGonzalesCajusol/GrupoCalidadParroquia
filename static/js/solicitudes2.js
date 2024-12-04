@@ -232,15 +232,6 @@ function verificar(excusa) {
                 if (excusa == "si") {
                     document.getElementById('registrar').textContent = "Modificar";
                     console.log(document.getElementById('acto_seleccionado').value);
-                    if (acto_liturgico == 1) {
-                        document.getElementById('formulario_solicitud').action = "modificar_solicitud_matrimonio";
-                    } else if (acto_liturgico == 2) {
-                        document.getElementById('formulario_solicitud').action = "modificar_solicitud_bautismo";
-                    } else if (acto_liturgico == 3) {
-                        document.getElementById('formulario_solicitud').action = "modificar_solicitud_Confirmacion";
-                    } else if (acto_liturgico == 6) {
-                        document.getElementById('formulario_solicitud').action = "modificar_solicitud_Pcomunion";
-                    }
                 }
             })
     }
@@ -1101,4 +1092,24 @@ function rellenar_formulario(id_solicitud, nombre_liturgia) {
         .catch(error => {
             console.error("Error al hacer la solicitud:", error);
         });
+}
+function validar_fecha_matrimonio(input) {
+    const fechaSeleccionada = new Date(input.value);
+    const fechaActual = new Date();
+
+    // Comparar solo las fechas, sin las horas
+    fechaSeleccionada.setHours(0, 0, 0, 0);
+    fechaActual.setHours(0, 0, 0, 0);
+
+    if (fechaSeleccionada < fechaActual) {
+        Swal.fire({
+            icon: 'error',
+            title: 'Fecha inválida',
+            text: 'La fecha de matrimonio no puede ser anterior al día actual.',
+            confirmButtonText: 'Aceptar'
+        });
+        
+        // Limpiar el valor del input
+        input.value = '';
+    }
 }

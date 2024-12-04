@@ -23,6 +23,10 @@ import routers.router_cronograma
 import routers.router_celebracion_crud
 import routers.router_celebracionesR
 import routers.router_certificado
+import routers.router_actosliturgicos
+from routers.router_estadisticas import registrar_rutas as registrar_rutas_estadisticas
+from routers.router_secretaria import registrar_rutas as registrar_rutas_secretaria
+import routers.router_reportes
 
 app = Flask(__name__)
 app.secret_key = 'super-secret'
@@ -95,5 +99,8 @@ routers.router_cronograma.registrar_rutas(app)
 routers.router_celebracion_crud.registrar_rutas(app)
 
 routers.router_certificado.registrar_rutas(app)
+registrar_rutas_estadisticas(app)
+registrar_rutas_secretaria(app)
+routers.router_reportes.registrar_rutas(app)
 if __name__ == '__main__':
     app.run(debug=True)

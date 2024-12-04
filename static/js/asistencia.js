@@ -1,12 +1,20 @@
 $(document).ready(function () {
     var table = $('#asistenciaTable').DataTable({
-        pageLength: 8,
-        dom: '<"d-flex justify-content-between align-items-center mb-3"<"d-flex"f><"d-flex justify-content-end button-section">>rt<"bottom"p>',
+        pageLength: 7,
+        dom: '<"d-flex justify-content-between align-items-start mb-2"<"d-flex"f>>rt<"bottom"p>',
         language: {
             search: "Buscar:"
         },
         initComplete: function () {
-             
+            $("div.dataTables_filter label").addClass("ms-3 mt-1");
+            $("div.bottom").append(`
+                <div class="d-flex justify-content-center mt-2">
+                    <button type="button" class="btn btn-success btn-lg custom-btn btn-agregar-ministro" data-bs-toggle="modal" data-bs-target="#agregarModal" onclick="guardar()">
+                        <i class="bi bi-person-check"></i> Guardar asistencias
+                    </button>
+                </div>
+            `);
+
             let opcionesFiltro = '<option value=""> Todos </option>';
             let opcionesFiltroH = '<option value=""> 00:00:00 </option>';
             let opcionesFiltroD = '<option value=""> 00:00:00 </option>';
@@ -22,17 +30,8 @@ $(document).ready(function () {
                     });
 
                     $("div.dataTables_filter").addClass("d-flex align-items-start");
-                    $("div.dataTables_filter").html(`
+                    $("div.dataTables_filter").prepend(`
                         <div>
-                            <div class="d-flex align-items-center mb-2">
-                               <button id="toggle-calendar" class="btn btn-info mb-3">Mostrar Calendario</button>
-                               <label for="buscar" class="me-2">Buscar:</label>
-                               <input type="search" id="buscar" style="flex-grow: 1; max-width: 500px; height: 37.5px; padding: 5px;" placeholder="" aria-controls="recaudacionesTable">
-                               
-                               <button type="button" class="btn btn-success btn-lg custom-btn btn-agregar-ministro" data-bs-toggle="modal" data-bs-target="#agregarModal" onclick="guardar()">
-                               <i class="bi bi-person-check"></i> Guardar asistencias
-                               </button>
-                            </div>
                             <div class="d-flex align-items-center mb-2">
                                 <label for="filtroProgramacion" class="me-2">Programación:</label>
                                 <select id="filtroProgramacion" class="form-select" style="width: auto;" onchange="filtrarPorProgramacion()">
@@ -53,18 +52,12 @@ $(document).ready(function () {
                                     ${opcionesFiltroD}
                                 </select>
                             </div>
-                            
                         </div>
                     `);
-                    $('#buscar').on('keyup', function() {
-                        table.search(this.value).draw();
-                    });
                 })
                 .catch(error => {
                     console.error("Error al cargar los datos de programación:", error);
                 });
-                                               
-            
         },
     });
 

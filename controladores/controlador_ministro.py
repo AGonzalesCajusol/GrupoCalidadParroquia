@@ -92,35 +92,37 @@ def obtener_ministros():
     try:
         with conexion.cursor() as cursor:
             cursor.execute("""
-               SELECT m.id_ministro, m.nombre_ministro, m.numero_documento, m.fecha_nacimiento, 
-                      m.fecha_ordenacion, m.fin_actividades, m.token, 
-                      tp.tipo_ministro, s.nombre_sede, c.cargo,  
-                      CASE 
-                          WHEN m.estado = 1 THEN 'Activo'
-                          WHEN m.estado = 0 THEN 'Inactivo'
-                          ELSE 'Desconocido'
-                      END AS estado
+               SELECT 
+                   m.id_ministro,
+                   m.nombre_ministro
                FROM ministro m 
-               INNER JOIN sede s ON s.id_sede = m.id_sede 
-               INNER JOIN tipo_ministro tp ON tp.id_tipoministro = m.tipoministro 
-               INNER JOIN cargo c ON c.id_cargo = m.id_cargo
+               WHERE m.estado = 1
+               AND m.id_cargo = 1
+               ORDER BY m.nombre_ministro
             """)
             ministros = cursor.fetchall()
-
-        # Validar si se obtuvieron resultados
-        if not ministros:
-            print("No se encontraron registros de ministros.")
-            return []
-
-        return ministros
+            
+            # Print para debug
+            print("Datos crudos de la BD:", ministros)
+            
+            ministros_lista = [
+                {
+                    'id_ministro': ministro[0],
+                    'nombre_ministro': ministro[1] if ministro[1] else "Sin nombre"
+                }
+                for ministro in ministros
+            ]
+            
+            # Print para debug
+            print("Lista formateada:", ministros_lista)
+            
+            return ministros_lista
+            
     except Exception as e:
-        print(f"Error al obtener ministros: {e}")
+        print(f"Error al obtener ministros: {str(e)}")
         return []
     finally:
-        try:
-            conexion.close()
-        except Exception as e:
-            print(f"Error al cerrar la conexión: {e}")
+        conexion.close()
 
 
 def obtener_ministro_por_id(id_ministro):

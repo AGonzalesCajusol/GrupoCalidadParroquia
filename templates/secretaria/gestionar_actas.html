@@ -1,0 +1,134 @@
+{% extends "index.html" %}
+{% block title %}Registro de Actas{% endblock %}
+
+{% block cuerpo %}
+<div class="container mt-4">
+    <h1 class="titulo-gestion">Registro de Acta Matrimonial</h1>
+
+    <div class="card">
+        <div class="card-body">
+            <form id="formActa" class="row g-3">
+                <!-- Datos del Libro -->
+                <div class="col-md-4">
+                    <label class="form-label">Número de Libro</label>
+                    <input type="text" class="form-control" id="libro" required>
+                </div>
+                <div class="col-md-4">
+                    <label class="form-label">Folio</label>
+                    <input type="text" class="form-control" id="folio" required>
+                </div>
+                <div class="col-md-4">
+                    <label class="form-label">Número de Partida</label>
+                    <input type="text" class="form-control" id="partida" required>
+                </div>
+
+                <!-- Datos de los Esposos -->
+                <div class="col-md-6">
+                    <label class="form-label">DNI Novio</label>
+                    <input type="text" class="form-control" id="dniNovio" maxlength="8" required>
+                </div>
+                <div class="col-md-6">
+                    <label class="form-label">DNI Novia</label>
+                    <input type="text" class="form-control" id="dniNovia" maxlength="8" required>
+                </div>
+
+                <!-- Datos de los Padres del Novio -->
+                <div class="col-12">
+                    <h5 class="mb-3">Datos de los Padres del Novio</h5>
+                </div>
+                <div class="col-md-6">
+                    <label class="form-label">Nombre del Padre</label>
+                    <input type="text" class="form-control" id="padreNovio" required>
+                </div>
+                <div class="col-md-6">
+                    <label class="form-label">Nombre de la Madre</label>
+                    <input type="text" class="form-control" id="madreNovio" required>
+                </div>
+
+                <!-- Datos de los Padres de la Novia -->
+                <div class="col-12">
+                    <h5 class="mb-3">Datos de los Padres de la Novia</h5>
+                </div>
+                <div class="col-md-6">
+                    <label class="form-label">Nombre del Padre</label>
+                    <input type="text" class="form-control" id="padreNovia" required>
+                </div>
+                <div class="col-md-6">
+                    <label class="form-label">Nombre de la Madre</label>
+                    <input type="text" class="form-control" id="madreNovia" required>
+                </div>
+
+                <!-- Fecha de Nacimiento -->
+                <div class="col-md-6">
+                    <label class="form-label">Fecha Nacimiento Novio</label>
+                    <input type="date" class="form-control" id="fechaNacNovio" required>
+                </div>
+                <div class="col-md-6">
+                    <label class="form-label">Fecha Nacimiento Novia</label>
+                    <input type="date" class="form-control" id="fechaNacNovia" required>
+                </div>
+
+                <!-- Fecha de Matrimonio -->
+                <div class="col-md-6">
+                    <label class="form-label">Fecha de Matrimonio</label>
+                    <input type="date" 
+                           class="form-control" 
+                           id="fechaMatrimonio" 
+                           onchange="validar_fecha_matrimonio(this)" 
+                           required>
+                </div>
+
+                <!-- Sacerdote -->
+                <div class="col-md-6">
+                    <label class="form-label">Sacerdote</label>
+                    <select class="form-select" id="sacerdote" name="sacerdote" required>
+                        <option value="">Seleccione un sacerdote</option>
+                        {% for ministro in ministros %}
+                            <option value="{{ ministro['id_ministro'] }}">{{ ministro['nombre_ministro'] }}</option>
+                        {% endfor %}
+                    </select>
+                </div>
+
+                <!-- Nota Marginal -->
+                <div class="col-12">
+                    <label class="form-label">Nota Marginal</label>
+                    <textarea class="form-control" id="notaMarginal" rows="3"></textarea>
+                </div>
+
+                <!-- Nombres de los Esposos -->
+                <div class="col-md-6">
+                    <label class="form-label">Nombre del Esposo</label>
+                    <input type="text" class="form-control" id="nombreNovio" required>
+                </div>
+                <div class="col-md-6">
+                    <label class="form-label">Nombre de la Esposa</label>
+                    <input type="text" class="form-control" id="nombreNovia" required>
+                </div>
+
+                <!-- Padrinos y Testigos -->
+                <div class="col-md-12">
+                    <label class="form-label">Nombre del Padrino</label>
+                    <input type="text" class="form-control" id="nombrePadrino" required>
+                </div>
+
+                <div class="col-md-6">
+                    <label class="form-label">Nombre del Testigo 1</label>
+                    <input type="text" class="form-control" id="nombreTestigo1" required>
+                </div>
+                <div class="col-md-6">
+                    <label class="form-label">Nombre del Testigo 2</label>
+                    <input type="text" class="form-control" id="nombreTestigo2" required>
+                </div>
+
+                <div class="col-12 text-center mt-4">
+                    <button type="submit" class="btn btn-primary">
+                        <i class="bi bi-file-pdf"></i> Generar Acta
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+<script src="/static/js/gestionar_actas.js"></script>
+{% endblock %} 

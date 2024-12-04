@@ -29,6 +29,7 @@
     <script src="https://cdn.jsdelivr.net/npm/fullcalendar@5.11.3/main.min.js"></script>    
     <link href="https://cdn.jsdelivr.net/npm/aos@2.3.4/dist/aos.css" rel="stylesheet">
     <script src="https://cdn.jsdelivr.net/npm/aos@2.3.4/dist/aos.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 
 
     <style>
@@ -43,11 +44,14 @@
         <div class="container-fluid d-flex align-items-center justify-content-between py-3 px-4">
             <!-- Logo y Nombre de la Sede -->
             <div class="d-flex align-items-center">
-                <img src="/static/img/calidazzzz.jpg" alt="Logo Iglesia" class="me-3"
-                    style="height: 60px; width: 60px;">
+                <a href="/inicio">
+                    <img src="/static/img/calidazzzz.jpg" alt="Logo Iglesia" class="me-3"
+                        style="height: 60px; width: 60px;">
+                </a>
                 <div>
-                    <h5 class="mb-0 text-primary fw-bold" >{{ request.cookies.get('sede') }}</h5>
+                    <h5 class="mb-0 text-primary fw-bold">{{ request.cookies.get('sede') }}</h5>
                     <input id="sede" type="text" value="{{ request.cookies.get('sede') }}" class="d-none">
+                    <small class="text-muted d-block">Parroquia San Juan María Vianney</small>
                     <small class="text-muted">😼 🥃 🥃 de la Chavarry</small>
                 </div>
             </div>
@@ -121,6 +125,10 @@
                             class="d-flex align-items-center text-muted py-2 sub-menu-item">
                             <i class="bi bi-arrow-return-right me-2"></i> Certificados
                         </a>
+                        <!-- <a href="{{ url_for('gestionar_actas') }}" 
+                            class="d-flex align-items-center text-muted py-2 sub-menu-item">
+                            <i class="bi bi-arrow-return-right me-2"></i> Gestión de Actas
+                        </a> -->
                     </div>
                 </div>
                 <!-- catequesis -->
@@ -224,10 +232,18 @@
                             class="d-flex align-items-center text-muted py-2 sub-menu-item">
                             <i class="bi bi-arrow-return-right me-2"></i> Cronograma de Actividades
                         </a>
+<!--                         <a href="{{ url_for('bautizos_aptos') }}"
+                            class="d-flex align-items-center text-muted py-2 sub-menu-item">
+                            <i class="bi bi-arrow-return-right me-2"></i> Bautizos Aptos
+                        </a> -->
                         <a href="{{ url_for('numero_actos_liturgicos') }}"
                             class="d-flex align-items-center text-muted py-2 sub-menu-item">
                             <i class="bi bi-arrow-return-right me-2"></i> Celebraciones por Actos Litúrgicos
                         </a>
+<!--                         <a href="{{ url_for('estadisticas_sacramentos') }}"
+                            class="d-flex align-items-center text-muted py-2 sub-menu-item">
+                            <i class="bi bi-arrow-return-right me-2"></i> Estadísticas de Sacramentos
+                        </a> -->
                         <a href="{{ url_for('reporte_egresos') }}"
                             class="d-flex align-items-center text-muted py-2 sub-menu-item">
                             <i class="bi bi-arrow-return-right me-2"></i> Reporte de Egresos
