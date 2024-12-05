@@ -1,0 +1,87 @@
+{% extends "index.html" %}
+
+{% block title %}Registro de Actas{% endblock %}
+{% block cuerpo %}
+
+<div class="container mt-4">
+  <div class="card">
+    <div class="card-header bg-primary text-white">
+      <h2 class="mb-0">Detalles de la Solicitud</h2>
+    </div>
+
+    <div class="card-body">
+      <!-- Mostrar información de la solicitud -->
+      <div class="mb-4">
+        <h3 class="text-primary border-bottom pb-2">Solicitud</h3>
+        <div class="row">
+          <div class="col-md-4">
+            <p><strong>ID Solicitud:</strong> {{ solicitud[0] }}</p>
+            <p><strong>Acto Litúrgico:</strong> {{ actoliturgico[1] }}</p>
+            <p><strong>Nombre Solicitud:</strong> {{ solicitud[5] }}</p>
+          </div>
+        </div>
+      </div>
+
+      <!-- Mostrar información de la celebración -->
+      {% if celebracion %}
+        <div class="mb-4">
+          <h3 class="text-primary border-bottom pb-2">Detalles de la Celebración</h3>
+          <div class="row">
+            <div class="col-md-4">
+              <p><strong>Nombre:</strong> {{ celebracion[0] }}</p>
+              <p><strong>Fecha:</strong> {{ celebracion[3] }}</p>
+            </div>
+          </div>
+        </div>
+      {% endif %}
+
+      <!-- Mostrar información del actoliturgico -->
+      {% if actoliturgico %}
+        <div class="mb-4">
+          <h3 class="text-primary border-bottom pb-2">Detalles del Acto Litúrgico</h3>
+          <div class="row">
+            <div class="col-md-4">
+              <p><strong>Nombre:</strong> {{ actoliturgico[1] }}</p>
+              <p><strong>Descripción:</strong> {{ actoliturgico[2] }}</p>
+            </div>
+          </div>
+        </div>
+      {% endif %}
+
+      <!-- Mostrar los registros de solicitud_feligreses -->
+      {% if solicitud_feligreses %}
+        <div class="mb-4">
+          <h3 class="text-primary border-bottom pb-2">Feligreses de la Solicitud</h3>
+          <div class="row">
+            <div class="col-md-8">
+              <div class="list-group">
+                {% for feligres in solicitud_feligreses %}
+                  <div class="list-group-item">
+                    <h5 class="mb-1">{{ feligres[0] }} {{ feligres[1] }}</h5>
+                    <p class="mb-1"><strong>Rol:</strong> {{ feligres[3] }}</p>
+                    <small><strong>Fecha de Nacimiento:</strong> {{ feligres[2].strftime('%d/%m/%Y') }}</small>
+                  </div>
+                {% endfor %}
+              </div>
+            </div>
+          </div>
+        </div>
+      {% else %}
+        <div class="alert alert-info">
+          No se encontraron feligreses asociados a esta solicitud.
+        </div>
+      {% endif %}
+
+      <!-- Botón para generar el PDF -->
+      <div class="mt-4">
+        <form action="{{ url_for('generar_pdfss') }}" method="POST">
+          <button type="submit" class="btn btn-primary">
+            <i class="fas fa-file-pdf"></i> Generar PDF
+          </button>
+        </form>
+      </div>
+    </div>
+  </div>
+</div>
+
+{% endblock %}

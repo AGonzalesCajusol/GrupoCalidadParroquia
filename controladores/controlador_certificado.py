@@ -38,7 +38,7 @@ def generar_certificado_pdf(id_solicitud):
         pdf.ln(10)
         pdf.cell(0, 10, f"CERTIFICADO DE {str(datos[0][2]).upper()}", ln=True, align='C')  # nombre_liturgia
         pdf.ln(20)
-
+        
         # Cuerpo principal
         pdf.set_font("Arial", size=14)
         pdf.multi_cell(0, 10, f"Por la presente se certifica que, en la parroquia {str(datos[0][7])}, "
